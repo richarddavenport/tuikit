@@ -16,9 +16,13 @@ jobs:
         run: gofmt -l . | tee /dev/stderr | (! read)
       - name: vet
         run: go vet ./...
-      - uses: golangci/golangci-lint-action@v6
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: latest
+          # Must be built with a Go >= our go directive (1.25). The action's
+          # "latest" resolves to the v1 line, built with go1.24, which refuses
+          # to run rather than degrading.
+          version: v2.12
       - name: test
         run: go test ./...
       - name: the design system still generates

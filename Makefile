@@ -15,11 +15,17 @@ build:
 test:
 	go test ./...
 
+# Pinned to what CI runs, and run through `go run` so it is the SAME version
+# whether or not anything is installed. An earlier version of this skipped the
+# linter when it was missing, which is how a config CI could not load got
+# pushed: a local check that quietly omits what CI enforces is a check that lies.
+GOLANGCI ?= go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.0
+
 ## lint: what CI enforces
 lint:
 	gofmt -l . | tee /dev/stderr | (! read)
 	go vet ./...
-	@command -v golangci-lint >/dev/null && golangci-lint run ./... || echo "golangci-lint not installed, skipped"
+	$(GOLANGCI) run ./...
 
 ## check: everything CI runs, before you push
 check: test lint

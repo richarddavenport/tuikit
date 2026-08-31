@@ -47,15 +47,16 @@ interface should be blue; <code>pink</code> does not.</p>`)
 // this file — and so the "every role is drawn" guard cannot be satisfied by a
 // swatch alone.
 func (r renderer) rolesInUse() string {
-	lines := []string{
-		r.span("accent", "> api_api") + plain("      2/2  ") + r.span("success", "ok"),
-		plain("  api_worker   1/1  ") + r.span("pending", "→ replicas 3"),
-		plain("  api_migrate  0/1  ") + r.span("danger", "✗ rejected"),
-		plain("  api_logs     1/1  ") + r.span("stderr", "warning: retrying"),
+	lines := make([]string, 0, 7+len(r.pal.Extra))
+	lines = append(lines,
+		r.span("accent", "> api_api")+plain("      2/2  ")+r.span("success", "ok"),
+		plain("  api_worker   1/1  ")+r.span("pending", "→ replicas 3"),
+		plain("  api_migrate  0/1  ")+r.span("danger", "✗ rejected"),
+		plain("  api_logs     1/1  ")+r.span("stderr", "warning: retrying"),
 		`<span class="selected">  api_web      3/3  the selected row</span>`,
 		r.span("border", "└──────────────────────────────────────┘"),
 		r.span("muted", "  j/k move · X remove · q quit"),
-	}
+	)
 	for _, role := range r.pal.Extra {
 		lines = append(lines, plain("  ")+r.span(cssClass(role.Name), role.Name+" — "+role.Why))
 	}

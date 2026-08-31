@@ -57,7 +57,7 @@ func designsystem(args []string) {
 }
 
 func usage(w *os.File) {
-	fmt.Fprint(w, `tuikit — a TUI framework for developers and agents
+	_, _ = fmt.Fprint(w, `tuikit — a TUI framework for developers and agents
 
   tuikit designsystem [-out dir] [-tool name]
         write the foundations bundle as HTML

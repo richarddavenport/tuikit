@@ -151,3 +151,22 @@ The ANSI file is both the archive and the golden: stripped of colour it diffs in
 a pull request, and kept whole it is exactly what the terminal emitted. HTML with
 real text keeps a published frame selectable and searchable. SVG would be a third
 representation of the same frame, earning nothing and drifting from the other two.
+
+## 14. The local check runs the same linter CI does, pinned, via `go run`
+
+The first push failed CI on a lint config the runner could not load, because
+`make lint` skipped golangci-lint when it was not installed and said so in a line
+nobody reads. A local check that quietly omits what CI enforces is a check that
+lies.
+
+`make lint` now runs `go run github.com/golangci/golangci-lint/v2/cmd/...@v2.12.0`,
+so the version is the same whether or not anything is installed, and there is no
+path where the step is skipped.
+
+The pin itself is inherited from swarmctl, which hit the same wall and left the
+comment: golangci-lint-action's `version: latest` resolves to the v1 line, built
+with go1.24, which refuses to run against a `go 1.25.0` directive rather than
+degrading. The action must be `@v8` and the version an explicit v2.
+
+This is the copy-by-hand problem the scaffolder exists to end: swarmctl knew the
+answer, and tuikit rediscovered it by breaking.
