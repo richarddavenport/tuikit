@@ -242,7 +242,22 @@ ones. The reason that decides it: **an agent cannot click.** In a framework whos
 thesis is that an agent gets on with a tool immediately, an action reachable only
 by right-click is an action agents cannot take.
 
-## 20. Regions have names, and the harness drives them by name
+## 20. An owner ID is an identity, not a screen position
+
+Found by scrolling the prototype. A list's owner IDs have to carry the absolute
+index of the item, not the row it happens to occupy — otherwise a click after
+scrolling selects whatever used to be there.
+
+It matters beyond lists because it is the first place the canvas design could go
+quietly wrong: "the ID is where it is on screen" is the easy mistake, it works
+perfectly until something scrolls, and it produces a wrong action rather than a
+visible fault.
+
+The related rule, from the same session: a viewport offset is a separate field
+from the selection. Scrolling is looking around; it does not choose. Conflating
+them made the wheel appear to pick items at random.
+
+## 21. Regions have names, and the harness drives them by name
 
 The prototype's tests already click by owner ID rather than coordinate. That is
 the shape a capture script takes — `click list.row[2]; drag split.main +10` —

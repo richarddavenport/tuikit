@@ -27,7 +27,8 @@ What was missing is *where the click lands*.
 
 ## The prototype
 
-Branch `prototype/canvas-mouse`, commit `1cdd3f8` — throwaway, not for merge.
+Branch `prototype/canvas-mouse`, commits `1cdd3f8` and `cd75346` — throwaway,
+not for merge.
 It renders democtl's dashboard through a cell grid and wires up all four
 behaviours.
 
@@ -73,6 +74,34 @@ building it:
   always does. So a drag in progress owns the mouse until release, whatever it is
   now over. That is four lines at the top of the mouse handler, and it is the
   same shape as the modal check.
+
+### What scrolling it found
+
+Two gaps, both found by Richard using the wheel rather than by any test, and both
+requirements for `comp` rather than prototype details.
+
+**The wheel scrolls a viewport; it does not move the cursor.** The list had no
+viewport at all — it drew from index 0 always — so the wheel was wired to the
+selection as a stand-in, and scrolling appeared to pick services at random. The
+targeting was right the whole time: the wheel does act on the pane under the
+pointer. What was wrong is what scrolling *meant*. Looking around and choosing
+are different operations and a list needs both.
+
+**Scrolling past the end has to be impossible, not discouraged.** The detail
+pane clamped to a hardcoded 20 rather than to its content, so wheeling over a
+five-line Overview scrolled it into empty space and blanked it.
+
+Three rules for `comp.List` fall out:
+
+- The viewport offset is a separate field from the selection.
+- **Owner IDs carry the absolute index, not the screen row.** An ID is an
+  identity, so a click after scrolling selects the service that is *there*. This
+  is the first place the canvas design could have gone quietly wrong, and it is
+  worth stating because "the ID is where it is on screen" is the easy mistake.
+- Both offsets clamp against what was actually drawn last frame, not a constant.
+
+A viewport also has to look like one — a `20/28` indicator, three rows a notch —
+or a list that scrolls looks like a list that lost rows.
 
 **An unexpected result: overflow stops being a class of bug.** `Set` clips to the
 canvas, so drawing outside the terminal is not an error to catch — it is a
