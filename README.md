@@ -26,18 +26,30 @@ pal.Accent = "33" // this tool is blue
 glyphs := theme.DefaultGlyphs.With('×', "multiplication sign — replica counts")
 ```
 
-**`guard`** — two tests that hold it closed. Call them from your UI package:
+**`guard`** — tests that hold the rules closed. Call them from your own packages:
 
 ```go
+// in your UI package
 func TestTheInterfaceStaysInItsVocabulary(t *testing.T) {
     guard.Tokens(t, ".", palette)  // no colour literals; no unused roles
     guard.Glyphs(t, ".", glyphs)   // nothing printed that a font may not have
 }
+
+// in your engine package
+func TestTheEngineHasNeverHeardOfATerminal(t *testing.T) {
+    guard.Engine(t, ".")           // no colour, no width, no keys, no framework
+}
 ```
 
-Both parse the package rather than pattern-matching it, so a comment explaining a
-glyph is not read as printing one. Both fail rather than pass when pointed at a
-directory with nothing to scan.
+They parse the package rather than pattern-matching it, so a comment explaining a
+glyph is not read as printing one. They fail rather than pass when pointed at a
+directory with nothing to scan — scanning nothing silently is how everyone comes
+to believe a rule is on when it is not.
+
+`guard.Engine` holds the split that every tool in the family keeps: the engine
+knows the domain, the UI knows the terminal. Its deny-list is by *category* —
+drawing libraries, terminal capabilities, width measurement — because an engine
+that measures display width has learned about columns whichever package it used.
 
 **`docgen`** — the vocabulary as HTML, generated from the code so it cannot
 drift:

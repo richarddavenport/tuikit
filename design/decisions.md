@@ -315,5 +315,8 @@ may import — a context, progress reporting, error kinds. It removes the glue,
 but "no UI imports" quietly becomes "no imports we currently consider UI", and
 the boundary stops being checkable.
 
-Checkable is the point: this is enforceable rather than merely intended, by a
-guard over the engine package's import list.
+Checkable is the point, and `guard.Engine` does it — a deny-list by *category*
+rather than by library, because an engine that measures display width has
+learned about columns whichever package it used. swarmctl's, pgctl's and azctl's
+engines all pass it; swarmctl's TUI reports 37 imports, so it is not passing
+vacuously.
