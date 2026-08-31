@@ -100,8 +100,12 @@ Three rules for `comp.List` fall out:
   worth stating because "the ID is where it is on screen" is the easy mistake.
 - Both offsets clamp against what was actually drawn last frame, not a constant.
 
-A viewport also has to look like one — a `20/28` indicator, three rows a notch —
-or a list that scrolls looks like a list that lost rows.
+A viewport also has to look like one — a count, three rows a notch — or a list
+that scrolls looks like a list that lost rows. And the count has to be drawn
+**always**, not only when the list overflows: on a tall terminal where everything
+fits, a wheel that correctly does nothing is indistinguishable from a wheel that
+is broken. `112/112` answers that in a glance; an absent indicator answers
+nothing. Found by Richard scrolling a 58-row pane that held the whole list.
 
 And a **selection scrolled out of view has to leave a trace**. Not by dragging
 the cursor into the viewport, which is the bug above wearing a different hat, but
