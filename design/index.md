@@ -9,6 +9,8 @@ people using it.
   the line between library and scaffolder falls
 - [capture.md](capture.md) — how someone building a tool sees what they are
   building, and how an agent sees it too
+- [mouse.md](mouse.md) — first-class mouse support, and the cell-grid substrate
+  the prototype settled on
 - [roadmap.md](roadmap.md) — what is built, what is next, what is undecided
 
 The design system bundle is generated rather than written: `make designsystem`

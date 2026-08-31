@@ -213,3 +213,39 @@ The evidence arrived immediately: democtl's first frames contained two bugs, and
 both are the kind a component would have to solve properly rather than a widget
 would paper over — an overlay that composites rather than replacing lines, and a
 right-aligned column measured against the box rather than the terminal.
+
+## 18. Components draw cells, not strings
+
+Settled by the prototype on `prototype/canvas-mouse` (`1cdd3f8`), and written up
+in [mouse.md](mouse.md).
+
+A component that returns a string cannot be clicked: hit-testing needs geometry,
+and `lipgloss.JoinHorizontal` throws it away. So `comp` sits on a cell grid where
+each cell carries a rune, a style and the ID of whatever drew it. `OwnerAt(x, y)`
+is the whole hit test, and there is no region list that can drift from the
+drawing because the drawing is the region list.
+
+The substrate cost 153 lines. It deletes `clip`, `pad`, `padVisible`, `rule` and
+`composite`, and turns a 28-line compositing overlay into an 8-line draw. Lip
+Gloss keeps styling; its layout helpers go.
+
+Two consequences beyond the mouse. Style lives on the cell, so nothing parses
+ANSI — the trim-versus-clip distinction the grid page documents stops existing.
+And `Set` clips to the canvas, so drawing past the edge is not an error to catch
+but a coordinate that does not exist: overflow, which caused two of pgctl's three
+capture bugs and both of democtl's, stops being a class of bug.
+
+## 19. Every mouse action needs a keyboard path, and a guard enforces it
+
+`guard.Reachable`. Keyboard-only users and ssh are the usual reasons and the weak
+ones. The reason that decides it: **an agent cannot click.** In a framework whose
+thesis is that an agent gets on with a tool immediately, an action reachable only
+by right-click is an action agents cannot take.
+
+## 20. Regions have names, and the harness drives them by name
+
+The prototype's tests already click by owner ID rather than coordinate. That is
+the shape a capture script takes — `click list.row[2]; drag split.main +10` —
+and an agent naming a region beats an agent guessing a coordinate. It only works
+because ownership is recorded at draw time, which is another thing the canvas
+gets for free and a string cannot.
