@@ -1,7 +1,8 @@
 # democtl
 
-tuikit's example tool, its reference implementation, and — from step 3 — the
-fixture its capture harness renders.
+tuikit's example tool, its reference implementation, the fixture its capture
+harness renders — and, until `tuikit new` exists, **the supported way to start a
+tool**. See "Starting a tool" in the root README.
 
 ```sh
 go run ./examples/democtl          # a fictional service fleet
