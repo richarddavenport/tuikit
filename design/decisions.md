@@ -170,3 +170,46 @@ degrading. The action must be `@v8` and the version an explicit v2.
 
 This is the copy-by-hand problem the scaffolder exists to end: swarmctl knew the
 answer, and tuikit rediscovered it by breaking.
+
+## 15. democtl is seeded and clock-frozen, not merely backendless
+
+The example tool needs no database or swarm, which is convenient. What matters
+more is that it is *deterministic*: `fleet.New(seed)` returns the same services,
+`Logs` the same lines, `Deploy` the same timings, and `fleet.Epoch` fixes the
+clock so a frame reading "47s ago" still reads that tomorrow.
+
+The harness renders democtl's screens as tuikit's own fixture. A fixture that
+changes between runs is not one, and a golden that fails the day after it is
+written teaches everyone to ignore goldens.
+
+The consequence worth stating: nothing in `fleet` may call `time.Now`, iterate a
+map into output, or use `rand` without a source. Its test asserts all three by
+comparing two independently generated fleets.
+
+## 16. The example is a tool, not a widget showcase
+
+democtl manages a fictional fleet with a dashboard, logs, a modal and a step run
+— the four shapes swarmctl, pgctl, azctl and dugo all have. It is deliberately
+not a gallery of components in a grid.
+
+A showcase demonstrates that a widget renders. A tool demonstrates the things
+that actually go wrong: a modal that has to bound itself to the terminal, an
+abandoned run whose steps must not draw into its successor, a filter that must
+stop `j` from scrolling the list behind it. Those are what a reader — human or
+agent — needs the reference for, and none of them appear in a widget grid.
+
+`tuikit gallery` is still worth building, and it will be seeded from democtl's
+components. But the components come from a working tool first, the same way
+`theme` came from swarmctl rather than from a palette designed in the abstract.
+
+## 17. Writing the example before the components is the right order
+
+democtl's panes are hand-drawn against `theme`, because `comp` does not exist
+yet. That is not work to be redone — it is the material `comp` gets extracted
+from, and extracting from two or three real usages is what stops a component
+library from being a set of guesses with configuration options nobody needs.
+
+The evidence arrived immediately: democtl's first frames contained two bugs, and
+both are the kind a component would have to solve properly rather than a widget
+would paper over — an overlay that composites rather than replacing lines, and a
+right-aligned column measured against the box rather than the terminal.
