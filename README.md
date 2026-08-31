@@ -78,12 +78,20 @@ for a page.
 Capture is a **building tool first**: its purpose is seeing the screen you are
 writing. Goldens and documentation are downstream of that.
 
-**`docgen`** — the vocabulary as HTML, generated from the code so it cannot
-drift:
+**`docgen`** — generated from the code, so it cannot drift. The vocabulary as
+HTML, and a capture as a page you can look at:
 
 ```
-go run ./cmd/tuikit designsystem -out design-system -tool mytool
+tuikit designsystem -out design-system -tool mytool
+tuikit frames ./frames -out page.html -title mytool
 ```
+
+The page carries three rules that are properties of terminal frames rather than
+editorial taste, so they live in the code: the frames keep a dark ground in both
+light and dark themes (the ANSI was captured for a dark terminal), they use the
+system monospace stack with no webfont (box-drawing and braille must share one
+set of advance widths), and every frame shows its provenance — fixture, live or
+composed.
 
 ## Starting a tool
 
