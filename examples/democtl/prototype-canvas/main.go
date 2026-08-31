@@ -34,16 +34,28 @@ func tabOwner(i int) string  { return fmt.Sprintf("detail.tab[%d]", i) }
 func menuOwner(i int) string { return fmt.Sprintf("menu.item[%d]", i) }
 
 type model struct {
-	fleet fleet.Fleet
-	sty   map[string]*lipgloss.Style
+	fleet    fleet.Fleet
+	services []fleet.Service
+	sty      map[string]*lipgloss.Style
 
 	w, h int
 
-	ratio  float64 // left pane's share of the width
-	sel    int
-	tab    int
-	focus  string
-	scroll int // detail pane's log scroll, to prove wheel targeting
+	ratio float64 // left pane's share of the width
+	sel   int
+	tab   int
+	focus string
+
+	// listTop and scroll are VIEWPORT offsets, kept separate from sel.
+	// Scrolling is looking around; it does not move the cursor. Conflating the
+	// two is what made the wheel appear to select things at random.
+	listTop int
+	scroll  int
+
+	// listRows is how many rows the list drew last frame, so a wheel handler
+	// can clamp against what actually fits rather than a guess. Same for the
+	// detail pane.
+	listRows                int
+	detailLines, detailRows int
 
 	dragging bool
 	menu     []string
@@ -70,10 +82,22 @@ func newModel() *model {
 	add("ok", lipgloss.NewStyle().Foreground(p.Success))
 	add("pending", lipgloss.NewStyle().Foreground(p.Pending))
 	add("danger", lipgloss.NewStyle().Foreground(p.Danger))
+	// A longer list than democtl's seven, so there is something to scroll. The
+	// prototype exists to show the behaviour.
+	base := fleet.New(1)
+	var services []fleet.Service
+	for _, region := range []string{"iad", "lhr", "syd", "fra"} {
+		for _, svc := range base.Services {
+			svc.Name = region + "_" + svc.Name
+			services = append(services, svc)
+		}
+	}
+
 	return &model{
-		fleet: fleet.New(1),
-		sty:   sty,
-		w:     132, h: 38,
+		fleet:    base,
+		services: services,
+		sty:      sty,
+		w:        132, h: 38,
 		ratio: 0.34,
 		focus: ownerList,
 		last:  "move the mouse",
@@ -144,11 +168,16 @@ func (m *model) mouse(e tea.MouseMsg) {
 		if e.Button == tea.MouseButtonWheelUp {
 			delta = -1
 		}
+		// Three wheel notches a click, which is what every other terminal
+		// program does and what a hand expects.
+		delta *= 3
 		switch {
 		case strings.HasPrefix(owner, "list.row[") || owner == ownerList:
-			m.sel = clampInt(m.sel+delta, 0, len(m.fleet.Services)-1)
+			// The VIEWPORT moves; sel does not. Clamped so the last row cannot
+			// be scrolled off the bottom into empty space.
+			m.listTop = clampInt(m.listTop+delta, 0, max(0, len(m.services)-m.listRows))
 		case owner == ownerDetl || strings.HasPrefix(owner, "detail."):
-			m.scroll = clampInt(m.scroll+delta, 0, 20)
+			m.scroll = clampInt(m.scroll+delta, 0, m.maxScroll())
 		}
 		return
 	}
@@ -188,6 +217,13 @@ func (m *model) mouse(e tea.MouseMsg) {
 	}
 }
 
+// maxScroll is the furthest the detail pane can go: scrolling past the last
+// line has to be impossible, not merely discouraged. Without this the pane
+// scrolls into empty space and looks like it lost its contents.
+func (m *model) maxScroll() int {
+	return max(0, m.detailLines-m.detailRows)
+}
+
 func (m *model) setRatio(f float64) {
 	m.ratio = clampFloat(f, 0.18, 0.7)
 }
@@ -220,22 +256,35 @@ func (m *model) drawList(c *Canvas, r Rect) {
 	if m.focus == ownerList {
 		style = m.sty["focus"]
 	}
-	c.Box(r, fmt.Sprintf("Services (%d)", len(m.fleet.Services)), style, m.sty["title"], ownerList)
+	c.Box(r, fmt.Sprintf("Services (%d)", len(m.services)), style, m.sty["title"], ownerList)
 
 	in := r.Inset(1)
-	for i, s := range m.fleet.Services {
-		if i >= in.H {
+	m.listRows = in.H
+	m.listTop = clampInt(m.listTop, 0, max(0, len(m.services)-in.H))
+
+	for row := 0; row < in.H; row++ {
+		i := m.listTop + row // the ABSOLUTE index
+		if i >= len(m.services) {
 			break
 		}
-		row := fmt.Sprintf(" %-14s %d/%d %s", s.Name, s.Ready, s.Want, mark(s.State))
+		s := m.services[i]
+		text := fmt.Sprintf(" %-18s %d/%d %s", s.Name, s.Ready, s.Want, mark(s.State))
 		st := m.stateStyle(s.State)
 		if i == m.sel {
 			st = m.sty["sel"]
 		}
-		// Fill first so the whole row belongs to the row, not just its text:
-		// clicking the blank space after a short name has to select it.
-		c.Fill(Rect{in.X, in.Y + i, in.W, 1}, ' ', st, rowOwner(i))
-		c.Text(in.X, in.Y+i, truncate(row, in.W), st, rowOwner(i))
+		// The owner carries the absolute index, not the screen row. An ID is an
+		// identity — a click has to select the service that is there, not the
+		// one that was there before the pane scrolled.
+		c.Fill(Rect{in.X, in.Y + row, in.W, 1}, ' ', st, rowOwner(i))
+		c.Text(in.X, in.Y+row, truncate(text, in.W), st, rowOwner(i))
+	}
+
+	// A scroll indicator, because a viewport with no sign of being one is a
+	// list that appears to have lost rows.
+	if len(m.services) > in.H {
+		c.Text(r.X+r.W-8, r.Y+r.H-1, fmt.Sprintf(" %d/%d ", m.listTop+in.H, len(m.services)),
+			m.sty["muted"], ownerList)
 	}
 }
 
@@ -254,7 +303,7 @@ func (m *model) drawDetail(c *Canvas, r Rect) {
 	if m.focus == ownerDetl {
 		style = m.sty["focus"]
 	}
-	svc := m.fleet.Services[m.sel]
+	svc := m.services[m.sel]
 	c.Box(r, svc.Name, style, m.sty["title"], ownerDetl)
 
 	in := r.Inset(1)
@@ -283,6 +332,8 @@ func (m *model) drawDetail(c *Canvas, r Rect) {
 			lines = append(lines, l.At.Format("15:04:05")+"  "+l.Text)
 		}
 	}
+	m.detailLines, m.detailRows = len(lines), in.H-2
+	m.scroll = clampInt(m.scroll, 0, m.maxScroll())
 	for i := m.scroll; i < len(lines) && i-m.scroll < in.H-2; i++ {
 		c.Text(in.X+1, in.Y+2+i-m.scroll, truncate(lines[i], in.W-2), m.sty["muted"], ownerDetl)
 	}
@@ -305,8 +356,10 @@ func (m *model) drawMenu(c *Canvas) {
 func (m *model) drawStatus(c *Canvas) {
 	y := m.h - 1
 	c.Text(0, y-1, truncate("  "+m.last, m.w), m.sty["muted"], "status")
-	state := fmt.Sprintf("  under: %-18s ratio: %.2f  sel: %d  tab: %d  scroll: %d  focus: %s",
-		orNone(m.under), m.ratio, m.sel, m.tab, m.scroll, m.focus)
+	state := fmt.Sprintf("  under: %-20s ratio: %.2f  sel: %d  top: %d/%d  tab: %d  scroll: %d/%d  focus: %s",
+		orNone(m.under), m.ratio, m.sel,
+		m.listTop, max(0, len(m.services)-m.listRows),
+		m.tab, m.scroll, m.maxScroll(), m.focus)
 	c.Text(0, y, truncate(state, m.w), m.sty["title"], "status")
 }
 

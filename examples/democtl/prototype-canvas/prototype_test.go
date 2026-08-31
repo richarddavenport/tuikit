@@ -4,6 +4,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -199,3 +200,80 @@ func stripANSI(s string) string {
 	}
 	return b.String()
 }
+
+// --- what Richard found by scrolling ------------------------------------
+
+// The wheel scrolls a viewport. It does not move the cursor.
+//
+// The first version had no viewport at all — the list drew from index 0 always
+// — so the wheel was wired to the selection as a stand-in, and scrolling
+// appeared to pick services at random. Conflating "look around" with "choose"
+// is a real bug and not only a missing feature.
+func TestTheWheelScrollsTheListWithoutMovingTheCursor(t *testing.T) {
+	m := boot()
+	sel := m.sel
+
+	x, y, _ := find(m, "list.row[1]")
+	m.Update(tea.MouseMsg{X: x, Y: y, Action: tea.MouseActionPress, Button: tea.MouseButtonWheelDown})
+	m.View()
+
+	if m.sel != sel {
+		t.Errorf("the wheel moved the selection from %d to %d", sel, m.sel)
+	}
+	if m.listTop == 0 {
+		t.Error("the wheel did not scroll the list")
+	}
+}
+
+// A click after scrolling has to select the service that is THERE, which only
+// works because the owner ID carries the absolute index rather than the screen
+// row.
+func TestClickingAfterScrollingSelectsWhatIsOnScreen(t *testing.T) {
+	m := boot()
+	x, y, _ := find(m, "list.row[1]")
+	m.Update(tea.MouseMsg{X: x, Y: y, Action: tea.MouseActionPress, Button: tea.MouseButtonWheelDown})
+	m.View()
+
+	top := m.listTop
+	if top == 0 {
+		t.Fatal("nothing scrolled, so there is nothing to check")
+	}
+
+	// The second visible row is now services[top+1].
+	want := top + 1
+	if !click(m, rowOwner(want), tea.MouseButtonLeft) {
+		t.Fatalf("row %d is not on screen after scrolling to %d", want, top)
+	}
+	if m.sel != want {
+		t.Errorf("sel = %d, want %d — the owner ID is a screen position, not an identity", m.sel, want)
+	}
+}
+
+// Scrolling past the end has to be impossible, not merely discouraged. With the
+// clamp missing, wheeling over a five-line Overview blanked the pane.
+func TestNeitherPaneCanScrollPastItsContent(t *testing.T) {
+	m := boot()
+
+	x, y, _ := find(m, ownerDetl)
+	for range 12 {
+		m.Update(tea.MouseMsg{X: x, Y: y, Action: tea.MouseActionPress, Button: tea.MouseButtonWheelDown})
+		m.View()
+	}
+	if !strings.Contains(m.View(), "replicas") {
+		t.Error("the detail pane scrolled past its content and went blank")
+	}
+
+	lx, ly, _ := find(m, "list.row["+itoa(m.listTop)+"]")
+	for range 40 {
+		m.Update(tea.MouseMsg{X: lx, Y: ly, Action: tea.MouseActionPress, Button: tea.MouseButtonWheelDown})
+		m.View()
+	}
+	if m.listTop > len(m.services)-m.listRows {
+		t.Errorf("listTop %d is past the last full page (%d)", m.listTop, len(m.services)-m.listRows)
+	}
+	if _, _, ok := find(m, rowOwner(len(m.services)-1)); !ok {
+		t.Error("the last service scrolled off the bottom into empty space")
+	}
+}
+
+func itoa(i int) string { return fmt.Sprintf("%d", i) }

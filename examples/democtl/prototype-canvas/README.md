@@ -29,6 +29,24 @@ implementation.
 targets by owner ID rather than coordinate. If a test can click, so can the
 capture harness and so can an agent.
 
+## What scrolling found
+
+The first version had no viewport at all — the list drew from index 0 always —
+so the wheel was wired to the *selection* as a stand-in. Scrolling therefore
+appeared to pick services at random, and the detail pane could scroll past its
+five lines of content and go blank.
+
+Fixed here, and the fix is a requirement for `comp.List` rather than a prototype
+detail:
+
+- A viewport offset is separate from the selection. Scrolling is looking around;
+  it does not move the cursor.
+- Owner IDs carry the **absolute** index, not the screen row. An ID is an
+  identity — after scrolling, a click has to select the service that is there.
+- Both offsets clamp to actual content, measured from what was drawn last frame.
+- Three rows a notch, and a `20/28` indicator, because a viewport with no sign of
+  being one looks like a list that lost rows.
+
 ## Verdict
 
 See `design/mouse.md` on `main`.
