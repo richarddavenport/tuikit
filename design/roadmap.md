@@ -14,32 +14,44 @@ not commitment.
    the harness can use it as a fixture. First real consumer of the guards. Its
    own frames found two bugs before the harness that will automate looking at
    them exists.
-3. **`harness`** — generalise pgctl's `screenshot_probe_test.go`: fixture and
+3. **`harness`** ([#3](https://github.com/richarddavenport/tuikit/issues/3)) — generalise pgctl's `screenshot_probe_test.go`: fixture and
    live modes, ANSI capture, ANSI→HTML, `guard.Width`, goldens. Prove it against
    democtl, then against swarmctl's existing screens.
-4. **`comp.Canvas`** — the cell-grid substrate, settled by the prototype on
+4. **`comp.Canvas`** ([#5](https://github.com/richarddavenport/tuikit/issues/5), needs [#4](https://github.com/richarddavenport/tuikit/issues/4) wide runes) — the cell-grid substrate, settled by the prototype on
    `prototype/canvas-mouse`. Wide runes, `Rect` layout, typed owner IDs, and
    democtl ported onto it. Before `comp`, because a component that returns a
    string cannot be clicked. See [mouse.md](mouse.md).
-5. **`tuikit watch`** — the inner loop. Cheap once `harness` and `docgen` exist,
+5. **`tuikit watch`** ([#7](https://github.com/richarddavenport/tuikit/issues/7)) — the inner loop. Cheap once `harness` and `docgen` exist,
    and it is what makes everything after this pleasant to build.
-6. **`comp` + `app`** — extract components, generalising only where two of the
+6. **`comp` + `app`** ([#8](https://github.com/richarddavenport/tuikit/issues/8), [#9](https://github.com/richarddavenport/tuikit/issues/9), gallery [#10](https://github.com/richarddavenport/tuikit/issues/10)) — extract components, generalising only where two of the
    four already differ meaningfully. **`tuikit gallery`** grows alongside: a
    component that is not in the gallery is not finished.
-7. **`spec`** — declarations, CLI generation, manifest, completions.
-8. **Migrate azctl** (3.2k lines, youngest, least to lose). This is the proof;
+7. **`spec`** ([#11](https://github.com/richarddavenport/tuikit/issues/11)) — declarations, CLI generation, manifest, completions.
+8. **Migrate azctl** ([#12](https://github.com/richarddavenport/tuikit/issues/12)) (3.2k lines, youngest, least to lose). This is the proof;
    a framework that has never met a real tool is a guess.
-9. **`tuikit new`**, seeded from what azctl's migration actually needed.
-10. pgctl, dugo, swarmctl migrate later or never.
+9. **`tuikit new`** ([#13](https://github.com/richarddavenport/tuikit/issues/13)), seeded from what azctl's migration actually needed.
+10. pgctl, dugo, swarmctl migrate later or never ([#14](https://github.com/richarddavenport/tuikit/issues/14)).
 
 ## Open
 
+Each is an issue, so it gets closed by a decision rather than forgotten.
+
 - Whether `engine` gets any framework support at all, or stays entirely the
-  tool's own. Current lean: entirely the tool's own — the split works *because*
-  the engine has no UI imports.
-- Whether `guard.Width` is needed at all once the canvas clips structurally, or
-  stays as a check on `comp` itself. Leaning on keeping it, cheaply, aimed at
-  `comp` rather than at every tool.
-- Wide runes in the canvas: one rune is not one cell for CJK or emoji. A
-  width-aware `Set` claiming two cells with a continuation marker is the answer;
-  it is not written.
+  tool's own — [#2](https://github.com/richarddavenport/tuikit/issues/2).
+  Current lean: entirely the tool's own, because the split works *because* the
+  engine has no UI imports.
+- Whether `guard.Width` is needed once the canvas clips structurally —
+  [#6](https://github.com/richarddavenport/tuikit/issues/6). Leaning on keeping
+  it, aimed at `comp` rather than at every tool: the canvas guarantees nothing
+  is drawn outside the *canvas*, not that a component stayed inside the *rect*
+  it was given.
+- Wide runes in the canvas — [#4](https://github.com/richarddavenport/tuikit/issues/4).
+  The answer is decided and unwritten: a width-aware `Set` claiming two cells
+  with a continuation marker.
+
+## Starting a tool today
+
+`tuikit new` is step 9, so the supported path until then is copying
+`examples/democtl` — [#1](https://github.com/richarddavenport/tuikit/issues/1)
+documents it. That is deliberate: scaffolding before azctl's migration has shown
+what a tool actually needs produces a template full of guesses.
