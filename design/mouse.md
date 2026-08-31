@@ -132,10 +132,29 @@ miscount. Lip Gloss keeps styling; its layout helpers (`JoinHorizontal`, `Place`
 go.
 
 **Every mouse action needs a keyboard path, and a guard will enforce it.**
-`guard.Reachable`. Three reasons, and the third decides it: ssh and
-keyboard-only users, muscle memory, and **an agent cannot click**. In a framework
-whose thesis is that agents get on with it immediately, a right-click-only action
-is one agents cannot reach.
+`guard.Reachable`. Four reasons now, and the last two decide it: ssh and
+keyboard-only users; muscle memory; **an agent cannot click**; and **a
+right-click may never arrive at all**.
+
+That fourth one was found by running the prototype inside herdr, which showed its
+own context menu instead. A multiplexer that captures the mouse gets the event
+first, and the application never learns it happened — there is no protocol for
+"did my right-click arrive?". So a tool whose only path to an action is a context
+menu is simply broken for anyone inside herdr or tmux, and it cannot detect or
+report that.
+
+herdr's own answer is `ui.right_click_passthrough_modifier` in
+`~/.config/herdr/config.toml`, empty by default; setting it to `ctrl` makes
+Ctrl+right-click reach the pane's app. That fixes the developer's machine. It
+does not fix the tool for anyone who has not set it, which is the point.
+
+**The context menu opens from the keyboard too, at the cursor.** Not merely "each
+action in the menu also has a binding somewhere" — the *menu itself* is
+keyboard-openable, the way a menu key works. Two reasons. It is the only way the
+mouse and keyboard paths cannot drift, because they are the same list rather than
+a list and a keymap maintained beside it. And it is what makes the whole surface
+reachable when right-click is being eaten upstream, which is a condition the tool
+cannot detect.
 
 **Regions get names, and the harness drives them by name.** The prototype's tests
 already find targets by owner ID rather than coordinate, which is how a capture
@@ -166,6 +185,14 @@ than a hand-maintained one.
   a toggle key is conventional. This is a documentation problem, not one to
   solve.
 - **tmux needs `mouse on`.** Also documentation.
+- **A multiplexer may keep right-click for itself**, as herdr does by default.
+  Nothing the application can do about it, which is why the menu has a keyboard
+  opener rather than a note in the README.
+
+One incidental confirmation: herdr's `ui.mouse_scroll_lines` defaults to `3`,
+which is the three-rows-a-notch the prototype picked on the grounds that it is
+what every other terminal program does. Worth having that checked rather than
+assumed.
 
 ## What changes in the plan
 

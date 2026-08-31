@@ -238,9 +238,24 @@ capture bugs and both of democtl's, stops being a class of bug.
 ## 19. Every mouse action needs a keyboard path, and a guard enforces it
 
 `guard.Reachable`. Keyboard-only users and ssh are the usual reasons and the weak
-ones. The reason that decides it: **an agent cannot click.** In a framework whose
-thesis is that an agent gets on with a tool immediately, an action reachable only
-by right-click is an action agents cannot take.
+ones. Two stronger ones.
+
+**An agent cannot click.** In a framework whose thesis is that an agent gets on
+with a tool immediately, an action reachable only by right-click is an action
+agents cannot take.
+
+**A right-click may never arrive.** Running the prototype inside herdr showed
+herdr's context menu instead of the tool's. A multiplexer that captures the mouse
+gets the event first and the application never learns it happened — there is no
+protocol for asking. So this is not a preference about input styles: a
+context-menu-only action is broken for a whole class of users, and the tool
+cannot detect or report it.
+
+The corollary: **the context menu opens from the keyboard too, at the cursor.**
+Not "every action in the menu also has a binding" — the menu itself, the way a
+menu key works. It is the only arrangement where the two paths cannot drift,
+because they are the same list rather than a list plus a keymap maintained
+beside it.
 
 ## 20. An owner ID is an identity, not a screen position
 
