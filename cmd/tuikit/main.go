@@ -6,12 +6,17 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
+	"path/filepath"
 	"strings"
+	"syscall"
 
 	"github.com/richarddavenport/tuikit/docgen"
+	"github.com/richarddavenport/tuikit/watch"
 )
 
 var version = "dev"
@@ -26,6 +31,8 @@ func main() {
 		designsystem(os.Args[2:])
 	case "frames":
 		frames(os.Args[2:])
+	case "watch":
+		watchCmd(os.Args[2:])
 	case "version":
 		fmt.Println("tuikit", version)
 	case "help", "-h", "--help":
@@ -96,6 +103,70 @@ func frames(args []string) {
 	fmt.Println("wrote " + *out)
 }
 
+// watchCmd runs the inner loop.
+func watchCmd(args []string) {
+	fs := flag.NewFlagSet("watch", flag.ExitOnError)
+	capture := fs.String("capture", "", "the command that captures frames (required)")
+	framesDir := fs.String("frames", "", "where the capture writes (required)")
+	out := fs.String("out", "", "the page file; defaults to <frames>/index.html")
+	addr := fs.String("addr", "127.0.0.1:7654", "address to serve on")
+	title := fs.String("title", "", "the page's title")
+	every := fs.Duration("every", 0, "how often to check for changes; default 300ms")
+
+	var dir string
+	if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
+		dir, args = args[0], args[1:]
+	}
+	if err := fs.Parse(args); err != nil {
+		os.Exit(2)
+	}
+	if dir == "" && fs.NArg() == 1 {
+		dir = fs.Arg(0)
+	}
+	if dir == "" || *capture == "" || *framesDir == "" {
+		fmt.Fprintln(os.Stderr, `usage: tuikit watch <dir> -capture "<command>" -frames <dir> [-out page.html]
+
+  tuikit watch ./internal/tui \
+    -capture "go test ./internal/tui -run CaptureFrames" \
+    -frames /tmp/frames`)
+		os.Exit(2)
+	}
+	if *out == "" {
+		*out = filepath.Join(*framesDir, "index.html")
+	}
+
+	cfg := watch.Config{
+		Dir: dir,
+		// Split on spaces rather than shelling out: a capture command is a
+		// program and its arguments, and going through a shell would make the
+		// tool's own quoting somebody else's problem.
+		Capture:  strings.Fields(*capture),
+		Frames:   *framesDir,
+		Out:      *out,
+		Interval: *every,
+		Log:      os.Stdout,
+		Page: func(framesDir string) (string, error) {
+			return docgen.Frames{Title: *title}.Page(framesDir)
+		},
+	}
+
+	// stop is called before exiting rather than deferred: os.Exit skips defers,
+	// and a watch that leaves the signal handler installed on its way out is a
+	// watch that ignores the second Ctrl-C.
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+
+	err := cfg.Run(ctx, *addr, func(url string) {
+		fmt.Printf("watching %s\n", dir)
+		fmt.Printf("  capture  %s\n", *capture)
+		fmt.Printf("  serving  %s\n", url)
+	})
+	stop()
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "tuikit watch:", err)
+		os.Exit(1)
+	}
+}
+
 func usage(w *os.File) {
 	_, _ = fmt.Fprint(w, `tuikit — a TUI framework for developers and agents
 
@@ -105,9 +176,11 @@ func usage(w *os.File) {
   tuikit frames <capture-dir> [-out page.html] [-title t] [-lede l]
         turn a captured run of frames into a page you can look at
 
+  tuikit watch <dir> -capture "<command>" -frames <dir>
+        recapture on save, rebuild the page, reload the browser
+
   tuikit version
 
-Planned: new (scaffold a tool), watch (recapture on save, serve, reload),
-gallery (browse the components). See design/.
+Planned: new (scaffold a tool), gallery (browse the components). See design/.
 `)
 }

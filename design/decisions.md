@@ -320,3 +320,27 @@ rather than by library, because an engine that measures display width has
 learned about columns whichever package it used. swarmctl's, pgctl's and azctl's
 engines all pass it; swarmctl's TUI reports 37 imports, so it is not passing
 vacuously.
+
+## 23. `tuikit watch` polls, rather than depending on fsnotify
+
+The obvious way to watch a directory is `fsnotify`. This module has four direct
+dependencies and they are all Charm, and for a dev tool watching one package the
+difference between an inotify callback and a digest every 300ms is imperceptible
+— the rebuild itself takes 200-600ms. A dependency that buys nothing a person
+can feel is a dependency that only costs.
+
+Digesting the tree rather than comparing a single mtime also makes a save that
+rewrites a file with identical content a non-event, which is what an editor with
+format-on-save does constantly.
+
+Two rules the loop follows that are not about watching:
+
+**A failed build puts the error on the page.** Leaving the last good frames up
+when the code no longer compiles is a page that describes a tool which does not
+exist — the same failure as a design system maintained beside the code rather
+than generated from it. The error page carries the compiler's own output,
+file and line intact.
+
+**The rebuild is debounced.** An editor that writes a file in two syscalls is one
+save, and rebuilding twice makes the page flicker through a state nobody asked
+for.

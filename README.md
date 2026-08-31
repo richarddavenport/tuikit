@@ -76,7 +76,19 @@ names the line and its column count. `harness.HTML` turns a frame into a block
 for a page.
 
 Capture is a **building tool first**: its purpose is seeing the screen you are
-writing. Goldens and documentation are downstream of that.
+writing. Goldens and documentation are downstream of that — which is why the
+loop matters more than any assertion the harness could offer:
+
+```
+tuikit watch ./internal/tui \
+  -capture "go test ./internal/tui -run CaptureFrames" \
+  -frames /tmp/frames
+```
+
+Change a line of view code, look at the frame. It recaptures on save, rebuilds
+the page, and reloads the browser. When the build fails the error goes **on the
+page** — leaving the last good frames up would describe a tool that no longer
+exists.
 
 **`docgen`** — generated from the code, so it cannot drift. The vocabulary as
 HTML, and a capture as a page you can look at:
