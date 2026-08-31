@@ -1,0 +1,10 @@
+# What CI enforces beyond gofmt and go vet.
+version: 2
+linters:
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - revive
