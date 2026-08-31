@@ -1,0 +1,37 @@
+democtl  a tuikit example  needs attention                                                                                  09:14:03
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Logs api_gateway (stderr only)                                                                                                   │
+│  09:12:06 api_gateway: retrying upstream after 370ms                                                                             │
+│  09:12:09 api_gateway: connection reset by peer (attempt 543)                                                                    │
+│  09:12:21 api_gateway: retrying upstream after 202ms                                                                             │
+│  09:12:27 api_gateway: connection reset by peer (attempt 881)                                                                    │
+│  09:12:30 api_gateway: retrying upstream after 845ms                                                                             │
+│  09:12:36 api_gateway: retrying upstream after 706ms                                                                             │
+│  09:12:42 api_gateway: connection reset by peer (attempt 822)                                                                    │
+│  09:12:48 api_gateway: retrying upstream after 582ms                                                                             │
+│  09:13:15 api_gateway: retrying upstream after 687ms                                                                             │
+│  09:13:33 api_gateway: retrying upstream after 596ms                                                                             │
+│  09:13:36 api_gateway: retrying upstream after 664ms                                                                             │
+│  09:13:42 api_gateway: retrying upstream after 637ms                                                                             │
+│  09:13:54 api_gateway: retrying upstream after 333ms                                                                             │
+│  09:14:00 api_gateway: connection reset by peer (attempt 543)                                                                    │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+│                                                                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ scroll · e stderr only · esc back · q quit

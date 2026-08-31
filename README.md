@@ -51,6 +51,33 @@ knows the domain, the UI knows the terminal. Its deny-list is by *category* —
 drawing libraries, terminal capabilities, width measurement — because an engine
 that measures display width has learned about columns whichever package it used.
 
+**`harness`** — render your screens to files, so you can look at them:
+
+```go
+func TestCaptureFrames(t *testing.T) {
+    dir := harness.Enabled("MYTOOL_FRAMES")
+    if dir == "" {
+        t.Skip("set MYTOOL_FRAMES to capture frames")
+    }
+    s := harness.Capture(t, dir, harness.Size(132, 38), harness.At(epoch))
+    s.Shot("dashboard", newModel())
+    s.Done()
+}
+
+func TestGoldens(t *testing.T) {
+    harness.Golden(t, "testdata", "dashboard", newModel().View())
+}
+```
+
+Capture writes one `.ansi` per frame, in colour, plus a manifest carrying each
+frame's provenance — fixture, live, or composed. Goldens hold the *shape*,
+colour stripped, so a layout change is an ordinary test failure and the report
+names the line and its column count. `harness.HTML` turns a frame into a block
+for a page.
+
+Capture is a **building tool first**: its purpose is seeing the screen you are
+writing. Goldens and documentation are downstream of that.
+
 **`docgen`** — the vocabulary as HTML, generated from the code so it cannot
 drift:
 
@@ -94,7 +121,7 @@ the two bugs its own frames caught.
 
 ## What is coming
 
-`harness` (deterministic frame capture, goldens, ANSI→HTML), `comp` (the
+`comp` (the
 components each of the four wrote separately), `app` (the Bubble Tea shell and
 its async conventions), `spec` (one command declaration → CLI, TUI screen, and a
 `describe --json` manifest an agent reads), `tuikit watch`, `tuikit gallery`,
@@ -105,5 +132,6 @@ its async conventions), `spec` (one command declaration → CLI, TUI screen, and
 
 The interface has a written-down vocabulary, the vocabulary is machine-readable,
 and the guards turn "I used a colour that does not exist" into a test failure
-rather than a review comment. What is still missing is the part that lets an
-agent *see* what it built — that is `harness`, and it is next.
+rather than a review comment. An agent can also *see* what it built:
+`harness` renders any screen to a file, and the goldens tell it whether the
+layout moved.

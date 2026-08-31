@@ -1,0 +1,23 @@
+democtl  a tuikit example  needs attention                              09:14:03
+────────────────────────────────────────────────────────────────────────────────
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ Logs api_gateway                                                             │
+│  09:12:03 api_gateway: listening on :863                                     │
+│  09:12:06 api_gateway: retrying upstream after 370ms                         │
+│  09:12:09 api_gateway: connection reset by peer (attempt 543)                │
+│  09:12:12 api_gateway: handled request in 270ms                              │
+│  09:12:15 api_gateway: listening on :312                                     │
+│  09:12:18 api_gateway: handled request in 553ms                              │
+│  09:12:21 api_gateway: retrying upstream after 202ms                         │
+│  09:12:24 api_gateway: flushed 566 records                                   │
+│  09:12:27 api_gateway: connection reset by peer (attempt 881)                │
+│  09:12:30 api_gateway: retrying upstream after 845ms                         │
+│  09:12:33 api_gateway: handled request in 121ms                              │
+│  09:12:36 api_gateway: retrying upstream after 706ms                         │
+│  09:12:39 api_gateway: handled request in 134ms                              │
+│  09:12:42 api_gateway: connection reset by peer (attempt 822)                │
+│  09:12:45 api_gateway: cache warm, 615 entries                               │
+│  09:12:48 api_gateway: retrying upstream after 582ms                         │
+│  09:12:51 api_gateway: listening on :815                                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ scroll · e stderr only · esc back · q quit

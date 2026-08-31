@@ -1,0 +1,23 @@
+democtl  a tuikit example  needs attention                              09:14:03
+────────────────────────────────────────────────────────────────────────────────
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ deploy api_migrate                                                           │
+│  ✓ resolve image digest                                                400ms │
+│  ● check node capacity  already true                                   260ms │
+│  ✓ push service spec                                                    1.2s │
+│  ✗ wait for tasks to converge                                                │
+│      task 3 exited 137 before the health check passed                        │
+│  • verify health endpoint                                                    │
+│                                                                              │
+│  stopped  r to run again · esc to go back                                    │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+  r run again · esc back · q quit

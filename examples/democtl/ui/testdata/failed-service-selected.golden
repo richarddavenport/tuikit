@@ -1,0 +1,37 @@
+democtl  a tuikit example  needs attention                                                                                  09:14:03
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌──────────────────────────────────────────┐ ┌─────────────────────────────────────────────────────────────────────────────────────┐
+│ Services (7)                             │ │ api_migrate                                                                         │
+│ api_gateway    3/3 ✓                     │ │ ‹ Overview ›  Config    Events                                                      │
+│ api_worker     1/2 ●                     │ │                                                                                     │
+│ api_migrate    0/1 ✗                     │ │  state      failed                                                                  │
+│ web_frontend   4/4 ✓                     │ │  replicas   0/1                                                                     │
+│ web_assets     1/1 ✓                     │ │  stack      api                                                                     │
+│ data_indexer   0/2 •                     │ │  node       node-c                                                                  │
+│ data_archiver  1/1 ✓                     │ │  updated    4m ago                                                                  │
+│                                          │ │                                                                                     │
+│                                          │ │  no suitable node: memory reservation exceeds every node                            │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+│                                          │ │                                                                                     │
+└──────────────────────────────────────────┘ └─────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ move · tab pane · ‹› tabs · / filter · L logs · D deploy · q quit

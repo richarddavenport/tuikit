@@ -1,0 +1,23 @@
+democtl  a tuikit example  needs attention                              09:14:03
+────────────────────────────────────────────────────────────────────────────────
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ deploy api_gateway                                                           │
+│  ✓ resolve image digest                                                400ms │
+│  ● check node capacity  already true                                   260ms │
+│  ✓ push service spec                                                    1.2s │
+│  ✓ wait for tasks to converge                                           4.3s │
+│  ✓ verify health endpoint                                              900ms │
+│                                                                              │
+│  done                                                                        │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+  r run again · esc back · q quit

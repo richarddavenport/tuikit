@@ -1,0 +1,23 @@
+democtl  a tuikit example  needs attention                              09:14:03
+────────────────────────────────────────────────────────────────────────────────
+┌────────────────────────┐ ┌───────────────────────────────────────────────────┐
+│ Services (7)           │ │ api_gateway                                       │
+│ api_gateway    3/3 ✓   │ │ ‹ Overview ›  Config    Events                    │
+│ api_worker     1/2 ●   │ │                                                   │
+│ api_migrate    0/1 ✗   │ │  state      running                               │
+│ web_fr┌──────────────────────────────────────────────────────────────┐       │
+│ web_as│Deploy api_gateway?                                           │       │
+│ data_i│                                                              │       │
+│ data_a│Pushes a new service spec and waits for the tasks to          │       │
+│       │converge. The current tasks are replaced one at a time.       │       │
+│       │                                                              │       │
+│       │y confirm · n cancel                                          │       │
+│       └──────────────────────────────────────────────────────────────┘       │
+│                        │ │                                                   │
+│                        │ │                                                   │
+│                        │ │                                                   │
+│                        │ │                                                   │
+│                        │ │                                                   │
+│                        │ │                                                   │
+└────────────────────────┘ └───────────────────────────────────────────────────┘
+  y confirm · n cancel
