@@ -9,9 +9,11 @@ not commitment.
    swarmctl into the module.~~ **Done** — commit `0d0e560`. Verified by running
    the extracted guards against swarmctl's own `internal/tui`: both clean, and a
    role nothing draws with still reported, so they are not passing vacuously.
-2. **`examples/democtl`** — the backendless tool tuikit tests itself against, the
-   reference an agent reads, and the seed of the gallery. Needed before `harness`
-   has anything to render.
+2. ~~**`examples/democtl`**~~ **Done** — commit `609ee55`. A fictional fleet with
+   a dashboard, logs, a confirm modal and a step run; seeded and clock-frozen so
+   the harness can use it as a fixture. First real consumer of the guards. Its
+   own frames found two bugs before the harness that will automate looking at
+   them exists.
 3. **`harness`** — generalise pgctl's `screenshot_probe_test.go`: fixture and
    live modes, ANSI capture, ANSI→HTML, `guard.Width`, goldens. Prove it against
    democtl, then against swarmctl's existing screens.
