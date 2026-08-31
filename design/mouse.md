@@ -103,6 +103,14 @@ Three rules for `comp.List` fall out:
 A viewport also has to look like one — a `20/28` indicator, three rows a notch —
 or a list that scrolls looks like a list that lost rows.
 
+And a **selection scrolled out of view has to leave a trace**. Not by dragging
+the cursor into the viewport, which is the bug above wearing a different hat, but
+by saying which way it went. A selection that is merely invisible is its own
+problem: the detail pane goes on describing an item nothing on screen points at,
+and the next key press acts on something the reader cannot see. This was the
+third thing scrolling found, and the only one that is a design decision rather
+than a missing implementation.
+
 **An unexpected result: overflow stops being a class of bug.** `Set` clips to the
 canvas, so drawing outside the terminal is not an error to catch — it is a
 coordinate that does not exist. A menu deliberately placed at column 88 of 96

@@ -257,6 +257,12 @@ The related rule, from the same session: a viewport offset is a separate field
 from the selection. Scrolling is looking around; it does not choose. Conflating
 them made the wheel appear to pick items at random.
 
+And its corollary, which is the part that is a judgement rather than a fix: a
+selection scrolled out of view must say which way it went. The temptation is to
+drag the cursor back into the viewport, which is the same conflation again. The
+answer is an edge marker — the selection stays where it is, and the interface
+admits it is off screen.
+
 ## 21. Regions have names, and the harness drives them by name
 
 The prototype's tests already click by owner ID rather than coordinate. That is
