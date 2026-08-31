@@ -105,3 +105,49 @@ controls nothing. What it is about is the terminal interface, which is what the
 four have in common and the only thing this module knows how to help with.
 
 Renamed before anything imported it, which is the only cheap time to do it.
+
+## 9. Capture is a building tool first
+
+Its purpose is seeing the screen you are writing. Goldens, documentation and
+catching overflow are all downstream of that, and treating any of them as the
+point produces a harness nobody runs. It is why `tuikit watch` matters more than
+any assertion the harness could offer: a command you have to remember to type
+with two environment variables set is not a loop.
+
+## 10. Two capture mechanisms, deliberately
+
+A test helper reaches any state at all — an error, a half-loaded pane, a modal
+over a 40-row table, something no key sequence gets to yet — because the model's
+fields are unexported and `go test` is the only thing that can reach inside the
+package. A `--snapshot` flag on the binary needs no test and is discoverable by
+an agent from `describe --json`, but only reaches what a keystroke reaches.
+
+Neither replaces the other, and pretending one does means either losing the
+states that matter most or making an agent read the test suite to take a picture.
+
+## 11. Extract from swarmctl, prove on azctl
+
+swarmctl is 65k lines and mid-flight, so it is the source rather than the first
+migration. azctl is 3.2k lines and the youngest, so it has the least to lose and
+is the honest test of whether the framework fits a real tool. A framework that
+has never met one is a guess.
+
+## 12. No cobra
+
+Once `spec` is the source of truth for a command, cobra is a second description
+of the same tree and the work becomes adapting one into the other. That costs two
+things worth keeping: swarmctl's exit-code contract — `0`, `1`, `2` meaning "a
+dry run found drift", and a script's own status passed through — and the
+dual-mode entry where `main` decides whether an argument is a subcommand or the
+start of the TUI's flags. Cobra wants to own `os.Exit` and returns 1 for
+everything.
+
+What cobra would have given free — completions, generated help — generates from
+`spec` directly. dugo drops it when it migrates.
+
+## 13. ANSI files and HTML, not SVG
+
+The ANSI file is both the archive and the golden: stripped of colour it diffs in
+a pull request, and kept whole it is exactly what the terminal emitted. HTML with
+real text keeps a published frame selectable and searchable. SVG would be a third
+representation of the same frame, earning nothing and drifting from the other two.

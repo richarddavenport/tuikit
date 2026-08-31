@@ -65,6 +65,6 @@ func usage(w *os.File) {
   tuikit version
 
 Planned: new (scaffold a tool), watch (recapture on save), gallery (browse the
-components). See design/decisions.md.
+components). See design/.
 `)
 }

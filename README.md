@@ -52,7 +52,7 @@ go run ./cmd/tuikit designsystem -out design-system -tool mytool
 components each of the four wrote separately), `app` (the Bubble Tea shell and
 its async conventions), `spec` (one command declaration → CLI, TUI screen, and a
 `describe --json` manifest an agent reads), `tuikit watch`, `tuikit gallery`,
-`tuikit new`. See `design/decisions.md`.
+`tuikit new`. See `design/`.
 
 ## Why an agent gets on with it
 
