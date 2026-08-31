@@ -285,3 +285,35 @@ the shape a capture script takes — `click list.row[2]; drag split.main +10` �
 and an agent naming a region beats an agent guessing a coordinate. It only works
 because ownership is recorded at draw time, which is another thing the canvas
 gets for free and a string cannot.
+
+## 22. The engine gets nothing from tuikit
+
+The split every tool in the family keeps: the engine knows the domain, the UI
+never calls the domain directly, and the CLI is a peer of the TUI over the same
+engine. The open question was whether tuikit should offer the engine anything.
+
+It should not, and the bar is higher than "no Bubble Tea imports". Measured on
+the tools that exist: democtl's `fleet` imports `fmt`, `math/rand` and `time` —
+stdlib only. swarmctl's `internal/engine` imports nothing from charmbracelet at
+all. What an engine imports is stdlib plus its own domain SDK: pgx, the Azure
+SDK, the Docker SDK.
+
+So the rule is **no terminal concepts**, not merely no terminal library. No
+colour, no width, no keys, no framework. An engine that has never heard of a
+column is one that can be tested, reused from a CLI, driven from a cron job, and
+read by someone who does not know what tuikit is.
+
+**Where the cost lands.** `spec.Command.Run` cannot be the engine's own function
+signature, because matching it would make the engine import `spec`. A thin
+adapter in the tool — in `cmd/` or beside the CLI — translates between a
+declaration and the engine's plain functions. That is a few lines of glue per
+command, paid deliberately, and it is the price of the split being load-bearing
+rather than decorative.
+
+The alternative considered and rejected: a "minimal UI-free surface" the engine
+may import — a context, progress reporting, error kinds. It removes the glue,
+but "no UI imports" quietly becomes "no imports we currently consider UI", and
+the boundary stops being checkable.
+
+Checkable is the point: this is enforceable rather than merely intended, by a
+guard over the engine package's import list.

@@ -36,18 +36,14 @@ not commitment.
 
 Each is an issue, so it gets closed by a decision rather than forgotten.
 
-- Whether `engine` gets any framework support at all, or stays entirely the
-  tool's own — [#2](https://github.com/richarddavenport/tuikit/issues/2).
-  Current lean: entirely the tool's own, because the split works *because* the
-  engine has no UI imports.
 - Whether `guard.Width` is needed once the canvas clips structurally —
   [#6](https://github.com/richarddavenport/tuikit/issues/6). Leaning on keeping
   it, aimed at `comp` rather than at every tool: the canvas guarantees nothing
   is drawn outside the *canvas*, not that a component stayed inside the *rect*
   it was given.
-- Wide runes in the canvas — [#4](https://github.com/richarddavenport/tuikit/issues/4).
-  The answer is decided and unwritten: a width-aware `Set` claiming two cells
-  with a continuation marker.
+- Wide runes in the canvas — folded into
+  [#5](https://github.com/richarddavenport/tuikit/issues/5), because a canvas
+  that is wrong for CJK and then corrected means writing `Set` twice.
 
 ## Starting a tool today
 

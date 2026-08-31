@@ -64,9 +64,11 @@ test failure rather than something someone has to notice.
 CLI command, the TUI screen, the `describe --json` entry an agent reads, and the
 right-click menu. One declaration, so none of them can drift from the others.
 
-**Engine / UI split** — the engine knows the domain and has no UI imports; the
-UI never calls the domain directly; the CLI is a peer of the TUI over the same
-engine. Every tool in the family keeps it.
+**Engine / UI split** — the engine knows the domain and has **no terminal
+concepts at all**: no colour, no width, no keys, no framework, and no tuikit
+import. In practice an engine imports stdlib plus its own domain SDK. The UI
+never calls the domain directly; the CLI is a peer of the TUI over the same
+engine. Every tool in the family keeps it (decision 22).
 
 **Screen** — one full-window view. Every screen constant needs a `View()` case;
 a screen without one renders as an empty terminal and says nothing about why.
