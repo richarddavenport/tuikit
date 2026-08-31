@@ -311,3 +311,43 @@ func TestASelectionScrolledOutOfViewSaysWhereItWent(t *testing.T) {
 		t.Error("the indicator stayed after the selection came back into view")
 	}
 }
+
+// A demo has to overflow the terminal it is being demonstrated on. Twenty-eight
+// services fit entirely in a 58-row pane, so on a tall screen the wheel was a
+// correct no-op and the prototype showed nothing at all.
+func TestTheListOverflowsEvenATallTerminal(t *testing.T) {
+	for _, h := range []int{24, 38, 64, 100} {
+		m := newModel()
+		m.w, m.h = 100, h
+		m.View()
+
+		if maxTop := len(m.services) - m.listRows; maxTop <= 0 {
+			t.Errorf("at %d rows the whole list fits (%d services, %d rows) — nothing to scroll",
+				h, len(m.services), m.listRows)
+		}
+	}
+}
+
+// The count is always drawn, so "the wheel did nothing because everything fits"
+// is distinguishable from "the wheel is broken".
+func TestTheListAlwaysSaysHowMuchOfItYouAreSeeing(t *testing.T) {
+	m := newModel()
+	m.w, m.h = 100, 400 // taller than any real terminal: everything fits
+	view := m.View()
+	if !strings.Contains(view, fmt.Sprintf("%d/%d", len(m.services), len(m.services))) {
+		t.Errorf("a list showing everything does not say so:\n%s", lastLines(view, 4))
+	}
+
+	m2 := boot()
+	if !strings.Contains(m2.View(), fmt.Sprintf("/%d", len(m2.services))) {
+		t.Error("a scrollable list does not say how much of it is showing")
+	}
+}
+
+func lastLines(s string, n int) string {
+	lines := strings.Split(s, "\n")
+	if len(lines) > n {
+		lines = lines[len(lines)-n:]
+	}
+	return strings.Join(lines, "\n")
+}

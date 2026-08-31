@@ -82,11 +82,18 @@ func newModel() *model {
 	add("ok", lipgloss.NewStyle().Foreground(p.Success))
 	add("pending", lipgloss.NewStyle().Foreground(p.Pending))
 	add("danger", lipgloss.NewStyle().Foreground(p.Danger))
-	// A longer list than democtl's seven, so there is something to scroll. The
-	// prototype exists to show the behaviour.
+	// A long list, so there is something to scroll on a TALL terminal too.
+	//
+	// Four regions was twenty-eight services, which fits entirely in a 58-row
+	// pane — so on Richard's screen the wheel was a legitimate no-op and the
+	// prototype demonstrated nothing. A demo has to overflow the terminal it is
+	// being demonstrated on.
 	base := fleet.New(1)
 	var services []fleet.Service
-	for _, region := range []string{"iad", "lhr", "syd", "fra"} {
+	for _, region := range []string{
+		"iad", "lhr", "syd", "fra", "ord", "cdg", "nrt", "gru",
+		"yyz", "sin", "bom", "jnb", "arn", "waw", "mad", "dub",
+	} {
 		for _, svc := range base.Services {
 			svc.Name = region + "_" + svc.Name
 			services = append(services, svc)
@@ -280,12 +287,15 @@ func (m *model) drawList(c *Canvas, r Rect) {
 		c.Text(in.X, in.Y+row, truncate(text, in.W), st, rowOwner(i))
 	}
 
-	// A scroll indicator, because a viewport with no sign of being one is a
-	// list that appears to have lost rows.
-	if len(m.services) > in.H {
-		c.Text(r.X+r.W-8, r.Y+r.H-1, fmt.Sprintf(" %d/%d ", m.listTop+in.H, len(m.services)),
-			m.sty["muted"], ownerList)
-	}
+	// The count is drawn ALWAYS, not only when the list overflows.
+	//
+	// Showing it only when scrollable meant that on a terminal where everything
+	// fits, a wheel that correctly does nothing is indistinguishable from a
+	// wheel that is broken. "28/28" answers that in one glance; its absence
+	// answered nothing.
+	shown := min(m.listTop+in.H, len(m.services))
+	count := fmt.Sprintf(" %d/%d ", shown, len(m.services))
+	c.Text(r.X+r.W-1-len([]rune(count)), r.Y+r.H-1, count, m.sty["muted"], ownerList)
 
 	// If the selection scrolled out of view, say so and say which way.
 	//

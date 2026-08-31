@@ -54,6 +54,12 @@ detail:
 
   (In the prototype that banner overwrites the box title. `comp` should use a
   compact marker in the corner instead, so the title survives.)
+- The count (`33/112`) is drawn **always**, not only when the list overflows. On
+  a tall terminal where everything fits, a wheel that correctly does nothing was
+  indistinguishable from a wheel that was broken. Its absence answered nothing;
+  `112/112` answers it in a glance.
+- 112 services, because a demo has to overflow the terminal it is being
+  demonstrated on. Twenty-eight fitted entirely in a 58-row pane.
 
 ## Verdict
 
