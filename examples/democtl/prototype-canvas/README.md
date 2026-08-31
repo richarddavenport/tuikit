@@ -46,6 +46,14 @@ detail:
 - Both offsets clamp to actual content, measured from what was drawn last frame.
 - Three rows a notch, and a `20/28` indicator, because a viewport with no sign of
   being one looks like a list that lost rows.
+- A selection scrolled out of view says so — `↑ selected above`. Not by dragging
+  the cursor into the viewport, which is the bug this replaced, but because a
+  selection that is merely invisible is its own problem: the detail pane goes on
+  describing a service nothing on screen points at, and the next key press acts
+  on something the reader cannot see.
+
+  (In the prototype that banner overwrites the box title. `comp` should use a
+  compact marker in the corner instead, so the title survives.)
 
 ## Verdict
 

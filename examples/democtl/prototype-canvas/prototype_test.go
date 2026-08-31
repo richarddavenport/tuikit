@@ -277,3 +277,37 @@ func TestNeitherPaneCanScrollPastItsContent(t *testing.T) {
 }
 
 func itoa(i int) string { return fmt.Sprintf("%d", i) }
+
+// A selection scrolled out of view has to leave a trace. Not by dragging the
+// cursor into the viewport — that is the bug this replaced — but by saying it
+// is up there. Otherwise the detail pane describes a service nothing on screen
+// points at, and the next key press acts on something invisible.
+func TestASelectionScrolledOutOfViewSaysWhereItWent(t *testing.T) {
+	m := boot()
+	if m.sel != 0 {
+		t.Fatalf("expected to start at the top, got %d", m.sel)
+	}
+
+	x, y, _ := find(m, "list.row[1]")
+	m.Update(tea.MouseMsg{X: x, Y: y, Action: tea.MouseActionPress, Button: tea.MouseButtonWheelDown})
+	view := m.View()
+
+	if m.listTop == 0 {
+		t.Fatal("nothing scrolled")
+	}
+	if m.sel != 0 {
+		t.Errorf("the cursor was dragged along to %d", m.sel)
+	}
+	if !strings.Contains(view, "selected above") {
+		t.Errorf("the selection scrolled off with no indication:\n%s", view)
+	}
+
+	// And scrolling back removes it, rather than leaving a permanent banner.
+	for range 4 {
+		m.Update(tea.MouseMsg{X: x, Y: y, Action: tea.MouseActionPress, Button: tea.MouseButtonWheelUp})
+		m.View()
+	}
+	if strings.Contains(m.View(), "selected above") {
+		t.Error("the indicator stayed after the selection came back into view")
+	}
+}

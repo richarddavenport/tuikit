@@ -286,6 +286,19 @@ func (m *model) drawList(c *Canvas, r Rect) {
 		c.Text(r.X+r.W-8, r.Y+r.H-1, fmt.Sprintf(" %d/%d ", m.listTop+in.H, len(m.services)),
 			m.sty["muted"], ownerList)
 	}
+
+	// If the selection scrolled out of view, say so and say which way.
+	//
+	// Scrolling must not drag the cursor — that was the bug — but a selection
+	// that is simply invisible is its own problem: the detail pane goes on
+	// describing a service with nothing on screen pointing at it, and the next
+	// key press acts on something the reader cannot see.
+	switch {
+	case m.sel < m.listTop:
+		c.Text(in.X, r.Y, " ↑ selected above ", m.sty["sel"], ownerList)
+	case m.sel >= m.listTop+in.H:
+		c.Text(in.X, r.Y+r.H-1, " ↓ selected below ", m.sty["sel"], ownerList)
+	}
 }
 
 // drawSplitter claims one column. Making the divider a real owner is what turns
