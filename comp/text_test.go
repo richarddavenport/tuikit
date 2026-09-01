@@ -66,3 +66,39 @@ func TestWrapFirstIsTheFirstLineAndNoWider(t *testing.T) {
 		t.Errorf("%q is %d columns", got, Width(got))
 	}
 }
+
+// A newline in the input is where the author said the break goes, and a wrapper
+// that collapses it has thrown away the one piece of formatting they were able
+// to express. A two-paragraph confirmation body used to come out as one run-on
+// paragraph.
+func TestWrapKeepsTheBreaksItWasGiven(t *testing.T) {
+	got := Wrap("docker stack rm old\n\nIt is guarded: a check decided this needs doing.", 30)
+	want := []string{
+		"docker stack rm old",
+		"",
+		"It is guarded: a check decided",
+		"this needs doing.",
+	}
+	if len(got) != len(want) {
+		t.Fatalf("got %d lines, want %d:\n%q", len(got), len(want), got)
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("line %d is %q, want %q", i, got[i], want[i])
+		}
+	}
+}
+
+// A line long enough to wrap still wraps; keeping breaks is not the same as
+// only breaking where it was told to.
+func TestWrapStillWrapsWithinAParagraph(t *testing.T) {
+	got := Wrap("one two three four five six seven", 12)
+	for _, line := range got {
+		if Width(line) > 12 {
+			t.Errorf("%q is wider than 12", line)
+		}
+	}
+	if len(got) < 3 {
+		t.Errorf("got %d lines, expected the text to wrap: %q", len(got), got)
+	}
+}

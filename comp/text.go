@@ -44,10 +44,29 @@ func truncate(s string, w int, ellipsis string) string {
 
 // Wrap breaks text into lines of at most w columns, at spaces where it can and
 // mid-word when a single word is longer than the line.
+//
+// A newline in the input is KEPT, and a blank line stays blank. It used to go
+// through strings.Fields, which collapses every kind of whitespace equally — so
+// a two-paragraph confirmation body came out as one run-on paragraph, and the
+// author who put the break there had no way to tell the difference between
+// "wrapped" and "ignored".
 func Wrap(s string, w int) []string {
 	if w <= 0 {
 		return nil
 	}
+	var out []string
+	for i, para := range strings.Split(s, "\n") {
+		if i > 0 && strings.TrimSpace(para) == "" {
+			out = append(out, "")
+			continue
+		}
+		out = append(out, wrapLine(para, w)...)
+	}
+	return out
+}
+
+// wrapLine wraps one line that has no breaks of its own.
+func wrapLine(s string, w int) []string {
 	var out []string
 	line := ""
 	for _, word := range strings.Fields(s) {
