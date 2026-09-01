@@ -1,16 +1,16 @@
 democtl  a tuikit example  needs attention                                                                                  09:14:03
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌──────────────────────────────────────────┐ ┌─────────────────────────────────────────────────────────────────────────────────────┐
-│ Services (7)                             │ │ api_gateway                                                                         │
+│ Services (7)                             │ │ api_worker                                                                          │
 │ api_gateway    3/3 ✓                     │ │ ‹ Overview ›  Config    Events                                                      │
-│ api_worker     1/2 ●                     │ │                                                                                     │
-│ api_migrate    0/1 ✗                     │ │  state      running                                                                 │
-│ web_frontend   4/4 ✓                     │ │  replicas   3/3                                                                     │
-│ web_assets     1/1 ✓                     │ │  stack      api                                                                     │
-│ data_indexer   0/2 •                     │ │  node       node-a                                                                  │
-│ data_archiver  1/1 ✓                     │ │  updated    47s ago                                                                 │
+│ a┌──────────────┐2 ●                     │ │                                                                                     │
+│ a│ View logs  L │1 ✗                     │ │  state      degraded                                                                │
+│ w│ Deploy     D │4 ✓                     │ │  replicas   1/2                                                                     │
+│ w└──────────────┘1 ✓                     │ │  stack      api                                                                     │
+│ data_indexer   0/2 •                     │ │  node       node-b                                                                  │
+│ data_archiver  1/1 ✓                     │ │  updated    5m ago                                                                  │
 │                                          │ │                                                                                     │
-│                                          │ │                                                                                     │
+│                                          │ │  one task restarting: liveness probe timed out                                      │
 │                                          │ │                                                                                     │
 │                                          │ │                                                                                     │
 │                                          │ │                                                                                     │
@@ -34,4 +34,4 @@ democtl  a tuikit example  needs attention                                      
 │                                          │ │                                                                                     │
 │                                          │ │                                                                                     │
 └──────────────────────────────────────────┘ └─────────────────────────────────────────────────────────────────────────────────────┘
-  ↑↓ move · tab pane · ‹› tabs · / filter · m menu · L logs · D deploy · q quit
+  ↑↓ choose · enter do it · esc close

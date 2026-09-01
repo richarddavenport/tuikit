@@ -52,6 +52,11 @@ func states() []struct {
 			press(m, "/", "z", "z", "z")
 			return m
 		}},
+		{"menu-open", func() *Model {
+			m := New(1)
+			press(m, "j", "m")
+			return m
+		}},
 		{"logs", func() *Model {
 			m := New(1)
 			press(m, "L")

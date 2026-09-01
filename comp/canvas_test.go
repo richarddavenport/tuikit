@@ -339,3 +339,26 @@ func TestFillCoversARect(t *testing.T) {
 		t.Errorf("got %q, want %q", got, want)
 	}
 }
+
+// A script and a frame have to speak the same language, so parsing is the exact
+// inverse of naming.
+func TestParseIDRoundTripsWithString(t *testing.T) {
+	for _, id := range []ID{Region(list), Region(row).At(0), Region(row).At(112)} {
+		got, err := ParseID(id.String())
+		if err != nil {
+			t.Errorf("ParseID(%q): %v", id.String(), err)
+			continue
+		}
+		if got != id {
+			t.Errorf("ParseID(%q) = %+v, want %+v", id.String(), got, id)
+		}
+	}
+}
+
+func TestParseIDRejectsWhatItCannotName(t *testing.T) {
+	for _, s := range []string{"", "services.row[", "services.row[two]", "services.row[2"} {
+		if got, err := ParseID(s); err == nil {
+			t.Errorf("ParseID(%q) = %+v, want an error", s, got)
+		}
+	}
+}

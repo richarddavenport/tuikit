@@ -23,6 +23,8 @@
 package comp
 
 import (
+	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -95,7 +97,7 @@ func (id ID) String() string {
 	if id.Index == NoIndex {
 		return string(id.Name)
 	}
-	return string(id.Name) + "[" + itoa(id.Index) + "]"
+	return string(id.Name) + "[" + strconv.Itoa(id.Index) + "]"
 }
 
 // Cell is one character position.
@@ -351,25 +353,26 @@ func (c *Canvas) lastInk(y int) int {
 	return -1
 }
 
-// itoa keeps ID.String free of a strconv import for one call.
-func itoa(n int) string {
-	if n == 0 {
-		return "0"
+// ParseID reads a name as a capture script writes it: `services.row[2]`, or
+// `services` for a region as a whole.
+//
+// The inverse of ID.String, so a script and a frame speak the same language.
+// Whether the region exists is a separate question, and Canvas.Region answers
+// it — a name can be well-formed and still name nothing.
+func ParseID(s string) (ID, error) {
+	if s == "" {
+		return ID{}, fmt.Errorf("comp: no region named")
 	}
-	neg := n < 0
-	if neg {
-		n = -n
+	open := strings.IndexByte(s, '[')
+	if open < 0 {
+		return Region(Name(s)), nil
 	}
-	var d [20]byte
-	i := len(d)
-	for n > 0 {
-		i--
-		d[i] = byte('0' + n%10)
-		n /= 10
+	if !strings.HasSuffix(s, "]") {
+		return ID{}, fmt.Errorf("comp: %q opens an index and never closes it", s)
 	}
-	if neg {
-		i--
-		d[i] = '-'
+	i, err := strconv.Atoi(s[open+1 : len(s)-1])
+	if err != nil {
+		return ID{}, fmt.Errorf("comp: %q has an index that is not a number", s)
 	}
-	return string(d[i:])
+	return Region(Name(s[:open])).At(i), nil
 }

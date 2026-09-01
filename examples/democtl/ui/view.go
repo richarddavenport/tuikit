@@ -40,6 +40,9 @@ func (m *Model) View() string {
 		c.Text(body.X, body.Y, fmt.Sprintf("screen %d has no View case", m.screen), &m.sty.danger, comp.ID{})
 	}
 	m.footer(c)
+	if m.menu != nil {
+		m.drawMenu(c)
+	}
 	if m.confirm != nil {
 		m.modal(c)
 	}
@@ -78,6 +81,8 @@ func (m *Model) footer(c *comp.Canvas) {
 	switch {
 	case m.confirm != nil:
 		keys = "y confirm · n cancel"
+	case m.menu != nil:
+		keys = "↑↓ choose · enter do it · esc close"
 	case m.typing:
 		keys = "type to filter · enter keep · esc clear"
 	case m.screen == screenLogs:
@@ -85,18 +90,30 @@ func (m *Model) footer(c *comp.Canvas) {
 	case m.screen == screenRun:
 		keys = "r run again · esc back · q quit"
 	default:
-		keys = "↑↓ move · tab pane · ‹› tabs · / filter · L logs · D deploy · q quit"
+		keys = "↑↓ move · tab pane · ‹› tabs · / filter · m menu · L logs · D deploy · q quit"
 	}
 	c.Text(0, 2+m.bodyHeight(), comp.Truncate("  "+keys, m.width), &m.sty.muted, comp.Region(regFooter))
 }
 
 func (m *Model) dashboard(c *comp.Canvas, r comp.Rect) {
-	listWidth := r.W / 3
-	if listWidth < 24 {
-		listWidth = 24
-	}
+	listWidth := m.listWidth()
 	m.servicePane(c, comp.Rect{X: r.X, Y: r.Y, W: listWidth, H: r.H})
+
+	// The divider owns its column so a drag has something to grab. It draws a
+	// blank, and an owned blank is still trimmed from the output, so naming it
+	// costs the frame nothing.
+	c.Fill(comp.Rect{X: r.X + listWidth, Y: r.Y, W: 1, H: r.H}, " ", nil, comp.Region(regSplit))
+
 	m.detailPane(c, comp.Rect{X: r.X + listWidth + 1, Y: r.Y, W: r.W - listWidth - 1, H: r.H})
+}
+
+// listWidth is the divider's position: a third of the window until someone
+// drags it, and then wherever they left it.
+func (m *Model) listWidth() int {
+	if m.split > 0 {
+		return clamp(m.split, minPane, max(minPane, m.width-minPane-1))
+	}
+	return max(m.width/3, minPane)
 }
 
 func (m *Model) servicePane(c *comp.Canvas, r comp.Rect) {
@@ -118,13 +135,21 @@ func (m *Model) servicePane(c *comp.Canvas, r comp.Rect) {
 		c.Text(empty.X, empty.Y, "  nothing matches", &m.sty.muted, comp.Region(regServices))
 		return
 	}
-	for i, s := range list {
-		if i >= inner.H {
+	// Both offsets clamp against what was actually drawn last frame rather
+	// than against a constant, which is how a five-line pane ends up scrolled
+	// into empty space.
+	m.listMax = max(0, len(list)-inner.H)
+	m.listOffset = clamp(m.listOffset, 0, m.listMax)
+
+	for i := m.listOffset; i < len(list); i++ {
+		s := list[i]
+		y := inner.Y + i - m.listOffset
+		if y > inner.Y+inner.H-1 {
 			break
 		}
-		// The owner carries the index into the list, not the row it landed on.
-		// They are the same today because this list does not scroll yet; when
-		// it does, the index is what still names the right service.
+		// The owner carries the index into the LIST, not the row it landed on.
+		// They differ the moment the viewport moves, and an ID that means "row
+		// 3 of the screen" then acts on whatever scrolled into row 3.
 		id := comp.Region(regServicesRow).At(i)
 		style := m.stateStyle(s.State)
 		switch {
@@ -133,7 +158,7 @@ func (m *Model) servicePane(c *comp.Canvas, r comp.Rect) {
 		case i == m.cur:
 			style = &m.sty.focused
 		}
-		row := comp.Rect{X: inner.X, Y: inner.Y + i, W: inner.W, H: 1}
+		row := comp.Rect{X: inner.X, Y: y, W: inner.W, H: 1}
 		c.Fill(row, " ", style, id)
 		c.Text(row.X, row.Y, fmt.Sprintf(" %-14s %d/%d %s",
 			comp.Truncate(s.Name, 14), s.Ready, s.Want, mark(s.State)), style, id)
@@ -349,6 +374,54 @@ func (m *Model) modal(c *comp.Canvas) {
 		c.Text(inner.X, inner.Y+2+i, line, &m.sty.muted, id)
 	}
 	c.Text(inner.X, inner.Y+len(body)+3, "y confirm · n cancel", &m.sty.muted, id)
+}
+
+// drawMenu puts the context menu on top.
+//
+// Eight lines, and there is no compositing step. On a string frame this was 28
+// lines that re-measured every line underneath and spliced the menu into it —
+// and the version that replaced whole lines instead punched a hole through the
+// panes. Drawn last is on top; that is the entire implementation.
+func (m *Model) drawMenu(c *comp.Canvas) {
+	w := 4
+	for _, item := range m.menu.items {
+		w = max(w, comp.Width(item.label)+comp.Width(item.key)+6)
+	}
+	x, y := m.menu.x, m.menu.y
+	if m.menu.onRegion {
+		// Where the thing it belongs to is IN THIS FRAME. The panes are
+		// already drawn, so the canvas can be asked — and a menu anchored to a
+		// row that has since scrolled follows it rather than pointing at where
+		// it used to be.
+		if at, ok := c.Region(m.menu.on); ok {
+			x, y = at.X+2, at.Y
+		}
+	}
+	r := comp.Rect{X: x, Y: y, W: w, H: len(m.menu.items) + 2}
+
+	// Nudged back on screen rather than clipped. The canvas would happily draw
+	// half a menu off the edge — that is what it is for — but half a menu is a
+	// list of actions you cannot read, which is a different thing from a pane
+	// that is cut off.
+	if bounds := c.Bounds(); true {
+		r.X = clamp(r.X, 0, max(0, bounds.W-r.W))
+		r.Y = clamp(r.Y, 0, max(0, bounds.H-r.H))
+	}
+	inner := m.box(c, r, "", true, comp.Region(regMenu))
+
+	for i, item := range m.menu.items {
+		id := comp.Region(regMenuItem).At(i)
+		style := &m.sty.muted
+		if i == m.menu.cur {
+			style = &m.sty.selected
+		}
+		row := comp.Rect{X: inner.X, Y: inner.Y + i, W: inner.W, H: 1}
+		c.Fill(row, " ", style, id)
+		c.Text(row.X+1, row.Y, item.label, style, id)
+		// The key sits beside the action rather than in a manual somewhere,
+		// because it is the same list.
+		c.Text(row.X+row.W-comp.Width(item.key)-1, row.Y, item.key, style, id)
+	}
 }
 
 // box draws a titled frame and returns the rect inside it.

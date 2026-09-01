@@ -20,8 +20,18 @@ type Driver interface {
 func Press(m Driver, keys ...string) {
 	for _, k := range keys {
 		m.Update(key(k))
+		redraw(m)
 	}
 }
+
+// redraw keeps the frame current after an input.
+//
+// Every helper here does it, because a model is drawn on every message when it
+// is really running, and a harness that skips it hands the next line of a
+// script a frame from before the thing it is about to address. That failure
+// reads as "menu.item[1] was not drawn" when the menu is plainly open, which
+// sends you looking in the wrong place entirely.
+func redraw(m Driver) { _ = m.View() }
 
 // Run sends a key and drains the command it returns, one level deep.
 //
@@ -38,11 +48,15 @@ func Run(m Driver, k string) {
 	if msg := cmd(); msg != nil {
 		m.Update(msg)
 	}
+	redraw(m)
 }
 
 // Resize tells a model the terminal changed, for capturing the same screen at
 // several widths.
-func Resize(m Driver, w, h int) { m.Update(tea.WindowSizeMsg{Width: w, Height: h}) }
+func Resize(m Driver, w, h int) {
+	m.Update(tea.WindowSizeMsg{Width: w, Height: h})
+	redraw(m)
+}
 
 func key(name string) tea.KeyMsg {
 	if t, ok := named[name]; ok {

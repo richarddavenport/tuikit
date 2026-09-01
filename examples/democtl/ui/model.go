@@ -63,6 +63,19 @@ type Model struct {
 	gen int
 
 	confirm *confirmState
+	// menu is the open context menu, and dragging says the divider has the
+	// mouse until it is let go.
+	menu     *menuState
+	dragging bool
+
+	// split is the list pane's width, once someone has dragged it. Zero means
+	// the default, so a tool that is never dragged has no state to capture.
+	split int
+	// listOffset is the list's viewport, a separate field from cur because
+	// scrolling is looking around and choosing is not. listMax is what the
+	// last frame could actually scroll to — clamping against a constant is how
+	// a five-line pane scrolls into empty space.
+	listOffset, listMax int
 
 	width, height int
 	// canvas is the last frame drawn, kept so a mouse event can ask what it
@@ -112,6 +125,11 @@ func (m *Model) SetPalette(p theme.Palette) { m.sty = newStyles(p) }
 // SetSize is what the capture harness calls instead of waiting for a terminal.
 func (m *Model) SetSize(w, h int) { m.width, m.height = w, h }
 
+// Canvas is the last frame drawn, so a script can ask what is where. This is
+// what harness.Driver wants, and it is three lines because the frame already
+// knows.
+func (m *Model) Canvas() *comp.Canvas { return m.canvas }
+
 // Now freezes the clock.
 func (m *Model) Now(t time.Time) { m.now = t }
 
@@ -153,7 +171,7 @@ func (m *Model) selected() (fleet.Service, bool) {
 // the filter is being typed, j is the letter j. Without this the list scrolls
 // behind a dialog, which is the kind of bug that survives review because nobody
 // tries it.
-func (m *Model) capturesKeys() bool { return m.typing || m.confirm != nil }
+func (m *Model) capturesKeys() bool { return m.typing || m.confirm != nil || m.menu != nil }
 
 func contains(haystack, needle string) bool {
 	if needle == "" {

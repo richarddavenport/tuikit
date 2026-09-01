@@ -34,4 +34,4 @@ democtl  a tuikit example  needs attention                                      
 │                                          │ │                                                                                     │
 │                                          │ │                                                                                     │
 └──────────────────────────────────────────┘ └─────────────────────────────────────────────────────────────────────────────────────┘
-  ↑↓ move · tab pane · ‹› tabs · / filter · L logs · D deploy · q quit
+  ↑↓ move · tab pane · ‹› tabs · / filter · m menu · L logs · D deploy · q quit

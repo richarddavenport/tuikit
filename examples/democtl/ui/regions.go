@@ -25,5 +25,11 @@ const (
 	regRun     comp.Name = "run"
 	regRunStep comp.Name = "run.step"
 
-	regConfirm comp.Name = "confirm"
+	// regSplit is the column between the panes. It draws nothing — an owned
+	// blank is still trimmed from the output — but it is what a drag grabs.
+	regSplit comp.Name = "split"
+
+	regConfirm  comp.Name = "confirm"
+	regMenu     comp.Name = "menu"
+	regMenuItem comp.Name = "menu.item"
 )

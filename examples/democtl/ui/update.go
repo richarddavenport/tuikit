@@ -5,6 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
 )
 
@@ -37,6 +38,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, m.startStep(msg.index + 1)
 
+	case tea.MouseMsg:
+		return m, m.mouse(msg)
+
 	case tea.KeyMsg:
 		return m, m.key(msg)
 	}
@@ -48,8 +52,11 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // global handled before a modal is a modal you cannot type into.
 func (m *Model) key(msg tea.KeyMsg) tea.Cmd {
 	if m.capturesKeys() {
-		if m.confirm != nil {
+		switch {
+		case m.confirm != nil:
 			return m.confirmKey(msg)
+		case m.menu != nil:
+			return m.menuKey(msg)
 		}
 		return m.filterKey(msg)
 	}
@@ -118,22 +125,13 @@ func (m *Model) dashboardKey(msg tea.KeyMsg) bool {
 			m.screen, m.logOffset = screenLogs, 0
 		}
 	case "D":
-		svc, ok := m.selected()
-		if !ok {
-			return true
-		}
-		m.confirm = &confirmState{
-			title:  "Deploy " + svc.Name + "?",
-			body:   "Pushes a new service spec and waits for the tasks to converge. The current tasks are replaced one at a time.",
-			danger: svc.State == fleet.Failed,
-			do: func(m *Model) tea.Cmd {
-				// The failed service is the one whose deploy breaks, so the
-				// step list's failure state is reachable by hand rather than
-				// only from a test.
-				m.startRun(fleet.Deploy(svc.Name, svc.State == fleet.Failed))
-				return m.startStep(0)
-			},
-		}
+		m.confirmDeploy()
+	case "m":
+		// The menu opens from the keyboard, at the cursor. Not a convenience:
+		// it is the only way the mouse and keyboard paths cannot drift, since
+		// they are one list rather than a list and a keymap maintained beside
+		// it.
+		m.openMenuOn(comp.Region(regServicesRow).At(m.cur))
 	default:
 		return false
 	}
