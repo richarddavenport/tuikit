@@ -138,6 +138,12 @@ func (m *Model) detailPane(w, h int) string {
 
 // tabStrip draws the tabs. The angle quotes are in the glyph set; the tee
 // pieces a nicer strip would want are not, so it does not have any.
+//
+// Padded with padVisible, not pad. The parts are STYLED, and pad measures with
+// trim, which counts runes — so with colour on the escape bytes inflate the
+// count, the strip is cut mid-sequence, the \x1b[0m that ends the bold run is
+// eaten, and bold leaks along the rest of the row. Invisible in the goldens,
+// which run uncoloured; caught by TestColourDoesNotChangeTheShape.
 func (m *Model) tabStrip(w int) string {
 	var parts []string
 	for i, name := range tabNames {
@@ -148,7 +154,7 @@ func (m *Model) tabStrip(w int) string {
 			parts = append(parts, m.sty.muted.Render(" "+label+" "))
 		}
 	}
-	return pad(" "+strings.Join(parts, ""), w)
+	return padVisible(" "+strings.Join(parts, ""), w)
 }
 
 func (m *Model) field(name, value string) string {

@@ -89,28 +89,28 @@ func HTML(frame string) string {
 	var b strings.Builder
 	b.WriteString(`<div class="tuikit-frame">`)
 
-	var open bool
+	var st sgr
 	for i, line := range Lines(frame) {
 		if i > 0 {
 			b.WriteByte('\n')
 		}
-		open = writeLine(&b, line, open)
-	}
-	if open {
-		b.WriteString("</span>")
+		st = writeLine(&b, line, st)
 	}
 	b.WriteString(`</div>`)
 	return b.String()
 }
 
-// writeLine converts one line, returning whether a span is still open. Spans do
-// not straddle lines — a colour left switched on across a newline paints the
-// page's background, which is how a frame ends up with a coloured margin.
-func writeLine(b *strings.Builder, line string, open bool) bool {
-	if open {
-		b.WriteString("</span>")
-		open = false
-	}
+// writeLine converts one line, carrying the style in and handing it back out.
+//
+// Two rules that are easy to get wrong in opposite directions. A span must not
+// straddle a newline — a colour left switched on across one paints the page's
+// background, which is how a frame ends up with a coloured margin. But the
+// STYLE does cross the line, because it does in a terminal: a background left
+// on at the end of a row paints the start of the next. So the span is closed
+// and reopened, rather than the state being forgotten.
+func writeLine(b *strings.Builder, line string, st sgr) sgr {
+	open := st.open(b)
+
 	runes := []rune(line)
 	for i := 0; i < len(runes); i++ {
 		if runes[i] != 0x1b {
@@ -142,64 +142,140 @@ func writeLine(b *strings.Builder, line string, open bool) bool {
 		}
 		if open {
 			b.WriteString("</span>")
-			open = false
 		}
-		if style := css(params); style != "" {
-			fmt.Fprintf(b, `<span style="%s">`, style)
-			open = true
-		}
+		st = st.apply(params)
+		open = st.open(b)
 	}
-	return open
+	if open {
+		b.WriteString("</span>")
+	}
+	return st
 }
 
-// css turns SGR parameters into a style. Only what a tuikit interface emits is
-// handled: reset, bold, and the 256-colour foreground and background forms.
-// Anything else is ignored rather than guessed at.
-func css(params string) string {
-	fields := strings.Split(params, ";")
+// sgr is the drawing state a terminal carries between characters.
+//
+// State rather than a style-per-sequence, which is the bug this replaced: a
+// terminal ACCUMULATES, so `\x1b[1m` then `\x1b[38;5;205m` is bold pink, and a
+// reader that treats each sequence as a complete style renders the second as
+// pink with the bold silently dropped.
+type sgr struct {
+	fg, bg string // hex, or empty for the terminal's default
+	bold   bool
+}
+
+// open writes the span for the current state, if it needs one.
+func (s sgr) open(b *strings.Builder) bool {
+	css := s.css()
+	if css == "" {
+		return false
+	}
+	fmt.Fprintf(b, `<span style="%s">`, css)
+	return true
+}
+
+func (s sgr) css() string {
 	var out []string
-	for i := 0; i < len(fields); i++ {
-		switch fields[i] {
-		case "", "0":
-			return "" // reset closes the span
-		case "1":
-			out = append(out, "font-weight:600")
-		case "38", "48":
-			// 38;5;N and 48;5;N — foreground and background from the palette.
-			if i+2 < len(fields) && fields[i+1] == "5" {
-				prop := "color"
-				if fields[i] == "48" {
-					prop = "background"
-				}
-				out = append(out, prop+":"+theme.Hex(lipgloss.Color(fields[i+2])))
-				i += 2
-			}
-		default:
-			if n, err := strconv.Atoi(fields[i]); err == nil {
-				if hex := basicColor(n); hex != "" {
-					out = append(out, hex)
-				}
-			}
-		}
+	if s.fg != "" {
+		out = append(out, "color:"+s.fg)
+	}
+	if s.bg != "" {
+		out = append(out, "background:"+s.bg)
+	}
+	if s.bold {
+		out = append(out, "font-weight:600")
 	}
 	return strings.Join(out, ";")
 }
 
-// basicColor handles the sixteen direct SGR colours, which lipgloss emits for a
-// palette index below 16.
-func basicColor(n int) string {
-	switch {
-	case n >= 30 && n <= 37:
-		return "color:" + theme.Hex(lipgloss.Color(strconv.Itoa(n-30)))
-	case n >= 90 && n <= 97:
-		return "color:" + theme.Hex(lipgloss.Color(strconv.Itoa(n-90+8)))
-	case n >= 40 && n <= 47:
-		return "background:" + theme.Hex(lipgloss.Color(strconv.Itoa(n-40)))
-	case n >= 100 && n <= 107:
-		return "background:" + theme.Hex(lipgloss.Color(strconv.Itoa(n-100+8)))
+// apply folds one SGR sequence into the state.
+//
+// Only what a terminal interface emits is handled: reset, bold, the default
+// colours, and both extended colour forms. Anything else is ignored rather than
+// guessed at.
+func (s sgr) apply(params string) sgr {
+	if params == "" {
+		return sgr{} // a bare \x1b[m is a reset
 	}
-	return ""
+	fields := strings.Split(params, ";")
+	for i := 0; i < len(fields); i++ {
+		n, err := strconv.Atoi(fields[i])
+		if err != nil {
+			continue
+		}
+		switch {
+		case n == 0:
+			s = sgr{}
+		case n == 1:
+			s.bold = true
+		case n == 22:
+			s.bold = false
+		case n == 39:
+			s.fg = ""
+		case n == 49:
+			s.bg = ""
+		case n == 38 || n == 48:
+			hex, used := extended(fields[i+1:])
+			if hex != "" {
+				if n == 38 {
+					s.fg = hex
+				} else {
+					s.bg = hex
+				}
+			}
+			i += used
+		case n >= 30 && n <= 37:
+			s.fg = indexHex(n - 30)
+		case n >= 90 && n <= 97:
+			s.fg = indexHex(n - 90 + 8)
+		case n >= 40 && n <= 47:
+			s.bg = indexHex(n - 40)
+		case n >= 100 && n <= 107:
+			s.bg = indexHex(n - 100 + 8)
+		}
+	}
+	return s
 }
+
+// extended reads the tail of a 38 or 48 sequence: `5;N` for a palette index,
+// `2;R;G;B` for 24-bit. It returns the colour and how many fields it consumed.
+//
+// The 24-bit form is why this is a parser rather than a lookup. Reading the
+// fields of `38;2;255;95;175` one at a time and asking what each MEANS finds
+// 95 in the range of the bright-colour codes, and renders a hand-picked pink as
+// bright magenta — a plausible wrong colour, which nobody questions.
+func extended(rest []string) (string, int) {
+	if len(rest) == 0 {
+		return "", 0
+	}
+	switch rest[0] {
+	case "5":
+		if len(rest) < 2 {
+			return "", len(rest)
+		}
+		n, err := strconv.Atoi(rest[1])
+		if err != nil {
+			return "", 2
+		}
+		return indexHex(n), 2
+	case "2":
+		if len(rest) < 4 {
+			return "", len(rest)
+		}
+		var c [3]int
+		for k := range c {
+			v, err := strconv.Atoi(rest[k+1])
+			if err != nil {
+				return "", 4
+			}
+			c[k] = v
+		}
+		return fmt.Sprintf("#%02x%02x%02x", c[0], c[1], c[2]), 4
+	}
+	return "", 1
+}
+
+// indexHex is a palette index as the browser needs it.
+func indexHex(n int) string { return theme.Hex(lipgloss.Color(strconv.Itoa(n))) }
 
 // FrameCSS is the style a page needs for HTML's output. Dark ground in both
 // themes, system mono, no ligatures, one character one cell.

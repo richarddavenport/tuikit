@@ -271,3 +271,65 @@ func (r *recorder) Fatalf(format string, args ...any) {
 	r.Errorf(format, args...)
 	panic("fatal")
 }
+
+// A terminal accumulates SGR state, so bold set by one sequence survives a
+// later one that only names a colour. Treating each sequence as a complete
+// style renders the second run pink with the bold silently gone — which is a
+// real frame democtl draws, not a synthetic case.
+func TestHTMLAccumulatesStyleTheWayATerminalDoes(t *testing.T) {
+	forceColour()
+	got := HTML("\x1b[1m\x1b[38;5;205mbold pink\x1b[0m")
+
+	// The text must sit inside ONE span carrying both. Asserting that the page
+	// merely contains each property somewhere passes against the bug, which
+	// emits a bold span and then a separate colour span with the bold gone.
+	if want := `<span style="color:#ff5faf;font-weight:600">bold pink`; !strings.Contains(got, want) {
+		t.Errorf("the bold and the colour are not on one span:\n%s", got)
+	}
+}
+
+// A style that straddles a line break continues in a terminal, so it has to
+// continue on the page. The span still closes at the newline — it is reopened
+// on the next line rather than left hanging.
+func TestHTMLCarriesStyleAcrossALineBreak(t *testing.T) {
+	forceColour()
+	got := HTML("\x1b[48;5;57mrow one\nrow two\x1b[0m")
+
+	lines := strings.Split(got, "\n")
+	if len(lines) != 2 {
+		t.Fatalf("expected two lines:\n%s", got)
+	}
+	if !strings.Contains(lines[1], "background:#5f00ff") {
+		t.Errorf("the background did not cross the line break:\n%s", lines[1])
+	}
+	if opens, closes := strings.Count(got, "<span"), strings.Count(got, "</span>"); opens != closes {
+		t.Errorf("%d spans opened, %d closed:\n%s", opens, closes, got)
+	}
+}
+
+// 24-bit colour is not something theme produces — the palette is nine 256
+// indices — but it is what lipgloss emits the moment a tool author writes a hex
+// value, and reading its channels one at a time as separate SGR codes finds 95
+// in the bright-colour range and renders a hand-picked pink as bright magenta.
+func TestHTMLDoesNotMistakeAColourChannelForACode(t *testing.T) {
+	forceColour()
+	got := HTML(lipgloss.NewStyle().Foreground(lipgloss.Color("#ff5faf")).Render("hand-picked"))
+
+	if !strings.Contains(got, "#ff5faf") {
+		t.Errorf("a 24-bit colour did not survive:\n%s", got)
+	}
+	if strings.Contains(got, "#ff00ff") {
+		t.Errorf("the blue channel was read as SGR 95, bright magenta:\n%s", got)
+	}
+}
+
+// A background must not survive a reset, or every frame after the first styled
+// run is painted.
+func TestHTMLResetClearsEverything(t *testing.T) {
+	forceColour()
+	got := HTML("\x1b[1;48;5;57mrow\x1b[0mplain")
+
+	if strings.Contains(got, ">plain") && strings.Contains(got, `<span style="background:#5f00ff;font-weight:600">plain`) {
+		t.Errorf("the reset did not clear the state:\n%s", got)
+	}
+}

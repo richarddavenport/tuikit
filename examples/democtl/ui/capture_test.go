@@ -64,3 +64,31 @@ func TestFramesAtEightyColumns(t *testing.T) {
 		})
 	}
 }
+
+// Colour must not change the shape.
+//
+// The half of the golden suite that the goldens cannot be: they run uncoloured,
+// where a helper that measures a styled string by counting runes is correct.
+// This draws every screen both ways and compares what a reader sees — which is
+// how democtl's tab strip was caught printing "‹ Config …" at 80 columns in a
+// real terminal while its golden showed the whole strip.
+func TestColourDoesNotChangeTheShape(t *testing.T) {
+	for _, size := range []struct {
+		name string
+		w, h int
+	}{
+		{"132x38", 132, 38},
+		{"80x24", 80, 24},
+	} {
+		t.Run(size.name, func(t *testing.T) {
+			for _, st := range states() {
+				harness.ShapeSurvivesColour(t, st.name, func() string {
+					m := st.build()
+					m.SetSize(size.w, size.h)
+					m.Now(fleet.Epoch)
+					return m.View()
+				})
+			}
+		})
+	}
+}
