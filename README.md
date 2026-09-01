@@ -5,8 +5,8 @@ A TUI framework for developers and agents. Go, Bubble Tea, Lip Gloss.
 It exists because four tools — [swarmctl], [pgctl], [azctl], [dugo] — arrived at
 the same shape independently, and that shape currently travels by copy. tuikit is
 that shape as a module: the vocabulary an interface is allowed to use, the guards
-that hold it closed, and (soon) the components, the capture harness, and a
-scaffolder.
+that hold it closed, the components, the capture harness, and a scaffolder that
+writes a tool which builds and passes its own checks on the first run.
 
 [swarmctl]: https://github.com/richarddavenport/swarmctl
 [pgctl]: https://github.com/richarddavenport/pgctl
@@ -107,45 +107,41 @@ composed.
 
 ## Starting a tool
 
-`tuikit new` does not exist yet — it is [#13], and it comes last on purpose, so
-that it generates what a real migration turned out to need rather than what
-seemed likely beforehand. Until then the supported path is copying the example,
-which is what the scaffolder will generate anyway:
-
 ```sh
-cp -r examples/democtl ../mytool
-cd ../mytool
-go mod init github.com/you/mytool     # then fix the import paths
+tuikit new mytool -short "what it does" -module github.com/you/mytool
+cd mytool && make check
 ```
 
-`examples/democtl` is a complete working tool, not a snippet: a fictional
-service fleet with a dashboard, a log pane, a confirm modal and a step run, in
-about 1,700 lines. Delete the screens you do not want.
+That is the whole of it. The generated tool **builds, runs and passes its own
+checks with no edits** — a test in `scaffold/` generates one into a temporary
+directory and puts `go build`, `go vet`, `go test` and `describe --json`
+through it, so the claim is run rather than asserted.
 
-**What to keep, and why:**
+`tuikit new` came last on purpose. It generates what a real migration turned
+out to need rather than what seemed likely beforehand, and the order it writes
+things in is the order of how much trouble each one saves:
 
-| Keep | Because |
+| You get | Because |
 |---|---|
-| `fleet/` and `ui/` as separate packages | The engine knows the domain and has **no UI imports**; the UI never calls the domain directly. Every tool in the family keeps this split, and it is what makes both halves testable. |
-| `ui/guard_test.go` | Six lines. It holds your palette and glyph set closed from your first commit rather than from whenever someone thinks of it. |
-| `ui/style.go` | Styles built from a `theme.Palette` rather than declared at package level, so changing the palette changes the interface without editing the file. |
-| `capturesKeys` in `ui/model.go` | The mode split: while a modal is open or a filter is being typed, `j` is the letter j. Without it your list scrolls behind the dialog, and nobody finds that in review. |
-| The generation counter on `stepDoneMsg` | An async result from something the user walked away from must not draw into its successor. Easy to write, almost impossible to see once written. |
-| The `View()` switch with a loud `default` | A screen constant without a case renders as an empty terminal and says nothing about why. |
-| `fleet.Epoch` and the seeded data | Only if you want capture. A frame reading "47s ago" has to read that tomorrow, or every golden fails the day after it is written. |
+| `internal/engine`, `internal/tui`, `internal/cli` as separate packages | The engine knows the domain and has **no terminal imports**; the CLI is a peer of the interface over the same engine, not a wrapper around it. `guard.Engine` holds it closed from the first commit. |
+| A **pointer** model with the components already in it | tuikit's components own state — a cursor, a viewport, a divider — and that state cannot survive being copied on every message. A value model compiles, runs, and silently forgets every scroll. It is the one change azctl's migration had to make in every file. |
+| A fixture and a capture test | Screens you can look at without whatever the real backend needs. azctl went years with no screenshot of its own interface because that split was not there. |
+| `guard_test.go`, already calling the guards | Five lines. Your palette, your glyph set and your engine's ignorance are closed from the first commit rather than from whenever someone thinks of it. |
+| A `spec.Command` tree, and a `main` that returns its exit code | One declaration becomes the CLI, the screens, `describe --json` and the context menus. Nothing calls `os.Exit` but `main`, so the richer exit-code contract survives. |
+| A Makefile, three workflows, a linter config | Repo infrastructure cannot be a dependency, which is the whole reason a scaffolder exists. `make check` is exactly what CI runs. |
+| `README.md`, `AGENTS.md`, `CONTEXT.md`, `design/decisions.md` | An agent arriving at the repo is told where things live, what will fail its change, and what the words mean. |
 
-`examples/democtl/README.md` says what each part is a reference for, and lists
-the two bugs its own frames caught.
-
-[#13]: https://github.com/richarddavenport/tuikit/issues/13
+`examples/democtl` is still there, and it is the bigger reference: a complete
+working tool with a dashboard, a log pane, a context menu, a confirm modal and
+a step run, in about 1,700 lines. Read it for a screen the scaffolder does not
+generate; do not copy it to start.
 
 ## What is coming
 
-`comp` (the
-components each of the four wrote separately), `app` (the Bubble Tea shell and
-its async conventions), `spec` (one command declaration → CLI, TUI screen, and a
-`describe --json` manifest an agent reads), `tuikit watch`, `tuikit gallery`,
-`tuikit new`. See `design/` for the reasoning and
+The pieces are all here — `theme`, `guard`, `comp`, `app`, `spec`, `harness`,
+`docgen`, and `tuikit` itself with `new`, `watch`, `gallery`, `frames` and
+`designsystem`. What is left is the work of using them: more guards, and the
+remaining three tools moving across. See `design/` for the reasoning and
 [the issues](https://github.com/richarddavenport/tuikit/issues) for the state.
 
 ## Why an agent gets on with it
