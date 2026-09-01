@@ -40,15 +40,47 @@ func TestEveryComponentIsInTheGallery(t *testing.T) {
 			t.Errorf("comp.%s has no gallery entry — a component that is not in the gallery is not finished", name)
 		}
 	}
-	in := map[string]bool{}
-	for _, name := range components {
-		in[name] = true
-	}
+	// The reverse direction asks a WEAKER question on purpose: does comp have a
+	// type by this name at all. An entry for a type that no longer exists is a
+	// gallery lying about the library; an entry for one that exists and does
+	// not draw is comp.Layout, which computes rects and is worth looking at
+	// precisely because you cannot see it in any other way.
+	types := typesIn(t, "../comp")
 	for name := range shown {
-		if !in[name] {
+		if !types[name] {
 			t.Errorf("the gallery has an entry for %q, which comp does not have", name)
 		}
 	}
+}
+
+// typesIn is every exported type in a package, drawing or not.
+func typesIn(t *testing.T, dir string) map[string]bool {
+	t.Helper()
+
+	pkgs, err := parser.ParseDir(token.NewFileSet(), dir, nil, 0) //nolint:staticcheck // see componentsIn
+	if err != nil {
+		t.Fatalf("gallery: %v", err)
+	}
+	out := map[string]bool{}
+	for _, pkg := range pkgs {
+		for name, file := range pkg.Files {
+			if strings.HasSuffix(name, "_test.go") {
+				continue
+			}
+			for _, decl := range file.Decls {
+				gen, ok := decl.(*ast.GenDecl)
+				if !ok || gen.Tok != token.TYPE {
+					continue
+				}
+				for _, spec := range gen.Specs {
+					if ts, ok := spec.(*ast.TypeSpec); ok && ast.IsExported(ts.Name.Name) {
+						out[ts.Name.Name] = true
+					}
+				}
+			}
+		}
+	}
+	return out
 }
 
 // componentsIn is every exported type in a package with a Draw* method.
