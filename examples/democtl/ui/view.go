@@ -304,45 +304,29 @@ func (m *Model) modal(c *comp.Canvas) {
 // lines that re-measured every line underneath and spliced the menu into it —
 // and the version that replaced whole lines instead punched a hole through the
 // panes. Drawn last is on top; that is the entire implementation.
+// drawMenu is comp.Menu, styled.
+//
+// What used to be here was forty lines with three real rules buried in it: a
+// keyboard-opened menu anchors to where its region is IN THIS FRAME, the box is
+// nudged back on screen rather than clipped, and the key sits beside the action
+// because it is the same list. All three are the component's now.
 func (m *Model) drawMenu(c *comp.Canvas) {
-	w := 4
-	for _, item := range m.menu.items {
-		w = max(w, comp.Width(item.Label)+comp.Width(item.Key)+6)
+	menu := comp.Menu{
+		Name: regMenu, Item: regMenuItem,
+		Items:    make([]comp.Hint, len(m.menu.items)),
+		Cursor:   m.menu.cur,
+		Border:   &m.sty.focused,
+		Style:    &m.sty.muted,
+		Selected: &m.sty.selected,
 	}
-	x, y := m.menu.x, m.menu.y
-	if m.menu.onRegion {
-		// Where the thing it belongs to is IN THIS FRAME. The panes are
-		// already drawn, so the canvas can be asked — and a menu anchored to a
-		// row that has since scrolled follows it rather than pointing at where
-		// it used to be.
-		if at, ok := c.Region(m.menu.on); ok {
-			x, y = at.X+2, at.Y
-		}
-	}
-	r := comp.Rect{X: x, Y: y, W: w, H: len(m.menu.items) + 2}
-
-	// Nudged back on screen rather than clipped. The canvas would happily draw
-	// half a menu off the edge — that is what it is for — but half a menu is a
-	// list of actions you cannot read, which is a different thing from a pane
-	// that is cut off.
-	bounds := c.Bounds()
-	r.X = min(max(r.X, 0), max(0, bounds.W-r.W))
-	r.Y = min(max(r.Y, 0), max(0, bounds.H-r.H))
-	inner := m.box(c, r, "", true, comp.Region(regMenu))
-
 	for i, item := range m.menu.items {
-		id := comp.Region(regMenuItem).At(i)
-		style := &m.sty.muted
-		if i == m.menu.cur {
-			style = &m.sty.selected
-		}
-		row := comp.Rect{X: inner.X, Y: inner.Y + i, W: inner.W, H: 1}
-		c.Fill(row, " ", style, id)
-		c.Text(row.X+1, row.Y, item.Label, style, id)
-		// The key sits beside the action rather than in a manual somewhere,
-		// because it is the same list.
-		c.Text(row.X+row.W-comp.Width(item.Key)-1, row.Y, item.Key, style, id)
+		menu.Items[i] = item.Hint
 	}
+	if m.menu.onRegion {
+		menu.DrawOn(c, m.menu.on)
+		return
+	}
+	menu.DrawAt(c, m.menu.x, m.menu.y)
 }
 
 // box draws one of democtl's panes.
