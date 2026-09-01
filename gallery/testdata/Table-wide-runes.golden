@@ -1,13 +1,13 @@
 tuikit gallery  every component, running                                                                                9 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ LogPane                                                                                        │
-│ List                          │ │ A stream of lines, tailing. Following is a place, not a mode.                                  │
-│ Pane                          │ │ ‹ following · detached · empty · one line ›                                                    │
-│ Tabs                          │ │ no scrolling to do, and it still says so                                                       │
+│ Components                    │ │ Table                                                                                          │
+│ List                          │ │ Rows of aligned columns. It lays out; a List selects and scrolls.                              │
+│ Pane                          │ │ ‹ marker first · a cell too long · wide runes · narrow ›                                       │
+│ Tabs                          │ │ measured in columns, or one CJK name knocks every row below it out                             │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │   09:10:00 api_gateway: handled request in 121ms                                               │
-│ StepList                      │ │                                                                                                │
+│ Confirm                       │ │ ✓ 世界のサービス                                                                api        3/3 │
+│ StepList                      │ │ ✓ ascii_service                                                                 api        3/3 │
 │ LogPane                       │ │                                                                                                │
 │ Spinner                       │ │                                                                                                │
 │ Table                         │ │                                                                                                │
@@ -27,11 +27,11 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │                                                                                     following  │
-│                               │ │ keys     ↑↓ scroll, detaching from the tail                                                    │
-│                               │ │ mouse    wheel the same                                                                        │
-│                               │ │ roles    Muted · Stderr                                                                        │
-│                               │ │ from     swarmctl logspane.go                                                                  │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ roles    Muted                                                                                 │
+│                               │ │ glyphs   ✓ ✗ ● …                                                                               │
+│                               │ │ from     pgctl rows.go, swarmctl pane and detail tables                                        │
 │                           9/9 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

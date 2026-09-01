@@ -28,6 +28,52 @@ func (m *Model) Entries() []Entry {
 		m.stepListEntry(s),
 		m.logPaneEntry(s),
 		m.spinnerEntry(s),
+		m.tableEntry(s),
+	}
+}
+
+func (m *Model) tableEntry(s *styles) Entry {
+	svc := [][]string{
+		{"✓", "api_gateway", "api", "3/3"},
+		{"●", "api_worker", "api", "1/2"},
+		{"✗", "api_migrate", "api", "0/1"},
+		{"✓", "web_frontend", "web", "4/4"},
+	}
+	long := [][]string{
+		{"✓", "a_service_with_a_very_long_name", "platform", "12/12"},
+		{"✓", "short", "web", "1/1"},
+	}
+	wide := [][]string{
+		{"✓", "世界のサービス", "api", "3/3"},
+		{"✓", "ascii_service", "api", "3/3"},
+	}
+	draw := func(tbl comp.Table, rows [][]string) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			tbl.Draw(c, r, rows, &s.muted, comp.Region("demo.table"))
+		}
+	}
+	standard := comp.Table{Gap: 1, Columns: []comp.Column{
+		{Width: 1}, {Fill: true}, {Width: 8}, {Width: 5, Right: true},
+	}}
+	return Entry{
+		Name:    "Table",
+		Summary: "Rows of aligned columns. It lays out; a List selects and scrolls.",
+		From:    "pgctl rows.go, swarmctl pane and detail tables",
+		Roles:   []string{"Muted"},
+		Glyphs:  []string{"✓", "✗", "●", "…"},
+		States: []State{
+			{Name: "marker first", Note: "'can I reach it' before 'which is it' — an unreachable one changes everything below",
+				Draw: draw(standard, svc)},
+			{Name: "a cell too long", Note: "truncated, so the columns after it stay where they are",
+				Draw: draw(standard, long)},
+			{Name: "wide runes", Note: "measured in columns, or one CJK name knocks every row below it out",
+				Draw: draw(standard, wide)},
+			{Name: "narrow", Note: "the filler gives its space up first",
+				Draw: func(c *comp.Canvas, r comp.Rect, _ bool) {
+					standard.Draw(c, comp.Rect{X: r.X, Y: r.Y, W: min(r.W, 26), H: r.H}, svc,
+						&s.muted, comp.Region("demo.table"))
+				}},
+		},
 	}
 }
 
