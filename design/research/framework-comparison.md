@@ -7,6 +7,13 @@ was Richard's: **what are we offering that these are not?**
 Every claim below came from reading the source, not the README. Where a README
 and the code disagree, that is noted, because it happened three times.
 
+> **Superseded in scope, 2026-09-01.** The pool this doc reasons over is one
+> GitHub query — `--language=go bubbletea` — so it could not contain tview,
+> termdash, or anything in Rust. The two most popular Go TUIs (lazygit, dive)
+> and the whole ratatui world were invisible to it. Read
+> [tui-landscape.md](tui-landscape.md) after this one: the per-project readings
+> below still stand, the field-wide conclusions are corrected there.
+
 | | Stars | Last commit | Tests |
 | --- | ---: | --- | ---: |
 | [metafates/bento](https://github.com/metafates/bento) | 17 | Mar 2025 | 4 files |

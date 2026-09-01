@@ -621,3 +621,106 @@ test that every role converts would have passed over a broken one.
 And `base16` claimed to hold xterm's defaults while holding the VGA set
 (`#800000` red, `#c0c0c0` white). It matters more than it did, because those
 sixteen are now every swatch on the design system page.
+
+## 29. Pixels are a decoration pass, and the cells are always the drawing
+
+swarmctl's design notes asked for a pixel layer — a panel drawn as a real image
+composited over the terminal, with a soft shadow and a smooth gradient. The
+obvious reading is that this needs a second renderer and a second view, and that
+a tool would have to be written twice.
+
+It does not, and the reason is decision 20. **An owner ID already says which
+cells a component drew.** So the pixel layer needs no layout of its own; it
+needs one call:
+
+```go
+// Picture asks that, if this terminal can, img be painted over the cells
+// owned by id. A terminal that cannot simply shows the cells.
+func (c *Canvas) Picture(id ID, img image.Image)
+```
+
+A component draws its panel as characters — always, unconditionally — and then
+says "and if you can do better, here is a picture of that." Nothing is written
+twice, because the cell drawing is not a fallback that exists for the pixel
+path's benefit. It is the drawing. The picture is a decoration over it.
+
+**The goldens never move**, because capability detection is false under test.
+Every golden is permanently a picture of the cells, which makes the fallback the
+most heavily regression-tested path in the system rather than the least.
+
+### Omarchy 4 made this mandatory rather than tidy
+
+There are two terminal graphics protocols and no terminal speaks both.
+
+**Sixel** is DEC's, from the 1980s: the image is encoded as text in stripes six
+pixels tall and pasted at the cursor. It is opaque — it covers the cells under
+it and nothing shows through — colour-register based rather than truecolour, and
+it has no z-index. Disturb the screen and it is gone.
+
+**The kitty graphics protocol** carries 32-bit RGBA and a z-index, stores the
+image under an id so it can be re-placed cheaply, and can sit *behind* the text
+at z = −1. Its Unicode placeholders let an image be anchored to ordinary
+printable cells, which means it survives a line-diffing renderer untouched —
+bubbletea v1.3.10's included.
+
+(The kitty **keyboard** protocol is an unrelated thing with a colliding name.
+foot implements that one, which is why "foot supports kitty" gets said.)
+
+Omarchy 4 "Quattro" supports four terminals, and they land in three places:
+
+| | Speaks | Gets |
+|---|---|---|
+| **foot** — the Quattro default | Sixel | pixels, opaque |
+| Ghostty | kitty protocol | pixels, layered |
+| kitty | kitty protocol | pixels, layered |
+| Alacritty | nothing | cells |
+
+foot is the default *and* is the one that will never gain the other protocol:
+its maintainer closed the question in foot#481 — *"I'm fairly sure I don't want
+another image protocol in foot ... our somewhat fuzzy goal of being
+'lightweight'."* And Alacritty's own entry in the Omarchy manual reads *"does
+not, however, support native tabs, splits, or image rendering."*
+
+So the cell drawing is not the degraded case for a minority. It is the only
+thing an Alacritty user ever sees, and it is what every foot user sees for the
+frames between a redraw and the next transmission.
+
+### Design to 5a, and let kitty be a quiet upgrade
+
+The best-looking mock in the handoff is 5b: rounded on all four corners, a
+translucent scrim dimming the app while the rows stay real text on top, a smooth
+gradient. All three of those are the z-index and the alpha channel. **They are
+not available on the default terminal.**
+
+The default gets 5a's four concessions — opaque panel, shadow baked into the
+image against a known background, origin snapped to a cell boundary, stepped
+gradient. Designing to 5b first would make foot look like a broken version of
+the real interface instead of a plainer one. Design to 5a; Ghostty and kitty
+users get softer edges and nobody is shown a hole.
+
+### Three emitters, one design
+
+The expensive part is shared. The panel is rasterised once into an
+`image.RGBA`; only the final encode differs — Sixel bytes, kitty bytes, or
+nothing. Ordering follows the audience, not the polish: cells, then Sixel for
+the default, then kitty.
+
+### What it costs
+
+**The runner has to own the final bytes.** Today every model ends
+`return c.String()`, and a decoration pass has nowhere to run — see issue 21,
+which was filed for a different reason and turns out to be load-bearing for
+this one.
+
+**A raster path and an embedded typeface**, which is a new asset class and a
+real number on the binary. This is the actual work; the escape sequences are
+the small part.
+
+**A capability query with a timeout** — the one place tuikit reads from the
+terminal rather than writing to it.
+
+### What it does not cost
+
+The guards, the goldens, the harness and the mouse hit-testing are all
+untouched, because a decoration pass changes no cell and no owner ID. A frame
+with a picture over it is the same frame.
