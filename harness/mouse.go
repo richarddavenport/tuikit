@@ -64,10 +64,17 @@ func Wheel(t T, m Pointer, region string, notches int) {
 	do(t, m, fmt.Sprintf("wheel %s %+d", region, notches))
 }
 
-// Drag presses in a region, moves by dx columns, and releases.
-func Drag(t T, m Pointer, region string, dx int) {
+// Drag presses in a region, moves it by n, and releases.
+//
+// The AXIS comes from the region's shape rather than from a second argument: a
+// divider is one column wide or one row tall, so a tall thin one moves in
+// columns and a wide flat one moves in rows. A vertical split's divider takes
+// `drag run.split +4` and moves down four rows, which is the only reading of
+// that line anyone has — and the alternative, an X-only Drag, silently does
+// nothing at all to a stacked divider.
+func Drag(t T, m Pointer, region string, n int) {
 	t.Helper()
-	do(t, m, fmt.Sprintf("drag %s %+d", region, dx))
+	do(t, m, fmt.Sprintf("drag %s %+d", region, n))
 }
 
 func do(t T, m Pointer, line string) {
@@ -109,22 +116,44 @@ func step(m Pointer, line string) error {
 			send(m, x, y, tea.MouseActionPress, button)
 		}
 	case "drag":
-		dx, err := amount(rest)
+		n, err := amount(rest)
 		if err != nil {
 			return err
 		}
-		send(m, x, y, tea.MouseActionPress, tea.MouseButtonLeft)
-		// Through the intervening columns, not straight to the end: a drag
-		// that only ever arrives is a drag whose motion handling is untested.
-		for step := 1; step <= abs(dx); step++ {
-			at := x + step*sign(dx)
-			send(m, at, y, tea.MouseActionMotion, tea.MouseButtonLeft)
+		// Wider than it is tall means a divider between STACKED panes, which
+		// moves in rows. Anything else moves in columns.
+		dx, dy := n, 0
+		if wide, err := wider(m, rest[0]); err != nil {
+			return err
+		} else if wide {
+			dx, dy = 0, n
 		}
-		send(m, x+dx, y, tea.MouseActionRelease, tea.MouseButtonLeft)
+
+		send(m, x, y, tea.MouseActionPress, tea.MouseButtonLeft)
+		// Through the intervening cells, not straight to the end: a drag that
+		// only ever arrives is a drag whose motion handling is untested.
+		for step := 1; step <= abs(n); step++ {
+			send(m, x+step*sign(dx), y+step*sign(dy), tea.MouseActionMotion, tea.MouseButtonLeft)
+		}
+		send(m, x+dx, y+dy, tea.MouseActionRelease, tea.MouseButtonLeft)
 	default:
 		return fmt.Errorf("no such action %q — click, rclick, wheel or drag", verb)
 	}
 	return nil
+}
+
+// wider reports that a region is wider than it is tall, which is how a divider
+// says which way it slides.
+func wider(m Pointer, name string) (bool, error) {
+	id, err := comp.ParseID(name)
+	if err != nil {
+		return false, err
+	}
+	r, ok := m.Canvas().Region(id)
+	if !ok {
+		return false, fmt.Errorf("%s was not drawn in the last frame", id)
+	}
+	return r.W > r.H, nil
 }
 
 // centre is the middle of a region, which is the safest cell to aim at: an
