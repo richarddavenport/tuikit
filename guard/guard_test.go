@@ -52,7 +52,7 @@ func TestTokensRejectsARoleNothingDrawsWith(t *testing.T) {
 	p.Extra = []theme.Role{{Name: "Info", Color: lipgloss.Color("39"), Why: "a note"}}
 
 	got := run(t, func(rec T) { Tokens(rec, dir, p) })
-	want(t, got, "Info is named in the palette but never drawn with")
+	want(t, got, "Info is an Extra role you named and never drew with")
 }
 
 func TestGlyphsRejectsACharacterOutsideTheSet(t *testing.T) {
@@ -182,5 +182,39 @@ func silent(t *testing.T, msgs []string) {
 	t.Helper()
 	if len(msgs) != 0 {
 		t.Errorf("guard fired on acceptable source: %v", msgs)
+	}
+}
+
+// The nine are the framework's vocabulary, not the tool's promise to draw with
+// all of them.
+//
+// A tool that never paints a selection background cannot "drop" SelectionBG —
+// it is a field on a struct it inherited. This check came from swarmctl, where
+// the palette was the tool's own and an unused role really was dead; azctl's
+// migration is where that stopped being true, and it failed on four roles at
+// once for the crime of being a browser rather than a table.
+func TestTokensDoesNotDemandAToolUseEveryInheritedRole(t *testing.T) {
+	dir := t.TempDir()
+	write(t, dir, "ui.go", `package ui
+
+import "github.com/richarddavenport/tuikit/theme"
+
+var p = theme.Default
+var _ = p.Accent
+`)
+	if got := run(t, func(rec T) { Tokens(rec, dir, theme.Default) }); len(got) != 0 {
+		t.Errorf("a tool using one of the nine was told off for the other eight: %v", got)
+	}
+}
+
+// The spinner range is the documented escape hatch, and the guard has to honour
+// the same answer GlyphSet.Printable gives. Two functions answering "may this
+// be printed" differently is worse than either answer.
+func TestGlyphsHonoursTheSpinnerRange(t *testing.T) {
+	dir := t.TempDir()
+	write(t, dir, "ui.go", "package ui\n\nvar frame = \"⠿\"\n")
+
+	if got := run(t, func(rec T) { Glyphs(rec, dir, theme.DefaultGlyphs) }); len(got) != 0 {
+		t.Errorf("a braille spinner frame was rejected: %v", got)
 	}
 }

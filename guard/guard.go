@@ -68,12 +68,25 @@ func Tokens(t T, dir string, p theme.Palette) {
 		all.Write(f.src)
 	}
 	joined := all.String()
-	for _, r := range p.Roles() {
+
+	// Only the EXTRA roles have to be used.
+	//
+	// The nine are the framework's vocabulary, not the tool's promise to draw
+	// with all of them: a tool that never paints a selection background cannot
+	// "drop" SelectionBG, because it is a field on a struct it inherited. This
+	// check came from swarmctl, where the palette was the tool's own and an
+	// unused role really was dead — azctl's migration is where that stopped
+	// being true.
+	//
+	// An unused Extra is still dead, and still worth failing on. A tool that
+	// invented a tenth meaning and then did not use it has left a name for the
+	// next person to wonder about.
+	for _, r := range p.Extra {
 		// Matched on a selector rather than a fixed "theme." prefix: a tool may
 		// import theme under any name, or hold its palette in a value of its
 		// own. What is constant is that the role is reached through a dot.
 		if !regexp.MustCompile(`\.` + regexp.QuoteMeta(r.Name) + `\b`).MatchString(joined) {
-			t.Errorf("%s is named in the palette but never drawn with — either use it or drop it", r.Name)
+			t.Errorf("%s is an Extra role you named and never drew with — use it or drop it", r.Name)
 		}
 	}
 }
@@ -97,7 +110,7 @@ func Glyphs(t T, dir string, g theme.GlyphSet) {
 				if r < 128 {
 					continue
 				}
-				if _, ok := g[r]; !ok {
+				if !g.Printable(r) {
 					offenders[r] = append(offenders[r], f.name)
 				}
 			}

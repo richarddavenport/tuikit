@@ -376,3 +376,33 @@ light interface is a real thing to want, and is not this.
 system page to show beside what it resolves to. "205" tells a reader the palette
 is ANSI indices and will follow their terminal's own scheme; "#d2a8ff" tells
 them it will not. Hex answers what it looks like; Value answers what it is.
+
+## 25. The nine roles are the framework's vocabulary, not the tool's promise
+
+Two guard bugs, both found in the first ten minutes of azctl's migration.
+
+**`guard.Tokens` demanded that every role be drawn with.** azctl failed on four
+at once — `Stderr`, `SelectionFG`, `SelectionBG` and its own `Text` — for the
+crime of being a resource browser rather than a table. "Either use it or drop
+it" is advice a tool cannot take: the nine are fields on a struct it inherited
+from `theme.Default`, and there is no dropping them.
+
+The check came from swarmctl, where the palette was the tool's own file and an
+unused role really was dead code. Inheriting a palette is what made that stop
+being true, and nothing noticed until a second tool inherited one.
+
+So the check now applies to `Extra` only. An unused Extra is still dead and
+still fails: a tool that invented a tenth meaning and then did not use it has
+left a name for the next person to wonder about.
+
+**`guard.Glyphs` did not honour `GlyphSet.Printable`.** It looked the rune up in
+the map directly, so `SpinnerRange` — documented in `theme` as the one thing the
+allow-list does not cover — did nothing, and azctl's `⠿` was rejected. Two
+functions answering "may this be printed" differently is worse than either
+answer on its own; the guard now asks `Printable`, which is the exported one.
+
+Worth noting what the second bug was hiding behind: `SpinnerRange`'s comment
+says the spinner's characters "never appear in a string literal and the guard
+never sees them". That was true when the spinner came from bubbles. It stopped
+being true when `comp.Spinner` started drawing braille itself, and a tool
+writing its own frame was never covered at all.
