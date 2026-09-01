@@ -1,15 +1,28 @@
-# Local development. tuikit is a library, so there is nothing to install —
-# `make check` is what CI runs and what you run before pushing.
+# Local development. `make check` is what CI runs and what you run before
+# pushing.
+#
+# tuikit is mostly a library, but `tuikit new` and `tuikit gallery` are things
+# you type — so there IS something to install, and there did not used to be.
 
+BIN     ?= $(HOME)/.local/bin/tuikit
 VERSION ?= $(shell git describe --tags --dirty 2>/dev/null || echo dev)
 LDFLAGS  = -s -w -X main.version=$(VERSION)
 
-.PHONY: build test lint check designsystem help
+.PHONY: install build test lint check designsystem gallery help
+
+## install: build to ~/.local/bin/tuikit (on your PATH)
+install:
+	@CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o "$(BIN)" ./cmd/tuikit
+	@echo "installed $$("$(BIN)" version) -> $(BIN)"
 
 ## build: build the tuikit binary to ./bin/tuikit
 build:
 	@CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o bin/tuikit ./cmd/tuikit
 	@echo "built $$(./bin/tuikit version) -> bin/tuikit"
+
+## gallery: open every component, running, without installing anything
+gallery:
+	@go run ./cmd/tuikit gallery
 
 ## test: unit tests
 test:

@@ -108,6 +108,8 @@ composed.
 ## Starting a tool
 
 ```sh
+make install    # puts tuikit on your PATH, once
+
 tuikit new mytool -short "what it does" -module github.com/you/mytool
 cd mytool && make check
 ```
