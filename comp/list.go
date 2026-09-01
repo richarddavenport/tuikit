@@ -1,6 +1,10 @@
 package comp
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"strings"
+
+	"github.com/charmbracelet/lipgloss"
+)
 
 // List is a scrollable, selectable list of rows.
 //
@@ -82,9 +86,20 @@ func (l *List) Cursor() int { return l.cursor }
 func (l *List) Offset() int { return l.offset }
 
 // Row is one line of a list.
+//
+// Text and Style are the common case: a whole row in one colour. Spans is for a
+// row that is more than one — a name with a dim count after it, a timestamp
+// then a message — and wins when it is set.
+//
+// Spans arrived late, from two tools independently. democtl's log lines are a
+// muted timestamp then plain text, and azctl's tree rows are a label then a
+// dim count; both had to fall back to drawing themselves rather than using a
+// List. Two of four needing it is the line at which it stops being a special
+// case.
 type Row struct {
 	Text  string
 	Style *lipgloss.Style
+	Spans []Segment
 }
 
 // Draw renders the rows into r.
@@ -147,7 +162,23 @@ func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
 		// after a short name still selects it: the cell decides ownership, not
 		// the glyph.
 		l.fill(c, Rect{X: body.X, Y: y, W: body.W, H: 1}, style, id)
-		c.Text(body.X, y, rows[i].Text, style, id)
+
+		// A selected row is one colour whatever its spans say. The selection is
+		// the reader's own mark on the list, and a row that kept its own
+		// colours under it would make the cursor hard to find in exactly the
+		// list where finding it matters.
+		if len(rows[i].Spans) == 0 || (i == l.cursor && style != nil) {
+			text := rows[i].Text
+			if text == "" {
+				text = spansText(rows[i].Spans)
+			}
+			c.Text(body.X, y, text, style, id)
+			continue
+		}
+		x := body.X
+		for _, span := range rows[i].Spans {
+			x += c.Text(x, y, span.Text, span.Style, id)
+		}
 	}
 	l.status(c, r)
 }
@@ -210,6 +241,16 @@ func (l *List) Select(i int) { l.cursor, l.reveal = max(0, i), true }
 // Reset puts the list back to the top, for when the rows underneath it have
 // changed out from under the cursor — a filter, usually.
 func (l *List) Reset() { l.cursor, l.offset, l.reveal = 0, 0, false }
+
+// spansText is a row's words without its colours, for when the selection paints
+// over them.
+func spansText(spans []Segment) string {
+	var b strings.Builder
+	for _, s := range spans {
+		b.WriteString(s.Text)
+	}
+	return b.String()
+}
 
 func clamp(v, lo, hi int) int { return max(lo, min(v, hi)) }
 

@@ -303,3 +303,66 @@ func TestTheWheelStillDoesNotSnapBackAfterAResizeRule(t *testing.T) {
 		t.Errorf("the wheel snapped back: offset %d, want %d", l.Offset(), before-5)
 	}
 }
+
+// A row can be more than one colour: a name with a dim count after it, a
+// timestamp then a message. democtl and azctl both had to draw their own lists
+// for want of this.
+func TestARowCanBeSeveralStyles(t *testing.T) {
+	forceColour()
+	dim := lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
+	accent := lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+
+	l := &List{Name: services}
+	c := NewCanvas(30, 4)
+	l.Draw(c, c.Bounds(), []Row{{Spans: []Segment{
+		{Text: "rg-forge", Style: &accent},
+		{Text: " 5", Style: &dim},
+	}}})
+
+	got := c.String()
+	if !strings.Contains(got, "38;5;205") || !strings.Contains(got, "38;5;241") {
+		t.Errorf("the spans did not keep their own colours: %q", got)
+	}
+	if !strings.Contains(harnessStrip(got), "rg-forge 5") {
+		t.Errorf("got %q", got)
+	}
+}
+
+// The selection paints over them. The cursor is the reader's own mark, and a
+// row that kept its colours under it would be hard to find in exactly the list
+// where finding it matters.
+func TestTheSelectedRowIsOneColourWhateverItsSpansSay(t *testing.T) {
+	forceColour()
+	dim := lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
+	selected := lipgloss.NewStyle().Background(lipgloss.Color("57"))
+
+	l := &List{Name: services, Selected: &selected, Focused: true}
+	c := NewCanvas(30, 4)
+	l.Draw(c, c.Bounds(), []Row{
+		{Spans: []Segment{{Text: "rg-forge"}, {Text: " 5", Style: &dim}}},
+		{Text: " another"},
+	})
+
+	first := strings.Split(c.String(), "\n")[0]
+	if strings.Contains(first, "38;5;241") {
+		t.Errorf("the selected row kept a span's colour: %q", first)
+	}
+	if !strings.Contains(first, "48;5;57") {
+		t.Errorf("the selected row is not painted: %q", first)
+	}
+}
+
+// harnessStrip is Strip without the import cycle — comp cannot import harness.
+func harnessStrip(s string) string {
+	var b strings.Builder
+	for i := 0; i < len(s); i++ {
+		if s[i] != 0x1b {
+			b.WriteByte(s[i])
+			continue
+		}
+		for i < len(s) && s[i] != 'm' {
+			i++
+		}
+	}
+	return b.String()
+}
