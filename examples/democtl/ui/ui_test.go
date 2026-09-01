@@ -7,7 +7,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
+	"github.com/richarddavenport/tuikit/guard"
 )
 
 // states is every distinct thing democtl can be showing, named. The width test
@@ -157,13 +159,15 @@ func TestNothingIsWiderThanTheTerminal(t *testing.T) {
 // screen says a case is missing. The default branch complains in colour; this
 // checks no real screen reaches it.
 func TestEveryScreenHasAViewCase(t *testing.T) {
-	for s := screenDashboard; s <= screenRun; s++ {
-		m := New(1)
-		m.screen = s
-		if got := m.View(); strings.Contains(got, "has no View case") {
-			t.Errorf("screen %d has no View case", s)
-		}
-	}
+	// The enumeration comes from the source rather than from a range written
+	// here. This used to be `for s := screenDashboard; s <= screenRun; s++`,
+	// which is the list that goes stale: a screen added after screenRun is not
+	// checked, and the check that exists to catch a forgotten screen was
+	// itself a place to forget one.
+	screens := New(1).screens
+	guard.Screens(t, ".", "screen", func(v int) bool {
+		return screens.Has(app.Screen(v))
+	})
 }
 
 // The mode split. While the filter is being typed, j is the letter j — without
