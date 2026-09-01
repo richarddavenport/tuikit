@@ -5,6 +5,8 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/richarddavenport/tuikit/comp"
+
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
 	"github.com/richarddavenport/tuikit/theme"
 )
@@ -63,6 +65,9 @@ type Model struct {
 	confirm *confirmState
 
 	width, height int
+	// canvas is the last frame drawn, kept so a mouse event can ask what it
+	// landed on. The frame is its own region list.
+	canvas *comp.Canvas
 	// now is frozen by the capture harness so a rendered frame says the same
 	// thing tomorrow. Nothing here calls time.Now directly.
 	now time.Time

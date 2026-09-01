@@ -19,20 +19,42 @@ const (
 	pane Name = "detail"
 )
 
-// A new canvas is blanks, and it serialises to exactly the size it was asked
-// for. Everything else depends on this.
-func TestACanvasIsExactlyTheSizeItWasAskedFor(t *testing.T) {
+// A canvas is as many lines as it was asked for, and a row nothing was drawn
+// into is empty rather than a run of spaces. Trailing blanks are invisible in a
+// terminal and are noise in a golden diff.
+func TestABlankCanvasIsBlankLines(t *testing.T) {
 	c := NewCanvas(10, 3)
-	got := c.String()
-
-	lines := strings.Split(got, "\n")
-	if len(lines) != 3 {
-		t.Fatalf("expected 3 lines, got %d: %q", len(lines), got)
+	if got := c.String(); got != "\n\n" {
+		t.Errorf("a blank canvas serialised to %q", got)
 	}
-	for i, line := range lines {
-		if Width(line) != 10 {
-			t.Errorf("line %d is %d columns, not 10: %q", i+1, Width(line), line)
-		}
+}
+
+// A row drawn to its edge is exactly the declared width. This is the half that
+// trailing-blank trimming must not break.
+func TestARowDrawnToTheEdgeIsTheDeclaredWidth(t *testing.T) {
+	c := NewCanvas(10, 1)
+	c.Fill(c.Bounds(), "─", nil, Region(pane))
+
+	if got := Width(c.String()); got != 10 {
+		t.Errorf("a filled 10-column row serialised to %d columns: %q", got, c.String())
+	}
+}
+
+// A blank that carries a STYLE is not trailing whitespace: it is a row painted
+// to its edge, which is how a selected row gets a background all the way
+// across. Trimming those would end the highlight at the last letter.
+func TestAStyledBlankIsNotTrailingWhitespace(t *testing.T) {
+	forceColour()
+	selected := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("229")).
+		Background(lipgloss.Color("57"))
+
+	c := NewCanvas(20, 1)
+	c.Fill(c.Bounds(), " ", &selected, Region(row).At(0))
+	c.Text(1, 0, "api_gateway", &selected, Region(row).At(0))
+
+	if got := lipgloss.Width(c.String()); got != 20 {
+		t.Errorf("the selected row is %d columns, not 20: %q", got, c.String())
 	}
 }
 
@@ -46,8 +68,8 @@ func TestDrawingOutsideTheCanvasIsANoOp(t *testing.T) {
 	c.Set(0, 9, "x", nil, Region(list))
 
 	for i, line := range strings.Split(c.String(), "\n") {
-		if Width(line) != 4 {
-			t.Errorf("line %d is %d columns, not 4: %q", i+1, Width(line), line)
+		if Width(line) > 4 {
+			t.Errorf("line %d is %d columns, over the 4 there are: %q", i+1, Width(line), line)
 		}
 	}
 }
@@ -111,9 +133,14 @@ func TestAFrameOfWideRunesSerialisesToItsDeclaredWidth(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			c := NewCanvas(20, 1)
-			c.Text(0, 0, tc.text, nil, Region(pane))
-			if got := Width(c.String()); got != 20 {
-				t.Errorf("a 20-column canvas serialised to %d columns: %q", got, c.String())
+			drawn := c.Text(0, 0, tc.text, nil, Region(pane))
+
+			// The row must serialise to exactly the columns it claimed. A
+			// continuation emitted as a space rather than skipped makes this
+			// one too wide per wide cluster, which is how everything after it
+			// ends up a column right of where it belongs.
+			if got := Width(c.String()); got != drawn {
+				t.Errorf("drew %d columns but serialised %d: %q", drawn, got, c.String())
 			}
 		})
 	}
@@ -135,11 +162,14 @@ func TestOverwritingHalfOfAWideRuneClearsBoth(t *testing.T) {
 			c.Set(0, 0, "世", nil, Region(pane))
 			c.Set(tc.x, 0, "x", nil, Region(pane))
 
-			if got := c.String(); Width(got) != 4 {
-				t.Errorf("the row is %d columns after the overwrite: %q", Width(got), got)
+			// Both cells go, so there is no continuation left with nothing to
+			// continue — an orphan serialises as nothing and the row silently
+			// loses a column.
+			if got, want := c.String(), "x"; tc.x == 0 && got != want {
+				t.Errorf("got %q, want %q", got, want)
 			}
-			if strings.Contains(c.String(), "世") {
-				t.Errorf("half of the wide rune survived: %q", c.String())
+			if got, want := c.String(), " x"; tc.x == 1 && got != want {
+				t.Errorf("got %q, want %q", got, want)
 			}
 		})
 	}
@@ -153,8 +183,8 @@ func TestAWideRuneAtTheLastColumnClips(t *testing.T) {
 	if n := c.Set(2, 0, "世", nil, Region(pane)); n != 0 {
 		t.Errorf("a wide rune drew %d columns with one to spare", n)
 	}
-	if got := c.String(); got != "ab " || Width(got) != 3 {
-		t.Errorf("got %q, want %q", got, "ab ")
+	if got := c.String(); got != "ab" {
+		t.Errorf("got %q, want %q", got, "ab")
 	}
 }
 
@@ -305,7 +335,7 @@ func TestFillCoversARect(t *testing.T) {
 	c := NewCanvas(6, 3)
 	c.Fill(Rect{1, 1, 3, 1}, "·", nil, Region(pane))
 
-	if got, want := c.String(), "      \n ···  \n      "; got != want {
+	if got, want := c.String(), "\n ···\n"; got != want {
 		t.Errorf("got %q, want %q", got, want)
 	}
 }

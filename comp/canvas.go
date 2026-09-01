@@ -315,7 +315,7 @@ func (c *Canvas) String() string {
 			}
 			run.Reset()
 		}
-		for x := 0; x < c.w; x++ {
+		for x := 0; x <= c.lastInk(y); x++ {
 			cell := c.cells[y*c.w+x]
 			if cell.Continuation() {
 				continue // its lead already wrote it
@@ -332,6 +332,23 @@ func (c *Canvas) String() string {
 		}
 	}
 	return b.String()
+}
+
+// lastInk is the last column of a row worth emitting.
+//
+// Trailing blanks are dropped, so a footer does not arrive with sixty spaces
+// after it — they are invisible in a terminal, and they make a golden diff
+// noise. A blank that carries a STYLE is not trailing whitespace though: it is
+// a row painted to its edge, which is how a selected row gets a background all
+// the way across, so those are kept.
+func (c *Canvas) lastInk(y int) int {
+	for x := c.w - 1; x >= 0; x-- {
+		cell := c.cells[y*c.w+x]
+		if cell.Style != nil || (cell.Text != " " && !cell.Continuation()) {
+			return x
+		}
+	}
+	return -1
 }
 
 // itoa keeps ID.String free of a strconv import for one call.
