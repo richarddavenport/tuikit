@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                                7 components
+tuikit gallery  every component, running                                                                                8 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Bar                                                                                            │
@@ -9,7 +9,7 @@ tuikit gallery  every component, running                                        
 │ Confirm                       │ │ q quit                                                                                         │
 │ StepList                      │ │                                                                                                │
 │ LogPane                       │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Spinner                       │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Accent · Muted · Success                                                              │
 │                               │ │ glyphs   ·                                                                                     │
 │                               │ │ from     swarmctl footerLine, azctl footer, democtl header and footer                          │
-│                           7/7 │ │                                                                                                │
+│                           8/8 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

@@ -2,6 +2,7 @@ package gallery
 
 import (
 	"strings"
+	"time"
 
 	"github.com/richarddavenport/tuikit/comp"
 )
@@ -26,6 +27,36 @@ func (m *Model) Entries() []Entry {
 		m.confirmEntry(s),
 		m.stepListEntry(s),
 		m.logPaneEntry(s),
+		m.spinnerEntry(s),
+	}
+}
+
+func (m *Model) spinnerEntry(s *styles) Entry {
+	// A fixed moment, because a gallery whose frames differ between runs has
+	// goldens nobody can review. The harness freezes the clock for the same
+	// reason, and a clock-driven spinner is what makes that possible.
+	at := time.Date(2026, 8, 31, 9, 14, 3, 0, time.UTC)
+	draw := func(sp comp.Spinner, offset time.Duration, label string) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			sp.Style = &s.pending
+			x := sp.Draw(c, r, at.Add(offset), comp.Region("demo.spinner"))
+			c.Text(r.X+x, r.Y, " "+label, &s.muted, comp.Region("demo.spinner"))
+		}
+	}
+	return Entry{
+		Name:    "Spinner",
+		Summary: "Work in flight. Its frame comes from the clock, so every spinner turns together.",
+		From:    "pgctl spinner(), azctl's single ⠿",
+		Roles:   []string{"Pending", "Muted"},
+		Glyphs:  []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"},
+		States: []State{
+			{Name: "turning", Note: "the frame is a function of the time, not of how often View ran",
+				Draw: draw(comp.Spinner{}, 0, "reading the target's foreign keys…")},
+			{Name: "a moment later", Note: "the same spinner, 300ms on — every spinner on screen agrees",
+				Draw: draw(comp.Spinner{}, 300*time.Millisecond, "reading the target's foreign keys…")},
+			{Name: "the caller's frames", Note: "braille is the default, not a requirement",
+				Draw: draw(comp.Spinner{Frames: []string{"-", "\\", "|", "/"}}, 0, "for a font without braille")},
+		},
 	}
 }
 

@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                                7 components
+tuikit gallery  every component, running                                                                                8 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ StepList                                                                                       │
@@ -9,7 +9,7 @@ tuikit gallery  every component, running                                        
 │ Confirm                       │ │   ✓ resolve image digest                                                                412ms  │
 │ StepList                      │ │   ● check node capacity  already true                                                     1ms  │
 │ LogPane                       │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Spinner                       │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Success · Danger · Pending · Muted                                                    │
 │                               │ │ glyphs   ✓ ✗ ● • →                                                                             │
 │                               │ │ from     swarmctl renderdeploy.go, pgctl actionrun.go, azctl runner.go                         │
-│                           7/7 │ │                                                                                                │
+│                           8/8 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

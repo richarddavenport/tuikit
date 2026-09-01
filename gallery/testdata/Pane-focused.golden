@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                                7 components
+tuikit gallery  every component, running                                                                                8 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Pane                                                                                           │
@@ -9,7 +9,7 @@ tuikit gallery  every component, running                                        
 │ Confirm                       │ │ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
 │ StepList                      │ │ │ Services                                                                                   │ │
 │ LogPane                       │ │ │ the room inside                                                                            │ │
-│                               │ │ │                                                                                            │ │
+│ Spinner                       │ │ │                                                                                            │ │
 │                               │ │ │                                                                                            │ │
 │                               │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Border · Accent                                                                       │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
 │                               │ │ from     swarmctl drawBox and drawBoxRaw (which disagreed), democtl box                        │
-│                           7/7 │ │                                                                                                │
+│                           8/8 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit
