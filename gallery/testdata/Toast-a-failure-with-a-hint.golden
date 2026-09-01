@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               12 components
+tuikit gallery  every component, running                                                                               13 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Toast                                                                                          │
@@ -11,10 +11,10 @@ tuikit gallery  every component, running                                        
 │ LogPane                       │ │                                             │cannot reach staging                          │   │
 │ Spinner                       │ │                                             │                                              │   │
 │ Table                         │ │                                             │dial tcp 10.0.0.4:5432: connection refused    │   │
-│ Toast                         │ │                                             │                                              │   │
-│ Form                          │ │                                             │is the tunnel up? try `pgctl connect staging` │   │
-│ Split                         │ │                                             │                                              │   │
-│                               │ │                                             └──────────────────────────────────────────────┘   │
+│ Detail                        │ │                                             │                                              │   │
+│ Toast                         │ │                                             │is the tunnel up? try `pgctl connect staging` │   │
+│ Form                          │ │                                             │                                              │   │
+│ Split                         │ │                                             └──────────────────────────────────────────────┘   │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Danger · Success · Border · Muted                                                     │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
 │                               │ │ from     swarmctl errorView                                                                    │
-│                         12/12 │ │                                                                                                │
+│                         13/13 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

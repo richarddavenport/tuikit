@@ -1,15 +1,15 @@
 tuikit gallery  every component, running                                                                               13 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Pane                                                                                           │
-│ List                          │ │ A bordered box with a title, and the rect inside it.                                           │
-│ Pane                          │ │ ‹ title in the edge · title on a row · focused · title too long · no room · rounded · ASCII ›  │
-│ Tabs                          │ │ under two columns it draws nothing at all                                                      │
+│ Components                    │ │ Detail                                                                                         │
+│ List                          │ │ What a pane says about the one thing you have selected.                                        │
+│ Pane                          │ │ ‹ a thing · a value with its own colour · prose · no room ›                                    │
+│ Tabs                          │ │ a state that is red in the list and grey here is one fact told twice                           │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │                                                                                                │
+│ Confirm                       │ │ api_migrate                                                                                    │
 │ StepList                      │ │                                                                                                │
-│ LogPane                       │ │                                                                                                │
-│ Spinner                       │ │                                                                                                │
+│ LogPane                       │ │ state    failed                                                                                │
+│ Spinner                       │ │ replicas 0/1                                                                                   │
 │ Table                         │ │                                                                                                │
 │ Detail                        │ │                                                                                                │
 │ Toast                         │ │                                                                                                │
@@ -28,10 +28,10 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │ mouse    click the border belongs to the pane                                                  │
-│                               │ │ roles    Border · Accent                                                                       │
-│                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
-│                               │ │ from     swarmctl drawBox and drawBoxRaw (which disagreed), democtl box                        │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ roles    Accent · Muted · Danger                                                               │
+│                               │ │ from     democtl field(), azctl fields() — both carried y from call to call                    │
 │                         13/13 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

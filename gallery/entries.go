@@ -30,6 +30,7 @@ func (m *Model) Entries() []Entry {
 		m.logPaneEntry(s),
 		m.spinnerEntry(s),
 		m.tableEntry(s),
+		m.detailEntry(s),
 		m.toastEntry(s),
 		m.formEntry(s),
 		m.splitEntry(s),
@@ -176,6 +177,55 @@ func (m *Model) toastEntry(s *styles) Entry {
 					Body:  strings.Repeat("a root cause that came from somewhere else and does not know how wide your terminal is. ", 2),
 					Hint:  "run with -v for the full trace",
 				})},
+		},
+	}
+}
+
+func (m *Model) detailEntry(s *styles) Entry {
+	draw := func(d comp.Detail) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			d.TitleStyle, d.SubtitleStyle = &s.title, &s.muted
+			d.HeadingStyle, d.LabelStyle = &s.muted, &s.muted
+			d.Draw(c, r, comp.Region("demo.detail"))
+		}
+	}
+	full := comp.Detail{
+		Title:    "vm-forge-0",
+		Subtitle: "Virtual machines",
+		Blocks: []comp.Block{
+			{Facts: []comp.Fact{
+				{Label: "group", Value: "rg-forge"},
+				{Label: "location", Value: "uksouth"},
+				{Label: "state", Value: "failed", Style: &s.danger},
+			}},
+			{Heading: "tags", Facts: []comp.Fact{
+				{Label: "env", Value: "prod"},
+				{Label: "owner", Value: "platform"},
+			}},
+		},
+	}
+	return Entry{
+		Name:    "Detail",
+		Summary: "What a pane says about the one thing you have selected.",
+		From:    "democtl field(), azctl fields() — both carried y from call to call",
+		Roles:   []string{"Accent", "Muted", "Danger"},
+		States: []State{
+			{Name: "a thing", Note: "labels line up per BLOCK, so a long tag key does not drag the facts above it wide",
+				Draw: draw(full)},
+			{Name: "a value with its own colour", Note: "a state that is red in the list and grey here is one fact told twice",
+				Draw: draw(comp.Detail{Title: "api_migrate", Blocks: []comp.Block{{Facts: []comp.Fact{
+					{Label: "state", Value: "failed", Style: &s.danger},
+					{Label: "replicas", Value: "0/1"},
+				}}}})},
+			{Name: "prose", Note: "a note wraps; a fact truncates — losing the end of a sentence loses the point",
+				Draw: draw(comp.Detail{
+					Title:  "api_migrate",
+					Blocks: []comp.Block{{Text: "Pushes a new service spec and waits for the tasks to converge. The current tasks are replaced one at a time."}},
+				})},
+			{Name: "no room", Note: "it stops at the bottom of its rect rather than writing over the border it sits in",
+				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
+					draw(full)(c, comp.Rect{X: r.X, Y: r.Y, W: r.W, H: 4}, focused)
+				}},
 		},
 	}
 }

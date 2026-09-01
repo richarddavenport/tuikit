@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               12 components
+tuikit gallery  every component, running                                                                               13 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ LogPane                                                                                        │
@@ -11,10 +11,10 @@ tuikit gallery  every component, running                                        
 │ LogPane                       │ │   09:15:05 api_gateway: handled request in 721ms                                               │
 │ Spinner                       │ │   09:16:02 api_gateway: handled request in 821ms                                               │
 │ Table                         │ │   09:17:09 api_gateway: upstream timed out after 3s                                            │
-│ Toast                         │ │   09:18:06 api_gateway: handled request in 121ms 3s                                            │
-│ Form                          │ │   09:19:03 api_gateway: handled request in 221ms                                               │
-│ Split                         │ │   09:10:00 api_gateway: handled request in 321ms                                               │
-│                               │ │   09:11:07 api_gateway: handled request in 421ms                                               │
+│ Detail                        │ │   09:18:06 api_gateway: handled request in 121ms 3s                                            │
+│ Toast                         │ │   09:19:03 api_gateway: handled request in 221ms                                               │
+│ Form                          │ │   09:10:00 api_gateway: handled request in 321ms                                               │
+│ Split                         │ │   09:11:07 api_gateway: handled request in 421ms                                               │
 │                               │ │   09:12:04 api_gateway: handled request in 521ms                                               │
 │                               │ │   09:13:01 api_gateway: handled request in 621ms                                               │
 │                               │ │   09:14:08 api_gateway: upstream timed out after 3s                                            │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ mouse    wheel the same                                                                        │
 │                               │ │ roles    Muted · Stderr                                                                        │
 │                               │ │ from     swarmctl logspane.go                                                                  │
-│                         12/12 │ │                                                                                                │
+│                         13/13 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

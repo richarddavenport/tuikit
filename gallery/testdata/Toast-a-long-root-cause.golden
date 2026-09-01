@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               12 components
+tuikit gallery  every component, running                                                                               13 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Toast                                                                                          │
@@ -11,10 +11,10 @@ tuikit gallery  every component, running                                        
 │ LogPane                       │ │                                             │apply failed                                  │   │
 │ Spinner                       │ │                                             │                                              │   │
 │ Table                         │ │                                             │a root cause that came from somewhere else    │   │
-│ Toast                         │ │                                             │and does not know how wide your terminal is.  │   │
-│ Form                          │ │                                             │a root cause that came from somewhere else    │   │
-│ Split                         │ │                                             │and does not know how wide your terminal is.  │   │
-│                               │ │                                             │                                              │   │
+│ Detail                        │ │                                             │and does not know how wide your terminal is.  │   │
+│ Toast                         │ │                                             │a root cause that came from somewhere else    │   │
+│ Form                          │ │                                             │and does not know how wide your terminal is.  │   │
+│ Split                         │ │                                             │                                              │   │
 │                               │ │                                             │run with -v for the full trace                │   │
 │                               │ │                                             └──────────────────────────────────────────────┘   │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Danger · Success · Border · Muted                                                     │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
 │                               │ │ from     swarmctl errorView                                                                    │
-│                         12/12 │ │                                                                                                │
+│                         13/13 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

@@ -1,20 +1,21 @@
 tuikit gallery  every component, running                                                                               13 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Pane                                                                                           │
-│ List                          │ │ A bordered box with a title, and the rect inside it.                                           │
-│ Pane                          │ │ ‹ title in the edge · title on a row · focused · title too long · no room · rounded · ASCII ›  │
-│ Tabs                          │ │ under two columns it draws nothing at all                                                      │
+│ Components                    │ │ Detail                                                                                         │
+│ List                          │ │ What a pane says about the one thing you have selected.                                        │
+│ Pane                          │ │ ‹ a thing · a value with its own colour · prose · no room ›                                    │
+│ Tabs                          │ │ labels line up per BLOCK, so a long tag key does not drag the facts above it wide              │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │                                                                                                │
-│ StepList                      │ │                                                                                                │
+│ Confirm                       │ │ vm-forge-0                                                                                     │
+│ StepList                      │ │ Virtual machines                                                                               │
 │ LogPane                       │ │                                                                                                │
-│ Spinner                       │ │                                                                                                │
-│ Table                         │ │                                                                                                │
-│ Detail                        │ │                                                                                                │
+│ Spinner                       │ │ group    rg-forge                                                                              │
+│ Table                         │ │ location uksouth                                                                               │
+│ Detail                        │ │ state    failed                                                                                │
 │ Toast                         │ │                                                                                                │
-│ Form                          │ │                                                                                                │
-│ Split                         │ │                                                                                                │
+│ Form                          │ │ tags                                                                                           │
+│ Split                         │ │   env   prod                                                                                   │
+│                               │ │   owner platform                                                                               │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -28,10 +29,9 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │ mouse    click the border belongs to the pane                                                  │
-│                               │ │ roles    Border · Accent                                                                       │
-│                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
-│                               │ │ from     swarmctl drawBox and drawBoxRaw (which disagreed), democtl box                        │
+│                               │ │                                                                                                │
+│                               │ │ roles    Accent · Muted · Danger                                                               │
+│                               │ │ from     democtl field(), azctl fields() — both carried y from call to call                    │
 │                         13/13 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit
