@@ -70,6 +70,9 @@ type List struct {
 	// shown and count are what the last frame actually drew, and what the
 	// offset is clamped against.
 	shown, count int
+	// drawn says a frame has been drawn, so the first one is not mistaken for
+	// a resize.
+	drawn bool
 }
 
 // Cursor is the selected row's index in the list.
@@ -96,7 +99,15 @@ func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
 	if r.H > 1 {
 		body.H = r.H - 1
 	}
-	l.shown = body.H
+	// A pane that changed size under the cursor reveals it again. The reveal
+	// flag exists so the WHEEL does not snap back, and a resize is not a
+	// wheel: the view moved underneath the reader rather than because they
+	// asked. Leaving the cursor stranded there means the detail beside it
+	// describes something off screen, and the next key acts on it.
+	if l.drawn && body.H != l.shown {
+		l.reveal = true
+	}
+	l.shown, l.drawn = body.H, true
 
 	if len(rows) == 0 {
 		if l.Empty != "" {

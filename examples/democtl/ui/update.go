@@ -118,7 +118,7 @@ func (m *Model) dashboardKey(msg tea.KeyMsg) bool {
 		m.typing = true
 	case "L":
 		if _, ok := m.selected(); ok {
-			m.screen, m.logOffset = screenLogs, 0
+			m.screen, m.log.Follow = screenLogs, true
 		}
 	case "D":
 		m.confirmDeploy()
@@ -175,14 +175,14 @@ func (m *Model) confirmKey(msg tea.KeyMsg) tea.Cmd {
 func (m *Model) logsKey(msg tea.KeyMsg) bool {
 	switch msg.String() {
 	case "j", "down":
-		m.logOffset++
+		m.log.Scroll(1)
 	case "k", "up":
-		if m.logOffset > 0 {
-			m.logOffset--
-		}
+		m.log.Scroll(-1)
 	case "e":
 		m.logStderr = !m.logStderr
-		m.logOffset = 0
+		// A different stream is a different buffer, so it opens at ITS tail
+		// rather than at wherever the last one had been scrolled to.
+		m.log.Follow = true
 	default:
 		return false
 	}

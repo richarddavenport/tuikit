@@ -85,6 +85,16 @@ func states() []struct {
 			press(m, "L")
 			return m
 		}},
+		{"logs-scrolled-back", func() *Model {
+			m := New(1)
+			press(m, "L")
+			// Scrolling up detaches from the tail, which is the state that
+			// says how far below the newest line you are.
+			for range 6 {
+				press(m, "k")
+			}
+			return m
+		}},
 		{"logs-stderr-only", func() *Model {
 			m := New(1)
 			press(m, "L", "e")
@@ -243,6 +253,11 @@ func press(m *Model, keys ...string) {
 		}
 		_, cmd := m.Update(msg)
 		drain(m, cmd, 1)
+		// Drawn after every key, the way a running program is. A component
+		// that scrolls needs to know what the last frame could show, and a
+		// helper that skips the draw hands the next key a model that has never
+		// seen its own size — which reads as "the key did nothing".
+		m.View()
 	}
 }
 

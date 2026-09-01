@@ -2,22 +2,22 @@ democtl  a tuikit example  needs attention                              09:14:03
 ────────────────────────────────────────────────────────────────────────────────
 ┌────────────────────────┐ ┌───────────────────────────────────────────────────┐
 │ Services (39)          │ │ api_gateway                                       │
-│ api_ratelimit  2/2 ✓   │ │ ‹ Overview · Config · Events ›                    │
+│ api_gateway    3/3 ✓   │ │ ‹ Overview · Config · Events ›                    │
+│ api_worker     1/2 ●   │ │                                                   │
+│ api_migrate    0/1 ✗   │ │  state      running                               │
+│ web_frontend   4/4 ✓   │ │  replicas   3/3                                   │
+│ web_assets     1/1 ✓   │ │  stack      api                                   │
+│ data_indexer   0/2 •   │ │  node       node-a                                │
+│ data_archiver  1/1 ✓   │ │  updated    47s ago                               │
+│ api_scheduler  2/2 ✓   │ │                                                   │
+│ api_webhooks   1/1 ✓   │ │                                                   │
+│ api_ratelimit  2/2 ✓   │ │                                                   │
 │ web_admin      2/2 ✓   │ │                                                   │
-│ web_docs       1/1 ✓   │ │  state      running                               │
-│ web_preview    0/1 •   │ │  replicas   3/3                                   │
-│ data_etl       3/3 ✓   │ │  stack      api                                   │
-│ data_warehouse 2/2 ✓   │ │  node       node-a                                │
-│ data_replica   1/2 ●   │ │  updated    47s ago                               │
-│ data_backup    1/1 ✓   │ │                                                   │
-│ edge_router    3/3 ✓   │ │                                                   │
-│ edge_cache     4/4 ✓   │ │                                                   │
-│ edge_tls       2/2 ✓   │ │                                                   │
-│ edge_waf       1/2 ●   │ │                                                   │
-│ auth_session   3/3 ✓   │ │                                                   │
-│ auth_tokens    2/2 ✓   │ │                                                   │
-│ auth_directory 1/1 ✓   │ │                                                   │
-│ auth_mfa       0/1 •   │ │                                                   │
-│ ↑ selected above 25/39 │ │                                                   │
+│ web_docs       1/1 ✓   │ │                                                   │
+│ web_preview    0/1 •   │ │                                                   │
+│ data_etl       3/3 ✓   │ │                                                   │
+│ data_warehouse 2/2 ✓   │ │                                                   │
+│ data_replica   1/2 ●   │ │                                                   │
+│                  16/39 │ │                                                   │
 └────────────────────────┘ └───────────────────────────────────────────────────┘
   ↑↓ move · tab pane · ‹› tabs · / filter · m menu · L logs · D deploy · q quit

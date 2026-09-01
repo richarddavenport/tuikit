@@ -52,8 +52,9 @@ type Model struct {
 	filter string
 	typing bool
 
-	// logs
-	logOffset int
+	// logs. The pane owns the viewport and whether it is following the tail;
+	// logStderr is the tool's own filter over what it is handed.
+	log       comp.LogPane
 	logStderr bool // show stderr lines only
 
 	// run
@@ -113,6 +114,7 @@ func New(seed int64) *Model {
 		height:  38,
 		now:     fleet.Epoch,
 	}
+	m.log = comp.LogPane{Follow: true}
 	m.list = comp.List{
 		Name:       regServicesRow,
 		Empty:      "  nothing matches",

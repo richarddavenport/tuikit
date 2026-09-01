@@ -263,3 +263,43 @@ func TestTheCountMovesWithTheViewport(t *testing.T) {
 		t.Errorf("after scrolling five the count is not 10/20:\n%s", after)
 	}
 }
+
+// A resize is not a wheel. The reveal flag keeps the wheel from snapping back
+// to the cursor, but when the PANE changes size the view moved underneath the
+// reader rather than because they asked — and a cursor left off screen means
+// whatever is drawn beside the list describes something invisible, and the next
+// key acts on it.
+func TestAResizeBringsTheCursorBack(t *testing.T) {
+	l := &List{Name: services, Focused: true}
+	draw(l, 20, 32, 39) // thirty body rows
+	l.Move(35)
+	draw(l, 20, 32, 39)
+
+	if l.Cursor() != 35 {
+		t.Fatalf("the cursor is on %d", l.Cursor())
+	}
+
+	// The pane shrinks: eighteen rows, one of them the status line.
+	const body = 18 - 1
+	draw(l, 20, 18, 39)
+
+	if got := l.Cursor() - l.Offset(); got < 0 || got >= body {
+		t.Errorf("after the resize the cursor is %d rows into a %d-row pane", got, body)
+	}
+}
+
+// The wheel still does not snap back, at the same size.
+func TestTheWheelStillDoesNotSnapBackAfterAResizeRule(t *testing.T) {
+	l := &List{Name: services, Focused: true}
+	draw(l, 20, 18, 39)
+	l.Move(30)
+	draw(l, 20, 18, 39)
+
+	before := l.Offset()
+	l.Scroll(-5)
+	draw(l, 20, 18, 39)
+
+	if l.Offset() != before-5 {
+		t.Errorf("the wheel snapped back: offset %d, want %d", l.Offset(), before-5)
+	}
+}

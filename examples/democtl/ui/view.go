@@ -234,10 +234,10 @@ func (m *Model) logs(c *comp.Canvas, r comp.Rect) {
 		}
 		lines = only
 	}
-	if m.logOffset > max(0, len(lines)-r.H+2) {
-		m.logOffset = max(0, len(lines)-r.H+2)
+	rows := make([]comp.LogLine, len(lines))
+	for i, l := range lines {
+		rows[i] = comp.LogLine{At: l.At.Format("15:04:05"), Text: l.Text, Stderr: l.Stderr}
 	}
-	lines = lines[min(m.logOffset, len(lines)):]
 
 	title := "Logs " + svc.Name
 	if m.logStderr {
@@ -245,23 +245,12 @@ func (m *Model) logs(c *comp.Canvas, r comp.Rect) {
 	}
 	inner := m.box(c, r, title, true, comp.Region(regLogs))
 
-	if len(lines) == 0 {
-		c.Text(inner.X, inner.Y, "  no lines on this stream", &m.sty.muted, comp.Region(regLogs))
-		return
-	}
-	for i, l := range lines {
-		if i >= inner.H {
-			break
-		}
-		id := comp.Region(regLogsRow).At(m.logOffset + i)
-		x := c.Text(inner.X, inner.Y+i, "  "+l.At.Format("15:04:05")+" ", &m.sty.muted, id)
-
-		var style *lipgloss.Style
-		if l.Stderr {
-			style = &m.sty.stderr
-		}
-		c.Text(inner.X+x, inner.Y+i, comp.Truncate(l.Text, m.width-14), style, id)
-	}
+	m.log.Empty = "  no lines on this stream"
+	m.log.Time = &m.sty.muted
+	m.log.Stderr = &m.sty.stderr
+	m.log.Status = &m.sty.muted
+	m.log.EmptyStyle = &m.sty.muted
+	m.log.Draw(c, inner, rows, regLogsRow)
 }
 
 func (m *Model) run(c *comp.Canvas, r comp.Rect) {

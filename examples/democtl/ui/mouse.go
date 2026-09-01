@@ -89,7 +89,7 @@ func (m *Model) press(id comp.ID, msg tea.MouseMsg) tea.Cmd {
 func (m *Model) scroll(id comp.ID, by int) {
 	switch id.Name {
 	case regLogs, regLogsRow:
-		m.logOffset = max(0, m.logOffset+by)
+		m.log.Scroll(by)
 	case regServices, regServicesRow:
 		m.list.Scroll(by)
 	}
@@ -174,7 +174,7 @@ func (m *Model) actionsFor(id comp.ID) []menuItem {
 		}
 		return []menuItem{
 			{Hint: comp.Hint{Key: "L", Label: "View logs"}, do: func(m *Model) tea.Cmd {
-				m.screen, m.logOffset = screenLogs, 0
+				m.screen, m.log.Follow = screenLogs, true
 				return nil
 			}},
 			{Hint: comp.Hint{Key: "D", Label: "Deploy"}, do: func(m *Model) tea.Cmd {
