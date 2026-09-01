@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/charmbracelet/lipgloss"
+
+	"github.com/richarddavenport/tuikit/theme"
 )
 
 const services Name = "services"
@@ -398,5 +400,89 @@ func TestAListWithoutAMarkerDrawsNoIndent(t *testing.T) {
 	c := draw(l, 24, 6, 3)
 	if got := strings.Split(c.String(), "\n")[0]; !strings.HasPrefix(got, " service-0") {
 		t.Errorf("got %q", got)
+	}
+}
+
+// A child sits Chrome.Indent columns right of its header. The shape two of the
+// four tools already had, in five places, each writing `"  " + line` by hand.
+func TestDepthIndentsARow(t *testing.T) {
+	c := NewCanvas(30, 4)
+	l := &List{Name: services}
+	l.Draw(c, c.Bounds(), []Row{
+		{Text: "rg-forge", Lead: "▾ "},
+		{Text: "vm-forge-0", Depth: 1},
+		{Text: "nic-forge-0", Depth: 1},
+	})
+
+	lines := strings.Split(c.String(), "\n")
+	if got := lines[0]; got != "▾ rg-forge" {
+		t.Errorf("header is %q", got)
+	}
+	if got := lines[1]; got != "  vm-forge-0" {
+		t.Errorf("child is %q, want two columns of indent", got)
+	}
+}
+
+// The indent is Chrome's, so a tool that wants a tighter tree changes it in one
+// place rather than reindenting every row it builds.
+func TestTheIndentComesFromChrome(t *testing.T) {
+	ch := theme.DefaultChrome
+	ch.Indent = 4
+	c := NewCanvas(30, 3).WithChrome(ch)
+
+	l := &List{Name: services}
+	l.Draw(c, c.Bounds(), []Row{{Text: "child", Depth: 1}})
+
+	if got := strings.Split(c.String(), "\n")[0]; got != "    child" {
+		t.Errorf("got %q, want four columns of indent", got)
+	}
+}
+
+// A row carrying its own state glyph does not also get the cursor's mark. Two
+// glyphs fighting for one column is how a tree's headers end up a character out
+// of line with its children.
+func TestALeadReplacesTheCursorMark(t *testing.T) {
+	c := NewCanvas(30, 4)
+	l := &List{Name: services, Marker: "> ", Blank: "  "}
+	l.Draw(c, c.Bounds(), []Row{
+		{Text: "rg-forge", Lead: "▾ "},
+		{Text: "vm-forge-0", Depth: 1},
+	})
+
+	lines := strings.Split(c.String(), "\n")
+	// The cursor is on row 0, which has a Lead: it keeps its own glyph.
+	if got := lines[0]; got != "▾ rg-forge" {
+		t.Errorf("the cursor mark displaced the header's own: %q", got)
+	}
+	// Row 1 has no Lead, so it gets the blank that keeps rows in line.
+	if got := lines[1]; got != "    vm-forge-0" {
+		t.Errorf("child is %q, want indent then the marker's blank", got)
+	}
+}
+
+// The indent belongs to the row, so a row of spans is indented too — otherwise
+// the one kind of row a tree needs most would be the one that ignores it.
+func TestSpansAreIndentedLikeAnythingElse(t *testing.T) {
+	c := NewCanvas(30, 3)
+	l := &List{Name: services}
+	l.Draw(c, c.Bounds(), []Row{
+		{Text: "header"},
+		{Depth: 1, Spans: []Segment{{Text: "vm-forge-0"}, {Text: " 3"}}},
+	})
+
+	if got := strings.Split(c.String(), "\n")[1]; got != "  vm-forge-0 3" {
+		t.Errorf("got %q", got)
+	}
+}
+
+// The whole row is clickable whatever its depth: the indent is drawn INTO the
+// row's own cells, so clicking the blank left of a child still selects it.
+func TestTheIndentIsStillTheRow(t *testing.T) {
+	c := NewCanvas(30, 3)
+	l := &List{Name: services}
+	l.Draw(c, c.Bounds(), []Row{{Text: "header"}, {Text: "child", Depth: 1}})
+
+	if got := c.OwnerAt(0, 1); got.Name != services || got.Index != 1 {
+		t.Errorf("the indent before a child is owned by %v", got)
 	}
 }

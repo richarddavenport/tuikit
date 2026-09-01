@@ -44,6 +44,12 @@ type Chrome struct {
 	// interface anyone has drawn; a field because a tool with no borders wants
 	// zero.
 	Inset int
+	// Indent is the columns a nested row moves right per level of depth. Two,
+	// in both tools that have grouped rows, in five separate places — and a
+	// field rather than a constant because it is a spacing decision like the
+	// other two, and a tool that wants a tighter tree should not have to
+	// reindent every row itself.
+	Indent int
 }
 
 // BoxSet is the six characters a frame is drawn with.
@@ -92,8 +98,9 @@ var DefaultChrome = Chrome{
 	ChevronLeft:  "‹",
 	ChevronRight: "›",
 
-	Gap:   1,
-	Inset: 1,
+	Gap:    1,
+	Inset:  1,
+	Indent: 2,
 }
 
 // Glyphs is every character this Chrome can draw, for a guard to check against

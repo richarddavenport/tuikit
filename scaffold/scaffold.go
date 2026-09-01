@@ -181,7 +181,7 @@ func (t Tool) reachable(root string) error {
 	abs, _ := filepath.Abs(path)
 	return fmt.Errorf("no tuikit checkout at %s\n\n"+
 		"tuikit is unpublished, so a generated tool resolves it from a directory\n"+
-		"on this machine. Pass -tuikit <path> to say where yours is.", abs)
+		"on this machine. Pass -tuikit <path> to say where yours is", abs)
 }
 
 // tuikitModule is what a checkout has to declare to be one.

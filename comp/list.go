@@ -110,6 +110,28 @@ type Row struct {
 	Text  string
 	Style *lipgloss.Style
 	Spans []Segment
+
+	// Depth indents the row, in levels — the flattened-hierarchy shape that
+	// two of the four tools already have in five separate places, every one of
+	// them writing `"  " + line` by hand.
+	//
+	// A NUMBER, not a node. The flattening stays the tool's: azctl's
+	// row{bucket, res} and swarmctl's diffRow{service, action, change} look
+	// alike and are not, because each carries a domain payload, and a shared
+	// []Node would make both of them box their data or keep it twice. What
+	// they have in common is that a child sits two columns right of its
+	// header, and that is this field.
+	Depth int
+
+	// Lead is the row's own prefix, drawn in the cursor marker's column and
+	// INSTEAD of it.
+	//
+	// For a group header that says something there already — ▸ collapsed, ▾
+	// expanded. A row carrying its own state glyph does not also want the
+	// cursor's mark on top of it: the highlight is what says where the cursor
+	// is, and two glyphs fighting for one column is how a tree ends up with
+	// its headers a character out of line with its children.
+	Lead string
 }
 
 // Draw renders the rows into r.
@@ -177,15 +199,16 @@ func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
 		// the reader's own mark on the list, and a row that kept its own
 		// colours under it would make the cursor hard to find in exactly the
 		// list where finding it matters.
+		lead := l.lead(c, rows[i], i)
 		if len(rows[i].Spans) == 0 || (i == l.cursor && style != nil) {
 			text := rows[i].Text
 			if text == "" {
 				text = spansText(rows[i].Spans)
 			}
-			c.Text(body.X, y, l.mark(i)+text, style, id)
+			c.Text(body.X, y, lead+text, style, id)
 			continue
 		}
-		x := body.X + c.Text(body.X, y, l.mark(i), style, id)
+		x := body.X + c.Text(body.X, y, lead, style, id)
 		for _, span := range rows[i].Spans {
 			x += c.Text(x, y, span.Text, span.Style, id)
 		}
@@ -251,6 +274,16 @@ func (l *List) Select(i int) { l.cursor, l.reveal = max(0, i), true }
 // Reset puts the list back to the top, for when the rows underneath it have
 // changed out from under the cursor — a filter, usually.
 func (l *List) Reset() { l.cursor, l.offset, l.reveal = 0, 0, false }
+
+// lead is everything drawn before a row's text: its indent, then either its own
+// prefix or the cursor's mark.
+func (l *List) lead(c *Canvas, row Row, i int) string {
+	indent := strings.Repeat(" ", max(0, row.Depth)*c.Chrome().Indent)
+	if row.Lead != "" {
+		return indent + row.Lead
+	}
+	return indent + l.mark(i)
+}
 
 // mark is the marker for a row, or the blank that keeps the others in line.
 func (l *List) mark(i int) string {
