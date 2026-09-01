@@ -398,28 +398,20 @@ func (m *Model) drawMenu(c *comp.Canvas) {
 	}
 }
 
-// box draws a titled frame and returns the rect inside it.
+// box draws one of democtl's panes.
 //
-// The inside is blanked, so a box drawn over something else covers it. That is
-// what makes the modal a draw rather than a composite.
+// A thin wrapper over comp.Pane rather than a call at each site, because the
+// styles are the tool's and the placement is a house rule: democtl puts its
+// titles on a row of their own so the focus highlight belongs to the pane.
 func (m *Model) box(c *comp.Canvas, r comp.Rect, title string, focused bool, id comp.ID) comp.Rect {
-	edge := &m.sty.border
-	if focused {
-		edge = &m.sty.focused
-	}
-	c.Box(r, edge, id)
-
-	inner := r.Inset(1)
-	c.Fill(inner, " ", nil, comp.ID{})
-	if title == "" {
-		return inner
-	}
-	// The title row is painted in full, trailing spaces included, because the
-	// style is the row's rather than the text's.
-	c.Fill(comp.Rect{X: inner.X, Y: inner.Y, W: inner.W, H: 1}, " ", &m.sty.title, id)
-	c.Text(inner.X, inner.Y, " "+comp.Truncate(title, inner.W-1), &m.sty.title, id)
-
-	return comp.Rect{X: inner.X, Y: inner.Y + 1, W: inner.W, H: inner.H - 1}
+	return comp.Pane{
+		Title:      title,
+		TitleAt:    comp.TitleOnRow,
+		Focused:    focused,
+		Border:     &m.sty.border,
+		Focus:      &m.sty.focused,
+		TitleStyle: &m.sty.title,
+	}.Draw(c, r, id)
 }
 
 // bodyHeight is what is left after the header's two lines and the footer's one.
