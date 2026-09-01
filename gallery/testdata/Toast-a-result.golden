@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               13 components
+tuikit gallery  every component, running                                                                               14 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Toast                                                                                          │
@@ -12,6 +12,7 @@ tuikit gallery  every component, running                                        
 │ Spinner                       │ │                                             │                                              │   │
 │ Table                         │ │                                             │3 of 3 tasks converged in 8.4s.               │   │
 │ Detail                        │ │                                             └──────────────────────────────────────────────┘   │
+│ Menu                          │ │                                                                                                │
 │ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │
 │ Split                         │ │                                                                                                │
@@ -28,10 +29,9 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │                                                                                                │
 │                               │ │ roles    Danger · Success · Border · Muted                                                     │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
 │                               │ │ from     swarmctl errorView                                                                    │
-│                         13/13 │ │                                                                                                │
+│                         14/14 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

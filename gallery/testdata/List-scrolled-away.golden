@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               13 components
+tuikit gallery  every component, running                                                                               14 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ List                                                                                           │
@@ -12,10 +12,10 @@ tuikit gallery  every component, running                                        
 │ Spinner                       │ │  media_upload                                                                                  │
 │ Table                         │ │  media_transcode                                                                               │
 │ Detail                        │ │  ops_metrics                                                                                   │
-│ Toast                         │ │  ops_logs                                                                                      │
-│ Form                          │ │  api_gateway                                                                                   │
-│ Split                         │ │  api_worker                                                                                    │
-│                               │ │  api_migrate                                                                                   │
+│ Menu                          │ │  ops_logs                                                                                      │
+│ Toast                         │ │  api_gateway                                                                                   │
+│ Form                          │ │  api_worker                                                                                    │
+│ Split                         │ │  api_migrate                                                                                   │
 │                               │ │  web_frontend                                                                                  │
 │                               │ │  web_assets                                                                                    │
 │                               │ │  data_indexer                                                                                  │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │
 │                               │ │ glyphs   ↑ ↓ ▸ ▾                                                                               │
 │                               │ │ from     pgctl window(), swarmctl pane scrolling, azctl cursor/top                             │
-│                         13/13 │ │                                                                                                │
+│                         14/14 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

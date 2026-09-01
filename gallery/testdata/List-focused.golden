@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               13 components
+tuikit gallery  every component, running                                                                               14 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ List                                                                                           │
@@ -12,10 +12,10 @@ tuikit gallery  every component, running                                        
 │ Spinner                       │ │  web_frontend                                                                                  │
 │ Table                         │ │  web_assets                                                                                    │
 │ Detail                        │ │  data_indexer                                                                                  │
+│ Menu                          │ │                                                                                                │
 │ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │
 │ Split                         │ │                                                                                                │
-│                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │
 │                               │ │ glyphs   ↑ ↓ ▸ ▾                                                                               │
 │                               │ │ from     pgctl window(), swarmctl pane scrolling, azctl cursor/top                             │
-│                         13/13 │ │                                                                                                │
+│                         14/14 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

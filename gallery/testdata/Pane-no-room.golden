@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               13 components
+tuikit gallery  every component, running                                                                               14 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Pane                                                                                           │
@@ -12,10 +12,10 @@ tuikit gallery  every component, running                                        
 │ Spinner                       │ │                                                                                                │
 │ Table                         │ │                                                                                                │
 │ Detail                        │ │                                                                                                │
+│ Menu                          │ │                                                                                                │
 │ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │
 │ Split                         │ │                                                                                                │
-│                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Border · Accent                                                                       │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
 │                               │ │ from     swarmctl drawBox and drawBoxRaw (which disagreed), democtl box                        │
-│                         13/13 │ │                                                                                                │
+│                         14/14 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

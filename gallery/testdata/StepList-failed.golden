@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               13 components
+tuikit gallery  every component, running                                                                               14 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ StepList                                                                                       │
@@ -12,10 +12,10 @@ tuikit gallery  every component, running                                        
 │ Spinner                       │ │   ✗ wait for tasks to converge                                                                 │
 │ Table                         │ │       task 3 exited 137 before the health check passed                                         │
 │ Detail                        │ │   • verify health endpoint                                                                     │
-│ Toast                         │ │                                                                                                │
-│ Form                          │ │   stopped  r to run again                                                                      │
+│ Menu                          │ │                                                                                                │
+│ Toast                         │ │   stopped  r to run again                                                                      │
+│ Form                          │ │                                                                                                │
 │ Split                         │ │                                                                                                │
-│                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Success · Danger · Pending · Muted                                                    │
 │                               │ │ glyphs   ✓ ✗ ● • →                                                                             │
 │                               │ │ from     swarmctl renderdeploy.go, pgctl actionrun.go, azctl runner.go                         │
-│                         13/13 │ │                                                                                                │
+│                         14/14 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

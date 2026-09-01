@@ -31,6 +31,7 @@ func (m *Model) Entries() []Entry {
 		m.spinnerEntry(s),
 		m.tableEntry(s),
 		m.detailEntry(s),
+		m.menuEntry(s),
 		m.toastEntry(s),
 		m.formEntry(s),
 		m.splitEntry(s),
@@ -177,6 +178,57 @@ func (m *Model) toastEntry(s *styles) Entry {
 					Body:  strings.Repeat("a root cause that came from somewhere else and does not know how wide your terminal is. ", 2),
 					Hint:  "run with -v for the full trace",
 				})},
+		},
+	}
+}
+
+func (m *Model) menuEntry(s *styles) Entry {
+	items := []comp.Hint{
+		{Key: "L", Label: "View logs"},
+		{Key: "D", Label: "Deploy"},
+		{Key: "R", Label: "Restart"},
+	}
+	menu := func(cursor int) comp.Menu {
+		return comp.Menu{
+			Name: "demo.menu", Item: "demo.menu.item",
+			Items: items, Cursor: cursor,
+			Border: &s.focused, Style: &s.muted, Selected: &s.selected,
+		}
+	}
+	return Entry{
+		Name:    "Menu",
+		Summary: "A short list of actions, at a point or on the thing they act on.",
+		From:    "democtl's context menu; azctl needs the same one",
+		Keys: []comp.Hint{
+			{Key: "↑↓", Label: "choose"}, {Key: "enter", Label: "do it"}, {Key: "esc", Label: "close"},
+		},
+		Mouse: []comp.Hint{
+			{Key: "rclick", Label: "open it on what is under the pointer"},
+			{Key: "click", Label: "choose — and a click on the border is not a click on an action"},
+		},
+		Roles: []string{"Accent", "Muted", "SelectionFG", "SelectionBG"},
+		States: []State{
+			{Name: "at a point", Note: "where a right-click landed",
+				Draw: func(c *comp.Canvas, r comp.Rect, _ bool) {
+					menu(0).DrawAt(c, r.X+2, r.Y+1)
+				}},
+			{Name: "moved down", Note: "the key sits beside the action, because it is the same list",
+				Draw: func(c *comp.Canvas, r comp.Rect, _ bool) {
+					menu(1).DrawAt(c, r.X+2, r.Y+1)
+				}},
+			{Name: "nudged back on screen", Note: "opened past the edge; half a menu is a list of actions you cannot read",
+				Draw: func(c *comp.Canvas, r comp.Rect, _ bool) {
+					menu(0).DrawAt(c, r.Right()-4, r.Bottom()-1)
+				}},
+			{Name: "on a region", Note: "the keyboard path — at the thing the cursor is on, wherever that is in THIS frame",
+				Draw: func(c *comp.Canvas, r comp.Rect, _ bool) {
+					// Something to anchor to, drawn first, so the menu can find
+					// it the way it would find a scrolled row.
+					row := comp.Rect{X: r.X + 6, Y: r.Y + 4, W: 24, H: 1}
+					c.Fill(row, " ", &s.selected, comp.Region("demo.row"))
+					c.Text(row.X+1, row.Y, "api_gateway", &s.selected, comp.Region("demo.row"))
+					menu(0).DrawOn(c, comp.Region("demo.row"))
+				}},
 		},
 	}
 }

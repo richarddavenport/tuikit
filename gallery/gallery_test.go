@@ -17,7 +17,7 @@ import (
 // A component that is not in the gallery is not finished.
 //
 // The rule enforced rather than written down. comp's own source is read for
-// every exported type with a Draw method — which is what a component IS here —
+// every exported type with a Draw* method — which is what a component IS here —
 // and each one has to have an entry. Adding a component without one fails this
 // test, instead of shipping something nobody has ever seen run.
 //
@@ -51,7 +51,7 @@ func TestEveryComponentIsInTheGallery(t *testing.T) {
 	}
 }
 
-// componentsIn is every exported type in a package with a Draw method.
+// componentsIn is every exported type in a package with a Draw* method.
 func componentsIn(t *testing.T, dir string) []string {
 	t.Helper()
 
@@ -70,7 +70,12 @@ func componentsIn(t *testing.T, dir string) []string {
 			}
 			for _, decl := range file.Decls {
 				fn, ok := decl.(*ast.FuncDecl)
-				if !ok || fn.Name.Name != "Draw" || fn.Recv == nil || len(fn.Recv.List) != 1 {
+				// Draw, DrawAt, DrawOn — a prefix, not an exact name.
+				// comp.Menu draws at a point or on a region and has no plain
+				// Draw, so an exact match let it into the library with no
+				// gallery entry at all: the check that exists to stop that
+				// silently stopped applying to it.
+				if !ok || !strings.HasPrefix(fn.Name.Name, "Draw") || fn.Recv == nil || len(fn.Recv.List) != 1 {
 					continue
 				}
 				if recv := receiverName(fn.Recv.List[0].Type); recv != "" && ast.IsExported(recv) {

@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               13 components
+tuikit gallery  every component, running                                                                               14 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Detail                                                                                         │
@@ -12,10 +12,10 @@ tuikit gallery  every component, running                                        
 │ Spinner                       │ │ group    rg-forge                                                                              │
 │ Table                         │ │ location uksouth                                                                               │
 │ Detail                        │ │ state    failed                                                                                │
-│ Toast                         │ │                                                                                                │
-│ Form                          │ │ tags                                                                                           │
-│ Split                         │ │   env   prod                                                                                   │
-│                               │ │   owner platform                                                                               │
+│ Menu                          │ │                                                                                                │
+│ Toast                         │ │ tags                                                                                           │
+│ Form                          │ │   env   prod                                                                                   │
+│ Split                         │ │   owner platform                                                                               │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │ roles    Accent · Muted · Danger                                                               │
 │                               │ │ from     democtl field(), azctl fields() — both carried y from call to call                    │
-│                         13/13 │ │                                                                                                │
+│                         14/14 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

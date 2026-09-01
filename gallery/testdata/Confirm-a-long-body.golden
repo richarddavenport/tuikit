@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               13 components
+tuikit gallery  every component, running                                                                               14 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Confirm                                                                                        │
@@ -12,10 +12,10 @@ tuikit gallery  every component, running                                        
 │ Spinner                       │ │                                                                                                │
 │ Table                         │ │                                                                                                │
 │ Detail                        │ │                ┌──────────────────────────────────────────────────────────────┐                │
-│ Toast                         │ │                │Apply the plan?                                               │                │
-│ Form                          │ │                │                                                              │                │
-│ Split                         │ │                │The plan's description can be as long as a list of every      │                │
-│                               │ │                │table a widened selection adds. The plan's description can    │                │
+│ Menu                          │ │                │Apply the plan?                                               │                │
+│ Toast                         │ │                │                                                              │                │
+│ Form                          │ │                │The plan's description can be as long as a list of every      │                │
+│ Split                         │ │                │table a widened selection adds. The plan's description can    │                │
 │                               │ │                │be as long as a list of every table a widened selection       │                │
 │                               │ │                │adds. The plan's description can be as long as a list of      │                │
 │                               │ │                │every table a widened selection adds.                         │                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Accent · Danger · Muted                                                               │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘ ·                                                                         │
 │                               │ │ from     swarmctl action.go, pgctl actionview.go, democtl overlay                              │
-│                         13/13 │ │                                                                                                │
+│                         14/14 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

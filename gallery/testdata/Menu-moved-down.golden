@@ -1,17 +1,17 @@
 tuikit gallery  every component, running                                                                               14 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Tabs                                                                                           │
-│ List                          │ │ A strip of names, one of them current. The chevrons say it cycles.                             │
-│ Pane                          │ │ ‹ focused · unfocused · with counts · too wide ›                                               │
-│ Tabs                          │ │ current, but not yours to change right now                                                     │
+│ Components                    │ │ Menu                                                                                           │
+│ List                          │ │ A short list of actions, at a point or on the thing they act on.                               │
+│ Pane                          │ │ ‹ at a point · moved down · nudged back on screen · on a region ›                              │
+│ Tabs                          │ │ the key sits beside the action, because it is the same list                                    │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │ ‹ Overview · Config · Events ›                                                                 │
-│ StepList                      │ │                                                                                                │
-│ LogPane                       │ │                                                                                                │
-│ Spinner                       │ │                                                                                                │
-│ Table                         │ │                                                                                                │
-│ Detail                        │ │                                                                                                │
+│ Confirm                       │ │                                                                                                │
+│ StepList                      │ │   ┌──────────────┐                                                                             │
+│ LogPane                       │ │   │ View logs  L │                                                                             │
+│ Spinner                       │ │   │ Deploy     D │                                                                             │
+│ Table                         │ │   │ Restart    R │                                                                             │
+│ Detail                        │ │   └──────────────┘                                                                             │
 │ Menu                          │ │                                                                                                │
 │ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │
@@ -27,11 +27,11 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │ keys     ‹› cycle                                                                              │
-│                               │ │ mouse    click each tab is its own region                                                      │
-│                               │ │ roles    Accent · Muted                                                                        │
-│                               │ │ glyphs   ‹ › ·                                                                                 │
-│                               │ │ from     swarmctl tabStrip, pgctl tab bar, democtl                                             │
+│                               │ │                                                                                                │
+│                               │ │ keys     ↑↓ choose · enter do it · esc close                                                   │
+│                               │ │ mouse    rclick open it on what is under the pointer · click choose — and a click on the bord… │
+│                               │ │ roles    Accent · Muted · SelectionFG · SelectionBG                                            │
+│                               │ │ from     democtl's context menu; azctl needs the same one                                      │
 │                         14/14 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit
