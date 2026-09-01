@@ -37,14 +37,60 @@ func TestHexFollowsTheAnsiPalette(t *testing.T) {
 	}
 }
 
-// Anything that is not a palette index is black rather than a panic: this runs
-// in a generator, and a bad value should produce a visibly wrong swatch, not a
-// crashed build.
+// Anything that is neither a palette index nor a hex value is black rather than
+// a panic: this runs in a generator, and a bad value should produce a visibly
+// wrong swatch, not a crashed build.
 func TestHexIsTotal(t *testing.T) {
-	for _, in := range []string{"", "nope", "-1", "256", "#ff00ff"} {
+	for _, in := range []string{"", "nope", "-1", "256"} {
 		if got := Hex(lipglossColor(in)); got != "#000000" {
 			t.Errorf("Hex(%q) = %s, want black", in, got)
 		}
+	}
+}
+
+// A tool that named its roles in hex has already answered the question, so Hex
+// hands it back rather than pretending not to understand. azctl's palette is
+// hex pairs, and a design system that drew nine black squares for it would be
+// describing a tool that does not exist.
+func TestHexPassesThroughAHexValue(t *testing.T) {
+	for in, want := range map[string]string{
+		"#ff00ff": "#ff00ff",
+		"#FF00FF": "#ff00ff",
+		"#d2a8ff": "#d2a8ff",
+		"#fff":    "#ffffff",
+	} {
+		if got := Hex(lipglossColor(in)); got != want {
+			t.Errorf("Hex(%q) = %s, want %s", in, got, want)
+		}
+	}
+}
+
+// An adaptive colour answers with its dark value, because everything that
+// renders a palette outside a terminal draws on a dark ground — that is what
+// the frame was captured for, and recolouring it would report a tool that does
+// not exist.
+func TestAnAdaptiveColourAnswersDark(t *testing.T) {
+	c := lipgloss.AdaptiveColor{Light: "#1f2328", Dark: "#e6edf3"}
+	if got := Hex(c); got != "#e6edf3" {
+		t.Errorf("Hex(adaptive) = %s, want the dark value", got)
+	}
+	if got := Value(c); got != "#1f2328 / #e6edf3" {
+		t.Errorf("Value(adaptive) = %q, want both", got)
+	}
+}
+
+// Value is what the tool DECLARED, which is what a design system page should
+// say alongside what it resolves to: "205" tells a reader the palette follows
+// their terminal's own scheme, and "#ff5faf" tells them it does not.
+func TestValueIsWhatWasWritten(t *testing.T) {
+	if got := Value(lipglossColor("205")); got != "205" {
+		t.Errorf("Value = %q", got)
+	}
+	if got := Value(lipglossColor("#d2a8ff")); got != "#d2a8ff" {
+		t.Errorf("Value = %q", got)
+	}
+	if got := Value(nil); got != "" {
+		t.Errorf("Value(nil) = %q", got)
 	}
 }
 

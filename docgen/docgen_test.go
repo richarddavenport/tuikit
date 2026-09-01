@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/charmbracelet/lipgloss"
+
 	"github.com/richarddavenport/tuikit/theme"
 )
 
@@ -74,8 +76,8 @@ func TestEveryRoleIsDrawnAndNotOnlySwatched(t *testing.T) {
 // to prevent.
 func TestAToolsOwnPaletteIsWhatGetsDrawn(t *testing.T) {
 	pal := theme.Default
-	pal.Accent = "33" // #0087ff
-	pal.Extra = []theme.Role{{Name: "Info", Color: "39", Why: "a note the tool wants to make"}}
+	pal.Accent = lipgloss.Color("33") // #0087ff
+	pal.Extra = []theme.Role{{Name: "Info", Color: lipgloss.Color("39"), Why: "a note the tool wants to make"}}
 
 	html := DesignSystem{Tool: "democtl", Palette: pal}.Pages()[0].HTML
 

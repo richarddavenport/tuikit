@@ -27,34 +27,47 @@ import "github.com/charmbracelet/lipgloss"
 // A tool takes [Default] and overrides the fields it wants. It does not build a
 // Palette from scratch, because the point of the set being closed is that
 // nine decisions is the whole vocabulary.
+//
+// # Why the colours are an interface
+//
+// A role holds a lipgloss.TerminalColor rather than a lipgloss.Color, so a tool
+// may supply an AdaptiveColor and have its interface read on a light terminal
+// as well as a dark one. That is azctl's requirement, found by migrating it:
+// its palette is light/dark pairs, and a Palette that could not hold them would
+// have forced it to choose between tuikit's vocabulary and working in daylight.
+//
+// Depth and adaptation are different questions. Decision 13 chose ANSI 256 over
+// truecolour because ssh decides the profile; that is about how many colours
+// there are. Which of them to use on a pale background is a separate decision,
+// and one a design system has no business taking for a tool.
 type Palette struct {
 	// Accent is the interface's own colour: titles, the selected row, the
 	// focused panel's border. It marks WHERE YOU ARE, which is why the same
 	// value carries all three.
-	Accent lipgloss.Color
+	Accent lipgloss.TerminalColor
 	// Muted is text that is present but not the point: hints, footers,
 	// explanations under a value.
-	Muted lipgloss.Color
+	Muted lipgloss.TerminalColor
 	// Border is an unfocused panel's edge — a shade below Muted, so the box is
 	// visible without competing with the text inside it.
-	Border lipgloss.Color
+	Border lipgloss.TerminalColor
 	// Success is a finished action and a live log stream: the state you wanted.
-	Success lipgloss.Color
+	Success lipgloss.TerminalColor
 	// Pending is a queued change, not yet applied — amber reads as "waiting on
 	// you", distinct from both the running value and an error.
-	Pending lipgloss.Color
+	Pending lipgloss.TerminalColor
 	// Danger is a refusal, an error, or a guarded environment. It is never
 	// decoration: something coloured Danger is something that stopped or will.
-	Danger lipgloss.Color
+	Danger lipgloss.TerminalColor
 	// Stderr marks a log line from stderr. Distinct from Danger on purpose —
 	// most programs write ordinary progress to stderr, and colouring that as a
 	// failure would make every run look broken.
-	Stderr lipgloss.Color
+	Stderr lipgloss.TerminalColor
 	// SelectionFG and SelectionBG are the one place the interface paints a
 	// background: the selected row of a table, where a foreground colour alone
 	// cannot be seen against the surrounding rows.
-	SelectionFG lipgloss.Color
-	SelectionBG lipgloss.Color
+	SelectionFG lipgloss.TerminalColor
+	SelectionBG lipgloss.TerminalColor
 
 	// Extra is for a role the nine do not cover.
 	//
@@ -73,21 +86,21 @@ type Palette struct {
 // understands and what every terminal has agreed on; a truecolour hex would
 // look right on this machine and wrong over ssh from another.
 var Default = Palette{
-	Accent:      "205",
-	Muted:       "241",
-	Border:      "240",
-	Success:     "34",
-	Pending:     "214",
-	Danger:      "196",
-	Stderr:      "203",
-	SelectionFG: "229",
-	SelectionBG: "57",
+	Accent:      lipgloss.Color("205"),
+	Muted:       lipgloss.Color("241"),
+	Border:      lipgloss.Color("240"),
+	Success:     lipgloss.Color("34"),
+	Pending:     lipgloss.Color("214"),
+	Danger:      lipgloss.Color("196"),
+	Stderr:      lipgloss.Color("203"),
+	SelectionFG: lipgloss.Color("229"),
+	SelectionBG: lipgloss.Color("57"),
 }
 
 // Role is one entry in the palette, for anything rendering the palette itself.
 type Role struct {
 	Name  string
-	Color lipgloss.Color
+	Color lipgloss.TerminalColor
 	Why   string
 }
 

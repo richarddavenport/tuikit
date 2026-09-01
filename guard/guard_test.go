@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/charmbracelet/lipgloss"
+
 	"github.com/richarddavenport/tuikit/theme"
 )
 
@@ -47,7 +49,7 @@ func TestTokensRejectsARoleNothingDrawsWith(t *testing.T) {
 	dir := pkg(t, "package ui\n\n"+allRoleUses())
 
 	p := theme.Default
-	p.Extra = []theme.Role{{Name: "Info", Color: "39", Why: "a note"}}
+	p.Extra = []theme.Role{{Name: "Info", Color: lipgloss.Color("39"), Why: "a note"}}
 
 	got := run(t, func(rec T) { Tokens(rec, dir, p) })
 	want(t, got, "Info is named in the palette but never drawn with")

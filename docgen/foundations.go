@@ -18,7 +18,7 @@ func (r renderer) colorsPage() string {
   <div><code style="color:%s">%s</code><br><code style="color:#6e6e6e">%s · %s</code></div>
   <div style="color:#9a9a9a;font-size:13px">%s</div>
 </div>`, hexOf(role.Color), hexOf(role.Color), html.EscapeString(role.Name),
-			html.EscapeString(string(role.Color)), hexOf(role.Color), html.EscapeString(role.Why))
+			html.EscapeString(valueOf(role.Color)), hexOf(role.Color), html.EscapeString(role.Why))
 	}
 	b.WriteString(`</div>`)
 

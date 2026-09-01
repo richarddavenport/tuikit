@@ -81,7 +81,7 @@ func (d DesignSystem) renderer() renderer {
 	// Checked on one field rather than against a zero Palette: Palette holds a
 	// slice, so it is not comparable, and a tool that set only Extra still has
 	// no colours.
-	if r.pal.Accent == "" {
+	if r.pal.Accent == nil {
 		r.pal = theme.Default
 	}
 	if r.glyphs == nil {

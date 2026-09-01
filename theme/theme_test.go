@@ -1,6 +1,10 @@
 package theme
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/charmbracelet/lipgloss"
+)
 
 // The palette is a closed set with a fixed reading order. A tool that recolours
 // it still gets the same nine roles in the same order, because the order is
@@ -24,16 +28,16 @@ func TestRolesAreTheNineInOrder(t *testing.T) {
 // changed what an accent means.
 func TestOverridingAColourKeepsTheReason(t *testing.T) {
 	blue := Default
-	blue.Accent = "33"
+	blue.Accent = lipgloss.Color("33")
 
 	before, after := Default.Roles()[0], blue.Roles()[0]
-	if after.Color != "33" {
+	if after.Color != lipgloss.Color("33") {
 		t.Errorf("Accent = %s, want 33", after.Color)
 	}
 	if after.Why != before.Why {
 		t.Errorf("the reason changed with the hue:\n got %q\nwant %q", after.Why, before.Why)
 	}
-	if Default.Accent != "205" {
+	if Default.Accent != lipgloss.Color("205") {
 		t.Errorf("overriding a copy mutated Default: Accent = %s", Default.Accent)
 	}
 }
@@ -43,7 +47,7 @@ func TestOverridingAColourKeepsTheReason(t *testing.T) {
 // see is a literal waiting to happen.
 func TestExtraRolesAreWalkedLikeAnyOther(t *testing.T) {
 	p := Default
-	p.Extra = []Role{{"Info", "39", "a note the tool wants to make"}}
+	p.Extra = []Role{{"Info", lipgloss.Color("39"), "a note the tool wants to make"}}
 
 	roles := p.Roles()
 	last := roles[len(roles)-1]

@@ -344,3 +344,35 @@ file and line intact.
 **The rebuild is debounced.** An editor that writes a file in two syscalls is one
 save, and rebuilding twice makes the page flicker through a state nobody asked
 for.
+
+## 24. A palette role holds a `TerminalColor`, not a `Color`
+
+Found by migrating azctl, which is what that migration is for.
+
+azctl's palette is `lipgloss.AdaptiveColor` pairs — a light value and a dark
+one, so the tool reads on a pale terminal as well as a dark one. `theme.Palette`
+held `lipgloss.Color`, which cannot express that at all, so azctl's choice was
+between tuikit's vocabulary and working in daylight. That is not a choice a
+design system should be imposing.
+
+**Depth and adaptation are different questions.** Decision 13 chose ANSI 256
+over truecolour because ssh decides the profile — that is about how many colours
+there are. Which of them to use against a pale background is a separate
+decision, and the tool's.
+
+So the nine roles hold `lipgloss.TerminalColor`. `theme.Default` still names
+ANSI indices and nothing about it changed; a tool that wants adaptive pairs can
+now have them.
+
+Two things follow:
+
+**`theme.Hex` answers with the DARK value of an adaptive colour**, and passes a
+hex value straight through. Everything that renders a palette outside a terminal
+— a design system page, a captured frame turned into HTML — draws on a dark
+ground, because that is what the frame was captured for. A palette page for a
+light interface is a real thing to want, and is not this.
+
+**`theme.Value` is new**: the colour as the tool *declared* it, for the design
+system page to show beside what it resolves to. "205" tells a reader the palette
+is ANSI indices and will follow their terminal's own scheme; "#d2a8ff" tells
+them it will not. Hex answers what it looks like; Value answers what it is.

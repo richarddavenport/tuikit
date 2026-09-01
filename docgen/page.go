@@ -83,7 +83,11 @@ func (r renderer) paletteCSS() string {
 func cssClass(role string) string { return strings.ToLower(role) }
 
 // hexOf is theme.Hex, named short because the colour pages call it constantly.
-func hexOf(c lipgloss.Color) string { return theme.Hex(c) }
+func hexOf(c lipgloss.TerminalColor) string { return theme.Hex(c) }
+
+// valueOf is the colour as the tool declared it, which is what a design system
+// page should say alongside what it resolves to.
+func valueOf(c lipgloss.TerminalColor) string { return theme.Value(c) }
 
 // classFor is the class a role is actually drawn with.
 //
