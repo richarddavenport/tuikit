@@ -55,6 +55,13 @@ const (
 //
 // The inside is blanked, so a pane drawn over something else covers it. That is
 // what makes a modal or a menu a draw rather than a composite.
+//
+// The blank cells are owned by the PANE, not by nobody. A pane whose empty
+// space belongs to no one answers "what is the pointer over" with nothing, so
+// the wheel does nothing over the bottom half of a short list and a click on a
+// menu's own padding reads as a click outside it and dismisses it. Whatever
+// draws into the inside — a list, a form, a table — takes ownership of the
+// cells it uses, so this only ever holds the space nothing else claimed.
 func (p Pane) Draw(c *Canvas, r Rect, id ID) Rect {
 	c = c.Clip(r)
 	edge := p.Border
@@ -71,7 +78,7 @@ func (p Pane) Draw(c *Canvas, r Rect, id ID) Rect {
 	}
 	c.Box(r, edge, id)
 	inner := r.Inset(c.Chrome().Inset)
-	c.Fill(inner, " ", nil, ID{})
+	c.Fill(inner, " ", nil, id)
 
 	if p.Title == "" {
 		return inner
