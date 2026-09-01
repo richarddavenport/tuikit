@@ -1,18 +1,18 @@
 tuikit gallery  every component, running                                                                               15 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Form                                                                                           │
-│ List                          │ │ Every field at once, so you can see what you have chosen rather than remember it.              │
-│ Pane                          │ │ ‹ focused · unfocused · type the name · phrase matched · no room ›                             │
-│ Tabs                          │ │ the marker is the caller's glyph, not one this package chose                                   │
+│ Components                    │ │ Layout                                                                                         │
+│ List                          │ │ Bands down an axis, so nobody computes a height twice.                                         │
+│ Pane                          │ │ ‹ the shape every tool has · weights · a clamp is paid for by the others · a gap between bands │
+│ Tabs                          │ │ Fill(1).Min(6) takes its floor and the rest is re-solved — solving once and clamping after wo… │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │   target   staging  production                                                                 │
-│ StepList                      │ │ > tag      v2.4.1                                                                              │
-│ LogPane                       │ │   note     (none)                                                                              │
-│ Spinner                       │ │   dry run  yes                                                                                 │
+│ Confirm                       │ │  Fill(1).Min(6)  6                                                                             │
+│ StepList                      │ │                                                                                                │
+│ LogPane                       │ │                                                                                                │
+│ Spinner                       │ │                                                                                                │
 │ Table                         │ │                                                                                                │
 │ Detail                        │ │                                                                                                │
-│ Menu                          │ │                                                                                                │
+│ Menu                          │ │  Fill(9)  18                                                                                   │
 │ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │
 │ Split                         │ │                                                                                                │
@@ -29,9 +29,9 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │ keys     ↑↓ field · ‹› choice · space toggle                                                   │
-│                               │ │ roles    Accent · Muted · Danger                                                               │
-│                               │ │ from     pgctl viewForm, swarmctl applyedits.go and confirmPhrase                              │
+│                               │ │                                                                                                │
+│                               │ │ roles    Accent · Muted · Pending                                                              │
+│                               │ │ from     the body()/bodyHeight() pair every one of the four tools writes                       │
 │                         15/15 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

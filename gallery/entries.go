@@ -4,6 +4,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/lipgloss"
+
 	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/theme"
 )
@@ -35,6 +37,51 @@ func (m *Model) Entries() []Entry {
 		m.toastEntry(s),
 		m.formEntry(s),
 		m.splitEntry(s),
+		m.layoutEntry(s),
+	}
+}
+
+func (m *Model) layoutEntry(s *styles) Entry {
+	draw := func(l comp.Layout, labels ...string) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			style := []*lipgloss.Style{&s.title, &s.muted, &s.focused, &s.pending}
+			for i, band := range l.Rows(r) {
+				if band.H <= 0 {
+					continue
+				}
+				c.Fill(band, " ", style[i%len(style)], comp.Region("demo.layout").At(i))
+				label := labels[i%len(labels)]
+				c.Text(band.X+1, band.Y, label+"  "+itoa(band.H),
+					style[i%len(style)], comp.Region("demo.layout").At(i))
+			}
+		}
+	}
+	window := comp.Layout{Constraints: []comp.Constraint{
+		comp.Length(1), comp.Length(1), comp.Fill(1).Min(3), comp.Length(1),
+	}}
+	return Entry{
+		Name:    "Layout",
+		Summary: "Bands down an axis, so nobody computes a height twice.",
+		From:    "the body()/bodyHeight() pair every one of the four tools writes",
+		Roles:   []string{"Accent", "Muted", "Pending"},
+		States: []State{
+			{Name: "the shape every tool has", Note: "a header, a rule, the body, the hints — one declaration instead of a rect and a height",
+				Draw: draw(window, "header", "rule", "body", "hints")},
+			{Name: "weights", Note: "Fill(1) and Fill(3): the leftover splits by weight, and the rounding never loses a row",
+				Draw: draw(comp.Layout{Constraints: []comp.Constraint{comp.Fill(1), comp.Fill(3)}}, "Fill(1)", "Fill(3)")},
+			{Name: "a clamp is paid for by the others", Note: "Fill(1).Min(6) takes its floor and the rest is re-solved — solving once and clamping after would overflow",
+				Draw: draw(comp.Layout{Constraints: []comp.Constraint{
+					comp.Fill(1).Min(6), comp.Fill(9),
+				}}, "Fill(1).Min(6)", "Fill(9)")},
+			{Name: "a gap between bands", Note: "the gap comes out of the fill, not out of the rect",
+				Draw: draw(comp.Layout{Constraints: []comp.Constraint{
+					comp.Length(2), comp.Fill(1), comp.Length(2),
+				}, Gap: 2}, "Length(2)", "Fill(1)", "Length(2)")},
+			{Name: "no room", Note: "a terminal too short gives bands of zero rather than negative ones",
+				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
+					draw(window, "header", "rule", "body", "hints")(c, comp.Rect{X: r.X, Y: r.Y, W: r.W, H: 3}, focused)
+				}},
+		},
 	}
 }
 
