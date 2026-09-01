@@ -4,14 +4,14 @@ tuikit gallery  every component, running                                        
 │ Components                    │ │ List                                                                                           │
 │ List                          │ │ A scrollable, selectable list, flat or grouped. The viewport and the selection are separate.   │
 │ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · grouped · grouped, collapsed · no│
-│ Tabs                          │ │ the selection is yours to move                                                                 │
+│ Tabs                          │ │ the headers say there is something under them you have not seen                                │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │  api_gateway                                                                                   │
-│ StepList                      │ │  api_worker                                                                                    │
-│ LogPane                       │ │  api_migrate                                                                                   │
-│ Spinner                       │ │  web_frontend                                                                                  │
-│ Table                         │ │  web_assets                                                                                    │
-│ Toast                         │ │  data_indexer                                                                                  │
+│ Confirm                       │ │ ▸ rg-forge 3                                                                                   │
+│ StepList                      │ │ ▸ rg-platform 3                                                                                │
+│ LogPane                       │ │ ▸ rg-data 2                                                                                    │
+│ Spinner                       │ │                                                                                                │
+│ Table                         │ │                                                                                                │
+│ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │
 │ Split                         │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -26,7 +26,7 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │                                                                                           6/6  │
+│                               │ │                                                                                           3/3  │
 │                               │ │ keys     ↑↓ move the selection · j/k the same                                                  │
 │                               │ │ mouse    click select the row, anywhere across it · wheel scroll the viewport, never the sele… │
 │                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │

@@ -38,6 +38,14 @@ type Chrome struct {
 	// which keys do it — a fact about the keymap that no styling can carry.
 	ChevronLeft, ChevronRight string
 
+	// Collapsed and Expanded lead a group header in a list of nested rows.
+	//
+	// The same category as the chevrons: a fact no styling can carry. A header
+	// that is merely bold says it is a header; ▸ says there is something under
+	// it you have not seen, which is the difference between a group worth
+	// opening and one that is empty.
+	Collapsed, Expanded string
+
 	// Gap is the columns between panes, and rows between stacked ones.
 	Gap int
 	// Inset is the distance from a pane's border to its content. One, in every
@@ -98,6 +106,12 @@ var DefaultChrome = Chrome{
 	ChevronLeft:  "‹",
 	ChevronRight: "›",
 
+	// A trailing space, because these sit in the marker's column and the row's
+	// text follows immediately. Part of the glyph rather than something every
+	// caller remembers to add.
+	Collapsed: "▸ ",
+	Expanded:  "▾ ",
+
 	Gap:    1,
 	Inset:  1,
 	Indent: 2,
@@ -119,6 +133,7 @@ func (c Chrome) Glyphs() []rune {
 		c.Divider, c.VDivider,
 		c.Ellipsis, c.Separator, c.ScrollUp, c.ScrollDown,
 		c.ChevronLeft, c.ChevronRight,
+		c.Collapsed, c.Expanded,
 	} {
 		for _, r := range s {
 			if !seen[r] {

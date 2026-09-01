@@ -148,6 +148,8 @@ var DefaultGlyphs = GlyphSet{
 	'↓': "down arrow — key hints",
 	'‹': "single left angle quote — tab strip",
 	'›': "single right angle quote — tab strip",
+	'▸': "black right-pointing small triangle — a collapsed group",
+	'▾': "black down-pointing small triangle — an expanded group",
 	'●': "black circle — badges and the dirty marker",
 	'•': "bullet — masked secret",
 	'✓': "check mark — success",

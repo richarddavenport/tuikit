@@ -4,16 +4,19 @@ tuikit gallery  every component, running                                        
 │ Components                    │ │ List                                                                                           │
 │ List                          │ │ A scrollable, selectable list, flat or grouped. The viewport and the selection are separate.   │
 │ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · grouped · grouped, collapsed · no│
-│ Tabs                          │ │ the selection is yours to move                                                                 │
+│ Tabs                          │ │ Depth indents a child; Lead is the header's own glyph, in the marker's column instead of it    │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │  api_gateway                                                                                   │
-│ StepList                      │ │  api_worker                                                                                    │
-│ LogPane                       │ │  api_migrate                                                                                   │
-│ Spinner                       │ │  web_frontend                                                                                  │
-│ Table                         │ │  web_assets                                                                                    │
-│ Toast                         │ │  data_indexer                                                                                  │
-│ Form                          │ │                                                                                                │
-│ Split                         │ │                                                                                                │
+│ Confirm                       │ │ ▾ rg-forge 3                                                                                   │
+│ StepList                      │ │   › vm-forge-0                                                                                 │
+│ LogPane                       │ │     nic-forge-0                                                                                │
+│ Spinner                       │ │     sambpforge                                                                                 │
+│ Table                         │ │ ▾ rg-platform 3                                                                                │
+│ Toast                         │ │     kv-platform                                                                                │
+│ Form                          │ │     app-web                                                                                    │
+│ Split                         │ │     app-api                                                                                    │
+│                               │ │ ▾ rg-data 2                                                                                    │
+│                               │ │     sql-reporting                                                                              │
+│                               │ │     sadatalake                                                                                 │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -23,10 +26,7 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │                                                                                                │
-│                               │ │                                                                                                │
-│                               │ │                                                                                                │
-│                               │ │                                                                                           6/6  │
+│                               │ │                                                                                         11/11  │
 │                               │ │ keys     ↑↓ move the selection · j/k the same                                                  │
 │                               │ │ mouse    click select the row, anywhere across it · wheel scroll the viewport, never the sele… │
 │                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │

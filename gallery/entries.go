@@ -267,6 +267,39 @@ func rowsFor(n int) []comp.Row {
 	return out
 }
 
+// groupedRows is the flattened-hierarchy shape: headers with children indented
+// under them, which is what two of the four tools build in five places.
+func groupedRows(c *comp.Canvas, s *styles, open bool) []comp.Row {
+	groups := []struct {
+		name     string
+		children []string
+	}{
+		{"rg-forge", []string{"vm-forge-0", "nic-forge-0", "sambpforge"}},
+		{"rg-platform", []string{"kv-platform", "app-web", "app-api"}},
+		{"rg-data", []string{"sql-reporting", "sadatalake"}},
+	}
+
+	ch := c.Chrome()
+	var out []comp.Row
+	for _, g := range groups {
+		lead := ch.Collapsed
+		if open {
+			lead = ch.Expanded
+		}
+		out = append(out, comp.Row{Lead: lead, Spans: []comp.Segment{
+			{Text: g.name, Style: &s.title},
+			{Text: " " + itoa(len(g.children)), Style: &s.muted},
+		}})
+		if !open {
+			continue
+		}
+		for _, child := range g.children {
+			out = append(out, comp.Row{Depth: 1, Text: child})
+		}
+	}
+	return out
+}
+
 func (m *Model) listEntry(s *styles) Entry {
 	demo := func(rows []comp.Row, focused bool, prepare func(*comp.List)) func(*comp.Canvas, comp.Rect, bool) {
 		return func(c *comp.Canvas, r comp.Rect, paneFocused bool) {
@@ -285,7 +318,7 @@ func (m *Model) listEntry(s *styles) Entry {
 	}
 	return Entry{
 		Name:    "List",
-		Summary: "A scrollable, selectable list. The viewport and the selection are separate.",
+		Summary: "A scrollable, selectable list, flat or grouped. The viewport and the selection are separate.",
 		From:    "pgctl window(), swarmctl pane scrolling, azctl cursor/top",
 		Keys: []comp.Hint{
 			{Key: "↑↓", Label: "move the selection"},
@@ -296,7 +329,7 @@ func (m *Model) listEntry(s *styles) Entry {
 			{Key: "wheel", Label: "scroll the viewport, never the selection"},
 		},
 		Roles:  []string{"SelectionFG", "SelectionBG", "Accent", "Muted"},
-		Glyphs: []string{"↑", "↓"},
+		Glyphs: []string{"↑", "↓", "▸", "▾"},
 		States: []State{
 			{Name: "focused", Note: "the selection is yours to move",
 				Draw: demo(rowsFor(6), true, nil)},
@@ -308,6 +341,25 @@ func (m *Model) listEntry(s *styles) Entry {
 				Draw: demo(rowsFor(40), true, nil)},
 			{Name: "scrolled away", Note: "the selection is off screen, and says which way",
 				Draw: demo(rowsFor(40), true, func(l *comp.List) { l.Scroll(8) })},
+			{Name: "grouped", Note: "Depth indents a child; Lead is the header's own glyph, in the marker's column instead of it",
+				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
+					l := &comp.List{
+						Name: "demo.list", Marker: "› ", Blank: "  ",
+						Selected: &s.selected, Unfocused: &s.focused,
+						Status: &s.muted, Focused: true,
+					}
+					l.Move(1) // onto a child, so the marker is visible under a header
+					l.Draw(c, r, groupedRows(c, s, true))
+				}},
+			{Name: "grouped, collapsed", Note: "the headers say there is something under them you have not seen",
+				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
+					l := &comp.List{
+						Name: "demo.list", Marker: "› ", Blank: "  ",
+						Selected: &s.selected, Unfocused: &s.focused,
+						Status: &s.muted, Focused: true,
+					}
+					l.Draw(c, r, groupedRows(c, s, false))
+				}},
 			{Name: "no room", Note: "one row; it draws what it can rather than crashing",
 				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
 					demo(rowsFor(40), true, nil)(c, comp.Rect{X: r.X, Y: r.Y, W: r.W, H: 1}, focused)

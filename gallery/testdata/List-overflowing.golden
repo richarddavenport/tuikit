@@ -2,8 +2,8 @@ tuikit gallery  every component, running                                        
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ List                                                                                           │
-│ List                          │ │ A scrollable, selectable list. The viewport and the selection are separate.                    │
-│ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · no room ›                        │
+│ List                          │ │ A scrollable, selectable list, flat or grouped. The viewport and the selection are separate.   │
+│ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · grouped · grouped, collapsed · no│
 │ Tabs                          │ │ more rows than the pane; the count says where you are                                          │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │  api_gateway                                                                                   │
@@ -30,7 +30,7 @@ tuikit gallery  every component, running                                        
 │                               │ │ keys     ↑↓ move the selection · j/k the same                                                  │
 │                               │ │ mouse    click select the row, anywhere across it · wheel scroll the viewport, never the sele… │
 │                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │
-│                               │ │ glyphs   ↑ ↓                                                                                   │
+│                               │ │ glyphs   ↑ ↓ ▸ ▾                                                                               │
 │                               │ │ from     pgctl window(), swarmctl pane scrolling, azctl cursor/top                             │
 │                         12/12 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
