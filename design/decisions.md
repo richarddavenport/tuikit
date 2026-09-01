@@ -406,3 +406,74 @@ says the spinner's characters "never appear in a string literal and the guard
 never sees them". That was true when the spinner came from bubbles. It stopped
 being true when `comp.Spinner` started drawing braille itself, and a tool
 writing its own frame was never covered at all.
+
+## 26. A depth and a toggle set, not a `comp.Tree`
+
+azctl has a tree, and the question was whether `comp` needs one. The five tools
+were surveyed rather than guessed at:
+
+| | Hierarchy in the UI? |
+|---|---|
+| azctl | **Yes** — real expand/collapse, `expanded map[string]bool`, ▸/▾, two levels |
+| swarmctl | The flattened shape in **four** places — diff rows, apply rows, pane rows, disk detail — and always fully expanded |
+| dugo | Recursive *data*, presented as a **drill-down** with a nav stack |
+| pgctl | No. Five flat parallel panels; hierarchy is panel-to-panel scoping |
+| democtl | No. `stack` is a detail field, never a grouping |
+
+A tree widget has one consumer. That is not the bar.
+
+**dugo is why the answer is not "one consumer for now".** It has the deepest
+hierarchy of the five and answers it with `navStack []NavigationState` — push on
+descend, pop on ascend, the cursor remembered per level. Shipping `comp.Tree`
+would commit the framework to the two-level flattened model, and the tool with
+the most hierarchy in it would not use the component. A drill-down is not a
+worse tree; it is the right answer when the depth is unbounded and the fan-out
+is large, which is what a filesystem is.
+
+### What did have two consumers
+
+**A row that knows its depth.** azctl left the clearest possible statement of a
+missing field, as a comment explaining a workaround:
+
+> The marker is built into the row rather than set on the list, because azctl
+> marks a RESOURCE row and not a bucket header — comp.List's Marker is one
+> character for the whole list, which is right for a flat list and not for a
+> tree.
+
+So it built the indent into the row text and recomputed `i == cursor` itself, to
+place its own cursor glyph — doing the list's job, inside the list's input.
+swarmctl does the same by hand in four places, as a literal `"  " + line`.
+`Row.Depth` and `Row.Lead` are that comment, as two fields.
+
+**A keyed toggle set.** azctl's `expanded map[string]bool` and swarmctl's
+`revealState{all bool; rows map[string]bool}` are the same type under two names,
+for two unrelated purposes — expansion, and unmasking secrets. A shape arrived
+at twice independently, for different reasons, is the strongest form of this
+project's signal. `app.Toggles` took swarmctl's semantics, which were the better
+of the two: turning the global override off also clears the per-key set, so the
+key twice is a reliable way back to nothing.
+
+### What must not be generalised
+
+The flattening. `row{bucket, res}`, `diffRow{service, action, change}` and
+`applyRow{service, stack, edits, edit}` look alike and are not: each carries a
+domain payload, and a shared `[]Node` would make every tool box its data or keep
+it twice. It is 12–45 lines of domain code per site, and it is the part that is
+genuinely different each time. A list of rows with a depth on them is the widest
+interface that is still honest.
+
+### Two rules the survey turned up, worth keeping
+
+azctl's `rebuild()` does two things nobody else does and everybody eventually
+wants:
+
+- **The selection is preserved by identity, not by row index.** After a
+  re-pivot, a filter or a refresh, it re-selects the row whose resource ID
+  matches the one that was selected. This is the same rule as owner IDs carrying
+  the absolute index (decision 20): a position is a fact about the screen and an
+  ID is a fact about the thing, and only one of them survives a rebuild.
+- **A filter implies expansion.** You searched for a thing; you want to see the
+  thing, not a list of folders it might be in.
+
+Both need the tool's own identity concept, so they are rules here rather than
+code in `comp`.
