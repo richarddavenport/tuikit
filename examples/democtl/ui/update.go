@@ -149,14 +149,9 @@ func (m *Model) filterKey(msg tea.KeyMsg) {
 			m.filter = ""
 		}
 		m.list.Reset()
-	case "backspace":
-		if m.filter != "" {
-			m.filter = m.filter[:len(m.filter)-1]
-			m.list.Reset()
-		}
 	default:
-		if len(msg.Runes) == 1 {
-			m.filter += string(msg.Runes)
+		if filter, took := app.Edit(m.filter, msg); took {
+			m.filter = filter
 			// The rows changed out from under the cursor, so it goes back to
 			// the top rather than pointing at whatever is now in its place.
 			m.list.Reset()
