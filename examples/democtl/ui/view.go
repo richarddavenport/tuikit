@@ -346,8 +346,14 @@ func (m *Model) box(c *comp.Canvas, r comp.Rect, title string, focused bool, id 
 }
 
 // paneWidth is where the divider currently sits, for a test that drags it.
+//
+// Read off the last frame, because the gap between panes is the canvas's chrome
+// and asking a different canvas could give a different answer.
 func (m *Model) paneWidth() int {
-	list, _ := m.split.Layout(m.body(), comp.NewCanvas(0, 0).Chrome().Gap)
+	if m.canvas == nil {
+		return 0
+	}
+	list, _ := m.split.Layout(m.canvas, m.body())
 	return list.W
 }
 

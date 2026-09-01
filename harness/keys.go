@@ -18,6 +18,14 @@ type Driver interface {
 // types; anything else is sent as runes, so "j" is j and "hello" is five
 // characters' worth of one message.
 func Press(m Driver, keys ...string) {
+	// Drawn BEFORE the first key as well as after each one, because a running
+	// program has always drawn by the time a keystroke reaches it — Bubble Tea
+	// sends a window size and renders before any input. Without this a
+	// component that needs the last frame to answer (a split asked to move
+	// relative to where it currently is) silently does nothing on the first
+	// key and something on the second, which reads as a key that works
+	// intermittently.
+	redraw(m)
 	for _, k := range keys {
 		m.Update(key(k))
 		redraw(m)

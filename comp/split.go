@@ -45,7 +45,13 @@ type Split struct {
 }
 
 // Layout divides r without drawing, for a tool that needs the rects first.
-func (s *Split) Layout(r Rect, gap int) (first, second Rect) {
+//
+// It takes the CANVAS rather than a gap, so it cannot be handed a different one
+// from the one Draw will use. That asymmetry was the actual bug: two ways of
+// getting the same rects that could disagree, and both democtl and azctl were
+// building a throwaway 0x0 canvas to read the gap back out of the chrome.
+func (s *Split) Layout(c *Canvas, r Rect) (first, second Rect) {
+	gap := c.Chrome().Gap
 	total, at := r.W, s.at(r.W, gap)
 	if s.Vertical {
 		total, at = r.H, s.at(r.H, gap)
@@ -83,7 +89,7 @@ func (s *Split) at(total, gap int) int {
 // reads as space rather than as a third thing.
 func (s *Split) Draw(c *Canvas, r Rect) (first, second Rect) {
 	ch := c.Chrome()
-	first, second = s.Layout(r, ch.Gap)
+	first, second = s.Layout(c, r)
 	if ch.Gap <= 0 {
 		return first, second
 	}
@@ -97,6 +103,32 @@ func (s *Split) Draw(c *Canvas, r Rect) (first, second Rect) {
 	}
 	c.Fill(gap, divider, s.Style, Region(s.Name))
 	return first, second
+}
+
+// Move nudges the divider by n, in the direction it slides.
+//
+// The keyboard's way in. MoveTo takes an absolute position, which is right for
+// a mouse — that is what the event carries — but a key press has no position,
+// so every tool with a draggable split was resolving the current layout and
+// adding to it by hand:
+//
+//	first, _ := m.split.Layout(m.body(), m.chromeGap())
+//	m.split.MoveTo(m.body().X+first.W+by, m.body())
+//
+// Three lines and two concepts to move a divider four columns.
+func (s *Split) Move(c *Canvas, n int, r Rect) {
+	// No frame yet, so there is no current position to move from. A key can
+	// arrive before the first draw — the capture harness presses one and then
+	// redraws — and app.Mouse.Route takes the same view of a nil canvas.
+	if c == nil {
+		return
+	}
+	first, _ := s.Layout(c, r)
+	if s.Vertical {
+		s.MoveTo(r.Y+first.H+n, r)
+		return
+	}
+	s.MoveTo(r.X+first.W+n, r)
 }
 
 // MoveTo puts the divider under a pointer, for a drag.
