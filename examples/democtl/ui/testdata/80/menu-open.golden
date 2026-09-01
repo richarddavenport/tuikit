@@ -1,7 +1,7 @@
 democtl  a tuikit example  needs attention                              09:14:03
 ────────────────────────────────────────────────────────────────────────────────
 ┌────────────────────────┐ ┌───────────────────────────────────────────────────┐
-│ Services (7)           │ │ api_worker                                        │
+│ Services (39)          │ │ api_worker                                        │
 │ api_gateway    3/3 ✓   │ │ ‹ Overview ›  Config    Events                    │
 │ a┌──────────────┐2 ●   │ │                                                   │
 │ a│ View logs  L │1 ✗   │ │  state      degraded                              │
@@ -9,15 +9,15 @@ democtl  a tuikit example  needs attention                              09:14:03
 │ w└──────────────┘1 ✓   │ │  stack      api                                   │
 │ data_indexer   0/2 •   │ │  node       node-b                                │
 │ data_archiver  1/1 ✓   │ │  updated    5m ago                                │
-│                        │ │                                                   │
-│                        │ │  one task restarting: liveness probe timed out    │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                    7/7 │ │                                                   │
+│ api_scheduler  2/2 ✓   │ │                                                   │
+│ api_webhooks   1/1 ✓   │ │  one task restarting: liveness probe timed out    │
+│ api_ratelimit  2/2 ✓   │ │                                                   │
+│ web_admin      2/2 ✓   │ │                                                   │
+│ web_docs       1/1 ✓   │ │                                                   │
+│ web_preview    0/1 •   │ │                                                   │
+│ data_etl       3/3 ✓   │ │                                                   │
+│ data_warehouse 2/2 ✓   │ │                                                   │
+│ data_replica   1/2 ●   │ │                                                   │
+│                  16/39 │ │                                                   │
 └────────────────────────┘ └───────────────────────────────────────────────────┘
   ↑↓ choose · enter do it · esc close

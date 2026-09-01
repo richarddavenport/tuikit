@@ -207,6 +207,9 @@ var catalog = []struct {
 	want    int
 	trouble trouble
 }{
+	// The first seven are the fleet democtl was written against, kept first and
+	// in order so the screens that name a row by position still mean what they
+	// meant.
 	{"api_gateway", "api", 3, troubleNone},
 	{"api_worker", "api", 2, troubleDegraded},
 	{"api_migrate", "api", 1, troubleFailed},
@@ -214,6 +217,48 @@ var catalog = []struct {
 	{"web_assets", "web", 1, troubleNone},
 	{"data_indexer", "data", 2, troublePending},
 	{"data_archiver", "data", 1, troubleNone},
+
+	// The rest exist so the list OVERFLOWS. A demo whose list fits the pane it
+	// is demonstrated in demonstrates nothing: a wheel that correctly does
+	// nothing looks exactly like a wheel that is broken, and the viewport, the
+	// count and the marker saying where an off-screen selection went are all
+	// invisible. Trouble is sprinkled deep on purpose, so scrolling finds
+	// something rather than more of the same.
+	{"api_scheduler", "api", 2, troubleNone},
+	{"api_webhooks", "api", 1, troubleNone},
+	{"api_ratelimit", "api", 2, troubleNone},
+	{"web_admin", "web", 2, troubleNone},
+	{"web_docs", "web", 1, troubleNone},
+	{"web_preview", "web", 1, troublePending},
+	{"data_etl", "data", 3, troubleNone},
+	{"data_warehouse", "data", 2, troubleNone},
+	{"data_replica", "data", 2, troubleDegraded},
+	{"data_backup", "data", 1, troubleNone},
+	{"edge_router", "edge", 3, troubleNone},
+	{"edge_cache", "edge", 4, troubleNone},
+	{"edge_tls", "edge", 2, troubleNone},
+	{"edge_waf", "edge", 2, troubleDegraded},
+	{"auth_session", "auth", 3, troubleNone},
+	{"auth_tokens", "auth", 2, troubleNone},
+	{"auth_directory", "auth", 1, troubleNone},
+	{"auth_mfa", "auth", 1, troublePending},
+	{"media_upload", "media", 2, troubleNone},
+	// Fifteen characters, one over what the list column shows. Deliberate: it
+	// is the fixture's proof that a name too long is truncated with an
+	// ellipsis rather than pushing the columns beside it out of line.
+	{"media_transcode", "media", 4, troubleFailed},
+	{"media_thumbs", "media", 2, troubleNone},
+	{"media_cdn", "media", 3, troubleNone},
+	{"ops_metrics", "ops", 2, troubleNone},
+	{"ops_logs", "ops", 3, troubleNone},
+	{"ops_alerts", "ops", 1, troubleNone},
+	{"ops_tracing", "ops", 2, troubleNone},
+	{"ops_registry", "ops", 1, troubleDegraded},
+	{"ops_backup", "ops", 1, troubleNone},
+	{"search_ingest", "search", 2, troubleNone},
+	{"search_query", "search", 3, troubleNone},
+	{"search_suggest", "search", 1, troubleNone},
+	{"search_reindex", "search", 1, troublePending},
 }
 
 var (

@@ -4,10 +4,10 @@ democtl  a tuikit example  needs attention                                      
 │ Filter: we_                              │ │ web_frontend                                                                        │
 │ web_frontend   4/4 ✓                     │ │ ‹ Overview ›  Config    Events                                                      │
 │ web_assets     1/1 ✓                     │ │                                                                                     │
-│                                          │ │  state      running                                                                 │
-│                                          │ │  replicas   4/4                                                                     │
-│                                          │ │  stack      web                                                                     │
-│                                          │ │  node       node-c                                                                  │
+│ api_webhooks   1/1 ✓                     │ │  state      running                                                                 │
+│ web_admin      2/2 ✓                     │ │  replicas   4/4                                                                     │
+│ web_docs       1/1 ✓                     │ │  stack      web                                                                     │
+│ web_preview    0/1 •                     │ │  node       node-c                                                                  │
 │                                          │ │  updated    8m ago                                                                  │
 │                                          │ │                                                                                     │
 │                                          │ │                                                                                     │
@@ -32,6 +32,6 @@ democtl  a tuikit example  needs attention                                      
 │                                          │ │                                                                                     │
 │                                          │ │                                                                                     │
 │                                          │ │                                                                                     │
-│                                      2/2 │ │                                                                                     │
+│                                      6/6 │ │                                                                                     │
 └──────────────────────────────────────────┘ └─────────────────────────────────────────────────────────────────────────────────────┘
   type to filter · enter keep · esc clear

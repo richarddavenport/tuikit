@@ -1,0 +1,23 @@
+democtl  a tuikit example  needs attention                              09:14:03
+────────────────────────────────────────────────────────────────────────────────
+┌────────────────────────┐ ┌───────────────────────────────────────────────────┐
+│ Services (39)          │ │ search_ingest                                     │
+│ edge_waf       1/2 ●   │ │ ‹ Overview ›  Config    Events                    │
+│ auth_session   3/3 ✓   │ │                                                   │
+│ auth_tokens    2/2 ✓   │ │  state      running                               │
+│ auth_directory 1/1 ✓   │ │  replicas   2/2                                   │
+│ auth_mfa       0/1 •   │ │  stack      search                                │
+│ media_upload   2/2 ✓   │ │  node       node-b                                │
+│ media_transco… 0/4 ✗   │ │  updated    1m ago                                │
+│ media_thumbs   2/2 ✓   │ │                                                   │
+│ media_cdn      3/3 ✓   │ │                                                   │
+│ ops_metrics    2/2 ✓   │ │                                                   │
+│ ops_logs       3/3 ✓   │ │                                                   │
+│ ops_alerts     1/1 ✓   │ │                                                   │
+│ ops_tracing    2/2 ✓   │ │                                                   │
+│ ops_registry   0/1 ●   │ │                                                   │
+│ ops_backup     1/1 ✓   │ │                                                   │
+│ search_ingest  2/2 ✓   │ │                                                   │
+│                  36/39 │ │                                                   │
+└────────────────────────┘ └───────────────────────────────────────────────────┘
+  ↑↓ move · tab pane · ‹› tabs · / filter · m menu · L logs · D deploy · q quit

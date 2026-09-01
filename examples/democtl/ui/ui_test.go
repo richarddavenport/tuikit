@@ -52,6 +52,29 @@ func states() []struct {
 			press(m, "/", "z", "z", "z")
 			return m
 		}},
+		// The list overflows now, so these two are the states a viewport has and
+		// a short list cannot: scrolled, and scrolled away from its selection.
+		{"list-scrolled", func() *Model {
+			m := New(1)
+			// Far enough that the viewport has to follow at 132 columns as
+			// well as at 80 — a state that only scrolls on the narrow capture
+			// is a state the wide golden does not test.
+			for range 35 {
+				press(m, "j")
+			}
+			return m
+		}},
+		{"selection-scrolled-away", func() *Model {
+			m := New(1)
+			// Rendered first so the list knows what it can scroll to. The
+			// wheel moves the viewport and leaves the cursor on row 0, which
+			// is the case the marker exists for.
+			m.SetSize(132, 38)
+			m.Now(fleet.Epoch)
+			m.View()
+			m.list.Scroll(12)
+			return m
+		}},
 		{"menu-open", func() *Model {
 			m := New(1)
 			press(m, "j", "m")

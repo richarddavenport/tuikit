@@ -2,22 +2,13 @@ democtl  a tuikit example  needs attention                                      
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌──────────────────────────────────────────┐ ┌─────────────────────────────────────────────────────────────────────────────────────┐
 │ Services (39)                            │ │ api_gateway                                                                         │
-│ api_gateway    3/3 ✓                     │ │ ‹ Overview ›  Config    Events                                                      │
-│ api_worker     1/2 ●                     │ │                                                                                     │
-│ api_migrate    0/1 ✗                     │ │  state      running                                                                 │
-│ web_frontend   4/4 ✓                     │ │  replicas   3/3                                                                     │
-│ web_assets     1/1 ✓                     │ │  stack      api                                                                     │
-│ data_indexer   0/2 •                     │ │  node       node-a                                                                  │
-│ data_archiver  1/1 ✓                     │ │  updated    47s ago                                                                 │
-│ api_scheduler  2/2 ✓                     │ │                                                                                     │
-│ api_webhooks   1/1 ✓                     │ │                                                                                     │
-│ api_ratelimit  2/2 ✓                     │ │                                                                                     │
+│ api_ratelimit  2/2 ✓                     │ │ ‹ Overview ›  Config    Events                                                      │
 │ web_admin      2/2 ✓                     │ │                                                                                     │
-│ web_docs       1/1 ✓                     │ │                                                                                     │
-│ web_preview    0/1 •                     │ │                                                                                     │
-│ data_etl       3/3 ✓                     │ │                                                                                     │
-│ data_warehouse 2/2 ✓                     │ │                                                                                     │
-│ data_replica   1/2 ●                     │ │                                                                                     │
+│ web_docs       1/1 ✓                     │ │  state      running                                                                 │
+│ web_preview    0/1 •                     │ │  replicas   3/3                                                                     │
+│ data_etl       3/3 ✓                     │ │  stack      api                                                                     │
+│ data_warehouse 2/2 ✓                     │ │  node       node-a                                                                  │
+│ data_replica   1/2 ●                     │ │  updated    47s ago                                                                 │
 │ data_backup    1/1 ✓                     │ │                                                                                     │
 │ edge_router    3/3 ✓                     │ │                                                                                     │
 │ edge_cache     4/4 ✓                     │ │                                                                                     │
@@ -32,6 +23,15 @@ democtl  a tuikit example  needs attention                                      
 │ media_thumbs   2/2 ✓                     │ │                                                                                     │
 │ media_cdn      3/3 ✓                     │ │                                                                                     │
 │ ops_metrics    2/2 ✓                     │ │                                                                                     │
-│                                    30/39 │ │                                                                                     │
+│ ops_logs       3/3 ✓                     │ │                                                                                     │
+│ ops_alerts     1/1 ✓                     │ │                                                                                     │
+│ ops_tracing    2/2 ✓                     │ │                                                                                     │
+│ ops_registry   0/1 ●                     │ │                                                                                     │
+│ ops_backup     1/1 ✓                     │ │                                                                                     │
+│ search_ingest  2/2 ✓                     │ │                                                                                     │
+│ search_query   3/3 ✓                     │ │                                                                                     │
+│ search_suggest 1/1 ✓                     │ │                                                                                     │
+│ search_reindex 0/1 •                     │ │                                                                                     │
+│ ↑ selected above                   39/39 │ │                                                                                     │
 └──────────────────────────────────────────┘ └─────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ move · tab pane · ‹› tabs · / filter · m menu · L logs · D deploy · q quit

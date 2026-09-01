@@ -1,7 +1,7 @@
 democtl  a tuikit example  needs attention                              09:14:03
 ────────────────────────────────────────────────────────────────────────────────
 ┌────────────────────────┐ ┌───────────────────────────────────────────────────┐
-│ Services (7)           │ │ api_gateway                                       │
+│ Services (39)          │ │ api_gateway                                       │
 │ api_gateway    3/3 ✓   │ │ ‹ Overview ›  Config    Events                    │
 │ api_worker     1/2 ●   │ │                                                   │
 │ api_migrate    0/1 ✗   │ │  state      running                               │
@@ -9,15 +9,15 @@ democtl  a tuikit example  needs attention                              09:14:03
 │ web_as│Deploy api_gateway?                                           │       │
 │ data_i│                                                              │       │
 │ data_a│Pushes a new service spec and waits for the tasks to          │       │
-│       │converge. The current tasks are replaced one at a time.       │       │
-│       │                                                              │       │
-│       │y confirm · n cancel                                          │       │
-│       └──────────────────────────────────────────────────────────────┘       │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                    7/7 │ │                                                   │
+│ api_sc│converge. The current tasks are replaced one at a time.       │       │
+│ api_we│                                                              │       │
+│ api_ra│y confirm · n cancel                                          │       │
+│ web_ad└──────────────────────────────────────────────────────────────┘       │
+│ web_docs       1/1 ✓   │ │                                                   │
+│ web_preview    0/1 •   │ │                                                   │
+│ data_etl       3/3 ✓   │ │                                                   │
+│ data_warehouse 2/2 ✓   │ │                                                   │
+│ data_replica   1/2 ●   │ │                                                   │
+│                  16/39 │ │                                                   │
 └────────────────────────┘ └───────────────────────────────────────────────────┘
   y confirm · n cancel

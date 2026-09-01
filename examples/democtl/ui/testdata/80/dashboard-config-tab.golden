@@ -1,7 +1,7 @@
 democtl  a tuikit example  needs attention                              09:14:03
 ────────────────────────────────────────────────────────────────────────────────
 ┌────────────────────────┐ ┌───────────────────────────────────────────────────┐
-│ Services (7)           │ │ api_gateway                                       │
+│ Services (39)          │ │ api_gateway                                       │
 │ api_gateway    3/3 ✓   │ │   Overview  ‹ Config ›  Events                    │
 │ api_worker     1/2 ●   │ │                                                   │
 │ api_migrate    0/1 ✗   │ │  image      registry.example/api_gateway:v2.4.0   │
@@ -9,15 +9,15 @@ democtl  a tuikit example  needs attention                              09:14:03
 │ web_assets     1/1 ✓   │ │  restart    on-failure                            │
 │ data_indexer   0/2 •   │ │  order      start-first                           │
 │ data_archiver  1/1 ✓   │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                        │ │                                                   │
-│                    7/7 │ │                                                   │
+│ api_scheduler  2/2 ✓   │ │                                                   │
+│ api_webhooks   1/1 ✓   │ │                                                   │
+│ api_ratelimit  2/2 ✓   │ │                                                   │
+│ web_admin      2/2 ✓   │ │                                                   │
+│ web_docs       1/1 ✓   │ │                                                   │
+│ web_preview    0/1 •   │ │                                                   │
+│ data_etl       3/3 ✓   │ │                                                   │
+│ data_warehouse 2/2 ✓   │ │                                                   │
+│ data_replica   1/2 ●   │ │                                                   │
+│                  16/39 │ │                                                   │
 └────────────────────────┘ └───────────────────────────────────────────────────┘
   ↑↓ move · tab pane · ‹› tabs · / filter · m menu · L logs · D deploy · q quit
