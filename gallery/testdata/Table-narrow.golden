@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                                9 components
+tuikit gallery  every component, running                                                                               10 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Table                                                                                          │
@@ -11,7 +11,7 @@ tuikit gallery  every component, running                                        
 │ LogPane                       │ │ ✗ api_migr… api        0/1                                                                     │
 │ Spinner                       │ │ ✓ web_fron… web        4/4                                                                     │
 │ Table                         │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Toast                         │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Muted                                                                                 │
 │                               │ │ glyphs   ✓ ✗ ● …                                                                               │
 │                               │ │ from     pgctl rows.go, swarmctl pane and detail tables                                        │
-│                           9/9 │ │                                                                                                │
+│                         10/10 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

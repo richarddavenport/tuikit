@@ -29,6 +29,59 @@ func (m *Model) Entries() []Entry {
 		m.logPaneEntry(s),
 		m.spinnerEntry(s),
 		m.tableEntry(s),
+		m.toastEntry(s),
+	}
+}
+
+func (m *Model) toastEntry(s *styles) Entry {
+	draw := func(t comp.Toast) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			t.Border, t.BodyStyle, t.HintStyle = &s.border, &s.muted, &s.muted
+			if t.Accent == nil {
+				t.Accent = &s.danger
+			}
+			sub := comp.NewCanvas(r.W, r.H)
+			t.Draw(sub, sub.Bounds(), comp.Region("demo.toast"))
+			blit(c, r, sub)
+		}
+	}
+	return Entry{
+		Name:    "Toast",
+		Summary: "Something the interface has to say — and, where we know it, what to do about it.",
+		From:    "swarmctl errorView",
+		Roles:   []string{"Danger", "Success", "Border", "Muted"},
+		Glyphs:  []string{"┌", "─", "┐", "│", "└", "┘"},
+		States: []State{
+			{Name: "a failure with a hint", Note: "the field most likely to be left empty, so it is a field",
+				Draw: draw(comp.Toast{
+					Title: "cannot reach staging",
+					Body:  "dial tcp 10.0.0.4:5432: connection refused",
+					Hint:  "is the tunnel up? try `pgctl connect staging`",
+				})},
+			{Name: "a failure without one", Note: "allowed, and usually means nobody has worked out the answer yet",
+				Draw: draw(comp.Toast{
+					Title: "deploy failed",
+					Body:  "task 3 exited 137 before the health check passed",
+				})},
+			{Name: "a result", Note: "the role is the caller's, so the same box says good news",
+				Draw: draw(comp.Toast{
+					Accent: &s.success,
+					Title:  "deployed api_gateway",
+					Body:   "3 of 3 tasks converged in 8.4s.",
+				})},
+			{Name: "bottom left", Note: "the corner is the caller's — what it must not cover is theirs to know",
+				Draw: draw(comp.Toast{
+					Anchor: comp.BottomLeft,
+					Title:  "cannot reach staging",
+					Body:   "dial tcp 10.0.0.4:5432: connection refused",
+				})},
+			{Name: "a long root cause", Note: "bounded, because the cause is arbitrary text from somewhere else",
+				Draw: draw(comp.Toast{
+					Title: "apply failed",
+					Body:  strings.Repeat("a root cause that came from somewhere else and does not know how wide your terminal is. ", 2),
+					Hint:  "run with -v for the full trace",
+				})},
+		},
 	}
 }
 

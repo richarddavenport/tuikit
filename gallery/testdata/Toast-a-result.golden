@@ -1,17 +1,17 @@
 tuikit gallery  every component, running                                                                               10 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ List                                                                                           │
-│ List                          │ │ A scrollable, selectable list. The viewport and the selection are separate.                    │
-│ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · no room ›                        │
-│ Tabs                          │ │ the selection is yours to move                                                                 │
+│ Components                    │ │ Toast                                                                                          │
+│ List                          │ │ Something the interface has to say — and, where we know it, what to do about it.               │
+│ Pane                          │ │ ‹ a failure with a hint · a failure without one · a result · bottom left · a long root cause › │
+│ Tabs                          │ │ the role is the caller's, so the same box says good news                                       │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │  api_gateway                                                                                   │
-│ StepList                      │ │  api_worker                                                                                    │
-│ LogPane                       │ │  api_migrate                                                                                   │
-│ Spinner                       │ │  web_frontend                                                                                  │
-│ Table                         │ │  web_assets                                                                                    │
-│ Toast                         │ │  data_indexer                                                                                  │
+│ Confirm                       │ │                                                                                                │
+│ StepList                      │ │                                             ┌──────────────────────────────────────────────┐   │
+│ LogPane                       │ │                                             │deployed api_gateway                          │   │
+│ Spinner                       │ │                                             │                                              │   │
+│ Table                         │ │                                             │3 of 3 tasks converged in 8.4s.               │   │
+│ Toast                         │ │                                             └──────────────────────────────────────────────┘   │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -26,12 +26,12 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │                                                                                           6/6  │
-│                               │ │ keys     ↑↓ move the selection · j/k the same                                                  │
-│                               │ │ mouse    click select the row, anywhere across it · wheel scroll the viewport, never the sele… │
-│                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │
-│                               │ │ glyphs   ↑ ↓                                                                                   │
-│                               │ │ from     pgctl window(), swarmctl pane scrolling, azctl cursor/top                             │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ roles    Danger · Success · Border · Muted                                                     │
+│                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
+│                               │ │ from     swarmctl errorView                                                                    │
 │                         10/10 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit
