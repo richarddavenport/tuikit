@@ -131,3 +131,20 @@ func run(dir, name string, args ...string) (string, error) {
 	out, err := cmd.CombinedOutput()
 	return string(out), err
 }
+
+// The `replace` is checked before anything is written, so a first run outside a
+// sibling checkout says which flag fixes it rather than failing four steps
+// later inside `go mod tidy`, against a module the reader did not write.
+func TestAToolIsNotWrittenIfTuikitCannotBeFound(t *testing.T) {
+	dir := t.TempDir()
+	_, err := (Tool{Name: "widgetctl"}).Write(dir)
+	if err == nil {
+		t.Fatal("wrote a tool whose replace cannot resolve")
+	}
+	if !strings.Contains(err.Error(), "-tuikit") {
+		t.Errorf("the error does not name the flag that fixes it: %v", err)
+	}
+	if entries, _ := os.ReadDir(filepath.Join(dir, "widgetctl")); len(entries) > 0 {
+		t.Errorf("%d files were written anyway", len(entries))
+	}
+}

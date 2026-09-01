@@ -105,6 +105,9 @@ func (t Tool) Write(dir string) ([]string, error) {
 	if entries, err := os.ReadDir(root); err == nil && len(entries) > 0 {
 		return nil, fmt.Errorf("%s already exists and is not empty", root)
 	}
+	if err := t.reachable(root); err != nil {
+		return nil, err
+	}
 
 	names, err := files()
 	if err != nil {
@@ -154,6 +157,35 @@ func (t Tool) valid() error {
 	}
 	return nil
 }
+
+// reachable checks that the `replace` will resolve, BEFORE writing anything.
+//
+// The default is a sibling checkout, which is right when you have one and
+// wrong the first time you run this anywhere else. Left to fail on its own it
+// fails four steps later, inside `go mod tidy`, as "replacement directory
+// ../tuikit does not exist" against a module the reader did not write and a
+// path they did not choose. Refusing here can say which flag fixes it.
+//
+// It goes when tuikit is tagged, along with the replace itself.
+func (t Tool) reachable(root string) error {
+	path := t.Tuikit
+	if !filepath.IsAbs(path) {
+		// Relative to the tool's own directory, because that is where go.mod
+		// will read it from.
+		path = filepath.Join(root, path)
+	}
+	body, err := os.ReadFile(filepath.Join(path, "go.mod"))
+	if err == nil && strings.Contains(string(body), "module "+tuikitModule) {
+		return nil
+	}
+	abs, _ := filepath.Abs(path)
+	return fmt.Errorf("no tuikit checkout at %s\n\n"+
+		"tuikit is unpublished, so a generated tool resolves it from a directory\n"+
+		"on this machine. Pass -tuikit <path> to say where yours is.", abs)
+}
+
+// tuikitModule is what a checkout has to declare to be one.
+const tuikitModule = "github.com/richarddavenport/tuikit"
 
 func (t Tool) render(name string) ([]byte, error) {
 	src, err := templates.ReadFile(name)
