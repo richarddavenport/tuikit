@@ -1,0 +1,339 @@
+{
+  "screen": "dashboard",
+  "styles": {
+    "title": {
+      "role": "Accent",
+      "bold": true
+    },
+    "muted": {
+      "role": "Muted"
+    },
+    "border": {
+      "role": "Border"
+    },
+    "focused": {
+      "role": "Accent"
+    },
+    "selected": {
+      "role": "SelectionFG",
+      "bg": "SelectionBG",
+      "bold": true
+    },
+    "success": {
+      "role": "Success"
+    },
+    "pending": {
+      "role": "Pending"
+    },
+    "danger": {
+      "role": "Danger"
+    }
+  },
+  "glyphs": [
+    "─",
+    "│",
+    "┌",
+    "┐",
+    "└",
+    "┘",
+    "✓",
+    "✗",
+    "●",
+    "•",
+    "‹",
+    "›",
+    "↑",
+    "↓",
+    "·"
+  ],
+  "root": {
+    "type": "column",
+    "id": "window",
+    "reserve": 1,
+    "children": [
+      {
+        "type": "statusbar",
+        "id": "header",
+        "constraint": {
+          "fixed": 1
+        },
+        "left": [
+          {
+            "style": "title",
+            "text": "democtl"
+          },
+          {
+            "style": "muted",
+            "text": "  a tuikit example"
+          },
+          {
+            "text": "  "
+          },
+          {
+            "switch": "fleet.healthy",
+            "cases": {
+              "true": {
+                "style": "success",
+                "text": "all services running"
+              },
+              "false": {
+                "style": "pending",
+                "text": "needs attention"
+              }
+            }
+          }
+        ],
+        "right": [
+          {
+            "style": "muted",
+            "text": "{clock}"
+          }
+        ]
+      },
+      {
+        "type": "rule",
+        "id": "header.rule",
+        "style": "border",
+        "constraint": {
+          "fixed": 1
+        }
+      },
+      {
+        "type": "row",
+        "id": "body",
+        "gap": 1,
+        "constraint": {
+          "fill": true
+        },
+        "children": [
+          {
+            "type": "box",
+            "id": "services",
+            "constraint": {
+              "ratio": [
+                1,
+                3
+              ],
+              "min": 24
+            },
+            "focused": "services.focused",
+            "body": [
+              {
+                "type": "list",
+                "id": "services.rows",
+                "rows": "services",
+                "cursor": "services.cursor",
+                "template": " {name:-14} {ready}/{want} {mark}",
+                "styleBy": "state",
+                "styleMap": {
+                  "running": "success",
+                  "pending": "pending",
+                  "degraded": "pending",
+                  "failed": "danger"
+                },
+                "glyphBy": "state",
+                "glyphMap": {
+                  "running": "✓",
+                  "pending": "•",
+                  "degraded": "●",
+                  "failed": "✗"
+                },
+                "selected": "selected",
+                "unfocused": "focused",
+                "empty": "  nothing matches",
+                "emptyStyle": "muted"
+              }
+            ],
+            "titles": [
+              {
+                "when": {
+                  "key": "ui.typing",
+                  "is": "true"
+                },
+                "text": "Filter: {filter}_"
+              },
+              {
+                "when": {
+                  "key": "ui.filtering",
+                  "is": "true"
+                },
+                "text": "Filter: {filter}"
+              },
+              {
+                "text": "Services ({services.count})"
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "id": "detail",
+            "constraint": {
+              "fill": true
+            },
+            "focused": "detail.focused",
+            "body": [
+              {
+                "type": "text",
+                "id": "detail.empty",
+                "style": "muted",
+                "when": {
+                  "key": "selected.name",
+                  "is": ""
+                },
+                "text": "  no service selected"
+              },
+              {
+                "type": "group",
+                "id": "detail.service",
+                "when": {
+                  "key": "selected.name",
+                  "not": ""
+                },
+                "children": [
+                  {
+                    "type": "tabs",
+                    "id": "detail.tabs",
+                    "names": [
+                      "Overview",
+                      "Config",
+                      "Events"
+                    ],
+                    "active": "detail.tab",
+                    "on": "title",
+                    "off": "muted",
+                    "openWith": "‹",
+                    "closeWith": "›"
+                  },
+                  {
+                    "type": "spacer"
+                  },
+                  {
+                    "type": "fields",
+                    "id": "detail.overview",
+                    "labelStyle": "muted",
+                    "labelWidth": 10,
+                    "fields": [
+                      {
+                        "name": "state",
+                        "value": "{selected.state}",
+                        "styleBy": "selected.state",
+                        "styleMap": {
+                          "running": "success",
+                          "pending": "pending",
+                          "degraded": "pending",
+                          "failed": "danger"
+                        }
+                      },
+                      {
+                        "name": "replicas",
+                        "value": "{selected.replicas}"
+                      },
+                      {
+                        "name": "stack",
+                        "value": "{selected.stack}"
+                      },
+                      {
+                        "name": "node",
+                        "value": "{selected.node}"
+                      },
+                      {
+                        "name": "updated",
+                        "value": "{selected.updated}"
+                      }
+                    ],
+                    "when": {
+                      "key": "detail.tab",
+                      "is": "0"
+                    }
+                  },
+                  {
+                    "type": "spacer",
+                    "when": {
+                      "key": "selected.note",
+                      "not": ""
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "style": "muted",
+                    "text": "  {selected.note:wrap-2}",
+                    "when": {
+                      "key": "selected.note",
+                      "not": ""
+                    }
+                  },
+                  {
+                    "type": "fields",
+                    "id": "detail.config",
+                    "when": {
+                      "key": "detail.tab",
+                      "is": "1"
+                    },
+                    "labelStyle": "muted",
+                    "labelWidth": 10,
+                    "fields": [
+                      {
+                        "name": "image",
+                        "value": "{selected.image:fit-12}"
+                      },
+                      {
+                        "name": "desired",
+                        "value": "{selected.want}"
+                      },
+                      {
+                        "name": "restart",
+                        "value": "on-failure"
+                      },
+                      {
+                        "name": "order",
+                        "value": "start-first"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "titles": [
+              {
+                "when": {
+                  "key": "selected.name",
+                  "not": ""
+                },
+                "text": "{selected.name}"
+              },
+              {
+                "text": "Detail"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "id": "footer",
+        "style": "muted",
+        "constraint": {
+          "fixed": 1
+        },
+        "when": {
+          "key": "ui.typing",
+          "is": "true"
+        },
+        "text": "  type to filter · enter keep · esc clear"
+      },
+      {
+        "type": "text",
+        "id": "footer",
+        "style": "muted",
+        "constraint": {
+          "fixed": 1
+        },
+        "text": "  ↑↓ move · tab pane · ‹› tabs · / filter · L logs · D deploy · q quit",
+        "when": {
+          "key": "ui.typing",
+          "is": "false"
+        }
+      }
+    ]
+  }
+}
