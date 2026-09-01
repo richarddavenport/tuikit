@@ -70,7 +70,7 @@ func (p Pane) Draw(c *Canvas, r Rect, id ID) Rect {
 		return Rect{}
 	}
 	c.Box(r, edge, id)
-	inner := r.Inset(1)
+	inner := r.Inset(c.Chrome().Inset)
 	c.Fill(inner, " ", nil, ID{})
 
 	if p.Title == "" {
@@ -80,11 +80,11 @@ func (p Pane) Draw(c *Canvas, r Rect, id ID) Rect {
 	case TitleOnRow:
 		row := Rect{X: inner.X, Y: inner.Y, W: inner.W, H: 1}
 		c.Fill(row, " ", title, id)
-		c.Text(row.X, row.Y, " "+Truncate(p.Title, row.W-1), title, id)
+		c.Text(row.X, row.Y, " "+truncate(p.Title, row.W-1, c.Chrome().Ellipsis), title, id)
 		return Rect{X: inner.X, Y: inner.Y + 1, W: inner.W, H: inner.H - 1}
 	default:
 		// Two columns in, so the title never sits against a corner.
-		c.Text(r.X+2, r.Y, Truncate(" "+p.Title+" ", max(0, inner.W-2)), title, id)
+		c.Text(r.X+2, r.Y, truncate(" "+p.Title+" ", max(0, inner.W-2), c.Chrome().Ellipsis), title, id)
 		return inner
 	}
 }

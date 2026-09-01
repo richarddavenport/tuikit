@@ -30,6 +30,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
 	"github.com/rivo/uniseg"
+
+	"github.com/richarddavenport/tuikit/theme"
 )
 
 // Rect is a region of the grid.
@@ -126,12 +128,19 @@ type Canvas struct {
 	// clip is what may be drawn into. The whole canvas by default; narrower
 	// for the view a component is handed.
 	clip Rect
+	// chrome is what the components draw WITH: the box characters, the
+	// separators, the markers. Carried by the canvas rather than passed to
+	// each component, because a component handed its own chrome is a component
+	// that can be handed the wrong one — or none, and draw a frame out of
+	// empty strings.
+	chrome theme.Chrome
 }
 
 // NewCanvas makes a canvas of blanks.
 func NewCanvas(w, h int) *Canvas {
 	c := &Canvas{w: max(0, w), h: max(0, h)}
 	c.clip = Rect{0, 0, c.w, c.h}
+	c.chrome = theme.DefaultChrome
 	c.cells = make([]Cell, c.w*c.h)
 	for i := range c.cells {
 		c.cells[i].Text = " "
@@ -144,6 +153,21 @@ func (c *Canvas) Bounds() Rect { return Rect{0, 0, c.w, c.h} }
 
 func (c *Canvas) in(x, y int) bool {
 	return x >= 0 && y >= 0 && x < c.w && y < c.h && c.clip.Contains(x, y)
+}
+
+// Chrome is what this canvas draws with.
+func (c *Canvas) Chrome() theme.Chrome { return c.chrome }
+
+// WithChrome returns a view drawing in a different vocabulary.
+//
+// A view, like Clip, so a tool sets it once at the top and every component
+// underneath inherits it. There is no way for one pane to end up with rounded
+// corners because somebody threaded the chrome through five call sites and
+// missed one.
+func (c *Canvas) WithChrome(ch theme.Chrome) *Canvas {
+	view := *c
+	view.chrome = ch
+	return &view
 }
 
 // Clip returns a view of the canvas that cannot draw outside r.
@@ -265,25 +289,30 @@ func (c *Canvas) Fill(r Rect, cluster string, s *lipgloss.Style, owner ID) {
 	}
 }
 
-// Box draws a frame with the six box-drawing characters the default glyph set
-// allows. There are no tee or cross pieces, so a component that wants a title
-// writes it into the top edge itself rather than breaking the line.
+// Box draws a frame in the canvas's chrome.
+//
+// Six characters, not eleven: there are no tee or cross pieces, so a component
+// that wants a title writes it into the top edge itself rather than breaking
+// the line. That is a constraint the glyph set imposes and the components were
+// designed around — a set with tees would need components that know what to do
+// with them.
 func (c *Canvas) Box(r Rect, s *lipgloss.Style, owner ID) {
 	if r.W < 2 || r.H < 2 {
 		return
 	}
+	box := c.chrome.Box
 	for x := r.X + 1; x < r.Right(); x++ {
-		c.Set(x, r.Y, "─", s, owner)
-		c.Set(x, r.Bottom(), "─", s, owner)
+		c.Set(x, r.Y, box.Top, s, owner)
+		c.Set(x, r.Bottom(), box.Bottom, s, owner)
 	}
 	for y := r.Y + 1; y < r.Bottom(); y++ {
-		c.Set(r.X, y, "│", s, owner)
-		c.Set(r.Right(), y, "│", s, owner)
+		c.Set(r.X, y, box.Left, s, owner)
+		c.Set(r.Right(), y, box.Right, s, owner)
 	}
-	c.Set(r.X, r.Y, "┌", s, owner)
-	c.Set(r.Right(), r.Y, "┐", s, owner)
-	c.Set(r.X, r.Bottom(), "└", s, owner)
-	c.Set(r.Right(), r.Bottom(), "┘", s, owner)
+	c.Set(r.X, r.Y, box.TopLeft, s, owner)
+	c.Set(r.Right(), r.Y, box.TopRight, s, owner)
+	c.Set(r.X, r.Bottom(), box.BottomLeft, s, owner)
+	c.Set(r.Right(), r.Bottom(), box.BottomRight, s, owner)
 }
 
 // OwnerAt is the entire hit test.

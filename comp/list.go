@@ -174,9 +174,9 @@ func (l *List) status(c *Canvas, r Rect) {
 	switch {
 	case l.count == 0:
 	case l.cursor < l.offset:
-		marker = "↑ selected above"
+		marker = c.Chrome().ScrollUp + " selected above"
 	case l.cursor >= l.offset+l.shown:
-		marker = "↓ selected below"
+		marker = c.Chrome().ScrollDown + " selected below"
 	}
 	if marker != "" {
 		c.Text(r.X+1, y, marker, l.Status, id)

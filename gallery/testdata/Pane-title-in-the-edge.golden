@@ -1,9 +1,9 @@
-tuikit gallery  every component, running                                                                               11 components
+tuikit gallery  every component, running                                                                               12 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Pane                                                                                           │
 │ List                          │ │ A bordered box with a title, and the rect inside it.                                           │
-│ Pane                          │ │ ‹ title in the edge · title on a row · focused · title too long · no room ›                    │
+│ Pane                          │ │ ‹ title in the edge · title on a row · focused · title too long · no room · rounded · ASCII ›  │
 │ Tabs                          │ │ swarmctl's arrangement; costs no row                                                           │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ ┌─ Services ─────────────────────────────────────────────────────────────────────────────────┐ │
@@ -13,7 +13,7 @@ tuikit gallery  every component, running                                        
 │ Table                         │ │ │                                                                                            │ │
 │ Toast                         │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
 │ Form                          │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Split                         │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Border · Accent                                                                       │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
 │                               │ │ from     swarmctl drawBox and drawBoxRaw (which disagreed), democtl box                        │
-│                         11/11 │ │                                                                                                │
+│                         12/12 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

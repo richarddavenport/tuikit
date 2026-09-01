@@ -80,9 +80,9 @@ type Model struct {
 	menu  *menuState
 	mouse app.Mouse
 
-	// split is the list pane's width, once someone has dragged it. Zero means
-	// the default, so a tool that is never dragged has no state to capture.
-	split int
+	// split is the divider between the panes: where it sits, how far it may be
+	// dragged, and the gap it lives in.
+	split comp.Split
 
 	width, height int
 	// canvas is the last frame drawn, kept so a mouse event can ask what it
@@ -129,6 +129,7 @@ func New(seed int64) *Model {
 		app.Screen(screenLogs):      m.logs,
 		app.Screen(screenRun):       m.run,
 	}
+	m.split = comp.Split{Name: regSplit, Ratio: [2]int{1, 3}, Min: minPane}
 	m.commands = Commands(seed)
 	m.log = comp.LogPane{Follow: true}
 	m.list = comp.List{

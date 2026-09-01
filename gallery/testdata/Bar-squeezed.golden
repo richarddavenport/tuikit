@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               11 components
+tuikit gallery  every component, running                                                                               12 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Bar                                                                                            │
@@ -13,7 +13,7 @@ tuikit gallery  every component, running                                        
 │ Table                         │ │                                                                                                │
 │ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Split                         │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Accent · Muted · Success                                                              │
 │                               │ │ glyphs   ·                                                                                     │
 │                               │ │ from     swarmctl footerLine, azctl footer, democtl header and footer                          │
-│                         11/11 │ │                                                                                                │
+│                         12/12 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

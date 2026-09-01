@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/richarddavenport/tuikit/comp"
+	"github.com/richarddavenport/tuikit/theme"
 )
 
 // Entries is every component in comp, with the states worth looking at.
@@ -31,6 +32,54 @@ func (m *Model) Entries() []Entry {
 		m.tableEntry(s),
 		m.toastEntry(s),
 		m.formEntry(s),
+		m.splitEntry(s),
+	}
+}
+
+func (m *Model) splitEntry(s *styles) Entry {
+	draw := func(sp comp.Split, chrome func(theme.Chrome) theme.Chrome) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			if chrome != nil {
+				c = c.WithChrome(chrome(c.Chrome()))
+			}
+			sp.Style = &s.border
+			first, second := sp.Draw(c, r)
+			for _, pane := range []struct {
+				r     comp.Rect
+				title string
+			}{{first, "first"}, {second, "second"}} {
+				inner := comp.Pane{
+					Title: pane.title, TitleAt: comp.TitleOnRow,
+					Border: &s.border, Focus: &s.focused, TitleStyle: &s.title,
+				}.Draw(c, pane.r, comp.Region("demo.split"))
+				if !inner.Empty() {
+					c.Text(inner.X+1, inner.Y, comp.Truncate(itoa(pane.r.W)+" columns", inner.W-2),
+						&s.muted, comp.Region("demo.split"))
+				}
+			}
+		}
+	}
+	third := comp.Split{Name: "demo.divider", Ratio: [2]int{1, 3}, Min: 10}
+	return Entry{
+		Name:    "Split",
+		Summary: "Two panes and the divider between them, which you can grab and drag.",
+		From:    "democtl's dashboard, before it was a component",
+		Mouse:   []comp.Hint{{Key: "drag", Label: "the gap between the panes IS the handle"}},
+		Roles:   []string{"Border"},
+		States: []State{
+			{Name: "a third", Note: "the ratio is taken against the whole width, gaps included",
+				Draw: draw(third, nil)},
+			{Name: "dragged", Note: "At overrides the ratio; zero means nobody has touched it",
+				Draw: draw(comp.Split{Name: "demo.divider", At: 60, Min: 10}, nil)},
+			{Name: "at its minimum", Note: "a split draggable to nothing is a pane you cannot get back",
+				Draw: draw(comp.Split{Name: "demo.divider", At: 1, Min: 20}, nil)},
+			{Name: "stacked", Note: "the same divider, between rows",
+				Draw: draw(comp.Split{Name: "demo.divider", Vertical: true, Ratio: [2]int{1, 2}, Min: 3}, nil)},
+			{Name: "a wider gap", Note: "the gap is the chrome's, so it is one number for every split",
+				Draw: draw(third, func(ch theme.Chrome) theme.Chrome { ch.Gap = 5; return ch })},
+			{Name: "a visible seam", Note: "and so is what fills it — a blank reads as space, a line as a join",
+				Draw: draw(third, func(ch theme.Chrome) theme.Chrome { ch.Divider = "│"; return ch })},
+		},
 	}
 }
 
@@ -296,6 +345,16 @@ func (m *Model) paneEntry(s *styles) Entry {
 			{Name: "no room", Note: "under two columns it draws nothing at all",
 				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
 					draw(comp.Pane{Title: "Services"}, "")(c, comp.Rect{X: r.X, Y: r.Y, W: 1, H: 1}, focused)
+				}},
+			{Name: "rounded", Note: "a chrome the tool chose — ╭╮╰╯ have to be added to its glyph set",
+				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
+					draw(comp.Pane{Title: "Services", TitleAt: comp.TitleOnRow}, "one field, every box")(
+						c.WithChrome(c.Chrome().With(theme.RoundedBox)), r, focused)
+				}},
+			{Name: "ASCII", Note: "the fallback for a font with nothing — ugly on purpose",
+				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
+					draw(comp.Pane{Title: "Services", TitleAt: comp.TitleOnRow}, "it should look like a fallback")(
+						c.WithChrome(c.Chrome().With(theme.ASCIIBox)), r, focused)
 				}},
 		},
 	}

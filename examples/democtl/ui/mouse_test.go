@@ -130,11 +130,11 @@ func TestAfterScrollingAClickSelectsWhatIsUnderIt(t *testing.T) {
 // what it grabbed — which happens on every real drag.
 func TestDraggingTheDividerMovesIt(t *testing.T) {
 	m := drawn(132, 38)
-	before := m.listWidth()
+	before := m.paneWidth()
 
 	harness.Drag(t, m, "split", +10)
 
-	if got := m.listWidth(); got != before+10 {
+	if got := m.paneWidth(); got != before+10 {
 		t.Errorf("the divider moved to %d, want %d", got, before+10)
 	}
 	if m.mouse.Dragging() {
@@ -147,8 +147,8 @@ func TestTheDividerKeepsBothPanesUsable(t *testing.T) {
 	m := drawn(132, 38)
 	harness.Drag(t, m, "split", -100)
 
-	if m.listWidth() < minPane {
-		t.Errorf("the list pane is %d columns, under the %d minimum", m.listWidth(), minPane)
+	if m.paneWidth() < minPane {
+		t.Errorf("the list pane is %d columns, under the %d minimum", m.paneWidth(), minPane)
 	}
 }
 

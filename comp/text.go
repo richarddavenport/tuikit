@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/x/ansi"
+
+	"github.com/richarddavenport/tuikit/theme"
 )
 
 // Text operations components need, measured in COLUMNS.
@@ -22,17 +24,22 @@ import (
 // Truncate shortens text to w columns, ending with an ellipsis when it had to
 // cut. The ellipsis is a column of its own, so the result is never wider than
 // asked for.
-func Truncate(s string, w int) string {
+func Truncate(s string, w int) string { return truncate(s, w, theme.DefaultChrome.Ellipsis) }
+
+// truncate is Truncate in a given chrome. Components use this, so a tool that
+// changed its ellipsis changed it everywhere rather than in the one place it
+// remembered.
+func truncate(s string, w int, ellipsis string) string {
 	if w <= 0 {
 		return ""
 	}
 	if Width(s) <= w {
 		return s
 	}
-	if w == 1 {
-		return "…"
+	if w <= Width(ellipsis) {
+		return ellipsis
 	}
-	return ansi.Truncate(s, w, "…")
+	return ansi.Truncate(s, w, ellipsis)
 }
 
 // Wrap breaks text into lines of at most w columns, at spaces where it can and

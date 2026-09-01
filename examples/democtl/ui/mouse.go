@@ -41,7 +41,7 @@ func (m *Model) onMouse(msg tea.MouseMsg) tea.Cmd {
 
 		Drags: func(id comp.ID) bool { return m.menu == nil && id.Name == regSplit },
 		Drag: func(_ comp.ID, msg tea.MouseMsg) tea.Cmd {
-			m.setSplit(msg.X)
+			m.split.MoveTo(msg.X, m.body())
 			return nil
 		},
 	})
@@ -78,16 +78,9 @@ func (m *Model) scroll(id comp.ID, by int) {
 	}
 }
 
-// setSplit moves the divider, keeping both panes usable. A split that can be
-// dragged to nothing is a pane you cannot get back.
-func (m *Model) setSplit(x int) {
-	m.split = clamp(x, minPane, m.width-minPane-1)
-}
-
-// minPane is the narrowest either pane may be dragged to.
+// minPane is how narrow democtl thinks a pane may get. The clamping is
+// comp.Split's; this is only the number.
 const minPane = 24
-
-func clamp(v, lo, hi int) int { return max(lo, min(v, hi)) }
 
 // --- the context menu ---------------------------------------------------
 

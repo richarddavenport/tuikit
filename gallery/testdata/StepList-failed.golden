@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               11 components
+tuikit gallery  every component, running                                                                               12 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ StepList                                                                                       │
@@ -13,7 +13,7 @@ tuikit gallery  every component, running                                        
 │ Table                         │ │       task 3 exited 137 before the health check passed                                         │
 │ Toast                         │ │   • verify health endpoint                                                                     │
 │ Form                          │ │                                                                                                │
-│                               │ │   stopped  r to run again                                                                      │
+│ Split                         │ │   stopped  r to run again                                                                      │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Success · Danger · Pending · Muted                                                    │
 │                               │ │ glyphs   ✓ ✗ ● • →                                                                             │
 │                               │ │ from     swarmctl renderdeploy.go, pgctl actionrun.go, azctl runner.go                         │
-│                         11/11 │ │                                                                                                │
+│                         12/12 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

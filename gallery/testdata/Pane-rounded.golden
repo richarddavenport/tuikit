@@ -1,17 +1,17 @@
 tuikit gallery  every component, running                                                                               12 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Form                                                                                           │
-│ List                          │ │ Every field at once, so you can see what you have chosen rather than remember it.              │
-│ Pane                          │ │ ‹ focused · unfocused · type the name · phrase matched · no room ›                             │
-│ Tabs                          │ │ still shows every value — seeing what you chose is the point                                   │
+│ Components                    │ │ Pane                                                                                           │
+│ List                          │ │ A bordered box with a title, and the rect inside it.                                           │
+│ Pane                          │ │ ‹ title in the edge · title on a row · focused · title too long · no room · rounded · ASCII ›  │
+│ Tabs                          │ │ a chrome the tool chose — ╭╮╰╯ have to be added to its glyph set                               │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │   target   staging  production                                                                 │
-│ StepList                      │ │   tag      v2.4.1                                                                              │
-│ LogPane                       │ │   note     (none)                                                                              │
-│ Spinner                       │ │   dry run  yes                                                                                 │
-│ Table                         │ │                                                                                                │
-│ Toast                         │ │                                                                                                │
+│ Confirm                       │ │ ╭────────────────────────────────────────────────────────────────────────────────────────────╮ │
+│ StepList                      │ │ │ Services                                                                                   │ │
+│ LogPane                       │ │ │ one field, every box                                                                       │ │
+│ Spinner                       │ │ │                                                                                            │ │
+│ Table                         │ │ │                                                                                            │ │
+│ Toast                         │ │ ╰────────────────────────────────────────────────────────────────────────────────────────────╯ │
 │ Form                          │ │                                                                                                │
 │ Split                         │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -28,10 +28,10 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │                                                                                                │
-│                               │ │ keys     ↑↓ field · ‹› choice · space toggle                                                   │
-│                               │ │ roles    Accent · Muted · Danger                                                               │
-│                               │ │ from     pgctl viewForm, swarmctl applyedits.go and confirmPhrase                              │
+│                               │ │ mouse    click the border belongs to the pane                                                  │
+│                               │ │ roles    Border · Accent                                                                       │
+│                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
+│                               │ │ from     swarmctl drawBox and drawBoxRaw (which disagreed), democtl box                        │
 │                         12/12 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

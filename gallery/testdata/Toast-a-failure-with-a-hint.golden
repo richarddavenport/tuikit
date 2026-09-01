@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               11 components
+tuikit gallery  every component, running                                                                               12 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Toast                                                                                          │
@@ -13,7 +13,7 @@ tuikit gallery  every component, running                                        
 │ Table                         │ │                                             │dial tcp 10.0.0.4:5432: connection refused    │   │
 │ Toast                         │ │                                             │                                              │   │
 │ Form                          │ │                                             │is the tunnel up? try `pgctl connect staging` │   │
-│                               │ │                                             │                                              │   │
+│ Split                         │ │                                             │                                              │   │
 │                               │ │                                             └──────────────────────────────────────────────┘   │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Danger · Success · Border · Muted                                                     │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
 │                               │ │ from     swarmctl errorView                                                                    │
-│                         11/11 │ │                                                                                                │
+│                         12/12 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

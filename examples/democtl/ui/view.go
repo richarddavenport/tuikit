@@ -29,8 +29,7 @@ func (m *Model) View() string {
 	// The default case used to be a hand-written complaint. app.Screens owns
 	// it now, so every tool's missing screen says the same thing in the same
 	// place — and guard.Screens can ask the question of the map.
-	m.screens.Draw(app.Screen(m.screen), c,
-		comp.Rect{X: 0, Y: 2, W: m.width, H: m.bodyHeight()}, &m.sty.danger)
+	m.screens.Draw(app.Screen(m.screen), c, m.body(), &m.sty.danger)
 	m.footer(c)
 	if m.menu != nil {
 		m.drawMenu(c)
@@ -95,24 +94,12 @@ func (m *Model) footer(c *comp.Canvas) {
 }
 
 func (m *Model) dashboard(c *comp.Canvas, r comp.Rect) {
-	listWidth := m.listWidth()
-	m.servicePane(c, comp.Rect{X: r.X, Y: r.Y, W: listWidth, H: r.H})
-
-	// The divider owns its column so a drag has something to grab. It draws a
-	// blank, and an owned blank is still trimmed from the output, so naming it
-	// costs the frame nothing.
-	c.Fill(comp.Rect{X: r.X + listWidth, Y: r.Y, W: 1, H: r.H}, " ", nil, comp.Region(regSplit))
-
-	m.detailPane(c, comp.Rect{X: r.X + listWidth + 1, Y: r.Y, W: r.W - listWidth - 1, H: r.H})
-}
-
-// listWidth is the divider's position: a third of the window until someone
-// drags it, and then wherever they left it.
-func (m *Model) listWidth() int {
-	if m.split > 0 {
-		return clamp(m.split, minPane, max(minPane, m.width-minPane-1))
-	}
-	return max(m.width/3, minPane)
+	// The divider, the gap it lives in and the minimum either pane may be
+	// dragged to are comp.Split's now. What was here was three literals and
+	// the arithmetic between them.
+	list, detail := m.split.Draw(c, r)
+	m.servicePane(c, list)
+	m.detailPane(c, detail)
 }
 
 func (m *Model) servicePane(c *comp.Canvas, r comp.Rect) {
@@ -338,10 +325,9 @@ func (m *Model) drawMenu(c *comp.Canvas) {
 	// half a menu off the edge — that is what it is for — but half a menu is a
 	// list of actions you cannot read, which is a different thing from a pane
 	// that is cut off.
-	if bounds := c.Bounds(); true {
-		r.X = clamp(r.X, 0, max(0, bounds.W-r.W))
-		r.Y = clamp(r.Y, 0, max(0, bounds.H-r.H))
-	}
+	bounds := c.Bounds()
+	r.X = min(max(r.X, 0), max(0, bounds.W-r.W))
+	r.Y = min(max(r.Y, 0), max(0, bounds.H-r.H))
 	inner := m.box(c, r, "", true, comp.Region(regMenu))
 
 	for i, item := range m.menu.items {
@@ -373,6 +359,18 @@ func (m *Model) box(c *comp.Canvas, r comp.Rect, title string, focused bool, id 
 		Focus:      &m.sty.focused,
 		TitleStyle: &m.sty.title,
 	}.Draw(c, r, id)
+}
+
+// paneWidth is where the divider currently sits, for a test that drags it.
+func (m *Model) paneWidth() int {
+	list, _ := m.split.Layout(m.body(), comp.NewCanvas(0, 0).Chrome().Gap)
+	return list.W
+}
+
+// body is the space between the header and the footer, and the rect every
+// screen is drawn into.
+func (m *Model) body() comp.Rect {
+	return comp.Rect{X: 0, Y: 2, W: m.width, H: m.bodyHeight()}
 }
 
 // bodyHeight is what is left after the header's two lines and the footer's one.

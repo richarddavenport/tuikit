@@ -6,6 +6,8 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/termenv"
+
+	"github.com/richarddavenport/tuikit/theme"
 )
 
 func forceColour() {
@@ -408,5 +410,52 @@ func TestAClipIsAViewNotACopy(t *testing.T) {
 	}
 	if got := c.OwnerAt(1, 0); got.Zero() {
 		t.Error("ownership did not reach the real canvas")
+	}
+}
+
+// The chrome reaches every component through the canvas, so a tool sets it once
+// at the top rather than threading it through five call sites and missing one.
+func TestTheChromeReachesTheComponents(t *testing.T) {
+	ascii := theme.DefaultChrome.With(theme.ASCIIBox)
+	ascii.Ellipsis, ascii.ChevronLeft, ascii.ChevronRight = "~", "<", ">"
+	ascii.ScrollUp, ascii.ScrollDown = "^", "v"
+
+	c := NewCanvas(40, 12).WithChrome(ascii)
+
+	inner := Pane{Title: "a title far too long for this box"}.
+		Draw(c, Rect{X: 0, Y: 0, W: 14, H: 4}, Region(pane))
+	_ = inner
+	Tabs{Tabs: []Tab{{Name: "one"}, {Name: "two"}}}.
+		Draw(c, Rect{X: 0, Y: 5, W: 30, H: 1}, tabsName)
+
+	l := &List{Name: services, Focused: true}
+	l.Draw(c, Rect{X: 0, Y: 7, W: 30, H: 5}, rows(20))
+	l.Scroll(10)
+	l.Draw(c, Rect{X: 0, Y: 7, W: 30, H: 5}, rows(20))
+
+	got := c.String()
+	for _, want := range []string{
+		"+------------+", // the ASCII box
+		"~",              // the ellipsis on the cut title
+		"< one",          // the chevrons
+		"^ selected above",
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("%q is missing — the chrome did not reach:\n%s", want, got)
+		}
+	}
+	if strings.ContainsAny(got, "┌┐└┘─│…‹›↑") {
+		t.Errorf("a default character survived the chrome:\n%s", got)
+	}
+}
+
+// A clipped view keeps the chrome, or a pane inside a pane draws in a different
+// vocabulary from its parent.
+func TestAClippedViewKeepsItsChrome(t *testing.T) {
+	c := NewCanvas(20, 4).WithChrome(theme.DefaultChrome.With(theme.ASCIIBox))
+	inner := c.Clip(Rect{X: 0, Y: 0, W: 10, H: 3})
+
+	if got := inner.Chrome().Box.TopLeft; got != "+" {
+		t.Errorf("a clipped view draws its corners with %q", got)
 	}
 }

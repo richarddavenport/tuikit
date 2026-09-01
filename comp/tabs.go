@@ -1,6 +1,10 @@
 package comp
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"strings"
+
+	"github.com/charmbracelet/lipgloss"
+)
 
 // Tabs is a strip of names, one of them current.
 //
@@ -53,11 +57,12 @@ type Tab struct {
 func (t Tabs) Draw(c *Canvas, r Rect, name Name) int {
 	c = c.Clip(r)
 	x := r.X
-	x += c.Text(x, r.Y, "‹", t.Chrome, Region(name))
+	ch := c.Chrome()
+	x += c.Text(x, r.Y, ch.ChevronLeft, t.Chrome, Region(name))
 
 	for i, tab := range t.Tabs {
 		if i > 0 {
-			x += c.Text(x, r.Y, "·", t.Chrome, Region(name))
+			x += c.Text(x, r.Y, strings.TrimSpace(ch.Separator), t.Chrome, Region(name))
 		}
 		label := " " + tab.Name
 		if tab.Count > 0 {
@@ -74,6 +79,6 @@ func (t Tabs) Draw(c *Canvas, r Rect, name Name) int {
 		}
 		x += c.Text(x, r.Y, label, style, Region(name).At(i))
 	}
-	x += c.Text(x, r.Y, "›", t.Chrome, Region(name))
+	x += c.Text(x, r.Y, ch.ChevronRight, t.Chrome, Region(name))
 	return x - r.X
 }

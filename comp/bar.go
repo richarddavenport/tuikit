@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+
+	"github.com/richarddavenport/tuikit/theme"
 )
 
 // Bar is one line with content at each end: a header, or a key hint bar.
@@ -97,7 +99,7 @@ func Hints(hints ...Hint) string {
 			parts = append(parts, h.Key+" "+h.Label)
 		}
 	}
-	return strings.Join(parts, " · ")
+	return strings.Join(parts, theme.DefaultChrome.Separator)
 }
 
 // KeyHints is the whole bar, for the common case of hints and nothing else.
