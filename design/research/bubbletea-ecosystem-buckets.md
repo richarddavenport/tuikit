@@ -14,6 +14,11 @@ not the GitHub dependents graph, and 1000 is the search API's hard result cap. T
 buckets are keyword heuristics, so expect a false positive or two per section — this
 is a rough map, not a taxonomy.
 
+The five frameworks in the app-shell bucket were read in full on 2026-09-01 —
+see [framework-comparison.md](framework-comparison.md) for what they do, what
+their READMEs claim that the source does not support, and the three ideas worth
+taking.
+
 ## Shape of it
 
 | | Count |
