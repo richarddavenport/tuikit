@@ -75,6 +75,21 @@ colour stripped, so a layout change is an ordinary test failure and the report
 names the line and its column count. `harness.HTML` turns a frame into a block
 for a page.
 
+**Two capture mechanisms, deliberately.** The test above reaches any state at
+all — an error, a half-loaded pane, a modal over a forty-row table — because it
+can touch unexported fields. The BINARY reaches what a keystroke reaches, needs
+no test, and an agent finds it from `--help`:
+
+```
+mytool browse --snapshot /tmp/frames \
+  --script 'press j j; shot moved; click items.row[2]; shot picked'
+```
+
+A command declared with a `Screen` gets those two flags from `spec`, so they are
+in the help and in `describe --json` without the tool declaring either — and
+`shot` is what makes this a capture rather than a keystroke replay: the script
+says where the interesting frames are.
+
 Capture is a **building tool first**: its purpose is seeing the screen you are
 writing. Goldens and documentation are downstream of that — which is why the
 loop matters more than any assertion the harness could offer:
