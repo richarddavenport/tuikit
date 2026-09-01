@@ -47,9 +47,13 @@ type Entry struct {
 
 // State is one way a component can look, and how to draw it.
 //
-// Draw takes the rect it may use and whether the gallery's preview has focus,
-// so a component whose selection looks different when focused can show both
-// without a second entry.
+// Draw takes the rect it may use and whether the gallery's PREVIEW pane has
+// focus, for a component that can be operated here rather than only looked at.
+//
+// A state that is itself about focus — "focused", "unfocused" — decides for
+// itself and ignores the parameter. Anding the two meant the state named
+// "focused" drew unfocused until you happened to tab into the preview, which
+// made the gallery lie about the thing that state exists to show.
 type State struct {
 	Name string
 	// Note says what this state is FOR — the condition that produces it —

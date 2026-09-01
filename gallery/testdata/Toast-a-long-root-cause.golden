@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               10 components
+tuikit gallery  every component, running                                                                               11 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Toast                                                                                          │
@@ -12,7 +12,7 @@ tuikit gallery  every component, running                                        
 │ Spinner                       │ │                                             │                                              │   │
 │ Table                         │ │                                             │a root cause that came from somewhere else    │   │
 │ Toast                         │ │                                             │and does not know how wide your terminal is.  │   │
-│                               │ │                                             │a root cause that came from somewhere else    │   │
+│ Form                          │ │                                             │a root cause that came from somewhere else    │   │
 │                               │ │                                             │and does not know how wide your terminal is.  │   │
 │                               │ │                                             │                                              │   │
 │                               │ │                                             │run with -v for the full trace                │   │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Danger · Success · Border · Muted                                                     │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
 │                               │ │ from     swarmctl errorView                                                                    │
-│                         10/10 │ │                                                                                                │
+│                         11/11 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

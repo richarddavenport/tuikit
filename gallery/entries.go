@@ -30,6 +30,52 @@ func (m *Model) Entries() []Entry {
 		m.spinnerEntry(s),
 		m.tableEntry(s),
 		m.toastEntry(s),
+		m.formEntry(s),
+	}
+}
+
+func (m *Model) formEntry(s *styles) Entry {
+	draw := func(f comp.Form) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, focused bool) {
+			f.Marker = "> "
+			f.Label, f.FocusLabel, f.Value = &s.muted, &s.title, &s.focused
+			f.Muted, f.Danger = &s.muted, &s.danger
+			f.Draw(c, r, "demo.form")
+		}
+	}
+	fields := []comp.Field{
+		{Label: "target", Kind: comp.FieldChoice, Choices: []string{"staging", "production"}},
+		{Label: "tag", Kind: comp.FieldText, Text: "v2.4.1"},
+		{Label: "note", Kind: comp.FieldText, Placeholder: "(none)"},
+		{Label: "dry run", Kind: comp.FieldToggle, On: true},
+	}
+	return Entry{
+		Name:    "Form",
+		Summary: "Every field at once, so you can see what you have chosen rather than remember it.",
+		From:    "pgctl viewForm, swarmctl applyedits.go and confirmPhrase",
+		Keys:    []comp.Hint{{Key: "↑↓", Label: "field"}, {Key: "‹›", Label: "choice"}, {Key: "space", Label: "toggle"}},
+		Roles:   []string{"Accent", "Muted", "Danger"},
+		States: []State{
+			{Name: "focused", Note: "the marker is the caller's glyph, not one this package chose",
+				Draw: draw(comp.Form{Fields: fields, Cursor: 1, Focused: true})},
+			{Name: "unfocused", Note: "still shows every value — seeing what you chose is the point",
+				Draw: draw(comp.Form{Fields: fields, Cursor: 1})},
+			{Name: "type the name", Note: "swarmctl's rule: the difference between a keystroke and a decision",
+				Draw: draw(comp.Form{Focused: true, Fields: []comp.Field{
+					{Label: "service", Kind: comp.FieldText, Text: "api_gateway", Disabled: true},
+					{Label: "type the name", Kind: comp.FieldText, Must: "api_gateway", Text: "api_gate"},
+				}})},
+			{Name: "phrase matched", Note: "and now the action is allowed to happen",
+				Draw: draw(comp.Form{Focused: true, Fields: []comp.Field{
+					{Label: "service", Kind: comp.FieldText, Text: "api_gateway", Disabled: true},
+					{Label: "type the name", Kind: comp.FieldText, Must: "api_gateway", Text: "api_gateway"},
+				}})},
+			{Name: "no room", Note: "stops at the edge like everything else",
+				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
+					draw(comp.Form{Fields: fields, Cursor: 0, Focused: true})(
+						c, comp.Rect{X: r.X, Y: r.Y, W: min(r.W, 22), H: 2}, focused)
+				}},
+		},
 	}
 }
 
@@ -179,7 +225,7 @@ func (m *Model) listEntry(s *styles) Entry {
 				Name: "demo.list", Empty: "  nothing matches",
 				Selected: &s.selected, Unfocused: &s.focused,
 				Status: &s.muted, EmptyStyle: &s.muted,
-				Focused: focused && paneFocused,
+				Focused: focused,
 			}
 			if prepare != nil {
 				l.Draw(c, r, rows) // once, so it knows what it can scroll
@@ -225,7 +271,6 @@ func (m *Model) paneEntry(s *styles) Entry {
 	draw := func(p comp.Pane, title string) func(*comp.Canvas, comp.Rect, bool) {
 		return func(c *comp.Canvas, r comp.Rect, focused bool) {
 			p.Border, p.Focus, p.TitleStyle = &s.border, &s.focused, &s.title
-			p.Focused = p.Focused && focused
 			inner := p.Draw(c, comp.Rect{X: r.X, Y: r.Y, W: r.W, H: min(r.H, 6)}, comp.Region("demo.pane"))
 			if !inner.Empty() {
 				c.Text(inner.X+1, inner.Y, title, &s.muted, comp.Region("demo.pane"))
@@ -260,7 +305,7 @@ func (m *Model) tabsEntry(s *styles) Entry {
 	draw := func(tabs []comp.Tab, active int, focused bool) func(*comp.Canvas, comp.Rect, bool) {
 		return func(c *comp.Canvas, r comp.Rect, paneFocused bool) {
 			comp.Tabs{
-				Tabs: tabs, Active: active, Focused: focused && paneFocused,
+				Tabs: tabs, Active: active, Focused: focused,
 				Style: &s.muted, Selected: &s.focused, FocusSelected: &s.title, Chrome: &s.muted,
 			}.Draw(c, r, "demo.tabs")
 		}

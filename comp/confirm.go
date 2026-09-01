@@ -22,15 +22,14 @@ import "github.com/charmbracelet/lipgloss"
 // floor costs nothing: a box wider than the terminal is clipped by the canvas
 // anyway, which is a better failure than a box too narrow to read.
 //
-// # What is deliberately not here yet
+// # Typing the name
 //
 // swarmctl requires DESTRUCTIVE actions to be confirmed by typing the subject's
 // name — the service, or env/service when the environment is guarded (action.go
-// confirmPhrase, confirmed). It is a real safety requirement and swarmctl
-// cannot migrate onto this component without it. It is left out because no tool
-// in this repo has it, and a component whose behaviour nothing exercises is a
-// guess; it belongs with the form work, where typed input lives. Whoever
-// migrates swarmctl should expect to add it here rather than around it.
+// confirmPhrase, confirmed). That lives in comp.Form, as a Field with a Must:
+// it is a text field with one extra rule, and putting it here would have been a
+// second implementation of typed input. A confirm that needs it draws a Form in
+// its body and asks Form.Complete before acting.
 type Confirm struct {
 	Title, Body string
 

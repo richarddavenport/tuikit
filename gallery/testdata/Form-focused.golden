@@ -1,15 +1,15 @@
 tuikit gallery  every component, running                                                                               11 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Table                                                                                          │
-│ List                          │ │ Rows of aligned columns. It lays out; a List selects and scrolls.                              │
-│ Pane                          │ │ ‹ marker first · a cell too long · wide runes · narrow ›                                       │
-│ Tabs                          │ │ 'can I reach it' before 'which is it' — an unreachable one changes everything below            │
+│ Components                    │ │ Form                                                                                           │
+│ List                          │ │ Every field at once, so you can see what you have chosen rather than remember it.              │
+│ Pane                          │ │ ‹ focused · unfocused · type the name · phrase matched · no room ›                             │
+│ Tabs                          │ │ the marker is the caller's glyph, not one this package chose                                   │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │ ✓ api_gateway                                                                   api        3/3 │
-│ StepList                      │ │ ● api_worker                                                                    api        1/2 │
-│ LogPane                       │ │ ✗ api_migrate                                                                   api        0/1 │
-│ Spinner                       │ │ ✓ web_frontend                                                                  web        4/4 │
+│ Confirm                       │ │   target   staging  production                                                                 │
+│ StepList                      │ │ > tag      v2.4.1                                                                              │
+│ LogPane                       │ │   note     (none)                                                                              │
+│ Spinner                       │ │   dry run  yes                                                                                 │
 │ Table                         │ │                                                                                                │
 │ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │
@@ -29,9 +29,9 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │ roles    Muted                                                                                 │
-│                               │ │ glyphs   ✓ ✗ ● …                                                                               │
-│                               │ │ from     pgctl rows.go, swarmctl pane and detail tables                                        │
+│                               │ │ keys     ↑↓ field · ‹› choice · space toggle                                                   │
+│                               │ │ roles    Accent · Muted · Danger                                                               │
+│                               │ │ from     pgctl viewForm, swarmctl applyedits.go and confirmPhrase                              │
 │                         11/11 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit
