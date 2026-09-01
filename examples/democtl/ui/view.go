@@ -23,7 +23,8 @@ var tabNames = []string{"Overview", "Config", "Events"}
 // bodyHeight arithmetic already put it: two rows of header, the body, one of
 // footer, and the bottom line left alone.
 func (m *Model) View() string {
-	c := comp.NewCanvas(m.width, 3+m.bodyHeight())
+	bands := m.bands()
+	c := comp.NewCanvas(m.width, bands[3].Bottom()+1)
 
 	m.header(c)
 	// The default case used to be a hand-written complaint. app.Screens owns
@@ -45,6 +46,7 @@ func (m *Model) View() string {
 }
 
 func (m *Model) header(c *comp.Canvas) {
+	bands := m.bands()
 	state, style := "all services running", &m.sty.success
 	if !m.fleet.Healthy() {
 		state, style = "needs attention", &m.sty.pending
@@ -57,9 +59,9 @@ func (m *Model) header(c *comp.Canvas) {
 			{Text: state, Style: style},
 		},
 		Right: []comp.Segment{{Text: m.now.Format("15:04:05"), Style: &m.sty.muted}},
-	}.Draw(c, comp.Rect{X: 0, Y: 0, W: m.width, H: 1}, comp.Region(regHeader))
+	}.Draw(c, bands[0], comp.Region(regHeader))
 
-	c.Fill(comp.Rect{X: 0, Y: 1, W: m.width, H: 1}, "─", &m.sty.border, comp.Region(regRule))
+	c.Fill(bands[1], "─", &m.sty.border, comp.Region(regRule))
 }
 
 // footer names the keys that act on WHAT IS FOCUSED, right now.
@@ -89,8 +91,7 @@ func (m *Model) footer(c *comp.Canvas) {
 			{Key: "L", Label: "logs"}, {Key: "D", Label: "deploy"}, {Key: "q", Label: "quit"},
 		}
 	}
-	comp.KeyHints(c, comp.Rect{X: 0, Y: 2 + m.bodyHeight(), W: m.width, H: 1},
-		comp.Region(regFooter), &m.sty.muted, hints...)
+	comp.KeyHints(c, m.bands()[3], comp.Region(regFooter), &m.sty.muted, hints...)
 }
 
 func (m *Model) dashboard(c *comp.Canvas, r comp.Rect) {
@@ -357,14 +358,23 @@ func (m *Model) paneWidth() int {
 	return list.W
 }
 
-// body is the space between the header and the footer, and the rect every
-// screen is drawn into.
-func (m *Model) body() comp.Rect {
-	return comp.Rect{X: 0, Y: 2, W: m.width, H: m.bodyHeight()}
+// bands is democtl's window: a title, a rule, the body, and the key hints.
+//
+// One declaration rather than a rect and a height computed separately and kept
+// in step by whoever remembers. Adding a row used to mean changing a literal in
+// body() and a different literal in bodyHeight(), with nothing relating them
+// and no test that could catch getting it wrong.
+func (m *Model) bands() []comp.Rect {
+	return comp.Layout{Constraints: []comp.Constraint{
+		comp.Length(1),      // the title bar
+		comp.Length(1),      // the rule under it
+		comp.Fill(1).Min(3), // the body: whatever screen is showing
+		comp.Length(1),      // the key hints
+	}}.Rows(comp.Rect{X: 0, Y: 0, W: m.width, H: max(4, m.height-1)})
 }
 
-// bodyHeight is what is left after the header's two lines and the footer's one.
-func (m *Model) bodyHeight() int { return max(3, m.height-4) }
+// body is the rect every screen is drawn into.
+func (m *Model) body() comp.Rect { return m.bands()[2] }
 
 // stateStyle is a pointer into the model's styles rather than a copy, so every
 // row in a state shares one address and serialising groups them into a single
