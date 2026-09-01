@@ -9,6 +9,7 @@ import (
 	"github.com/richarddavenport/tuikit/comp"
 
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
+	"github.com/richarddavenport/tuikit/spec"
 	"github.com/richarddavenport/tuikit/theme"
 )
 
@@ -50,6 +51,9 @@ type Model struct {
 	// screens is the router. A screen constant with no entry draws a visible
 	// complaint rather than an empty terminal.
 	screens app.Screens
+	// commands is democtl declared: the CLI, the menu, the keys and the
+	// manifest, from one place.
+	commands spec.Command
 
 	// filter narrows the list. typing is the mode split: while it is true the
 	// list's own keys are text, and only Esc and Enter mean anything else.
@@ -125,6 +129,7 @@ func New(seed int64) *Model {
 		app.Screen(screenLogs):      m.logs,
 		app.Screen(screenRun):       m.run,
 	}
+	m.commands = Commands(seed)
 	m.log = comp.LogPane{Follow: true}
 	m.list = comp.List{
 		Name:       regServicesRow,

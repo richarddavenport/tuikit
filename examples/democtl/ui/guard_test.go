@@ -14,4 +14,7 @@ import (
 func TestTheInterfaceStaysInItsVocabulary(t *testing.T) {
 	guard.Tokens(t, ".", Palette)
 	guard.Glyphs(t, ".", Glyphs)
+	// Every action reachable by mouse has a keyboard path. An agent cannot
+	// click, and a multiplexer may eat the right-click before democtl sees it.
+	guard.Reachable(t, Commands(1))
 }

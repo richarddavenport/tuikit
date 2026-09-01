@@ -21,14 +21,71 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/richarddavenport/tuikit/examples/democtl/ui"
+	"github.com/richarddavenport/tuikit/spec"
 )
 
+var version = "dev"
+
+// main decides when the process ends.
+//
+// Nothing in spec calls os.Exit, which is why it is not cobra: the exit-code
+// contract is richer than ok-or-not — 2 means a dry run found drift — and a
+// framework that owns the exit is a framework that flattens it.
+//
+// The dual-mode entry lives here too: no arguments opens the TUI, and anything
+// else is a command. main is the only place that can decide which, because it
+// is the only place that knows a bare `democtl` means "show me".
 func main() {
 	seed := flag.Int64("seed", 1, "which fleet to generate; the same seed is the same fleet")
 	flag.Parse()
 
-	if _, err := tea.NewProgram(ui.New(*seed), tea.WithAltScreen()).Run(); err != nil {
-		fmt.Fprintln(os.Stderr, "democtl:", err)
-		os.Exit(1)
+	argv := flag.Args()
+	if len(argv) == 0 {
+		os.Exit(runTUI(*seed))
 	}
+
+	root := ui.Commands(*seed)
+	switch argv[0] {
+	case "describe":
+		// The whole surface in one call, so an agent never has to grep for it.
+		out, err := spec.Describe(root, version, ui.Palette, ui.Glyphs).JSON()
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "democtl:", err)
+			os.Exit(spec.Fail)
+		}
+		fmt.Println(string(out))
+		os.Exit(spec.OK)
+
+	case "completion":
+		if len(argv) < 2 {
+			fmt.Fprintln(os.Stderr, "usage: democtl completion <bash|zsh|fish>")
+			os.Exit(spec.Fail)
+		}
+		if err := spec.CompletionScript(argv[1], "democtl", os.Stdout); err != nil {
+			fmt.Fprintln(os.Stderr, "democtl:", err)
+			os.Exit(spec.Fail)
+		}
+		os.Exit(spec.OK)
+
+	case "__complete":
+		// What the shell calls back into. The scripts know nothing about the
+		// commands, so they cannot go stale when one is added.
+		for _, word := range spec.Complete(root, argv[1:]) {
+			fmt.Println(word)
+		}
+		os.Exit(spec.OK)
+
+	case "tui":
+		os.Exit(runTUI(*seed))
+	}
+	os.Exit(spec.Run(root, argv, os.Stdout, os.Stderr))
+}
+
+func runTUI(seed int64) int {
+	p := tea.NewProgram(ui.New(seed), tea.WithAltScreen(), tea.WithMouseCellMotion())
+	if _, err := p.Run(); err != nil {
+		fmt.Fprintln(os.Stderr, "democtl:", err)
+		return spec.Fail
+	}
+	return spec.OK
 }

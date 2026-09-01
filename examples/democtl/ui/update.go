@@ -125,12 +125,10 @@ func (m *Model) dashboardKey(msg tea.KeyMsg) bool {
 		}
 	case "/":
 		m.typing = true
-	case "L":
-		if _, ok := m.selected(); ok {
-			m.screen, m.log.Follow = screenLogs, true
-		}
-	case "D":
-		m.confirmDeploy()
+	case "L", "D":
+		// The same call the menu entry makes. One implementation, reached two
+		// ways, which is the only arrangement in which they cannot drift.
+		m.act(msg.String())
 	case "m":
 		// The menu opens from the keyboard, at the cursor. Not a convenience:
 		// it is the only way the mouse and keyboard paths cannot drift, since

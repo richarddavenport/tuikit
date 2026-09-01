@@ -6,6 +6,7 @@ import (
 	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
+	"github.com/richarddavenport/tuikit/spec"
 )
 
 // onMouse routes one mouse event.
@@ -146,26 +147,23 @@ func (m *Model) openMenuOn(id comp.ID) {
 	m.menu = &menuState{on: id, onRegion: true, items: items}
 }
 
-// actionsFor is what a region can do. One list, so the menu, the keymap and —
-// once spec exists — the CLI command and the manifest all come from it.
+// actionsFor is what a region can do, read from the declaration.
+//
+// Not a list kept in step with the CLI — the same list. A command given a
+// Target appears here, one removed from the tree disappears, and neither
+// requires anybody to remember this function exists.
 func (m *Model) actionsFor(id comp.ID) []menuItem {
-	switch id.Name {
-	case regServicesRow, regServices:
-		if _, ok := m.selected(); !ok {
-			return nil
-		}
-		return []menuItem{
-			{Hint: comp.Hint{Key: "L", Label: "View logs"}, do: func(m *Model) tea.Cmd {
-				m.screen, m.log.Follow = screenLogs, true
-				return nil
-			}},
-			{Hint: comp.Hint{Key: "D", Label: "Deploy"}, do: func(m *Model) tea.Cmd {
-				m.confirmDeploy()
-				return nil
-			}},
-		}
+	if id.Name == regServices {
+		id = comp.Region(regServicesRow)
 	}
-	return nil
+	if _, ok := m.selected(); !ok {
+		return nil
+	}
+	var out []menuItem
+	for _, hint := range spec.MenuFor(m.commands, id.Name) {
+		out = append(out, menuItem{Hint: hint, do: func(m *Model) tea.Cmd { return m.act(hint.Key) }})
+	}
+	return out
 }
 
 func (m *Model) menuMouse(msg tea.MouseMsg, id comp.ID) tea.Cmd {

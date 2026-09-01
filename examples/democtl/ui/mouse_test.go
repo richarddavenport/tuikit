@@ -6,6 +6,7 @@ import (
 	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
 	"github.com/richarddavenport/tuikit/harness"
+	"github.com/richarddavenport/tuikit/spec"
 )
 
 // drawn builds a model and renders once, because a region cannot be clicked
@@ -271,3 +272,38 @@ type recorder struct{ failed bool }
 func (r *recorder) Helper()                           {}
 func (r *recorder) Errorf(string, ...any)             { r.failed = true }
 func (r *recorder) Fatalf(format string, args ...any) { r.failed = true }
+
+// The menu is the declaration, not a list kept in step with it. A command given
+// a Target appears here without anybody editing the menu.
+func TestTheMenuComesFromTheDeclaration(t *testing.T) {
+	m := drawn(132, 38)
+	harness.Press(m, "m")
+
+	if m.menu == nil {
+		t.Fatal("no menu")
+	}
+	declared := spec.MenuFor(Commands(1), regServicesRow)
+	if len(m.menu.items) != len(declared) {
+		t.Fatalf("the menu has %d entries and the declaration has %d", len(m.menu.items), len(declared))
+	}
+	for i, want := range declared {
+		if m.menu.items[i].Hint != want {
+			t.Errorf("entry %d is %+v, declared as %+v", i, m.menu.items[i].Hint, want)
+		}
+	}
+}
+
+// The menu entry and the keystroke run the same call, which is the only
+// arrangement in which they cannot drift.
+func TestTheMenuEntryAndItsKeyDoTheSameThing(t *testing.T) {
+	byKey := drawn(132, 38)
+	harness.Press(byKey, "L")
+
+	byMenu := drawn(132, 38)
+	harness.Press(byMenu, "m")
+	harness.Click(t, byMenu, "menu.item[0]") // View logs
+
+	if byKey.screen != screenLogs || byMenu.screen != screenLogs {
+		t.Errorf("the key reached screen %v and the menu %v", byKey.screen, byMenu.screen)
+	}
+}
