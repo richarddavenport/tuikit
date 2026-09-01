@@ -90,6 +90,19 @@ the page, and reloads the browser. When the build fails the error goes **on the
 page** — leaving the last good frames up would describe a tool that no longer
 exists.
 
+**`tuikit gallery`** — every component, running, with its states and its keys.
+The fastest way to find out whether this framework is for you:
+
+```
+make gallery
+```
+
+A real TUI rather than a page, because what a component is like to USE — what it
+feels like to arrow through, what it does at 80 columns, what it looks like
+empty — is not a thing a screenshot answers. It is built out of `comp`, so it
+cannot show you a component that does not work; it found two bugs on its first
+run, one of them in itself.
+
 **`docgen`** — generated from the code, so it cannot drift. The vocabulary as
 HTML, and a capture as a page you can look at:
 
