@@ -477,3 +477,61 @@ wants:
 
 Both need the tool's own identity concept, so they are rules here rather than
 code in `comp`.
+
+## 27. tuikit is a shape for one kind of tool, not a TUI framework
+
+Read the five most-starred Bubble Tea app frameworks in full — see
+[research/framework-comparison.md](research/framework-comparison.md) — to answer
+the only question that matters about a project like this: what is it offering
+that the alternatives are not?
+
+The field splits in two, and tuikit is in neither half.
+
+**bento is a rendering substrate.** A faithful `ratatui-core` port — grapheme
+cells, `Buffer.Diff`, a Cassowary solver — with no opinions about applications
+at all. It does not even depend on Bubble Tea.
+
+**The other four are app frameworks over strings.** bubbleapp is React,
+bubblyui is Vue, the two sodas are a screen stack. Every one composes with
+`lipgloss.JoinVertical`.
+
+tuikit is an opinionated shape for **one kind of tool**: an operator CLI *and*
+TUI over a domain engine, with `guard.Engine` failing the build if the engine
+learns what a terminal is. That is a narrower claim than "a TUI framework", and
+the narrowness is the product.
+
+### What follows from that
+
+**We do not compete on component count.** bubblyui has 31 and they are real;
+ours are 14 and thicker, because each was extracted from two of four working
+tools rather than designed. A component that exists in one tool is not a
+component, it is that tool's code.
+
+**We do not need reactivity.** Refs, computed values and watchers answer "what
+changed" for a graph of UI state. Our shape is a snapshot redrawn — `app.Gen`
+drops the result of a read the reader walked away from, and that is the whole
+async problem an operator tool has.
+
+**The CLI is not a side feature.** It is the axis nobody else is on. Not one of
+the five has anything to say about flags, subcommands or exit codes, because
+none of them is built for a tool that must also work in a pipe.
+
+**The cell buffer is a means, not the thesis.** bento has cells and stores no
+owner, with mouse reporting never switched on. bubbleapp wanted ownership badly
+enough to embed invisible ANSI markers and scan them back out of the rendered
+frame, with an overlap heuristic its own source calls guesswork. Each has half
+of what a cell that records its owner gives you for nothing. If the substrate
+were the point, bento would already have won; it is the layer above that was
+missing.
+
+**Tests of appearance are the differentiator nobody replicated.** bubblyui has
+4,816 tests, a `SnapshotManager` with diffing and normalizers, and a written
+guide — and zero committed snapshot files. Not one component's appearance is
+pinned. Building the machinery is easy; committing the frames is the part that
+requires believing they matter.
+
+### What this decision does not license
+
+Ignoring the field. Three things came back worth taking, and are filed: deleting
+`View() string` (#21), a screen stack with history (#22), and constraint layout
+(#23) — the one axis where somebody else is plainly better than us.

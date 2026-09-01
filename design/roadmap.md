@@ -45,9 +45,34 @@ Each is an issue, so it gets closed by a decision rather than forgotten.
   [#5](https://github.com/richarddavenport/tuikit/issues/5), because a canvas
   that is wrong for CJK and then corrected means writing `Set` twice.
 
+## From reading the field
+
+Steps 1–9 are done. The five most-starred Bubble Tea app frameworks were then
+read in full ([research/framework-comparison.md](research/framework-comparison.md),
+decision 27), and three things came back worth taking:
+
+11. **Delete `View() string`** ([#21](https://github.com/richarddavenport/tuikit/issues/21))
+    — bento's `Model` embeds the thing that renders. Ours returns a string,
+    which is a seam where a tool can hand back a hand-joined frame and no guard
+    would notice. Cheapest of the three, and it hardens what `comp` already is.
+12. **A screen stack with history** ([#22](https://github.com/richarddavenport/tuikit/issues/22))
+    — `app.Screens` calls itself the router and is a flat map. democtl's `esc`
+    is a hardcoded constant; azctl's runner is a second program you cannot
+    return from. Take soda's mechanism, add a `spec.Call` label per entry so an
+    agent can read where it is, and stop at about a hundred lines.
+13. **Constraint layout** ([#23](https://github.com/richarddavenport/tuikit/issues/23))
+    — the one axis where the field is plainly ahead of us. Not a Cassowary
+    solver; `Length/Min/Max/Percentage/Fill` in one pass covers every layout the
+    four tools have.
+
 ## Starting a tool today
 
-`tuikit new` is step 9, so the supported path until then is copying
-`examples/democtl` — [#1](https://github.com/richarddavenport/tuikit/issues/1)
-documents it. That is deliberate: scaffolding before azctl's migration has shown
-what a tool actually needs produces a template full of guesses.
+```sh
+make install
+tuikit new mytool -short "what it does" -module github.com/you/mytool
+cd mytool && make check
+```
+
+It came last on purpose, seeded from what azctl's migration actually needed
+rather than from a guess — scaffolding written before a real tool had been
+migrated would have been a template full of them.
