@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                                7 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ Tabs                                                                                           │
+│ List                          │ │ A strip of names, one of them current. The chevrons say it cycles.                             │
+│ Pane                          │ │ ‹ focused · unfocused · with counts · too wide ›                                               │
+│ Tabs                          │ │ a tab can say how much is behind it                                                            │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │ ‹ Edits(3) · Log · Plan(12) ›                                                                  │
+│ StepList                      │ │                                                                                                │
+│ LogPane                       │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ keys     ‹› cycle                                                                              │
+│                               │ │ mouse    click each tab is its own region                                                      │
+│                               │ │ roles    Accent · Muted                                                                        │
+│                               │ │ glyphs   ‹ › ·                                                                                 │
+│                               │ │ from     swarmctl tabStrip, pgctl tab bar, democtl                                             │
+│                           7/7 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

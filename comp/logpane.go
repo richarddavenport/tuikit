@@ -54,6 +54,7 @@ type LogLine struct {
 
 // Draw renders the pane into r, reserving its bottom row for the status.
 func (p *LogPane) Draw(c *Canvas, r Rect, lines []LogLine, name Name) {
+	c = c.Clip(r)
 	p.count = len(lines)
 	body := r
 	if r.H > 1 {

@@ -84,6 +84,7 @@ type StepLook struct {
 
 // Draw renders the list into r.
 func (s StepList) Draw(c *Canvas, r Rect, name Name) {
+	c = c.Clip(r)
 	y := r.Y
 	for i, step := range s.Steps {
 		if y > r.Bottom() {

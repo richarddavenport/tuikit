@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                                7 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ List                                                                                           │
+│ List                          │ │ A scrollable, selectable list. The viewport and the selection are separate.                    │
+│ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · no room ›                        │
+│ Tabs                          │ │ more rows than the pane; the count says where you are                                          │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │  api_gateway                                                                                   │
+│ StepList                      │ │  api_worker                                                                                    │
+│ LogPane                       │ │  api_migrate                                                                                   │
+│                               │ │  web_frontend                                                                                  │
+│                               │ │  web_assets                                                                                    │
+│                               │ │  data_indexer                                                                                  │
+│                               │ │  data_archiver                                                                                 │
+│                               │ │  edge_router                                                                                   │
+│                               │ │  edge_cache                                                                                    │
+│                               │ │  auth_session                                                                                  │
+│                               │ │  auth_tokens                                                                                   │
+│                               │ │  media_upload                                                                                  │
+│                               │ │  media_transcode                                                                               │
+│                               │ │  ops_metrics                                                                                   │
+│                               │ │  ops_logs                                                                                      │
+│                               │ │  api_gateway                                                                                   │
+│                               │ │  api_worker                                                                                    │
+│                               │ │  api_migrate                                                                                   │
+│                               │ │  web_frontend                                                                                  │
+│                               │ │  web_assets                                                                                    │
+│                               │ │                                                                                         20/40  │
+│                               │ │ keys     ↑↓ move the selection · j/k the same                                                  │
+│                               │ │ mouse    click select the row, anywhere across it · wheel scroll the viewport, never the sele… │
+│                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │
+│                               │ │ glyphs   ↑ ↓                                                                                   │
+│                               │ │ from     pgctl window(), swarmctl pane scrolling, azctl cursor/top                             │
+│                           7/7 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

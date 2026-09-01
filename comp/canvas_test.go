@@ -362,3 +362,51 @@ func TestParseIDRejectsWhatItCannotName(t *testing.T) {
 		}
 	}
 }
+
+// A component must not draw outside the rect it was given.
+//
+// The canvas already makes drawing off the terminal impossible. This is the
+// other half, and the half design/roadmap.md left open: a component that moved
+// but kept drawing at its old width scribbles over its neighbour, and the frame
+// is still exactly the right number of columns so nothing notices.
+func TestClipStopsAComponentLeavingItsRect(t *testing.T) {
+	c := NewCanvas(20, 3)
+	inside := c.Clip(Rect{X: 2, Y: 1, W: 5, H: 1})
+
+	inside.Text(2, 1, "far too long for five columns", nil, Region(pane))
+	inside.Text(0, 0, "outside", nil, Region(pane))
+
+	lines := strings.Split(c.String(), "\n")
+	if lines[0] != "" {
+		t.Errorf("drew above its rect: %q", lines[0])
+	}
+	if got, want := lines[1], "  far t"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+// Clipping composes, so a pane inside a pane cannot escape either.
+func TestClipsNest(t *testing.T) {
+	c := NewCanvas(20, 2)
+	inner := c.Clip(Rect{X: 0, Y: 0, W: 10, H: 2}).Clip(Rect{X: 5, Y: 0, W: 10, H: 1})
+
+	inner.Fill(Rect{X: 0, Y: 0, W: 20, H: 2}, "x", nil, Region(pane))
+
+	if got, want := strings.Split(c.String(), "\n")[0], "     xxxxx"; got != want {
+		t.Errorf("got %q, want %q", got, want)
+	}
+}
+
+// A clipped view shares the cells: a component draws into the real frame, it
+// simply cannot reach past its own box.
+func TestAClipIsAViewNotACopy(t *testing.T) {
+	c := NewCanvas(10, 1)
+	c.Clip(Rect{X: 0, Y: 0, W: 4, H: 1}).Text(0, 0, "abcd", nil, Region(pane))
+
+	if got := c.String(); got != "abcd" {
+		t.Errorf("the clipped view drew into a copy: %q", got)
+	}
+	if got := c.OwnerAt(1, 0); got.Zero() {
+		t.Error("ownership did not reach the real canvas")
+	}
+}

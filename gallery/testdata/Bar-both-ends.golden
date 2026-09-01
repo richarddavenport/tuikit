@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                                7 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ Bar                                                                                            │
+│ List                          │ │ One line with content at each end. Its Hints are a key and what it does.                       │
+│ Pane                          │ │ ‹ both ends · hints · squeezed ›                                                               │
+│ Tabs                          │ │ the common case                                                                                │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │ democtl  a tuikit example  all services running                                       09:14:03 │
+│ StepList                      │ │                                                                                                │
+│ LogPane                       │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ roles    Accent · Muted · Success                                                              │
+│                               │ │ glyphs   ·                                                                                     │
+│                               │ │ from     swarmctl footerLine, azctl footer, democtl header and footer                          │
+│                           7/7 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

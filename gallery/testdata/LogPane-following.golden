@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                                7 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ LogPane                                                                                        │
+│ List                          │ │ A stream of lines, tailing. Following is a place, not a mode.                                  │
+│ Pane                          │ │ ‹ following · detached · empty · one line ›                                                    │
+│ Tabs                          │ │ pinned to the newest line as they arrive                                                       │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │   09:19:03 api_gateway: handled request in 221ms                                               │
+│ StepList                      │ │   09:10:00 api_gateway: handled request in 321ms                                               │
+│ LogPane                       │ │   09:11:07 api_gateway: handled request in 421ms                                               │
+│                               │ │   09:12:04 api_gateway: handled request in 521ms                                               │
+│                               │ │   09:13:01 api_gateway: handled request in 621ms                                               │
+│                               │ │   09:14:08 api_gateway: upstream timed out after 3s                                            │
+│                               │ │   09:15:05 api_gateway: handled request in 821ms                                               │
+│                               │ │   09:16:02 api_gateway: handled request in 921ms                                               │
+│                               │ │   09:17:09 api_gateway: handled request in 121ms                                               │
+│                               │ │   09:18:06 api_gateway: handled request in 221ms                                               │
+│                               │ │   09:19:03 api_gateway: handled request in 321ms                                               │
+│                               │ │   09:10:00 api_gateway: handled request in 421ms                                               │
+│                               │ │   09:11:07 api_gateway: upstream timed out after 3s                                            │
+│                               │ │   09:12:04 api_gateway: handled request in 621ms                                               │
+│                               │ │   09:13:01 api_gateway: handled request in 721ms                                               │
+│                               │ │   09:14:08 api_gateway: handled request in 821ms                                               │
+│                               │ │   09:15:05 api_gateway: handled request in 921ms                                               │
+│                               │ │   09:16:02 api_gateway: handled request in 121ms                                               │
+│                               │ │   09:17:09 api_gateway: handled request in 221ms                                               │
+│                               │ │   09:18:06 api_gateway: upstream timed out after 3s                                            │
+│                               │ │   09:19:03 api_gateway: handled request in 421ms                                               │
+│                               │ │                                                                                     following  │
+│                               │ │ keys     ↑↓ scroll, detaching from the tail                                                    │
+│                               │ │ mouse    wheel the same                                                                        │
+│                               │ │ roles    Muted · Stderr                                                                        │
+│                               │ │ from     swarmctl logspane.go                                                                  │
+│                           7/7 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

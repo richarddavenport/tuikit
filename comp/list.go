@@ -94,6 +94,7 @@ type Row struct {
 // because a viewport that only looks like one when it is scrolling is a
 // viewport you cannot tell from a short list.
 func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
+	c = c.Clip(r)
 	l.count = len(rows)
 	body := r
 	if r.H > 1 {

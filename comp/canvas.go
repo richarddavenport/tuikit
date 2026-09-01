@@ -123,11 +123,15 @@ func (c Cell) Continuation() bool { return c.Text == "" }
 type Canvas struct {
 	w, h  int
 	cells []Cell
+	// clip is what may be drawn into. The whole canvas by default; narrower
+	// for the view a component is handed.
+	clip Rect
 }
 
 // NewCanvas makes a canvas of blanks.
 func NewCanvas(w, h int) *Canvas {
 	c := &Canvas{w: max(0, w), h: max(0, h)}
+	c.clip = Rect{0, 0, c.w, c.h}
 	c.cells = make([]Cell, c.w*c.h)
 	for i := range c.cells {
 		c.cells[i].Text = " "
@@ -138,7 +142,33 @@ func NewCanvas(w, h int) *Canvas {
 // Bounds is the whole canvas as a rect, for a component handed the window.
 func (c *Canvas) Bounds() Rect { return Rect{0, 0, c.w, c.h} }
 
-func (c *Canvas) in(x, y int) bool { return x >= 0 && y >= 0 && x < c.w && y < c.h }
+func (c *Canvas) in(x, y int) bool {
+	return x >= 0 && y >= 0 && x < c.w && y < c.h && c.clip.Contains(x, y)
+}
+
+// Clip returns a view of the canvas that cannot draw outside r.
+//
+// The canvas already makes drawing off the TERMINAL impossible. This makes
+// drawing outside the rect a component was GIVEN impossible too, which is the
+// other half — and the half design/roadmap.md flagged as still open: "the
+// canvas guarantees nothing is drawn outside the canvas, not that a component
+// stayed inside the rect it was given."
+//
+// A view rather than a copy: the cells are shared, so a component draws into
+// the real frame and simply cannot reach past its own box. Coordinates stay
+// absolute, so a component's rect arithmetic is unchanged and nothing has to be
+// translated back for a hit test.
+func (c *Canvas) Clip(r Rect) *Canvas {
+	view := *c
+	view.clip = intersect(c.clip, r)
+	return &view
+}
+
+func intersect(a, b Rect) Rect {
+	x, y := max(a.X, b.X), max(a.Y, b.Y)
+	right, bottom := min(a.Right(), b.Right()), min(a.Bottom(), b.Bottom())
+	return Rect{X: x, Y: y, W: max(0, right-x+1), H: max(0, bottom-y+1)}
+}
 
 func (c *Canvas) at(x, y int) *Cell {
 	if !c.in(x, y) {

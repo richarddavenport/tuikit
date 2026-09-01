@@ -42,6 +42,7 @@ type Segment struct {
 
 // Draw renders the bar along the top row of r.
 func (b Bar) Draw(c *Canvas, r Rect, id ID) {
+	c = c.Clip(r)
 	right := width(b.Right)
 	room := r.W - right
 

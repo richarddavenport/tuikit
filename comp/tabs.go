@@ -51,6 +51,7 @@ type Tab struct {
 // Each tab owns its own region, indexed, so a click lands on the tab rather
 // than on the strip.
 func (t Tabs) Draw(c *Canvas, r Rect, name Name) int {
+	c = c.Clip(r)
 	x := r.X
 	x += c.Text(x, r.Y, "‹", t.Chrome, Region(name))
 

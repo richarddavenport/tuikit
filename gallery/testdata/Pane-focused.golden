@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                                7 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ Pane                                                                                           │
+│ List                          │ │ A bordered box with a title, and the rect inside it.                                           │
+│ Pane                          │ │ ‹ title in the edge · title on a row · focused · title too long · no room ›                    │
+│ Tabs                          │ │ the border and the title change together                                                       │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ StepList                      │ │ │ Services                                                                                   │ │
+│ LogPane                       │ │ │ the room inside                                                                            │ │
+│                               │ │ │                                                                                            │ │
+│                               │ │ │                                                                                            │ │
+│                               │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ mouse    click the border belongs to the pane                                                  │
+│                               │ │ roles    Border · Accent                                                                       │
+│                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
+│                               │ │ from     swarmctl drawBox and drawBoxRaw (which disagreed), democtl box                        │
+│                           7/7 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

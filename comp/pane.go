@@ -56,6 +56,7 @@ const (
 // The inside is blanked, so a pane drawn over something else covers it. That is
 // what makes a modal or a menu a draw rather than a composite.
 func (p Pane) Draw(c *Canvas, r Rect, id ID) Rect {
+	c = c.Clip(r)
 	edge := p.Border
 	if p.Focused && p.Focus != nil {
 		edge = p.Focus

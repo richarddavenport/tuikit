@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                                7 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ Confirm                                                                                        │
+│ List                          │ │ A question in a box, bounded to its container by construction.                                 │
+│ Pane                          │ │ ‹ ordinary · danger · a long body ›                                                            │
+│ Tabs                          │ │ wraps inside the box rather than through the border                                            │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │                                                                                                │
+│ StepList                      │ │                                                                                                │
+│ LogPane                       │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                ┌──────────────────────────────────────────────────────────────┐                │
+│                               │ │                │Apply the plan?                                               │                │
+│                               │ │                │                                                              │                │
+│                               │ │                │The plan's description can be as long as a list of every      │                │
+│                               │ │                │table a widened selection adds. The plan's description can    │                │
+│                               │ │                │be as long as a list of every table a widened selection       │                │
+│                               │ │                │adds. The plan's description can be as long as a list of      │                │
+│                               │ │                │every table a widened selection adds.                         │                │
+│                               │ │                │                                                              │                │
+│                               │ │                │y confirm · n cancel                                          │                │
+│                               │ │                └──────────────────────────────────────────────────────────────┘                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ keys     y confirm · n cancel                                                                  │
+│                               │ │ roles    Accent · Danger · Muted                                                               │
+│                               │ │ glyphs   ┌ ─ ┐ │ └ ┘ ·                                                                         │
+│                               │ │ from     swarmctl action.go, pgctl actionview.go, democtl overlay                              │
+│                           7/7 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

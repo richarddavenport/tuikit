@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                                7 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ StepList                                                                                       │
+│ List                          │ │ A run in progress: what will happen, what has, and what it cost.                               │
+│ Pane                          │ │ ‹ running · succeeded · failed · no room ›                                                     │
+│ Tabs                          │ │ one step in flight, the rest waiting                                                           │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │   ✓ resolve image digest                                                                412ms  │
+│ StepList                      │ │   ● check node capacity  already true                                                     1ms  │
+│ LogPane                       │ │   ✓ push service spec                                                                    1.1s  │
+│                               │ │   → wait for tasks to converge                                                                 │
+│                               │ │   • verify health endpoint                                                                     │
+│                               │ │                                                                                                │
+│                               │ │   running…                                                                                     │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ keys     r run again · esc back                                                                │
+│                               │ │ roles    Success · Danger · Pending · Muted                                                    │
+│                               │ │ glyphs   ✓ ✗ ● • →                                                                             │
+│                               │ │ from     swarmctl renderdeploy.go, pgctl actionrun.go, azctl runner.go                         │
+│                           7/7 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

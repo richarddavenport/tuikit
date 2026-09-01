@@ -15,7 +15,11 @@ import (
 	"strings"
 	"syscall"
 
+	tea "github.com/charmbracelet/bubbletea"
+
 	"github.com/richarddavenport/tuikit/docgen"
+	"github.com/richarddavenport/tuikit/gallery"
+	"github.com/richarddavenport/tuikit/theme"
 	"github.com/richarddavenport/tuikit/watch"
 )
 
@@ -33,6 +37,8 @@ func main() {
 		frames(os.Args[2:])
 	case "watch":
 		watchCmd(os.Args[2:])
+	case "gallery":
+		galleryCmd(os.Args[2:])
 	case "version":
 		fmt.Println("tuikit", version)
 	case "help", "-h", "--help":
@@ -167,6 +173,29 @@ func watchCmd(args []string) {
 	}
 }
 
+// galleryCmd opens every component, running.
+//
+// A real TUI rather than a page, because what a component is like to USE — what
+// it feels like to arrow through, what it does at 80 columns, what it looks
+// like empty — is not a thing a screenshot answers. tuikit designsystem renders
+// the vocabulary so you can review it; this lets you use it.
+func galleryCmd(args []string) {
+	fs := flag.NewFlagSet("gallery", flag.ExitOnError)
+	if err := fs.Parse(args); err != nil {
+		os.Exit(2)
+	}
+
+	// The default palette, because this binary shows tuikit's own components. A
+	// tool checking its OWN palette against them calls gallery.New with it —
+	// which is the point of taking one at all.
+	p := tea.NewProgram(gallery.New(theme.Default),
+		tea.WithAltScreen(), tea.WithMouseCellMotion())
+	if _, err := p.Run(); err != nil {
+		fmt.Fprintln(os.Stderr, "tuikit gallery:", err)
+		os.Exit(1)
+	}
+}
+
 func usage(w *os.File) {
 	_, _ = fmt.Fprint(w, `tuikit — a TUI framework for developers and agents
 
@@ -179,8 +208,11 @@ func usage(w *os.File) {
   tuikit watch <dir> -capture "<command>" -frames <dir>
         recapture on save, rebuild the page, reload the browser
 
+  tuikit gallery
+        open every component, running, with its states and keys
+
   tuikit version
 
-Planned: new (scaffold a tool), gallery (browse the components). See design/.
+Planned: new (scaffold a tool). See design/.
 `)
 }
