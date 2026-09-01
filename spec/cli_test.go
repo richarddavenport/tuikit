@@ -257,3 +257,51 @@ func TestAValueFlagWithNoValueSaysSo(t *testing.T) {
 		t.Errorf("exit %d, %q", code, errOut)
 	}
 }
+
+// A command whose flags are not knowable until it runs.
+//
+// azctl's `play` takes --<param> <value> for any parameter the PLAYBOOK
+// declares, and the playbook is a YAML file chosen at runtime. Without
+// pass-through the choice is between rejecting a valid invocation and declaring
+// nothing — and a command that declares nothing has no help, no completions and
+// no manifest entry.
+func TestAPassThroughCommandCollectsWhatItDidNotDeclare(t *testing.T) {
+	var got Call
+	root := Command{Name: "azctl", Commands: []Command{{
+		Name:        "play",
+		Args:        []Arg{{Name: "playbook", Required: true}},
+		Flags:       []Flag{{Name: "dry-run", Kind: Bool}, {Name: "provider", Kind: String, Default: "azure"}},
+		PassThrough: true,
+		Run:         func(c Call) int { got = c; return OK },
+	}}}
+
+	var out, errw bytes.Buffer
+	code := Run(root, []string{"play", "swarm", "--provider", "orbstack", "--dry-run",
+		"--env", "stg", "--nodes", "3"}, &out, &errw)
+
+	if code != OK {
+		t.Fatalf("exit %d: %s", code, errw.String())
+	}
+	if got.Arg("playbook") != "swarm" {
+		t.Errorf("playbook = %q", got.Arg("playbook"))
+	}
+	// The declared flags are still declared: they parse, they default, and they
+	// are not swept into Extra.
+	if got.Flag("provider") != "orbstack" || !got.Bool("dry-run") {
+		t.Errorf("declared flags did not parse: %+v", got.Flags)
+	}
+	if _, ok := got.Extra["provider"]; ok {
+		t.Error("a declared flag was collected as an extra")
+	}
+	if got.Extra["env"] != "stg" || got.Extra["nodes"] != "3" {
+		t.Errorf("extras are %+v", got.Extra)
+	}
+}
+
+// Off by default, and it should stay off for almost everything: a command that
+// quietly accepts --wach instead of --watch does nothing and says it worked.
+func TestWithoutPassThroughAnUnknownFlagIsStillRejected(t *testing.T) {
+	if code, _, errOut := run("status", "--nope", "x"); code != Fail || !strings.Contains(errOut, "unknown flag") {
+		t.Errorf("exit %d, %q", code, errOut)
+	}
+}

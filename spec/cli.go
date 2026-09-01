@@ -108,7 +108,7 @@ func Parse(cmd Command, argv []string) (Call, error) {
 	// command works around it by hand, with the note that "the directory goes
 	// after the flags" is a rule nobody remembers and nothing enforces. A
 	// generated CLI must not make every tool learn that.
-	flagArgs, positional, err := split(cmd, argv)
+	flagArgs, positional, extra, err := split(cmd, argv)
 	if err != nil {
 		return Call{}, err
 	}
@@ -119,6 +119,7 @@ func Parse(cmd Command, argv []string) (Call, error) {
 	call := Call{
 		Args:  map[string]string{},
 		Flags: map[string]string{},
+		Extra: pairs(extra),
 		JSON:  *jsonFlag == "true",
 	}
 	for name, v := range values {
@@ -149,7 +150,7 @@ func Parse(cmd Command, argv []string) (Call, error) {
 // A flag that takes a value swallows the token after it, which is the only
 // thing that needs knowing about the declaration — and the reason this cannot
 // be a generic argument shuffle.
-func split(cmd Command, argv []string) (flags, positional []string, err error) {
+func split(cmd Command, argv []string) (flags, positional, extra []string, err error) {
 	takesValue := map[string]bool{}
 	known := map[string]bool{"json": true}
 	for _, f := range cmd.Flags {
@@ -169,7 +170,7 @@ func split(cmd Command, argv []string) (flags, positional []string, err error) {
 		case arg == "--":
 			// Everything after is positional, however it looks. A service
 			// really can be called -w.
-			return flags, append(positional, argv[i+1:]...), nil
+			return flags, append(positional, argv[i+1:]...), extra, nil
 		case !strings.HasPrefix(arg, "-") || arg == "-":
 			positional = append(positional, arg)
 			continue
@@ -177,18 +178,30 @@ func split(cmd Command, argv []string) (flags, positional []string, err error) {
 
 		name, _, hasValue := strings.Cut(strings.TrimLeft(arg, "-"), "=")
 		if !known[name] {
-			return nil, nil, fmt.Errorf("unknown flag -%s", name)
+			if !cmd.PassThrough {
+				return nil, nil, nil, fmt.Errorf("unknown flag -%s", name)
+			}
+			// Collected rather than rejected, and it takes a value: a
+			// pass-through command cannot know which of its flags are
+			// switches, so it treats them all as values and lets whatever
+			// consumes them decide.
+			extra = append(extra, arg)
+			if !hasValue && i+1 < len(argv) && !strings.HasPrefix(argv[i+1], "-") {
+				i++
+				extra = append(extra, argv[i])
+			}
+			continue
 		}
 		flags = append(flags, arg)
 		if takesValue[name] && !hasValue {
 			if i+1 >= len(argv) {
-				return nil, nil, fmt.Errorf("flag -%s needs a value", name)
+				return nil, nil, nil, fmt.Errorf("flag -%s needs a value", name)
 			}
 			i++
 			flags = append(flags, argv[i])
 		}
 	}
-	return flags, positional, nil
+	return flags, positional, extra, nil
 }
 
 // flagValue adapts a string to flag.Value, so every flag is read the same way
@@ -280,6 +293,20 @@ func visible(cmds []Command) []Command {
 		if !c.Hidden {
 			out = append(out, c)
 		}
+	}
+	return out
+}
+
+// pairs turns collected pass-through arguments into names and values.
+func pairs(args []string) map[string]string {
+	out := map[string]string{}
+	for i := 0; i < len(args); i++ {
+		name, value, hasValue := strings.Cut(strings.TrimLeft(args[i], "-"), "=")
+		if !hasValue && i+1 < len(args) && !strings.HasPrefix(args[i+1], "-") {
+			i++
+			value = args[i]
+		}
+		out[name] = value
 	}
 	return out
 }

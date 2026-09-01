@@ -114,6 +114,20 @@ type Command struct {
 	// Hidden keeps a command out of help and completions without removing it.
 	// For things that still work but should not be advertised.
 	Hidden bool
+
+	// PassThrough collects flags this command did not declare, instead of
+	// rejecting them.
+	//
+	// From azctl, whose `play` takes `--<param> <value>` for any parameter the
+	// PLAYBOOK declares — a set the command cannot know, because it is in a
+	// YAML file chosen at runtime. Without this the choice is between rejecting
+	// a valid invocation and declaring nothing, and a command that declares
+	// nothing has no help, no completions and no manifest entry.
+	//
+	// Off by default, and it should stay off for almost everything: a command
+	// that quietly accepts --wach instead of --watch is a command that does
+	// nothing and says it worked.
+	PassThrough bool
 }
 
 // Call is one invocation, parsed.
@@ -124,6 +138,8 @@ type Call struct {
 	Rest []string
 	// Flags are every flag by name, including defaults not given.
 	Flags map[string]string
+	// Extra is the flags a PassThrough command was given and did not declare.
+	Extra map[string]string
 	// JSON says the caller asked for machine-readable output. Every command
 	// gets it, so an agent never has to find out which ones support it.
 	JSON bool
