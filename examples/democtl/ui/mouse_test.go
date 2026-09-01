@@ -303,7 +303,7 @@ func TestTheMenuEntryAndItsKeyDoTheSameThing(t *testing.T) {
 	harness.Press(byMenu, "m")
 	harness.Click(t, byMenu, "menu.item[0]") // View logs
 
-	if byKey.screen != screenLogs || byMenu.screen != screenLogs {
-		t.Errorf("the key reached screen %v and the menu %v", byKey.screen, byMenu.screen)
+	if byKey.at() != screenLogs || byMenu.at() != screenLogs {
+		t.Errorf("the key reached screen %v and the menu %v", byKey.at(), byMenu.at())
 	}
 }

@@ -75,7 +75,7 @@ func (m *Model) capture() app.Handled {
 }
 
 func (m *Model) screenKey(msg tea.KeyMsg) (tea.Cmd, bool) {
-	switch m.screen {
+	switch screen(m.stack.Current()) {
 	case screenDashboard:
 		return nil, m.dashboardKey(msg)
 	case screenLogs:
@@ -91,8 +91,9 @@ func (m *Model) globalKey(msg tea.KeyMsg) tea.Cmd {
 	case "q", "ctrl+c":
 		return tea.Quit
 	case "esc":
-		if m.screen != screenDashboard {
-			m.screen = screenDashboard
+		// Back to where this screen was opened FROM, which is not always the
+		// dashboard the moment a screen can be reached two ways.
+		if m.stack.Back() {
 			// Abandoning a run invalidates everything still in flight for it.
 			m.gen.Next()
 			m.running = -1
@@ -191,9 +192,18 @@ func (m *Model) logsKey(msg tea.KeyMsg) bool {
 }
 
 func (m *Model) runKey(msg tea.KeyMsg) (tea.Cmd, bool) {
-	if msg.String() == "r" && m.running < 0 {
-		m.startRun(m.plan)
-		return m.startStep(0), true
+	switch msg.String() {
+	case "r":
+		if m.running < 0 {
+			m.startRun(m.plan)
+			return m.startStep(0), true
+		}
+	case "L":
+		// The logs of the service being deployed, from inside the run — the
+		// thing you want when a step has just failed. It is also what makes
+		// the screen stack necessary rather than decorative: the logs are now
+		// reachable two ways, so esc cannot be a constant.
+		return m.act("L"), true
 	}
 	return nil, false
 }
@@ -201,7 +211,8 @@ func (m *Model) runKey(msg tea.KeyMsg) (tea.Cmd, bool) {
 // startRun resets the step list and takes a new generation, so anything still
 // in flight from the last one lands in the void.
 func (m *Model) startRun(p fleet.Plan) {
-	m.screen, m.plan = screenRun, p
+	m.plan = p
+	m.stack.Push(app.Screen(screenRun), "deploy "+p.Name)
 	m.done = make([]stepState, len(p.Steps))
 	m.gen.Next()
 }

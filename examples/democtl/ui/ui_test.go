@@ -317,7 +317,7 @@ func drain(m *Model, cmd tea.Cmd, depth int) {
 	}
 	// A tea.Tick would block for the step's duration. The run tests drive the
 	// chain through settle instead, so nothing here has to wait on a clock.
-	if m.screen == screenRun {
+	if m.at() == screenRun {
 		return
 	}
 	if msg := cmd(); msg != nil {
@@ -380,5 +380,53 @@ func TestAStepsDurationFitsInsideTheBox(t *testing.T) {
 	}
 	if strings.Contains(view, "m…") {
 		t.Errorf("a duration is being clipped:\n%s", view)
+	}
+}
+
+// Back returns to where a screen was opened FROM.
+//
+// This used to be `m.screen = screenDashboard`, which is right only while every
+// screen is reached from the dashboard. Opening the logs from a run is the case
+// that breaks it, and no golden could have caught it: the frame after esc is a
+// perfectly good dashboard, just not the screen you were on.
+func TestEscReturnsToWhereTheScreenWasOpenedFrom(t *testing.T) {
+	fromDashboard := New(1)
+	press(fromDashboard, "L")
+	if fromDashboard.at() != screenLogs {
+		t.Fatalf("L did not open the logs: %v", fromDashboard.at())
+	}
+	press(fromDashboard, "esc")
+	if got := fromDashboard.at(); got != screenDashboard {
+		t.Errorf("esc from logs-opened-on-the-dashboard landed on %v", got)
+	}
+
+	fromRun := New(1)
+	press(fromRun, "D", "y") // a run
+	if fromRun.at() != screenRun {
+		t.Fatalf("D did not open a run: %v", fromRun.at())
+	}
+	press(fromRun, "L") // the logs, from inside the run
+	if fromRun.at() != screenLogs {
+		t.Fatalf("L did not open the logs from the run: %v", fromRun.at())
+	}
+
+	press(fromRun, "esc")
+	if got := fromRun.at(); got != screenRun {
+		t.Errorf("esc landed on %v — the logs were opened from the run, not the dashboard", got)
+	}
+}
+
+// Where you are is a command line, so an agent can read it and a capture script
+// could ask for it directly instead of pressing three keys to arrive.
+func TestThePathReadsAsCommands(t *testing.T) {
+	m := New(1)
+	press(m, "L")
+
+	var got []string
+	for _, e := range m.stack.Path() {
+		got = append(got, e.Label)
+	}
+	if len(got) != 2 || got[0] != "democtl" || !strings.HasPrefix(got[1], "logs ") {
+		t.Errorf("the path reads %q", got)
 	}
 }

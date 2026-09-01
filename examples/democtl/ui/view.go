@@ -30,7 +30,7 @@ func (m *Model) View() string {
 	// The default case used to be a hand-written complaint. app.Screens owns
 	// it now, so every tool's missing screen says the same thing in the same
 	// place — and guard.Screens can ask the question of the map.
-	m.screens.Draw(app.Screen(m.screen), c, m.body(), &m.sty.danger)
+	m.screens.Draw(m.stack.Current(), c, m.body(), &m.sty.danger)
 	m.footer(c)
 	if m.menu != nil {
 		m.drawMenu(c)
@@ -80,10 +80,13 @@ func (m *Model) footer(c *comp.Canvas) {
 		hints = []comp.Hint{{Key: "↑↓", Label: "choose"}, {Key: "enter", Label: "do it"}, {Key: "esc", Label: "close"}}
 	case m.typing:
 		hints = []comp.Hint{{Label: "type to filter"}, {Key: "enter", Label: "keep"}, {Key: "esc", Label: "clear"}}
-	case m.screen == screenLogs:
+	case m.stack.Current() == app.Screen(screenLogs):
 		hints = []comp.Hint{{Key: "↑↓", Label: "scroll"}, {Key: "e", Label: "stderr only"}, {Key: "esc", Label: "back"}, {Key: "q", Label: "quit"}}
-	case m.screen == screenRun:
-		hints = []comp.Hint{{Key: "r", Label: "run again"}, {Key: "esc", Label: "back"}, {Key: "q", Label: "quit"}}
+	case m.stack.Current() == app.Screen(screenRun):
+		hints = []comp.Hint{
+			{Key: "r", Label: "run again"}, {Key: "L", Label: "logs"},
+			{Key: "esc", Label: "back"}, {Key: "q", Label: "quit"},
+		}
 	default:
 		hints = []comp.Hint{
 			{Key: "↑↓", Label: "move"}, {Key: "tab", Label: "pane"}, {Key: "‹›", Label: "tabs"},

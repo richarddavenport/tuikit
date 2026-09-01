@@ -41,9 +41,12 @@ type Model struct {
 	fleet fleet.Fleet
 	sty   styles
 
-	screen screen
-	focus  pane
-	tab    int
+	// stack is where you are and how you got there. A field rather than a
+	// `screen` — esc used to go to screenDashboard by name, which is right
+	// only while every screen is reached from the dashboard.
+	stack app.Stack
+	focus pane
+	tab   int
 
 	// list is the service list's cursor and viewport, which used to be three
 	// fields here and the arithmetic to keep them honest.
@@ -112,6 +115,10 @@ type confirmState struct {
 	do     func(*Model) tea.Cmd
 }
 
+// at is the screen showing, as democtl's own constant. app.Screen is an int so
+// a tool can use its own enumeration, and this is the one place the cast lives.
+func (m *Model) at() screen { return screen(m.stack.Current()) }
+
 // New builds the model. seed picks the fleet; the same seed is the same fleet.
 func New(seed int64) *Model {
 	m := &Model{
@@ -129,6 +136,9 @@ func New(seed int64) *Model {
 		app.Screen(screenLogs):      m.logs,
 		app.Screen(screenRun):       m.run,
 	}
+	// The root goes on the stack, so back has somewhere to land and nothing
+	// has to special-case "the first screen".
+	m.stack.Push(app.Screen(screenDashboard), "democtl")
 	m.split = comp.Split{Name: regSplit, Ratio: [2]int{1, 3}, Min: minPane}
 	m.commands = Commands(seed)
 	m.log = comp.LogPane{Follow: true}

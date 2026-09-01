@@ -6,6 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
 	"github.com/richarddavenport/tuikit/spec"
 )
@@ -138,8 +139,9 @@ func known(f fleet.Fleet, name string) bool {
 func (m *Model) act(key string) tea.Cmd {
 	switch key {
 	case "L":
-		if _, ok := m.selected(); ok {
-			m.screen, m.log.Follow = screenLogs, true
+		if svc, ok := m.selected(); ok {
+			m.log.Follow = true
+			m.stack.Push(app.Screen(screenLogs), "logs "+svc.Name)
 		}
 	case "D":
 		m.confirmDeploy()
