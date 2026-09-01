@@ -54,8 +54,10 @@ func (r Rect) Inset(n int) Rect {
 // failure.
 func (r Rect) Empty() bool { return r.W <= 0 || r.H <= 0 }
 
-// Right and Bottom are the last column and row inside the rect.
-func (r Rect) Right() int  { return r.X + r.W - 1 }
+// Right is the last column inside the rect.
+func (r Rect) Right() int { return r.X + r.W - 1 }
+
+// Bottom is the last row inside the rect.
 func (r Rect) Bottom() int { return r.Y + r.H - 1 }
 
 // Name is a region's name, declared once by the tool as a constant.

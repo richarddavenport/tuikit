@@ -107,7 +107,9 @@ func flagNames(cmd Command, prefix string) []string {
 			out = append(out, name)
 		}
 	}
-	if strings.HasPrefix("--json", prefix) {
+	// The constant is the CANDIDATE and prefix is what was typed, so the
+	// arguments read backwards and are the right way round.
+	if strings.HasPrefix("--json", prefix) { //nolint:gocritic // see above
 		out = append(out, "--json")
 	}
 	return out

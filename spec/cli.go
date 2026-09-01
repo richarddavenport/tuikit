@@ -32,7 +32,7 @@ func Run(root Command, argv []string, out, errw io.Writer) int {
 
 	call, err := Parse(cmd, rest)
 	if err != nil {
-		fmt.Fprintf(errw, "%s: %v\n\n", strings.Join(path, " "), err)
+		printf(errw, "%s: %v\n\n", strings.Join(path, " "), err)
 		Usage(cmd, path, errw)
 		return Fail
 	}
@@ -243,33 +243,33 @@ func Usage(cmd Command, path []string, w io.Writer) {
 	if len(cmd.Flags) > 0 {
 		line += " [flags]"
 	}
-	fmt.Fprintf(w, "usage: %s\n", line)
+	printf(w, "usage: %s\n", line)
 	if cmd.Short != "" {
-		fmt.Fprintf(w, "\n%s\n", cmd.Short)
+		printf(w, "\n%s\n", cmd.Short)
 	}
 	if cmd.Long != "" {
-		fmt.Fprintf(w, "\n%s\n", cmd.Long)
+		printf(w, "\n%s\n", cmd.Long)
 	}
 
 	if visible := visible(cmd.Commands); len(visible) > 0 {
-		fmt.Fprintf(w, "\ncommands:\n")
+		printf(w, "\ncommands:\n")
 		width := 0
 		for _, sub := range visible {
 			width = max(width, len(sub.Name))
 		}
 		for _, sub := range visible {
-			fmt.Fprintf(w, "  %-*s  %s\n", width, sub.Name, sub.Short)
+			printf(w, "  %-*s  %s\n", width, sub.Name, sub.Short)
 		}
 	}
 
 	if len(cmd.Args) > 0 {
-		fmt.Fprintf(w, "\narguments:\n")
+		printf(w, "\narguments:\n")
 		for _, a := range cmd.Args {
-			fmt.Fprintf(w, "  %-12s  %s\n", a.Name, a.Help)
+			printf(w, "  %-12s  %s\n", a.Name, a.Help)
 		}
 	}
 
-	fmt.Fprintf(w, "\nflags:\n")
+	printf(w, "\nflags:\n")
 	for _, f := range cmd.Flags {
 		name := "--" + f.Name
 		if f.Short != "" {
@@ -282,9 +282,19 @@ func Usage(cmd Command, path []string, w io.Writer) {
 		if f.Default != "" {
 			help += " (default " + f.Default + ")"
 		}
-		fmt.Fprintf(w, "  %-24s  %s\n", name, help)
+		printf(w, "  %-24s  %s\n", name, help)
 	}
-	fmt.Fprintf(w, "  %-24s  %s\n", "--json", "machine-readable output")
+	printf(w, "  %-24s  %s\n", "--json", "machine-readable output")
+}
+
+// printf writes and drops the error.
+//
+// Nothing useful can be done with a failed write to stderr on the way out of a
+// command, and threading one through every line of a usage message would say
+// nothing a reader needs. Named here so that is a decision taken once rather
+// than twelve unchecked calls.
+func printf(w io.Writer, format string, args ...any) {
+	_, _ = fmt.Fprintf(w, format, args...)
 }
 
 func visible(cmds []Command) []Command {

@@ -81,7 +81,7 @@ func status(f fleet.Fleet, c spec.Call) int {
 		if c.Bool("failing") && s.State == fleet.Running {
 			continue
 		}
-		fmt.Fprintf(c.Out, "%-16s %d/%d %s\n", s.Name, s.Ready, s.Want, s.State)
+		_, _ = fmt.Fprintf(c.Out, "%-16s %d/%d %s\n", s.Name, s.Ready, s.Want, s.State)
 	}
 	return spec.OK
 }
@@ -89,11 +89,11 @@ func status(f fleet.Fleet, c spec.Call) int {
 func logsOf(f fleet.Fleet, c spec.Call) int {
 	name := c.Arg("service")
 	if !known(f, name) {
-		fmt.Fprintf(c.Err, "democtl: no service %q\n", name)
+		_, _ = fmt.Fprintf(c.Err, "democtl: no service %q\n", name)
 		return spec.Fail
 	}
 	for _, l := range f.Logs(name, 40) {
-		fmt.Fprintf(c.Out, "%s %s\n", l.At.Format("15:04:05"), l.Text)
+		_, _ = fmt.Fprintf(c.Out, "%s %s\n", l.At.Format("15:04:05"), l.Text)
 	}
 	return spec.OK
 }
@@ -105,7 +105,7 @@ func logsOf(f fleet.Fleet, c spec.Call) int {
 func deploy(f fleet.Fleet, c spec.Call) int {
 	name := c.Arg("service")
 	if !known(f, name) {
-		fmt.Fprintf(c.Err, "democtl: no service %q\n", name)
+		_, _ = fmt.Fprintf(c.Err, "democtl: no service %q\n", name)
 		return spec.Fail
 	}
 	plan := fleet.Deploy(name, false)
@@ -113,7 +113,7 @@ func deploy(f fleet.Fleet, c spec.Call) int {
 		if c.Bool("dry-run") && step.Skip {
 			continue
 		}
-		fmt.Fprintf(c.Out, "%s\n", step.Name)
+		_, _ = fmt.Fprintf(c.Out, "%s\n", step.Name)
 	}
 	if c.Bool("dry-run") {
 		return spec.Drift

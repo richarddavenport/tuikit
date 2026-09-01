@@ -23,7 +23,7 @@ func (m *Model) onMouse(msg tea.MouseMsg) tea.Cmd {
 			if m.menu != nil {
 				return m.menuMouse(msg, id)
 			}
-			return m.press(id, msg)
+			return m.press(id)
 		},
 		RightPress: func(id comp.ID, msg tea.MouseMsg) tea.Cmd {
 			if m.menu != nil {
@@ -47,7 +47,7 @@ func (m *Model) onMouse(msg tea.MouseMsg) tea.Cmd {
 	})
 }
 
-func (m *Model) press(id comp.ID, msg tea.MouseMsg) tea.Cmd {
+func (m *Model) press(id comp.ID) tea.Cmd {
 	switch id.Name {
 	case regServicesRow:
 		m.focus = paneList

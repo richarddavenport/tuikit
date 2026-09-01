@@ -55,7 +55,10 @@ func TestEveryComponentIsInTheGallery(t *testing.T) {
 func componentsIn(t *testing.T, dir string) []string {
 	t.Helper()
 
-	pkgs, err := parser.ParseDir(token.NewFileSet(), dir, nil, 0)
+	// ParseDir is deprecated for not considering build tags. comp has none,
+	// and go/packages would pull a toolchain into a test that only wants the
+	// exported names.
+	pkgs, err := parser.ParseDir(token.NewFileSet(), dir, nil, 0) //nolint:staticcheck // see above
 	if err != nil {
 		t.Fatalf("reading %s: %v", dir, err)
 	}

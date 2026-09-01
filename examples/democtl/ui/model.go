@@ -191,14 +191,6 @@ func (m *Model) selected() (fleet.Service, bool) {
 	return list[m.list.Cursor()], true
 }
 
-// capturesKeys reports that something on screen is eating keystrokes.
-//
-// The split that every screen's key handling hangs off: while a modal is open or
-// the filter is being typed, j is the letter j. Without this the list scrolls
-// behind a dialog, which is the kind of bug that survives review because nobody
-// tries it.
-func (m *Model) capturesKeys() bool { return m.typing || m.confirm != nil || m.menu != nil }
-
 func contains(haystack, needle string) bool {
 	if needle == "" {
 		return true

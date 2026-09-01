@@ -70,8 +70,11 @@ func (m *Model) entry() Entry {
 	return m.entries[clamp(m.index.Cursor(), 0, len(m.entries)-1)]
 }
 
+// Init has nothing to start: every component the gallery shows is already
+// built, and none of them reads anything.
 func (m *Model) Init() tea.Cmd { return nil }
 
+// Update handles one message.
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -194,9 +197,8 @@ func (m *Model) drawEntry(c *comp.Canvas, r comp.Rect) {
 		return
 	}
 
-	y := inner.Y
-	y += c.Text(inner.X+1, y, comp.Truncate(e.Summary, inner.W-2), &m.sty.muted, comp.Region(regEntry))
-	y = inner.Y + 1
+	c.Text(inner.X+1, inner.Y, comp.Truncate(e.Summary, inner.W-2), &m.sty.muted, comp.Region(regEntry))
+	y := inner.Y + 1
 
 	if len(e.States) > 0 {
 		m.state = clamp(m.state, 0, len(e.States)-1)

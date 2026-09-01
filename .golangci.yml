@@ -1,6 +1,13 @@
 # golangci-lint v2 config. Run: golangci-lint run ./...
 version: "2"
 
+# Every instance, not the first three. A linter that reports "3 of these" and
+# stops makes a clean run look like progress while the same fault is still
+# there twice more.
+issues:
+  max-same-issues: 0
+  max-issues-per-linter: 0
+
 linters:
   default: standard # errcheck, govet, ineffassign, staticcheck, unused
   enable:
@@ -29,6 +36,10 @@ linters:
         linters:
           - errcheck
           - prealloc
+          # A test helper taking the width it is always called with reads
+          # better than one that hard-codes it, and is what the next case
+          # needs when it varies.
+          - unparam
 
 formatters:
   enable:

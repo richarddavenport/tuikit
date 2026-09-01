@@ -69,7 +69,7 @@ func (m *Model) capture() app.Handled {
 	case m.menu != nil:
 		return func(msg tea.KeyMsg) (tea.Cmd, bool) { return m.menuKey(msg), true }
 	case m.typing:
-		return func(msg tea.KeyMsg) (tea.Cmd, bool) { return m.filterKey(msg), true }
+		return func(msg tea.KeyMsg) (tea.Cmd, bool) { m.filterKey(msg); return nil, true }
 	}
 	return nil
 }
@@ -141,7 +141,7 @@ func (m *Model) dashboardKey(msg tea.KeyMsg) bool {
 	return true
 }
 
-func (m *Model) filterKey(msg tea.KeyMsg) tea.Cmd {
+func (m *Model) filterKey(msg tea.KeyMsg) {
 	switch msg.String() {
 	case "enter", "esc":
 		m.typing = false
@@ -162,7 +162,6 @@ func (m *Model) filterKey(msg tea.KeyMsg) tea.Cmd {
 			m.list.Reset()
 		}
 	}
-	return nil
 }
 
 func (m *Model) confirmKey(msg tea.KeyMsg) tea.Cmd {

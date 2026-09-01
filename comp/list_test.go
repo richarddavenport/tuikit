@@ -147,10 +147,11 @@ func TestASelectionScrolledOutOfViewSaysWhichWay(t *testing.T) {
 // into row 3.
 func TestRowsAreOwnedByTheirIndexNotTheirRow(t *testing.T) {
 	l := &List{Name: services}
-	l.Scroll(0)
-	c := draw(l, 20, 6, 20)
+	// Drawn once so the list knows what a frame can show, then scrolled and
+	// drawn again — the offset clamps against what was actually drawn.
+	draw(l, 20, 6, 20)
 	l.Scroll(4)
-	c = draw(l, 20, 6, 20)
+	c := draw(l, 20, 6, 20)
 
 	top := c.OwnerAt(2, 0)
 	if top.Index != 4 {
