@@ -123,14 +123,14 @@ type menuState struct {
 	cur      int
 }
 
-// menuItem is one action, with the key that does the same thing.
+// menuItem is one action: the hint that names it, and what it does.
 //
-// The key is carried IN THE ITEM rather than documented beside it, so the menu
-// and the keymap are one list and cannot drift.
+// comp.Hint rather than a label and a key of its own, because the footer is
+// built from the same type. The two paths to an action are one list, which is
+// the only arrangement in which they cannot drift.
 type menuItem struct {
-	label string
-	key   string
-	do    func(*Model) tea.Cmd
+	comp.Hint
+	do func(*Model) tea.Cmd
 }
 
 // openMenuAt opens the menu for a region at a point — where a right-click
@@ -173,11 +173,11 @@ func (m *Model) actionsFor(id comp.ID) []menuItem {
 			return nil
 		}
 		return []menuItem{
-			{label: "View logs", key: "L", do: func(m *Model) tea.Cmd {
+			{Hint: comp.Hint{Key: "L", Label: "View logs"}, do: func(m *Model) tea.Cmd {
 				m.screen, m.logOffset = screenLogs, 0
 				return nil
 			}},
-			{label: "Deploy", key: "D", do: func(m *Model) tea.Cmd {
+			{Hint: comp.Hint{Key: "D", Label: "Deploy"}, do: func(m *Model) tea.Cmd {
 				m.confirmDeploy()
 				return nil
 			}},

@@ -54,45 +54,52 @@ func (m *Model) View() string {
 }
 
 func (m *Model) header(c *comp.Canvas) {
-	id := comp.Region(regHeader)
-	x := 0
-	x += c.Text(x, 0, "democtl", &m.sty.title, id)
-	x += c.Text(x, 0, "  a tuikit example", &m.sty.muted, id)
-	x += c.Text(x, 0, "  ", nil, id)
-
 	state, style := "all services running", &m.sty.success
 	if !m.fleet.Healthy() {
 		state, style = "needs attention", &m.sty.pending
 	}
-	x += c.Text(x, 0, state, style, id)
+	comp.Bar{
+		Left: []comp.Segment{
+			{Text: "democtl", Style: &m.sty.title},
+			{Text: "  a tuikit example", Style: &m.sty.muted},
+			{Text: "  "},
+			{Text: state, Style: style},
+		},
+		Right: []comp.Segment{{Text: m.now.Format("15:04:05"), Style: &m.sty.muted}},
+	}.Draw(c, comp.Rect{X: 0, Y: 0, W: m.width, H: 1}, comp.Region(regHeader))
 
-	// The clock goes right, and only if it does not collide. Measured in
-	// columns by the canvas rather than by len — this is the bug that put a
-	// header off the side of the screen in a real tool.
-	clock := m.now.Format("15:04:05")
-	if at := m.width - comp.Width(clock); at > x {
-		c.Text(at, 0, clock, &m.sty.muted, id)
-	}
 	c.Fill(comp.Rect{X: 0, Y: 1, W: m.width, H: 1}, "─", &m.sty.border, comp.Region(regRule))
 }
 
+// footer names the keys that act on WHAT IS FOCUSED, right now.
+//
+// swarmctl learned the rule the expensive way and wrote it down: its footer
+// used to list every action on every panel, which grew a letter per feature and
+// read as a menu of things mostly not applicable. And while something is
+// capturing keys, the keys it is not taking do not belong here — listing them
+// is a lie.
 func (m *Model) footer(c *comp.Canvas) {
-	var keys string
+	var hints []comp.Hint
 	switch {
 	case m.confirm != nil:
-		keys = "y confirm · n cancel"
+		hints = []comp.Hint{{Key: "y", Label: "confirm"}, {Key: "n", Label: "cancel"}}
 	case m.menu != nil:
-		keys = "↑↓ choose · enter do it · esc close"
+		hints = []comp.Hint{{Key: "↑↓", Label: "choose"}, {Key: "enter", Label: "do it"}, {Key: "esc", Label: "close"}}
 	case m.typing:
-		keys = "type to filter · enter keep · esc clear"
+		hints = []comp.Hint{{Label: "type to filter"}, {Key: "enter", Label: "keep"}, {Key: "esc", Label: "clear"}}
 	case m.screen == screenLogs:
-		keys = "↑↓ scroll · e stderr only · esc back · q quit"
+		hints = []comp.Hint{{Key: "↑↓", Label: "scroll"}, {Key: "e", Label: "stderr only"}, {Key: "esc", Label: "back"}, {Key: "q", Label: "quit"}}
 	case m.screen == screenRun:
-		keys = "r run again · esc back · q quit"
+		hints = []comp.Hint{{Key: "r", Label: "run again"}, {Key: "esc", Label: "back"}, {Key: "q", Label: "quit"}}
 	default:
-		keys = "↑↓ move · tab pane · ‹› tabs · / filter · m menu · L logs · D deploy · q quit"
+		hints = []comp.Hint{
+			{Key: "↑↓", Label: "move"}, {Key: "tab", Label: "pane"}, {Key: "‹›", Label: "tabs"},
+			{Key: "/", Label: "filter"}, {Key: "m", Label: "menu"},
+			{Key: "L", Label: "logs"}, {Key: "D", Label: "deploy"}, {Key: "q", Label: "quit"},
+		}
 	}
-	c.Text(0, 2+m.bodyHeight(), comp.Truncate("  "+keys, m.width), &m.sty.muted, comp.Region(regFooter))
+	comp.KeyHints(c, comp.Rect{X: 0, Y: 2 + m.bodyHeight(), W: m.width, H: 1},
+		comp.Region(regFooter), &m.sty.muted, hints...)
 }
 
 func (m *Model) dashboard(c *comp.Canvas, r comp.Rect) {
@@ -362,7 +369,7 @@ func (m *Model) modal(c *comp.Canvas) {
 func (m *Model) drawMenu(c *comp.Canvas) {
 	w := 4
 	for _, item := range m.menu.items {
-		w = max(w, comp.Width(item.label)+comp.Width(item.key)+6)
+		w = max(w, comp.Width(item.Label)+comp.Width(item.Key)+6)
 	}
 	x, y := m.menu.x, m.menu.y
 	if m.menu.onRegion {
@@ -394,10 +401,10 @@ func (m *Model) drawMenu(c *comp.Canvas) {
 		}
 		row := comp.Rect{X: inner.X, Y: inner.Y + i, W: inner.W, H: 1}
 		c.Fill(row, " ", style, id)
-		c.Text(row.X+1, row.Y, item.label, style, id)
+		c.Text(row.X+1, row.Y, item.Label, style, id)
 		// The key sits beside the action rather than in a manual somewhere,
 		// because it is the same list.
-		c.Text(row.X+row.W-comp.Width(item.key)-1, row.Y, item.key, style, id)
+		c.Text(row.X+row.W-comp.Width(item.Key)-1, row.Y, item.Key, style, id)
 	}
 }
 

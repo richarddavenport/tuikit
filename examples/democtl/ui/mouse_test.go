@@ -192,11 +192,11 @@ func TestEveryMenuActionNamesItsKey(t *testing.T) {
 	harness.Press(m, "m")
 
 	for _, item := range m.menu.items {
-		if item.key == "" {
-			t.Errorf("%q has no keyboard path", item.label)
+		if item.Key == "" {
+			t.Errorf("%q has no keyboard path", item.Label)
 		}
 		if item.do == nil {
-			t.Errorf("%q does nothing", item.label)
+			t.Errorf("%q does nothing", item.Label)
 		}
 	}
 }
