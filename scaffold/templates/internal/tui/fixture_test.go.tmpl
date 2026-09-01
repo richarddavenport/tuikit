@@ -1,0 +1,37 @@
+package tui
+
+import (
+	"time"
+
+	"<<.Module>>/internal/engine"
+)
+
+// A fixed world, so a captured frame says the same thing tomorrow.
+//
+// This is the file to change first when the engine becomes real. A tool whose
+// screens can only be rendered against a live backend is a tool whose screens
+// nobody has ever compared — which is exactly the state azctl was in before it
+// moved to tuikit.
+func fixture() engine.Snapshot {
+	at := time.Date(2026, 1, 1, 9, 0, 0, 0, time.UTC)
+	return engine.Snapshot{
+		Fetched: at,
+		Items: []engine.Item{
+			{Name: "alpha", Group: "one", State: engine.Ready, Updated: at.Add(-3 * time.Minute)},
+			{Name: "beta", Group: "one", State: engine.Pending, Updated: at.Add(-30 * time.Second)},
+			{Name: "gamma", Group: "two", State: engine.Degraded, Updated: at.Add(-9 * time.Minute),
+				Note: "a degraded thing owes an explanation; a healthy one has none to give"},
+			{Name: "delta", Group: "two", State: engine.Failed, Updated: at.Add(-2 * time.Hour),
+				Note: "the failed one, so the danger role is reachable by hand"},
+			{Name: "epsilon", Group: "three", State: engine.Ready, Updated: at.Add(-time.Hour)},
+		},
+	}
+}
+
+// browsing is the model with the world already loaded — the state a reader
+// spends every second of their time in.
+func browsing() *Model {
+	m := New()
+	m.Load(fixture())
+	return m
+}

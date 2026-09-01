@@ -1,0 +1,11 @@
+module <<.Module>>
+
+go <<.GoVersion>>
+
+require github.com/richarddavenport/tuikit v0.0.0
+
+// tuikit is private and unpublished, so this resolves it from a sibling
+// checkout. Relative, so it works on any machine with both repos side by side
+// rather than only on the one it was generated on. It goes when tuikit is
+// tagged.
+replace github.com/richarddavenport/tuikit => <<.Tuikit>>

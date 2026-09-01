@@ -1,0 +1,29 @@
+package tui
+
+import "github.com/richarddavenport/tuikit/comp"
+
+// Every region <<.Name>> draws, named once.
+//
+// A capture script addresses these by name — `click items.row[2]` rather than a
+// coordinate — and comp.Canvas reports whether one was drawn at all, so a
+// script that has drifted from the interface is told which region it can no
+// longer find. An agent naming a region beats an agent guessing a coordinate.
+const (
+	regHeader comp.Name = "header"
+	regRule   comp.Name = "header.rule"
+	regFooter comp.Name = "footer"
+
+	regItems    comp.Name = "items"
+	regItemsRow comp.Name = "items.row"
+	regDetail   comp.Name = "detail"
+	regSplit    comp.Name = "split"
+)
+
+// RegItemsRow is the one region named from outside this package: internal/cli
+// declares a command that targets an item row, and a command's Target is the
+// region whose context menu it appears in.
+//
+// Exported rather than duplicated. A string constant copied into the other
+// package is a region name that goes stale silently, and the failure is a menu
+// that is simply empty.
+const RegItemsRow = regItemsRow

@@ -1,0 +1,171 @@
+package tui
+
+import (
+	"fmt"
+
+	"github.com/charmbracelet/lipgloss"
+
+	"github.com/richarddavenport/tuikit/comp"
+
+	"<<.Module>>/internal/engine"
+)
+
+// View draws the whole window and returns the frame.
+//
+// Everything below draws CELLS into a canvas rather than returning strings to
+// be joined. That is what makes a click land somewhere: every cell records who
+// drew it, so the frame is its own map. It also deletes a category of bug —
+// there is no way to draw past the edge, because the coordinate does not exist.
+func (m *Model) View() string {
+	c := comp.NewCanvas(m.width, 3+m.bodyHeight()).WithChrome(Chrome)
+
+	m.header(c)
+	m.dashboard(c, m.body())
+	m.footer(c)
+
+	// Kept so a mouse event can ask what it landed on.
+	m.canvas = c
+	return c.String()
+}
+
+// body is the space between the header and the footer.
+func (m *Model) body() comp.Rect {
+	return comp.Rect{X: 0, Y: 2, W: m.width, H: m.bodyHeight()}
+}
+
+// bodyHeight leaves two rows for the header and one for the footer, and never
+// goes below one: a terminal too short to draw in is still a terminal.
+func (m *Model) bodyHeight() int { return max(1, m.height-4) }
+
+func (m *Model) header(c *comp.Canvas) {
+	state, style := "all good", &m.sty.ready
+	switch {
+	case m.err != nil:
+		state, style = m.err.Error(), &m.sty.danger
+	case !m.snap.Healthy():
+		state, style = "needs attention", &m.sty.pending
+	}
+	comp.Bar{
+		Left: []comp.Segment{
+			{Text: "<<.Name>>", Style: &m.sty.title},
+			{Text: "  <<.Short>>", Style: &m.sty.muted},
+			{Text: "  "},
+			{Text: state, Style: style},
+		},
+		Right: []comp.Segment{
+			{Text: fmt.Sprintf("%d items", len(m.snap.Items)), Style: &m.sty.muted},
+		},
+	}.Draw(c, comp.Rect{X: 0, Y: 0, W: m.width, H: 1}, comp.Region(regHeader))
+
+	c.Fill(comp.Rect{X: 0, Y: 1, W: m.width, H: 1}, "─", &m.sty.border, comp.Region(regRule))
+}
+
+// footer names the keys that act on what is focused RIGHT NOW.
+//
+// Not every key the tool has. A footer that lists everything grows a letter per
+// feature and reads as a menu of things mostly not applicable — and while
+// something is capturing keys, the keys it is not taking do not belong here.
+func (m *Model) footer(c *comp.Canvas) {
+	hints := []comp.Hint{
+		{Key: "↑↓", Label: "move"}, {Key: "/", Label: "filter"},
+		{Key: "r", Label: "refresh"}, {Key: "q", Label: "quit"},
+	}
+	if m.typing {
+		hints = []comp.Hint{
+			{Label: "type to filter"}, {Key: "enter", Label: "keep"}, {Key: "esc", Label: "clear"},
+		}
+	}
+	comp.KeyHints(c, comp.Rect{X: 0, Y: 2 + m.bodyHeight(), W: m.width, H: 1},
+		comp.Region(regFooter), &m.sty.muted, hints...)
+}
+
+func (m *Model) dashboard(c *comp.Canvas, r comp.Rect) {
+	// The divider, the gap it lives in and the minimum either pane may be
+	// dragged to are comp.Split's. What would be here otherwise is three
+	// literals and the arithmetic between them.
+	items, detail := m.split.Draw(c, r)
+	m.itemsPane(c, items)
+	m.detailPane(c, detail)
+}
+
+func (m *Model) itemsPane(c *comp.Canvas, r comp.Rect) {
+	list := m.visible()
+	title := fmt.Sprintf("Items (%d)", len(list))
+	if m.filter != "" || m.typing {
+		title = "Filter: " + m.filter
+		if m.typing {
+			title += "_"
+		}
+	}
+	inner := m.box(c, r, title, true, comp.Region(regItems))
+
+	// The name column is sized from the pane rather than fixed, so dragging
+	// the divider narrow truncates the NAME instead of chopping the state into
+	// "degra". A literal column width is a layout that only works at the one
+	// terminal size it was written on.
+	namew := max(8, inner.W-2-len("degraded")-1)
+	rows := make([]comp.Row, len(list))
+	for i, it := range list {
+		rows[i] = comp.Row{
+			Text:  fmt.Sprintf("%-*s %s", namew, comp.Truncate(it.Name, namew), it.State),
+			Style: m.stateStyle(it.State),
+		}
+	}
+	m.list.Focused = !m.typing
+	m.list.Draw(c, inner, rows)
+}
+
+func (m *Model) detailPane(c *comp.Canvas, r comp.Rect) {
+	id := comp.Region(regDetail)
+	it, ok := m.selected()
+	if !ok {
+		inner := m.box(c, r, "Detail", false, id)
+		c.Text(inner.X, inner.Y, "nothing selected", &m.sty.muted, id)
+		return
+	}
+	inner := m.box(c, r, it.Name, false, id)
+
+	lines := []comp.Segment{
+		{Text: "group    " + it.Group},
+		{Text: "state    " + it.State.String(), Style: m.stateStyle(it.State)},
+		{Text: "updated  " + engine.Ago(m.snap.Fetched.Sub(it.Updated)), Style: &m.sty.muted},
+	}
+	if it.Note != "" {
+		lines = append(lines, comp.Segment{Text: ""}, comp.Segment{Text: it.Note, Style: &m.sty.muted})
+	}
+	for i, l := range lines {
+		if i >= inner.H {
+			break
+		}
+		c.Text(inner.X, inner.Y+i, comp.Truncate(l.Text, inner.W), l.Style, id)
+	}
+}
+
+// box is the one place a pane's chrome is decided, so every pane in <<.Name>>
+// agrees about what a pane looks like.
+func (m *Model) box(c *comp.Canvas, r comp.Rect, title string, focused bool, id comp.ID) comp.Rect {
+	return comp.Pane{
+		Title:      title,
+		TitleAt:    comp.TitleOnRow,
+		Focused:    focused,
+		Border:     &m.sty.border,
+		Focus:      &m.sty.focused,
+		TitleStyle: &m.sty.title,
+	}.Draw(c, r, id)
+}
+
+// stateStyle is the ONE place a state becomes a colour.
+//
+// A switch per drawing site is how "failed" ends up red in one pane and plain
+// in another, and neither is wrong on its own.
+func (m *Model) stateStyle(s engine.State) *lipgloss.Style {
+	switch s {
+	case engine.Ready:
+		return &m.sty.ready
+	case engine.Pending:
+		return &m.sty.pending
+	case engine.Degraded, engine.Failed:
+		return &m.sty.danger
+	}
+	return &m.sty.muted
+}

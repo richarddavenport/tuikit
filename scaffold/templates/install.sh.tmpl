@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Build <<.Name>> and put it on your PATH.
+#
+# Deliberately the same two commands the Makefile runs, and no more: a script
+# that quietly differs from `make install` is a second way to build that
+# nobody tests.
+set -euo pipefail
+
+BIN="${BIN:-$HOME/.local/bin/<<.Name>>}"
+VERSION="$(git describe --tags --dirty 2>/dev/null || echo dev)"
+
+mkdir -p "$(dirname "$BIN")"
+CGO_ENABLED=0 go build -ldflags "-s -w -X main.version=$VERSION" -o "$BIN" ./cmd/<<.Name>>
+
+echo "installed $("$BIN" version) -> $BIN"
+case ":$PATH:" in
+	*":$(dirname "$BIN"):"*) ;;
+	*) echo "note: $(dirname "$BIN") is not on your PATH" ;;
+esac

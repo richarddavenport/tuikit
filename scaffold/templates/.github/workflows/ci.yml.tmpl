@@ -1,0 +1,33 @@
+name: CI
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '<<.GoVersion>>'
+      - name: gofmt
+        run: gofmt -l . | tee /dev/stderr | (! read)
+      - name: vet
+        run: go vet ./...
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          # Pinned to the v2 line explicitly. The action's "latest" resolves to
+          # v1, which is built with an older Go than this module's directive and
+          # refuses to run rather than degrading.
+          version: v2.12
+      - name: test
+        run: go test ./...
+      - name: cross-build
+        run: |
+          for target in darwin/arm64 darwin/amd64 linux/arm64 linux/amd64; do
+            GOOS=${target%/*} GOARCH=${target#*/} CGO_ENABLED=0 \
+              go build -o /dev/null ./cmd/<<.Name>>
+          done

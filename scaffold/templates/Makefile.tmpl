@@ -1,0 +1,51 @@
+# Local development for <<.Name>>.
+#
+# `make check` is what CI runs and what you run before pushing. If those two
+# ever differ, this file is wrong.
+
+BIN     ?= $(HOME)/.local/bin/<<.Name>>
+VERSION ?= $(shell git describe --tags --dirty 2>/dev/null || echo dev)
+LDFLAGS  = -s -w -X main.version=$(VERSION)
+
+.PHONY: help install build test lint check frames
+
+## help: this
+help:
+	@grep -h '^## ' $(MAKEFILE_LIST) | sed 's/^## /  /'
+
+## install: build to ~/.local/bin/<<.Name>> (on your PATH)
+install:
+	@CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o "$(BIN)" ./cmd/<<.Name>>
+	@echo "installed $$("$(BIN)" version) -> $(BIN)"
+
+## build: build to ./bin/<<.Name>> without touching your PATH
+build:
+	@CGO_ENABLED=0 go build -ldflags "$(LDFLAGS)" -o bin/<<.Name>> ./cmd/<<.Name>>
+	@echo "built -> bin/<<.Name>>"
+
+## test: unit tests
+test:
+	go test ./...
+
+# Pinned to what CI runs, and run through `go run` so it is the SAME version
+# whether or not anything is installed. Do not make this skip when the linter is
+# missing: a local check that quietly omits what CI enforces is a check that
+# lies, and it is how a config CI could not load gets pushed.
+GOLANGCI ?= go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@<<.Linter>>
+
+## lint: what CI enforces
+lint:
+	gofmt -l . | tee /dev/stderr | (! read)
+	go vet ./...
+	$(GOLANGCI) run ./...
+
+## check: everything CI runs, before you push
+check: test lint
+	@echo "all checks passed"
+
+## frames: render every screen to /tmp/<<.Name>>-frames and build a page
+frames:
+	@<<.Env>>_FRAMES=/tmp/<<.Name>>-frames go test ./internal/tui -run CaptureFrames
+	@go run github.com/richarddavenport/tuikit/cmd/tuikit frames /tmp/<<.Name>>-frames \
+		-out /tmp/<<.Name>>-frames/index.html -title "<<.Title>>"
+	@echo "open /tmp/<<.Name>>-frames/index.html"

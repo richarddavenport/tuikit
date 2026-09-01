@@ -1,0 +1,44 @@
+package engine
+
+import "testing"
+
+// The engine is deterministic, which is what lets the interface be captured as
+// a fixture. A snapshot that differs between runs is not one.
+func TestFetchIsDeterministic(t *testing.T) {
+	a, err := Fetch()
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, _ := Fetch()
+
+	if len(a.Items) != len(b.Items) {
+		t.Fatalf("two fetches returned %d and %d items", len(a.Items), len(b.Items))
+	}
+	for i := range a.Items {
+		if a.Items[i] != b.Items[i] {
+			t.Errorf("item %d differs between fetches", i)
+		}
+	}
+}
+
+// Groups are sorted, or the interface reorders itself between runs and nobody
+// can screenshot it.
+func TestGroupsAreSorted(t *testing.T) {
+	s, _ := Fetch()
+	got := s.Groups()
+	for i := 1; i < len(got); i++ {
+		if got[i-1] > got[i] {
+			t.Errorf("groups are not sorted: %v", got)
+		}
+	}
+}
+
+func TestHealthySaysWhenSomethingNeedsAttention(t *testing.T) {
+	s, _ := Fetch()
+	if s.Healthy() {
+		t.Error("the sample snapshot has a degraded item and reports healthy")
+	}
+	if (Snapshot{Items: []Item{{State: Ready}}}).Healthy() != true {
+		t.Error("a snapshot of ready items is not healthy")
+	}
+}

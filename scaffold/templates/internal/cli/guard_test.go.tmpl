@@ -1,0 +1,17 @@
+package cli
+
+import (
+	"testing"
+
+	"github.com/richarddavenport/tuikit/guard"
+)
+
+// Every action reachable by mouse has a keyboard path.
+//
+// It lives here rather than beside the interface's other guards because it
+// reads the command tree, and the tree is this package's — internal/tui imports
+// nothing from internal/cli, which is what keeps the interface from knowing how
+// it was launched.
+func TestEveryActionHasAKeyboardPath(t *testing.T) {
+	guard.Reachable(t, Commands())
+}

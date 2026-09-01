@@ -1,0 +1,37 @@
+# <<.Name>>, for an agent
+
+Read `<<.Name>> describe --json` first. It is the whole surface — every command,
+its flags and arguments, the screens, the palette and the glyph set — in one
+call, generated from the same declaration the tool runs on. It cannot describe a
+flag the tool does not have.
+
+## Where things live
+
+- `internal/engine` — the domain. Change what <<.Name>> knows about here.
+  It must not import anything terminal-shaped; a test enforces that.
+- `internal/tui` — the interface. Regions are named in `regions.go`; a click
+  resolves to a region name and index, never a coordinate.
+- `internal/cli` — the command tree. Adding a command here adds it to the CLI,
+  to `describe --json`, and (given a `Target`) to a context menu. Do not add it
+  in more than one place; there is only one place.
+
+## Before you say you are done
+
+```
+make check
+```
+
+That is what CI runs. If a screen changed on purpose, `go test ./internal/tui -update-goldens`
+and read the diff in the goldens — they are plain text, and a surprise in one is
+the point of having them.
+
+## Rules that will fail your change if you break them
+
+- A colour must come from `Palette`, named by the ROLE it plays. A raw
+  `lipgloss.Color("205")` fails, because it says what a colour IS instead of
+  what it is FOR.
+- A non-ASCII character must be in `Glyphs`. Add it deliberately, with the
+  reason, or use ASCII.
+- The engine imports the standard library and its own backend's SDK. Nothing
+  else.
+- Anything a mouse can do, a key must also do.

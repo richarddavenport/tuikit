@@ -1,8 +1,10 @@
 // Command tuikit is the framework's own tooling.
 //
-// Only `designsystem` exists so far. `new`, `watch` and `gallery` are the
-// planned surface and are named here rather than left undiscoverable — see
-// design/decisions.md.
+//	tuikit new           scaffold a tool that builds and passes its own checks
+//	tuikit designsystem  write the foundations bundle as HTML
+//	tuikit frames        turn a captured run of frames into a page
+//	tuikit watch         recapture on save and reload the browser
+//	tuikit gallery       open every component, running
 package main
 
 import (
@@ -19,6 +21,7 @@ import (
 
 	"github.com/richarddavenport/tuikit/docgen"
 	"github.com/richarddavenport/tuikit/gallery"
+	"github.com/richarddavenport/tuikit/scaffold"
 	"github.com/richarddavenport/tuikit/theme"
 	"github.com/richarddavenport/tuikit/watch"
 )
@@ -31,6 +34,8 @@ func main() {
 		os.Exit(2)
 	}
 	switch os.Args[1] {
+	case "new":
+		newTool(os.Args[2:])
 	case "designsystem":
 		designsystem(os.Args[2:])
 	case "frames":
@@ -48,6 +53,65 @@ func main() {
 		usage(os.Stderr)
 		os.Exit(2)
 	}
+}
+
+// newTool scaffolds a tool.
+//
+// It generates and then BOOTSTRAPS: resolves modules and writes the goldens for
+// the screens the tool was born with. A generated tool that fails `go test
+// ./...` on its first run has taught its owner, in the first thirty seconds,
+// that the tests are noise.
+func newTool(args []string) {
+	fs := flag.NewFlagSet("new", flag.ExitOnError)
+	module := fs.String("module", "", "the go.mod path; defaults to the tool's name")
+	short := fs.String("short", "", "one sentence saying what the tool does")
+	dir := fs.String("dir", ".", "where to create the tool's directory")
+	tuikitPath := fs.String("tuikit", "", "what the `replace` points at; defaults to ../tuikit")
+	skip := fs.Bool("no-bootstrap", false, "write the files and stop, without running go")
+
+	// The name is taken before parsing, so it may come first or last. stdlib
+	// flag stops at the first non-flag argument, which would make `tuikit new
+	// widgetctl -short "..."` silently parse no flags at all — the same trap
+	// `frames` works around below, and the reason spec does the separation for
+	// every generated CLI.
+	var name string
+	if len(args) > 0 && !strings.HasPrefix(args[0], "-") {
+		name, args = args[0], args[1:]
+	}
+	if err := fs.Parse(args); err != nil {
+		os.Exit(2)
+	}
+	if name == "" && fs.NArg() == 1 {
+		name = fs.Arg(0)
+	}
+	if name == "" || fs.NArg() > 1 {
+		fmt.Fprintln(os.Stderr, "usage: tuikit new <name> [-module path] [-short text] [-dir where]")
+		os.Exit(2)
+	}
+
+	tool := scaffold.Tool{
+		Name:   name,
+		Module: *module,
+		Short:  *short,
+		Tuikit: *tuikitPath,
+	}
+	written, err := tool.Write(*dir)
+	for _, path := range written {
+		fmt.Println("  " + path)
+	}
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "tuikit new:", err)
+		os.Exit(1)
+	}
+
+	root := filepath.Join(*dir, tool.Name)
+	if !*skip {
+		if err := scaffold.Bootstrap(root); err != nil {
+			fmt.Fprintln(os.Stderr, "tuikit new:", err)
+			os.Exit(1)
+		}
+	}
+	fmt.Printf("\n%d files written to %s\n\n  cd %s && make check\n", len(written), root, root)
 }
 
 func designsystem(args []string) {
@@ -199,6 +263,9 @@ func galleryCmd(args []string) {
 func usage(w *os.File) {
 	_, _ = fmt.Fprint(w, `tuikit — a TUI framework for developers and agents
 
+  tuikit new <name> [-module path] [-short text] [-dir where]
+        scaffold a tool that builds, runs and passes its own checks
+
   tuikit designsystem [-out dir] [-tool name]
         write the foundations bundle as HTML
 
@@ -213,6 +280,5 @@ func usage(w *os.File) {
 
   tuikit version
 
-Planned: new (scaffold a tool). See design/.
 `)
 }

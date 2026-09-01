@@ -1,0 +1,92 @@
+package tui
+
+import (
+	"testing"
+
+	"github.com/richarddavenport/tuikit/harness"
+)
+
+// states is every distinct thing <<.Name>> can be showing.
+//
+// ONE list, walked by the goldens, the narrow-terminal run, the colour check
+// and the capture. A screen added without a frame is a screen added without any
+// of them, which is the only arrangement in which they cannot drift apart.
+func states() []struct {
+	name  string
+	build func() *Model
+} {
+	return []struct {
+		name  string
+		build func() *Model
+	}{
+		{"browsing", browsing},
+		{"moved-down", func() *Model { return press(browsing(), "j", "j") }},
+		{"filtering", func() *Model { return press(browsing(), "/", "o", "n", "e") }},
+		{"filter-matches-nothing", func() *Model { return press(browsing(), "/", "z", "z") }},
+		{"empty", func() *Model { return New() }},
+	}
+}
+
+// press sends keys and REDRAWS after each one, the way a running program does.
+// A component that scrolls needs to know what the last frame could show, so a
+// test that only draws at the end is testing a state the program never has.
+func press(m *Model, keys ...string) *Model {
+	m.SetSize(132, 38)
+	harness.Press(m, keys...)
+	return m
+}
+
+func sized(m *Model, w, h int) *Model {
+	m.SetSize(w, h)
+	return m
+}
+
+// The screens as goldens.
+func TestFramesMatchTheirGoldens(t *testing.T) {
+	for _, st := range states() {
+		t.Run(st.name, func(t *testing.T) {
+			harness.Golden(t, "testdata", st.name, sized(st.build(), 132, 38).View())
+		})
+	}
+}
+
+// The same screens on a terminal somebody actually has. Most layout bugs are
+// only visible when there is not enough room.
+func TestFramesAtEightyColumns(t *testing.T) {
+	for _, st := range states() {
+		t.Run(st.name, func(t *testing.T) {
+			harness.Golden(t, "testdata/80", st.name, sized(st.build(), 80, 24).View())
+		})
+	}
+}
+
+// Colour must not change the shape.
+//
+// Goldens are captured uncoloured, so a width bug in a styled string is
+// invisible to every one of them — which is how democtl's tab strip shipped
+// counting runes instead of columns.
+func TestColourDoesNotChangeTheShape(t *testing.T) {
+	for _, size := range []struct{ w, h int }{{132, 38}, {80, 24}} {
+		for _, st := range states() {
+			harness.ShapeSurvivesColour(t, st.name, func() string {
+				return sized(st.build(), size.w, size.h).View()
+			})
+		}
+	}
+}
+
+// <<.Env>>_FRAMES=/tmp/<<.Name>>-frames go test ./internal/tui -run CaptureFrames
+//
+// Off unless asked, because writing files is not what `go test ./...` is for.
+// `make frames` turns the captures into a page you can look at.
+func TestCaptureFrames(t *testing.T) {
+	dir := harness.Enabled("<<.Env>>_FRAMES")
+	if dir == "" {
+		t.Skip("set <<.Env>>_FRAMES to capture frames")
+	}
+	s := harness.Capture(t, dir, harness.Size(132, 38))
+	for _, st := range states() {
+		s.Shot(st.name, sized(st.build(), 132, 38))
+	}
+	s.Done()
+}

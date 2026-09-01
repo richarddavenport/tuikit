@@ -1,0 +1,129 @@
+// Package cli is <<.Name>>'s command tree, declared ONCE.
+//
+// The CLI, the TUI screen each command opens, the entry an agent reads in
+// `<<.Name>> describe --json`, and the right-click menu for the regions a
+// command targets all come from this one declaration. Not four descriptions
+// kept in step — one, read four ways.
+//
+// The four disagreeing is the failure this exists to prevent, and it is never
+// dramatic: a flag renamed in one place, a key that does something slightly
+// different, a README a version behind. Enough that an agent reading any one of
+// them is reading a lie.
+package cli
+
+import (
+	"fmt"
+	"sort"
+
+	"github.com/richarddavenport/tuikit/spec"
+
+	"<<.Module>>/internal/engine"
+	"<<.Module>>/internal/tui"
+)
+
+// Commands is <<.Name>>, declared once.
+func Commands() spec.Command {
+	return spec.Command{
+		Name:  "<<.Name>>",
+		Short: "<<.Short>>",
+		Commands: []spec.Command{
+			{
+				Name:   "browse",
+				Short:  "Open the interface",
+				Screen: "browse",
+				Run:    func(spec.Call) int { return browse() },
+			},
+			{
+				Name:  "list",
+				Short: "List everything",
+				Flags: []spec.Flag{
+					{Name: "failing", Kind: spec.Bool, Help: "only what needs attention"},
+				},
+				Run: list,
+			},
+			{
+				Name:  "show",
+				Short: "Show one item",
+				Args:  []spec.Arg{{Name: "item", Required: true, Complete: names}},
+				// The other three surfaces: the region whose menu this belongs
+				// in, and the key that does the same thing from the keyboard.
+				//
+				// The Key is not optional once there is a Target, and
+				// guard.Reachable says so: an agent cannot click, and a
+				// multiplexer may eat the right-click before <<.Name>> ever
+				// sees it.
+				Target: tui.RegItemsRow,
+				Key:    "enter",
+				Run:    show,
+			},
+		},
+	}
+}
+
+// names completes an item name — the same completer the shell and the
+// interface both use, so they cannot offer different answers.
+func names(prefix string) []string {
+	snap, err := engine.Fetch()
+	if err != nil {
+		return nil
+	}
+	var out []string
+	for _, i := range snap.Items {
+		if prefix == "" || len(i.Name) >= len(prefix) && i.Name[:len(prefix)] == prefix {
+			out = append(out, i.Name)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+func browse() int {
+	if err := tui.Run(); err != nil {
+		fmt.Println("<<.Name>>:", err)
+		return spec.Fail
+	}
+	return spec.OK
+}
+
+func list(c spec.Call) int {
+	snap, err := engine.Fetch()
+	if err != nil {
+		fail(c, err)
+		return spec.Fail
+	}
+	for _, i := range snap.Items {
+		if c.Bool("failing") && i.State == engine.Ready {
+			continue
+		}
+		_, _ = fmt.Fprintf(c.Out, "%-16s %-8s %s\n", i.Name, i.Group, i.State)
+	}
+	return spec.OK
+}
+
+func show(c spec.Call) int {
+	snap, err := engine.Fetch()
+	if err != nil {
+		fail(c, err)
+		return spec.Fail
+	}
+	want := c.Arg("item")
+	for _, i := range snap.Items {
+		if i.Name != want {
+			continue
+		}
+		_, _ = fmt.Fprintf(c.Out, "name     %s\ngroup    %s\nstate    %s\nupdated  %s\n",
+			i.Name, i.Group, i.State, engine.Ago(snap.Fetched.Sub(i.Updated)))
+		if i.Note != "" {
+			_, _ = fmt.Fprintf(c.Out, "note     %s\n", i.Note)
+		}
+		return spec.OK
+	}
+	fail(c, fmt.Errorf("no such item %q", want))
+	return spec.Fail
+}
+
+// fail is the one place <<.Name>> writes to stderr, so every command's error
+// reads the same and none of them has to remember the prefix.
+func fail(c spec.Call, err error) {
+	_, _ = fmt.Fprintln(c.Err, "<<.Name>>:", err)
+}

@@ -1,0 +1,42 @@
+name: Docs
+on:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '<<.GoVersion>>'
+      # The design system and the frames are GENERATED from the code that
+      # ships. A hand-maintained page describes a tool that may not exist.
+      - name: design system
+        run: go run github.com/richarddavenport/tuikit/cmd/tuikit designsystem -out site -tool <<.Name>>
+      - name: frames
+        run: |
+          <<.Env>>_FRAMES="$RUNNER_TEMP/frames" go test ./internal/tui -run CaptureFrames
+          go run github.com/richarddavenport/tuikit/cmd/tuikit frames "$RUNNER_TEMP/frames" \
+            -out site/frames.html -title "<<.Title>> screens"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/deploy-pages@v4

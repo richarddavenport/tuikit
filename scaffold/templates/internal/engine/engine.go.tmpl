@@ -1,0 +1,113 @@
+// Package engine is <<.Name>>'s domain, and it has NO TERMINAL CONCEPTS AT ALL.
+//
+// No colour, no width, no keys, no framework, no tuikit import. In practice an
+// engine imports the standard library plus its own backend's SDK. The UI never
+// calls the backend directly; the CLI is a peer of the TUI over the same
+// engine.
+//
+// guard.Engine holds that closed, and it is the split every tuikit tool keeps.
+// It is also what makes the interface testable: the fixture the screens are
+// rendered from is a value this package returns, so a screen can be looked at
+// without whatever the real backend needs.
+package engine
+
+import (
+	"fmt"
+	"sort"
+	"time"
+)
+
+// State is what a thing is doing. Four, chosen to exercise the palette: each
+// maps to a colour role, and together they cover every one a status can take.
+type State int
+
+// The four states.
+const (
+	Ready State = iota
+	Pending
+	Degraded
+	Failed
+)
+
+func (s State) String() string {
+	switch s {
+	case Ready:
+		return "ready"
+	case Pending:
+		return "pending"
+	case Degraded:
+		return "degraded"
+	case Failed:
+		return "failed"
+	}
+	return "unknown"
+}
+
+// Item is one thing <<.Name>> knows about. Replace it with yours.
+type Item struct {
+	Name    string
+	Group   string
+	State   State
+	Updated time.Time
+	// Note is the explanation a Degraded or Failed item owes. Empty on a
+	// healthy one, because a healthy thing has nothing to explain.
+	Note string
+}
+
+// Snapshot is everything, at one moment.
+type Snapshot struct {
+	Items   []Item
+	Fetched time.Time
+}
+
+// Healthy reports that nothing needs attention.
+func (s Snapshot) Healthy() bool {
+	for _, i := range s.Items {
+		if i.State != Ready {
+			return false
+		}
+	}
+	return true
+}
+
+// Groups is the distinct groups, sorted. Sorted rather than map order, because
+// an interface that reorders itself between runs is one nobody can screenshot.
+func (s Snapshot) Groups() []string {
+	seen := map[string]bool{}
+	var out []string
+	for _, i := range s.Items {
+		if !seen[i.Group] {
+			seen[i.Group] = true
+			out = append(out, i.Group)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// Fetch reads the world. Replace the body; keep the shape — a function the CLI
+// and the TUI both call, returning a value neither of them has to interpret.
+func Fetch() (Snapshot, error) {
+	at := time.Date(2026, 1, 1, 9, 0, 0, 0, time.UTC)
+	return Snapshot{
+		Fetched: at,
+		Items: []Item{
+			{Name: "first", Group: "one", State: Ready, Updated: at.Add(-3 * time.Minute)},
+			{Name: "second", Group: "one", State: Degraded, Updated: at.Add(-9 * time.Minute),
+				Note: "replace this with something your domain would say"},
+			{Name: "third", Group: "two", State: Ready, Updated: at.Add(-time.Hour)},
+		},
+	}, nil
+}
+
+// Ago is a duration as a person would say it. Coarse on purpose: "4m ago" is
+// what the reader wants, and "4m13.204s ago" is the same fact made unreadable.
+func Ago(d time.Duration) string {
+	switch {
+	case d < time.Minute:
+		return fmt.Sprintf("%ds ago", int(d.Seconds()))
+	case d < time.Hour:
+		return fmt.Sprintf("%dm ago", int(d.Minutes()))
+	}
+	return fmt.Sprintf("%dh ago", int(d.Hours()))
+}
