@@ -329,35 +329,19 @@ func (m *Model) run(c *comp.Canvas, r comp.Rect) {
 	}
 }
 
-// modal draws the confirm box over whatever is behind it.
-//
-// Drawn LAST, so it is on top. There is no compositing step, no re-measuring of
-// the lines beneath and nothing to get wrong — which is the whole of the bug
-// that once wiped 8 of 18 framed rows.
+// modal draws the confirm question over whatever is behind it.
 func (m *Model) modal(c *comp.Canvas) {
-	w := min(m.width-8, 64)
-	title := &m.sty.title
-	if m.confirm.danger {
-		title = &m.sty.danger
-	}
-
-	body := comp.Wrap(m.confirm.body, w-4)
-	h := len(body) + 6 // title, blank, body, blank, keys, and two of border
-
-	r := comp.Rect{
-		X: max(0, (m.width-w)/2),
-		Y: max(0, (3+m.bodyHeight()-h)/2),
-		W: w,
-		H: h,
-	}
-	id := comp.Region(regConfirm)
-	inner := m.box(c, r, "", true, id)
-
-	c.Text(inner.X, inner.Y, comp.Truncate(m.confirm.title, inner.W), title, id)
-	for i, line := range body {
-		c.Text(inner.X, inner.Y+2+i, line, &m.sty.muted, id)
-	}
-	c.Text(inner.X, inner.Y+len(body)+3, "y confirm · n cancel", &m.sty.muted, id)
+	comp.Confirm{
+		Title:       m.confirm.title,
+		Body:        m.confirm.body,
+		Danger:      m.confirm.danger,
+		Hints:       []comp.Hint{{Key: "y", Label: "confirm"}, {Key: "n", Label: "cancel"}},
+		Border:      &m.sty.focused,
+		TitleStyle:  &m.sty.title,
+		DangerStyle: &m.sty.danger,
+		BodyStyle:   &m.sty.muted,
+		HintStyle:   &m.sty.muted,
+	}.Draw(c, comp.Region(regConfirm))
 }
 
 // drawMenu puts the context menu on top.
