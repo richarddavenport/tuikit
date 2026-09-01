@@ -246,3 +246,20 @@ func TestTheOffsetClampsAgainWhenThePaneGrows(t *testing.T) {
 		t.Errorf("the count does not say everything is shown:\n%s", got.String())
 	}
 }
+
+// The count moves as you scroll. A number that says how MUCH is shown is the
+// same wherever you are in the list, so it answers nothing about where that is.
+func TestTheCountMovesWithTheViewport(t *testing.T) {
+	l := &List{Name: services}
+	before := draw(l, 20, 6, 20).String()
+
+	l.Scroll(5)
+	after := draw(l, 20, 6, 20).String()
+
+	if !strings.Contains(before, "5/20") {
+		t.Errorf("at the top the count is not 5/20:\n%s", before)
+	}
+	if !strings.Contains(after, "10/20") {
+		t.Errorf("after scrolling five the count is not 10/20:\n%s", after)
+	}
+}

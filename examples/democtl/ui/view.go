@@ -127,42 +127,16 @@ func (m *Model) servicePane(c *comp.Canvas, r comp.Rect) {
 	inner := m.box(c, r, title, m.focus == paneList, comp.Region(regServices))
 
 	list := m.visible()
-	if len(list) == 0 {
-		// Painted the full width, like any other row, so the empty state is a
-		// row of the list rather than a sentence floating in the pane.
-		empty := comp.Rect{X: inner.X, Y: inner.Y, W: inner.W, H: 1}
-		c.Fill(empty, " ", &m.sty.muted, comp.Region(regServices))
-		c.Text(empty.X, empty.Y, "  nothing matches", &m.sty.muted, comp.Region(regServices))
-		return
-	}
-	// Both offsets clamp against what was actually drawn last frame rather
-	// than against a constant, which is how a five-line pane ends up scrolled
-	// into empty space.
-	m.listMax = max(0, len(list)-inner.H)
-	m.listOffset = clamp(m.listOffset, 0, m.listMax)
-
-	for i := m.listOffset; i < len(list); i++ {
-		s := list[i]
-		y := inner.Y + i - m.listOffset
-		if y > inner.Y+inner.H-1 {
-			break
+	rows := make([]comp.Row, len(list))
+	for i, s := range list {
+		rows[i] = comp.Row{
+			Text: fmt.Sprintf(" %-14s %d/%d %s",
+				comp.Truncate(s.Name, 14), s.Ready, s.Want, mark(s.State)),
+			Style: m.stateStyle(s.State),
 		}
-		// The owner carries the index into the LIST, not the row it landed on.
-		// They differ the moment the viewport moves, and an ID that means "row
-		// 3 of the screen" then acts on whatever scrolled into row 3.
-		id := comp.Region(regServicesRow).At(i)
-		style := m.stateStyle(s.State)
-		switch {
-		case i == m.cur && m.focus == paneList:
-			style = &m.sty.selected
-		case i == m.cur:
-			style = &m.sty.focused
-		}
-		row := comp.Rect{X: inner.X, Y: y, W: inner.W, H: 1}
-		c.Fill(row, " ", style, id)
-		c.Text(row.X, row.Y, fmt.Sprintf(" %-14s %d/%d %s",
-			comp.Truncate(s.Name, 14), s.Ready, s.Want, mark(s.State)), style, id)
 	}
+	m.list.Focused = m.focus == paneList
+	m.list.Draw(c, inner, rows)
 }
 
 func (m *Model) detailPane(c *comp.Canvas, r comp.Rect) {

@@ -64,7 +64,8 @@ func (m *Model) mouse(msg tea.MouseMsg) tea.Cmd {
 func (m *Model) press(id comp.ID, msg tea.MouseMsg) tea.Cmd {
 	switch id.Name {
 	case regServicesRow:
-		m.focus, m.cur = paneList, id.Index
+		m.focus = paneList
+		m.list.Select(id.Index)
 	case regServices:
 		m.focus = paneList
 	case regDetailTab:
@@ -90,7 +91,7 @@ func (m *Model) scroll(id comp.ID, by int) {
 	case regLogs, regLogsRow:
 		m.logOffset = max(0, m.logOffset+by)
 	case regServices, regServicesRow:
-		m.listOffset = clamp(m.listOffset+by, 0, m.listMax)
+		m.list.Scroll(by)
 	}
 }
 
@@ -140,7 +141,8 @@ func (m *Model) openMenuAt(id comp.ID, x, y int) {
 		return
 	}
 	if id.Name == regServicesRow {
-		m.focus, m.cur = paneList, id.Index
+		m.focus = paneList
+		m.list.Select(id.Index)
 	}
 	m.menu = &menuState{on: id, x: x, y: y, items: items}
 }

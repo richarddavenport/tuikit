@@ -140,8 +140,8 @@ func TestTypingDoesNotAlsoDriveTheList(t *testing.T) {
 	m := New(1)
 	press(m, "/", "j", "j")
 
-	if m.cur != 0 {
-		t.Errorf("the cursor moved to %d while the filter was being typed", m.cur)
+	if m.list.Cursor() != 0 {
+		t.Errorf("the cursor moved to %d while the filter was being typed", m.list.Cursor())
 	}
 	if m.filter != "jj" {
 		t.Errorf("filter = %q, want %q", m.filter, "jj")
@@ -154,7 +154,7 @@ func TestAModalCapturesKeysToo(t *testing.T) {
 	m := New(1)
 	press(m, "D", "j")
 
-	if m.cur != 0 {
+	if m.list.Cursor() != 0 {
 		t.Error("the list moved behind the modal")
 	}
 	if m.confirm == nil {

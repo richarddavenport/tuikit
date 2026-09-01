@@ -170,7 +170,11 @@ func (l *List) status(c *Canvas, r Rect) {
 		c.Text(r.X+1, y, marker, l.Status, id)
 	}
 
-	count := itoa(min(l.shown, l.count)) + "/" + itoa(l.count)
+	// The last row on screen, over the total — a POSITION, not a proportion.
+	// "5 of 20 shown" is the same number wherever you scroll to, so it says
+	// nothing about where you are; "8/20" moves under your hand, which is what
+	// makes a viewport feel like one.
+	count := itoa(min(l.offset+l.shown, l.count)) + "/" + itoa(l.count)
 	c.Text(r.Right()-Width(count), y, count, l.Status, id)
 }
 

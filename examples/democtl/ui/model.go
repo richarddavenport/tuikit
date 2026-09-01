@@ -41,8 +41,11 @@ type Model struct {
 
 	screen screen
 	focus  pane
-	cur    int // index into visible()
 	tab    int
+
+	// list is the service list's cursor and viewport, which used to be three
+	// fields here and the arithmetic to keep them honest.
+	list comp.List
 
 	// filter narrows the list. typing is the mode split: while it is true the
 	// list's own keys are text, and only Esc and Enter mean anything else.
@@ -71,11 +74,6 @@ type Model struct {
 	// split is the list pane's width, once someone has dragged it. Zero means
 	// the default, so a tool that is never dragged has no state to capture.
 	split int
-	// listOffset is the list's viewport, a separate field from cur because
-	// scrolling is looking around and choosing is not. listMax is what the
-	// last frame could actually scroll to — clamping against a constant is how
-	// a five-line pane scrolls into empty space.
-	listOffset, listMax int
 
 	width, height int
 	// canvas is the last frame drawn, kept so a mouse event can ask what it
@@ -107,7 +105,7 @@ type confirmState struct {
 
 // New builds the model. seed picks the fleet; the same seed is the same fleet.
 func New(seed int64) *Model {
-	return &Model{
+	m := &Model{
 		fleet:   fleet.New(seed),
 		sty:     newStyles(Palette),
 		running: -1,
@@ -115,6 +113,15 @@ func New(seed int64) *Model {
 		height:  38,
 		now:     fleet.Epoch,
 	}
+	m.list = comp.List{
+		Name:       regServicesRow,
+		Empty:      "  nothing matches",
+		Selected:   &m.sty.selected,
+		Unfocused:  &m.sty.focused,
+		Status:     &m.sty.muted,
+		EmptyStyle: &m.sty.muted,
+	}
+	return m
 }
 
 // SetPalette swaps the vocabulary. A tool would not normally expose this; democtl
@@ -159,10 +166,10 @@ func (m *Model) selected() (fleet.Service, bool) {
 	if len(list) == 0 {
 		return fleet.Service{}, false
 	}
-	if m.cur >= len(list) {
-		m.cur = len(list) - 1
+	if m.list.Cursor() >= len(list) {
+		m.list.Select(len(list) - 1)
 	}
-	return list[m.cur], true
+	return list[m.list.Cursor()], true
 }
 
 // capturesKeys reports that something on screen is eating keystrokes.

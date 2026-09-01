@@ -25,8 +25,8 @@ func TestClickingARowSelectsIt(t *testing.T) {
 
 	harness.Click(t, m, "services.row[3]")
 
-	if m.cur != 3 {
-		t.Errorf("the cursor is on %d, not 3", m.cur)
+	if m.list.Cursor() != 3 {
+		t.Errorf("the cursor is on %d, not 3", m.list.Cursor())
 	}
 	if m.focus != paneList {
 		t.Errorf("clicking the list did not focus it")
@@ -68,15 +68,15 @@ func TestClickingATabSelectsIt(t *testing.T) {
 // pick services at random.
 func TestTheWheelScrollsTheViewportNotTheSelection(t *testing.T) {
 	m := drawn(132, 12) // short enough that the list overflows
-	before := m.cur
+	before := m.list.Cursor()
 
 	harness.Wheel(t, m, "services", +2)
 
-	if m.listOffset == 0 {
+	if m.list.Offset() == 0 {
 		t.Errorf("the wheel did not scroll the list")
 	}
-	if m.cur != before {
-		t.Errorf("the wheel moved the selection from %d to %d", before, m.cur)
+	if m.list.Cursor() != before {
+		t.Errorf("the wheel moved the selection from %d to %d", before, m.list.Cursor())
 	}
 }
 
@@ -87,16 +87,16 @@ func TestScrollingStopsAtTheEnd(t *testing.T) {
 	m := drawn(132, 12)
 	harness.Wheel(t, m, "services", +50)
 
-	if m.listOffset > m.listMax {
-		t.Errorf("scrolled to %d, past the %d there is", m.listOffset, m.listMax)
+	if m.list.Offset() > m.list.Max() {
+		t.Errorf("scrolled to %d, past the %d there is", m.list.Offset(), m.list.Max())
 	}
 	if got := m.View(); got == "" {
 		t.Error("the pane scrolled itself blank")
 	}
 
 	harness.Wheel(t, m, "services", -50)
-	if m.listOffset != 0 {
-		t.Errorf("scrolling back up stopped at %d", m.listOffset)
+	if m.list.Offset() != 0 {
+		t.Errorf("scrolling back up stopped at %d", m.list.Offset())
 	}
 }
 
@@ -116,12 +116,12 @@ func TestAfterScrollingAClickSelectsWhatIsUnderIt(t *testing.T) {
 	// The first row on screen is now the second service, so clicking it must
 	// select index 1 and not index 0.
 	top := c.OwnerAt(inner.X+2, inner.Y+2)
-	if top.Index != m.listOffset {
-		t.Fatalf("the top row is owned by %v, want index %d", top, m.listOffset)
+	if top.Index != m.list.Offset() {
+		t.Fatalf("the top row is owned by %v, want index %d", top, m.list.Offset())
 	}
 	harness.Click(t, m, top.String())
-	if m.cur != m.listOffset {
-		t.Errorf("clicking the top row selected %d, want %d", m.cur, m.listOffset)
+	if m.list.Cursor() != m.list.Offset() {
+		t.Errorf("clicking the top row selected %d, want %d", m.list.Cursor(), m.list.Offset())
 	}
 }
 
@@ -159,8 +159,8 @@ func TestRightClickOpensTheMenuForThatRow(t *testing.T) {
 	if m.menu == nil {
 		t.Fatal("no menu opened")
 	}
-	if m.cur != 4 {
-		t.Errorf("the menu opened on row 4 but the cursor is on %d", m.cur)
+	if m.list.Cursor() != 4 {
+		t.Errorf("the menu opened on row 4 but the cursor is on %d", m.list.Cursor())
 	}
 	if len(m.menu.items) == 0 {
 		t.Error("the menu has no actions")
@@ -223,12 +223,12 @@ func TestTheMenuAndTheKeyDoTheSameThing(t *testing.T) {
 func TestAModalTakesTheMouse(t *testing.T) {
 	m := drawn(132, 38)
 	harness.Press(m, "D")
-	before := m.cur
+	before := m.list.Cursor()
 
 	harness.Click(t, m, "services.row[5]")
 
-	if m.cur != before {
-		t.Errorf("a click behind the modal moved the cursor to %d", m.cur)
+	if m.list.Cursor() != before {
+		t.Errorf("a click behind the modal moved the cursor to %d", m.list.Cursor())
 	}
 	if m.confirm == nil {
 		t.Error("a click behind the modal dismissed it")
@@ -259,8 +259,8 @@ func TestAScriptDrivesTheInterfaceByName(t *testing.T) {
 		rclick services.row[2]
 	`)
 
-	if m.cur != 2 || m.tab != 1 || m.menu == nil {
-		t.Errorf("after the script: cur=%d tab=%d menu=%v", m.cur, m.tab, m.menu != nil)
+	if m.list.Cursor() != 2 || m.tab != 1 || m.menu == nil {
+		t.Errorf("after the script: cur=%d tab=%d menu=%v", m.list.Cursor(), m.tab, m.menu != nil)
 	}
 }
 

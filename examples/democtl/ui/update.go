@@ -97,13 +97,9 @@ func (m *Model) globalKey(msg tea.KeyMsg) tea.Cmd {
 func (m *Model) dashboardKey(msg tea.KeyMsg) bool {
 	switch msg.String() {
 	case "j", "down":
-		if list := m.visible(); m.cur < len(list)-1 {
-			m.cur++
-		}
+		m.list.Move(1)
 	case "k", "up":
-		if m.cur > 0 {
-			m.cur--
-		}
+		m.list.Move(-1)
 	case "tab":
 		if m.focus == paneList {
 			m.focus = paneDetail
@@ -131,7 +127,7 @@ func (m *Model) dashboardKey(msg tea.KeyMsg) bool {
 		// it is the only way the mouse and keyboard paths cannot drift, since
 		// they are one list rather than a list and a keymap maintained beside
 		// it.
-		m.openMenuOn(comp.Region(regServicesRow).At(m.cur))
+		m.openMenuOn(comp.Region(regServicesRow).At(m.list.Cursor()))
 	default:
 		return false
 	}
@@ -145,15 +141,18 @@ func (m *Model) filterKey(msg tea.KeyMsg) tea.Cmd {
 		if msg.String() == "esc" {
 			m.filter = ""
 		}
-		m.cur = 0
+		m.list.Reset()
 	case "backspace":
 		if m.filter != "" {
 			m.filter = m.filter[:len(m.filter)-1]
+			m.list.Reset()
 		}
 	default:
 		if len(msg.Runes) == 1 {
 			m.filter += string(msg.Runes)
-			m.cur = 0
+			// The rows changed out from under the cursor, so it goes back to
+			// the top rather than pointing at whatever is now in its place.
+			m.list.Reset()
 		}
 	}
 	return nil
