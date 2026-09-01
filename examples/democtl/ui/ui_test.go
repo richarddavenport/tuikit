@@ -201,7 +201,7 @@ func TestAModalCapturesKeysToo(t *testing.T) {
 func TestAStepFromAnAbandonedRunIsDropped(t *testing.T) {
 	m := New(1)
 	press(m, "D", "y")
-	stale := m.gen
+	stale := m.gen.Current()
 
 	press(m, "esc") // walks away, taking a new generation
 
@@ -299,7 +299,7 @@ func settle(m *Model, n int) {
 		case m.plan.Steps[i].Fails:
 			state = stepFailed
 		}
-		_, cmd := m.Update(stepDoneMsg{gen: m.gen, index: i, state: state})
+		_, cmd := m.Update(stepDoneMsg{gen: m.gen.Current(), index: i, state: state})
 		drain(m, cmd, 0)
 	}
 }

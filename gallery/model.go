@@ -4,6 +4,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/richarddavenport/tuikit/app"
+
 	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/theme"
 )
@@ -35,6 +37,7 @@ type Model struct {
 
 	width, height int
 	canvas        *comp.Canvas
+	mouse         app.Mouse
 }
 
 // New builds the gallery over a palette.
@@ -74,17 +77,27 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 	case tea.MouseMsg:
-		m.mouse(msg)
+		m.mouse.Route(msg, m.canvas, app.Handler{
+			Wheel: func(_ comp.ID, by int) tea.Cmd { m.index.Scroll(by); return nil },
+			Press: m.press,
+		})
 	case tea.KeyMsg:
 		return m, m.key(msg)
 	}
 	return m, nil
 }
 
+// key routes through app.Keys, so the gallery obeys the same contract it shows.
+// Nothing here captures keys yet — a nil Capture is a tool with nothing
+// capturing rather than a tool that forgot.
 func (m *Model) key(msg tea.KeyMsg) tea.Cmd {
+	return app.Keys{Global: m.globalKey}.Route(msg)
+}
+
+func (m *Model) globalKey(msg tea.KeyMsg) (tea.Cmd, bool) {
 	switch msg.String() {
 	case "q", "ctrl+c":
-		return tea.Quit
+		return tea.Quit, true
 	case "j", "down":
 		m.index.Move(1)
 		m.state = 0
@@ -97,31 +110,23 @@ func (m *Model) key(msg tea.KeyMsg) tea.Cmd {
 		m.state = min(m.state+1, len(m.entry().States)-1)
 	case "left", "h", "[":
 		m.state = max(m.state-1, 0)
+	default:
+		return nil, false
 	}
-	return nil
+	return nil, true
 }
 
-func (m *Model) mouse(msg tea.MouseMsg) {
-	if m.canvas == nil {
-		return
+func (m *Model) press(id comp.ID, _ tea.MouseMsg) tea.Cmd {
+	switch id.Name {
+	case regIndexRow:
+		m.index.Select(id.Index)
+		m.state, m.preview = 0, false
+	case regStateTab:
+		m.state, m.preview = id.Index, true
+	case regPreview, regEntry:
+		m.preview = true
 	}
-	id := m.canvas.OwnerAt(msg.X, msg.Y)
-	switch {
-	case msg.Button == tea.MouseButtonWheelUp:
-		m.index.Scroll(-3)
-	case msg.Button == tea.MouseButtonWheelDown:
-		m.index.Scroll(3)
-	case msg.Action == tea.MouseActionPress && msg.Button == tea.MouseButtonLeft:
-		switch id.Name {
-		case regIndexRow:
-			m.index.Select(id.Index)
-			m.state, m.preview = 0, false
-		case regStateTab:
-			m.state, m.preview = id.Index, true
-		case regPreview, regEntry:
-			m.preview = true
-		}
-	}
+	return nil
 }
 
 // View draws the gallery.

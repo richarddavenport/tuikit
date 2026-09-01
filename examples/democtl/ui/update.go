@@ -5,6 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
 )
@@ -26,7 +27,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case stepDoneMsg:
-		if msg.gen != m.gen {
+		if m.gen.Stale(msg.gen) {
 			// A result from a run the user walked away from. Dropping it here
 			// is the whole reason gen exists.
 			return m, nil
@@ -39,7 +40,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.startStep(msg.index + 1)
 
 	case tea.MouseMsg:
-		return m, m.mouse(msg)
+		return m, m.onMouse(msg)
 
 	case tea.KeyMsg:
 		return m, m.key(msg)
@@ -47,34 +48,42 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// key routes one keystroke. The order is the whole contract: whatever is
-// capturing keys gets them first, then the screen, then the global keys. A
-// global handled before a modal is a modal you cannot type into.
+// key routes one keystroke.
+//
+// The order used to be a comment and two early returns anyone could delete. It
+// is app.Keys' struct now: whatever is capturing goes in Capture, and a nil
+// Capture is a tool with nothing capturing rather than a tool that forgot.
 func (m *Model) key(msg tea.KeyMsg) tea.Cmd {
-	if m.capturesKeys() {
-		switch {
-		case m.confirm != nil:
-			return m.confirmKey(msg)
-		case m.menu != nil:
-			return m.menuKey(msg)
-		}
-		return m.filterKey(msg)
+	return app.Keys{
+		Capture: m.capture(),
+		Screen:  m.screenKey,
+		Global:  func(msg tea.KeyMsg) (tea.Cmd, bool) { return m.globalKey(msg), true },
+	}.Route(msg)
+}
+
+// capture is whatever is eating keystrokes, or nil.
+func (m *Model) capture() app.Handled {
+	switch {
+	case m.confirm != nil:
+		return func(msg tea.KeyMsg) (tea.Cmd, bool) { return m.confirmKey(msg), true }
+	case m.menu != nil:
+		return func(msg tea.KeyMsg) (tea.Cmd, bool) { return m.menuKey(msg), true }
+	case m.typing:
+		return func(msg tea.KeyMsg) (tea.Cmd, bool) { return m.filterKey(msg), true }
 	}
+	return nil
+}
+
+func (m *Model) screenKey(msg tea.KeyMsg) (tea.Cmd, bool) {
 	switch m.screen {
 	case screenDashboard:
-		if m.dashboardKey(msg) {
-			return nil
-		}
+		return nil, m.dashboardKey(msg)
 	case screenLogs:
-		if m.logsKey(msg) {
-			return nil
-		}
+		return nil, m.logsKey(msg)
 	case screenRun:
-		if cmd, handled := m.runKey(msg); handled {
-			return cmd
-		}
+		return m.runKey(msg)
 	}
-	return m.globalKey(msg)
+	return nil, false
 }
 
 func (m *Model) globalKey(msg tea.KeyMsg) tea.Cmd {
@@ -85,7 +94,7 @@ func (m *Model) globalKey(msg tea.KeyMsg) tea.Cmd {
 		if m.screen != screenDashboard {
 			m.screen = screenDashboard
 			// Abandoning a run invalidates everything still in flight for it.
-			m.gen++
+			m.gen.Next()
 			m.running = -1
 		}
 	}
@@ -202,7 +211,7 @@ func (m *Model) runKey(msg tea.KeyMsg) (tea.Cmd, bool) {
 func (m *Model) startRun(p fleet.Plan) {
 	m.screen, m.plan = screenRun, p
 	m.done = make([]stepState, len(p.Steps))
-	m.gen++
+	m.gen.Next()
 }
 
 // startStep runs one step and reports the next. Sequential on purpose: a step
@@ -224,7 +233,7 @@ func (m *Model) startStep(i int) tea.Cmd {
 		state = stepFailed
 	}
 
-	gen := m.gen
+	gen := m.gen.Current()
 	// Tick rather than a goroutine: the duration is the step's own, so a
 	// captured run reports the timings the plan declares.
 	return tea.Tick(step.Took, func(time.Time) tea.Msg {

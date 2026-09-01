@@ -5,6 +5,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
 )
@@ -25,20 +26,11 @@ func (m *Model) View() string {
 	c := comp.NewCanvas(m.width, 3+m.bodyHeight())
 
 	m.header(c)
-	body := comp.Rect{X: 0, Y: 2, W: m.width, H: m.bodyHeight()}
-	switch m.screen {
-	case screenDashboard:
-		m.dashboard(c, body)
-	case screenLogs:
-		m.logs(c, body)
-	case screenRun:
-		m.run(c, body)
-	default:
-		// A visible complaint rather than an empty string: a screen that
-		// renders nothing looks like a hang, and the reader has no way to know
-		// a case is missing.
-		c.Text(body.X, body.Y, fmt.Sprintf("screen %d has no View case", m.screen), &m.sty.danger, comp.ID{})
-	}
+	// The default case used to be a hand-written complaint. app.Screens owns
+	// it now, so every tool's missing screen says the same thing in the same
+	// place — and guard.Screens can ask the question of the map.
+	m.screens.Draw(app.Screen(m.screen), c,
+		comp.Rect{X: 0, Y: 2, W: m.width, H: m.bodyHeight()}, &m.sty.danger)
 	m.footer(c)
 	if m.menu != nil {
 		m.drawMenu(c)

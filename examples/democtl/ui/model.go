@@ -5,6 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/comp"
 
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
@@ -46,6 +47,9 @@ type Model struct {
 	// list is the service list's cursor and viewport, which used to be three
 	// fields here and the arithmetic to keep them honest.
 	list comp.List
+	// screens is the router. A screen constant with no entry draws a visible
+	// complaint rather than an empty terminal.
+	screens app.Screens
 
 	// filter narrows the list. typing is the mode split: while it is true the
 	// list's own keys are text, and only Esc and Enter mean anything else.
@@ -64,13 +68,13 @@ type Model struct {
 	// gen invalidates async results from a run that has been abandoned. A step
 	// that finishes after you pressed Esc must not draw into the next run — the
 	// bug is easy to write and almost impossible to see once written.
-	gen int
+	gen app.Gen
 
 	confirm *confirmState
-	// menu is the open context menu, and dragging says the divider has the
-	// mouse until it is let go.
-	menu     *menuState
-	dragging bool
+	// menu is the open context menu. Who owns the mouse mid-drag is app.Mouse's
+	// business, not a flag here.
+	menu  *menuState
+	mouse app.Mouse
 
 	// split is the list pane's width, once someone has dragged it. Zero means
 	// the default, so a tool that is never dragged has no state to capture.
@@ -113,6 +117,13 @@ func New(seed int64) *Model {
 		width:   132,
 		height:  38,
 		now:     fleet.Epoch,
+	}
+	// Built once, so "every screen has a view" is a property of the model
+	// rather than of whoever last edited a switch.
+	m.screens = app.Screens{
+		app.Screen(screenDashboard): m.dashboard,
+		app.Screen(screenLogs):      m.logs,
+		app.Screen(screenRun):       m.run,
 	}
 	m.log = comp.LogPane{Follow: true}
 	m.list = comp.List{

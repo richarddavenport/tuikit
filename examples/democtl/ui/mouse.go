@@ -3,62 +3,47 @@ package ui
 import (
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
 )
 
-// wheelRows is how far one notch scrolls. Three, because that is what every
-// other terminal program does — confirmed rather than assumed: herdr's own
-// ui.mouse_scroll_lines defaults to 3.
-const wheelRows = 3
-
-// mouse routes one mouse event.
+// onMouse routes one mouse event.
 //
-// It asks the LAST FRAME what is at the pointer, which is the whole benefit of
-// drawing into a canvas: there is no region list to keep in step, because the
-// frame is the region list. A pane that moved cannot be clicked in its old
-// place, since its old place is not what was drawn.
-func (m *Model) mouse(msg tea.MouseMsg) tea.Cmd {
-	if m.canvas == nil {
-		return nil
-	}
+// The four lines that used to sit at the top of this function — a drag owns the
+// mouse until release, whatever it is now over — are app.Mouse's, because they
+// are four lines everyone writes once they have felt the bug and nobody writes
+// before. What is left here is what democtl actually decides.
+func (m *Model) onMouse(msg tea.MouseMsg) tea.Cmd {
+	return m.mouse.Route(msg, m.canvas, app.Handler{
+		Blocked: func() bool { return m.confirm != nil },
 
-	// A drag owns the mouse until release, whatever it is now over. The
-	// pointer outruns the divider it grabbed on every real drag, and without
-	// this the divider is dropped the moment the cursor leaves it.
-	if m.dragging {
-		if msg.Action == tea.MouseActionRelease {
-			m.dragging = false
+		Press: func(id comp.ID, msg tea.MouseMsg) tea.Cmd {
+			if m.menu != nil {
+				return m.menuMouse(msg, id)
+			}
+			return m.press(id, msg)
+		},
+		RightPress: func(id comp.ID, msg tea.MouseMsg) tea.Cmd {
+			if m.menu != nil {
+				return m.menuMouse(msg, id)
+			}
+			m.openMenuAt(id, msg.X, msg.Y)
 			return nil
-		}
-		m.setSplit(msg.X)
-		return nil
-	}
+		},
+		Wheel: func(id comp.ID, by int) tea.Cmd {
+			if m.menu == nil {
+				m.scroll(id, by)
+			}
+			return nil
+		},
 
-	id := m.canvas.OwnerAt(msg.X, msg.Y)
-
-	// A modal takes the mouse the way it takes the keyboard. Clicking the
-	// frame behind a question is not an answer to it.
-	if m.confirm != nil {
-		return nil
-	}
-	if m.menu != nil {
-		return m.menuMouse(msg, id)
-	}
-
-	switch {
-	case msg.Button == tea.MouseButtonWheelUp:
-		m.scroll(id, -wheelRows)
-	case msg.Button == tea.MouseButtonWheelDown:
-		m.scroll(id, wheelRows)
-
-	case msg.Action == tea.MouseActionPress && msg.Button == tea.MouseButtonLeft:
-		return m.press(id, msg)
-
-	case msg.Action == tea.MouseActionPress && msg.Button == tea.MouseButtonRight:
-		m.openMenuAt(id, msg.X, msg.Y)
-	}
-	return nil
+		Drags: func(id comp.ID) bool { return m.menu == nil && id.Name == regSplit },
+		Drag: func(_ comp.ID, msg tea.MouseMsg) tea.Cmd {
+			m.setSplit(msg.X)
+			return nil
+		},
+	})
 }
 
 func (m *Model) press(id comp.ID, msg tea.MouseMsg) tea.Cmd {
@@ -72,9 +57,6 @@ func (m *Model) press(id comp.ID, msg tea.MouseMsg) tea.Cmd {
 		m.focus, m.tab = paneDetail, id.Index
 	case regDetail:
 		m.focus = paneDetail
-	case regSplit:
-		m.dragging = true
-		m.setSplit(msg.X)
 	}
 	return nil
 }

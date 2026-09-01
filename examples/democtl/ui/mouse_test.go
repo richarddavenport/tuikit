@@ -136,7 +136,7 @@ func TestDraggingTheDividerMovesIt(t *testing.T) {
 	if got := m.listWidth(); got != before+10 {
 		t.Errorf("the divider moved to %d, want %d", got, before+10)
 	}
-	if m.dragging {
+	if m.mouse.Dragging() {
 		t.Error("the drag never ended")
 	}
 }
