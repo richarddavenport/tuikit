@@ -28,7 +28,10 @@ jobs:
         run: |
           <<.Env>>_FRAMES="$RUNNER_TEMP/frames" go test ./internal/tui -run CaptureFrames
           go run github.com/richarddavenport/tuikit/cmd/tuikit frames "$RUNNER_TEMP/frames" \
-            -out site/frames.html -title "<<.Title>> screens"
+            -out site/index.html -title "<<.Title>> screens"
+      # The screens are the INDEX, and the foundations sit under
+      # /foundations/. A Pages site whose root is a 404 is a site nobody
+      # follows a link to twice.
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
