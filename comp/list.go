@@ -54,6 +54,16 @@ type List struct {
 	// nothing is an ordinary state, not an error.
 	Empty string
 
+	// Marker is drawn against the cursor row and Blank against the rest, for a
+	// list whose selection is a CHARACTER rather than only a colour. They
+	// should be the same width, or the rows jump as you move.
+	//
+	// comp.Form has had these since it was written and a List did not, which
+	// azctl's migration found the hard way: its resource rows are marked with
+	// › and the port silently dropped them. Two components with a cursor
+	// should agree about how a cursor is shown.
+	Marker, Blank string
+
 	// Styles. Selected is the cursor row when focused, Unfocused when not.
 	Selected, Unfocused, Status, EmptyStyle *lipgloss.Style
 
@@ -172,10 +182,10 @@ func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
 			if text == "" {
 				text = spansText(rows[i].Spans)
 			}
-			c.Text(body.X, y, text, style, id)
+			c.Text(body.X, y, l.mark(i)+text, style, id)
 			continue
 		}
-		x := body.X
+		x := body.X + c.Text(body.X, y, l.mark(i), style, id)
 		for _, span := range rows[i].Spans {
 			x += c.Text(x, y, span.Text, span.Style, id)
 		}
@@ -241,6 +251,20 @@ func (l *List) Select(i int) { l.cursor, l.reveal = max(0, i), true }
 // Reset puts the list back to the top, for when the rows underneath it have
 // changed out from under the cursor — a filter, usually.
 func (l *List) Reset() { l.cursor, l.offset, l.reveal = 0, 0, false }
+
+// mark is the marker for a row, or the blank that keeps the others in line.
+func (l *List) mark(i int) string {
+	if l.Marker == "" {
+		return ""
+	}
+	if i == l.cursor {
+		return l.Marker
+	}
+	if l.Blank != "" {
+		return l.Blank
+	}
+	return strings.Repeat(" ", Width(l.Marker))
+}
 
 // spansText is a row's words without its colours, for when the selection paints
 // over them.

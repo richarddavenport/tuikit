@@ -366,3 +366,36 @@ func harnessStrip(s string) string {
 	}
 	return b.String()
 }
+
+// A list whose selection is a CHARACTER, not only a colour.
+//
+// comp.Form has had a cursor marker since it was written and a List did not,
+// which azctl's migration found the hard way: its resource rows are marked with
+// › and the port silently dropped them. Two components with a cursor should
+// agree about how a cursor is shown.
+func TestAListCanMarkItsCursor(t *testing.T) {
+	l := &List{Name: services, Marker: "› ", Blank: "  ", Focused: true}
+	l.Move(1)
+	c := draw(l, 24, 6, 4)
+
+	lines := strings.Split(c.String(), "\n")
+	if !strings.HasPrefix(lines[1], "› ") {
+		t.Errorf("the cursor row is %q", lines[1])
+	}
+	if strings.Contains(lines[0], "›") {
+		t.Errorf("a row that is not the cursor is marked: %q", lines[0])
+	}
+	// The blank is the marker's width, or the rows jump as you move.
+	if at(lines[0], "service-0") != at(lines[1], "service-1") {
+		t.Errorf("the rows move with the cursor:\n%q\n%q", lines[0], lines[1])
+	}
+}
+
+// A list without one is unchanged: most selections are a colour.
+func TestAListWithoutAMarkerDrawsNoIndent(t *testing.T) {
+	l := &List{Name: services}
+	c := draw(l, 24, 6, 3)
+	if got := strings.Split(c.String(), "\n")[0]; !strings.HasPrefix(got, " service-0") {
+		t.Errorf("got %q", got)
+	}
+}
