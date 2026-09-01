@@ -2,7 +2,7 @@ democtl  a tuikit example  needs attention                                      
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌──────────────────────────────────────────┐ ┌─────────────────────────────────────────────────────────────────────────────────────┐
 │ Filter: we_                              │ │ web_frontend                                                                        │
-│ web_frontend   4/4 ✓                     │ │ ‹ Overview ›  Config    Events                                                      │
+│ web_frontend   4/4 ✓                     │ │ ‹ Overview · Config · Events ›                                                      │
 │ web_assets     1/1 ✓                     │ │                                                                                     │
 │ api_webhooks   1/1 ✓                     │ │  state      running                                                                 │
 │ web_admin      2/2 ✓                     │ │  replicas   4/4                                                                     │

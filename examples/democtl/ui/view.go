@@ -189,24 +189,27 @@ func (m *Model) field(c *comp.Canvas, inner comp.Rect, y int, name, value string
 	return y + 1
 }
 
-// tabStrip draws the tabs. The angle quotes are in the glyph set; the tee
-// pieces a nicer strip would want are not, so it does not have any.
+// tabStrip draws the tabs.
 //
-// No padding arithmetic any more. The strip draws until it runs out of rect,
-// and the canvas stops it there — which is what the old rune-counting pad got
-// wrong at 80 columns, cutting the strip mid-escape and leaking bold down the
-// row.
+// The chevrons now wrap the strip rather than the current tab, which is
+// swarmctl's arrangement and the better one: the current tab is already
+// coloured, so chevrons around it repeat what the colour says, while chevrons
+// around the strip say that ‹ and › cycle it — which nothing else on screen
+// does.
 func (m *Model) tabStrip(c *comp.Canvas, r comp.Rect) {
-	x := r.X + 1
+	tabs := make([]comp.Tab, len(tabNames))
 	for i, name := range tabNames {
-		id := comp.Region(regDetailTab).At(i)
-		label := " " + name + " "
-		if i == m.tab {
-			x += c.Text(x, r.Y, "‹"+label+"›", &m.sty.title, id)
-		} else {
-			x += c.Text(x, r.Y, " "+label+" ", &m.sty.muted, id)
-		}
+		tabs[i] = comp.Tab{Name: name}
 	}
+	comp.Tabs{
+		Tabs:          tabs,
+		Active:        m.tab,
+		Focused:       m.focus == paneDetail,
+		Style:         &m.sty.muted,
+		Selected:      &m.sty.focused,
+		FocusSelected: &m.sty.title,
+		Chrome:        &m.sty.muted,
+	}.Draw(c, comp.Rect{X: r.X + 1, Y: r.Y, W: r.W - 1, H: 1}, regDetailTab)
 }
 
 func (m *Model) logs(c *comp.Canvas, r comp.Rect) {

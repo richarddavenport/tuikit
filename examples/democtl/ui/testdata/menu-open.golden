@@ -2,7 +2,7 @@ democtl  a tuikit example  needs attention                                      
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌──────────────────────────────────────────┐ ┌─────────────────────────────────────────────────────────────────────────────────────┐
 │ Services (39)                            │ │ api_worker                                                                          │
-│ api_gateway    3/3 ✓                     │ │ ‹ Overview ›  Config    Events                                                      │
+│ api_gateway    3/3 ✓                     │ │ ‹ Overview · Config · Events ›                                                      │
 │ a┌──────────────┐2 ●                     │ │                                                                                     │
 │ a│ View logs  L │1 ✗                     │ │  state      degraded                                                                │
 │ w│ Deploy     D │4 ✓                     │ │  replicas   1/2                                                                     │

@@ -2,7 +2,7 @@ democtl  a tuikit example  needs attention                              09:14:03
 ────────────────────────────────────────────────────────────────────────────────
 ┌────────────────────────┐ ┌───────────────────────────────────────────────────┐
 │ Services (39)          │ │ api_gateway                                       │
-│ api_gateway    3/3 ✓   │ │ ‹ Overview ›  Config    Events                    │
+│ api_gateway    3/3 ✓   │ │ ‹ Overview · Config · Events ›                    │
 │ api_worker     1/2 ●   │ │                                                   │
 │ api_migrate    0/1 ✗   │ │  state      running                               │
 │ web_frontend   4/4 ✓   │ │  replicas   3/3                                   │

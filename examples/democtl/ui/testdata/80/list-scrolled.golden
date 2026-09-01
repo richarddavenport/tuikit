@@ -2,7 +2,7 @@ democtl  a tuikit example  needs attention                              09:14:03
 ────────────────────────────────────────────────────────────────────────────────
 ┌────────────────────────┐ ┌───────────────────────────────────────────────────┐
 │ Services (39)          │ │ search_ingest                                     │
-│ edge_waf       1/2 ●   │ │ ‹ Overview ›  Config    Events                    │
+│ edge_waf       1/2 ●   │ │ ‹ Overview · Config · Events ›                    │
 │ auth_session   3/3 ✓   │ │                                                   │
 │ auth_tokens    2/2 ✓   │ │  state      running                               │
 │ auth_directory 1/1 ✓   │ │  replicas   2/2                                   │

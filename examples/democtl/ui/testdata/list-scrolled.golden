@@ -2,7 +2,7 @@ democtl  a tuikit example  needs attention                                      
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌──────────────────────────────────────────┐ ┌─────────────────────────────────────────────────────────────────────────────────────┐
 │ Services (39)                            │ │ search_ingest                                                                       │
-│ data_archiver  1/1 ✓                     │ │ ‹ Overview ›  Config    Events                                                      │
+│ data_archiver  1/1 ✓                     │ │ ‹ Overview · Config · Events ›                                                      │
 │ api_scheduler  2/2 ✓                     │ │                                                                                     │
 │ api_webhooks   1/1 ✓                     │ │  state      running                                                                 │
 │ api_ratelimit  2/2 ✓                     │ │  replicas   2/2                                                                     │

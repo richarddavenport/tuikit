@@ -2,7 +2,7 @@ democtl  a tuikit example  needs attention                                      
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌──────────────────────────────────────────┐ ┌─────────────────────────────────────────────────────────────────────────────────────┐
 │ Services (39)                            │ │ api_gateway                                                                         │
-│ api_ratelimit  2/2 ✓                     │ │ ‹ Overview ›  Config    Events                                                      │
+│ api_ratelimit  2/2 ✓                     │ │ ‹ Overview · Config · Events ›                                                      │
 │ web_admin      2/2 ✓                     │ │                                                                                     │
 │ web_docs       1/1 ✓                     │ │  state      running                                                                 │
 │ web_preview    0/1 •                     │ │  replicas   3/3                                                                     │
