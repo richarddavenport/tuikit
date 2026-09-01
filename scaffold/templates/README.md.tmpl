@@ -52,7 +52,8 @@ go test ./internal/tui -update-goldens
   check that colour does not change the shape — goldens are captured uncoloured,
   so a width bug in a styled string is invisible to all of them.
 - **The vocabulary.** A colour that did not come from the palette, or a
-  character the glyph set does not cover, fails. A font without a glyph draws a
+  character the glyph set does not cover, fails. The palette is the terminal's
+  own sixteen ANSI indices, so <<.Name>> follows your terminal's theme. A font without a glyph draws a
   replacement box, which reads as a bug rather than as decoration.
 - **The engine's ignorance.** An import that means it has learned about
   terminals fails.

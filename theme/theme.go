@@ -82,19 +82,53 @@ type Palette struct {
 // Default is the palette swarmctl arrived at, and the one a tuikit tool gets
 // unless it says otherwise.
 //
-// Values are ANSI 256 palette indices, because that is what a terminal
-// understands and what every terminal has agreed on; a truecolour hex would
-// look right on this machine and wrong over ssh from another.
+// Values are the FIRST SIXTEEN ANSI indices, and the sixteen are the whole
+// point: they are the only colours a terminal lets its user redefine.
+//
+// Everything from 16 up is a fixed formula — a 6x6x6 cube and a grey ramp —
+// identical in every terminal and untouched by every theme. A palette built
+// from those indices looks the same under gruvbox, tokyo-night and solarized,
+// which is another way of saying it ignores what the reader chose. This palette
+// used to be 205/241/240; it was themeable in the sense that a Go programmer
+// could edit it.
+//
+// The sixteen are already semantic, which is what makes this a mapping rather
+// than a guess. Terminal themes agree that 0 is the background and 7 the
+// foreground; 8 is the dimmed grey comments are drawn in; 15 is the brightest
+// text. Omarchy's templates say so literally — `palette = 0={{ background }}`,
+// `palette = 8={{ muted }}` — and every other theme system does the same thing
+// under other names.
+//
+// So a tuikit tool is themed by whatever themed the terminal, with no config
+// format, no loader, and nothing to reload: an index is resolved by the
+// terminal at paint time, so changing the theme retints the next frame.
+//
+// # The selection is reverse video, deliberately
+//
+// SelectionFG is the background and SelectionBG the foreground, which inverts
+// correctly on a light theme BY CONSTRUCTION rather than by detecting one.
+// swarmctl's design notes reached the same place independently: it is "the one
+// treatment that reads identically in both profiles".
+//
+// # What this costs
+//
+// One grey. Muted and Border are the same index, where they used to be 241 and
+// 240 — one step apart on the ramp and near-indistinguishable anyway.
+//
+// And the accent is the terminal's magenta rather than the theme's own accent
+// colour, because ANSI has no accent slot. A tool that wants the real one reads
+// it from wherever its desktop keeps it and overrides the role; that is what
+// Extra and a plain assignment are for.
 var Default = Palette{
-	Accent:      lipgloss.Color("205"),
-	Muted:       lipgloss.Color("241"),
-	Border:      lipgloss.Color("240"),
-	Success:     lipgloss.Color("34"),
-	Pending:     lipgloss.Color("214"),
-	Danger:      lipgloss.Color("196"),
-	Stderr:      lipgloss.Color("203"),
-	SelectionFG: lipgloss.Color("229"),
-	SelectionBG: lipgloss.Color("57"),
+	Accent:      lipgloss.Color("13"), // bright magenta
+	Muted:       lipgloss.Color("8"),  // the dimmed grey — literally named muted
+	Border:      lipgloss.Color("8"),  // the same grey; see above
+	Success:     lipgloss.Color("2"),  // green
+	Pending:     lipgloss.Color("3"),  // yellow
+	Danger:      lipgloss.Color("1"),  // red
+	Stderr:      lipgloss.Color("9"),  // bright red
+	SelectionFG: lipgloss.Color("0"),  // the background
+	SelectionBG: lipgloss.Color("7"),  // the foreground
 }
 
 // Role is one entry in the palette, for anything rendering the palette itself.

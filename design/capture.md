@@ -80,9 +80,14 @@ lipgloss.SetColorProfile(termenv.TrueColor)
 lipgloss.SetHasDarkBackground(true)
 ```
 
-This does not conflict with "ANSI 256, not truecolour" — the theme's *values*
-stay 256 palette indices, which is what ships. Forcing the TrueColor *profile*
-only stops lipgloss from discarding them on a pipe.
+This does not conflict with "indices, not truecolour" — the theme's *values*
+stay palette indices, which is what ships. Forcing the TrueColor *profile* only
+stops lipgloss from discarding them on a pipe.
+
+A captured frame therefore holds the reader's own theme for the sixteen roles
+(decision 28), and `harness.HTML` renders them as xterm's defaults. A published
+frame shows what *a* terminal draws, not what yours does — which is the honest
+answer for a page rendered where there is no terminal to ask.
 
 **Fix the frame, freeze the clock.** `m.width, m.height = 132, 38` and
 `m.now = <fixed time>` before every shot. Nothing else is reproducible.

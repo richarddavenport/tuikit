@@ -20,16 +20,17 @@ func TestHexFollowsTheAnsiPalette(t *testing.T) {
 		{"231", "#ffffff"}, // and its last
 		{"232", "#080808"}, // the grey ramp's ends
 		{"255", "#eeeeee"}, //
+		{"7", "#e5e5e5"},   // xterm's gray90, not VGA's silver
+		{"8", "#7f7f7f"},   // and its gray50
 		// Every role, so a change to one is a change to a value someone can see.
-		{"205", "#ff5faf"}, // Accent
-		{"241", "#626262"}, // Muted
-		{"240", "#585858"}, // Border
-		{"34", "#00af00"},  // Success
-		{"214", "#ffaf00"}, // Pending
-		{"196", "#ff0000"}, // Danger
-		{"203", "#ff5f5f"}, // Stderr
-		{"229", "#ffffaf"}, // SelectionFG
-		{"57", "#5f00ff"},  // SelectionBG
+		{"13", "#ff00ff"}, // Accent
+		{"8", "#7f7f7f"},  // Muted, and Border
+		{"2", "#00cd00"},  // Success
+		{"3", "#cdcd00"},  // Pending
+		{"1", "#cd0000"},  // Danger
+		{"9", "#ff0000"},  // Stderr
+		{"0", "#000000"},  // SelectionFG
+		{"7", "#e5e5e5"},  // SelectionBG
 	} {
 		if got := Hex(lipglossColor(tc.in)); got != tc.want {
 			t.Errorf("Hex(%s) = %s, want %s", tc.in, got, tc.want)
@@ -37,14 +38,21 @@ func TestHexFollowsTheAnsiPalette(t *testing.T) {
 	}
 }
 
-// Anything that is neither a palette index nor a hex value is black rather than
-// a panic: this runs in a generator, and a bad value should produce a visibly
-// wrong swatch, not a crashed build.
+// Anything that is neither a palette index nor a hex value is EMPTY rather than
+// a panic: this runs in a generator, and a bad value should be visible as a
+// missing swatch, not a crashed build.
+//
+// Empty rather than black, because index 0 is a real role now — a sentinel that
+// collides with a legitimate answer is a check that has stopped checking.
 func TestHexIsTotal(t *testing.T) {
 	for _, in := range []string{"", "nope", "-1", "256"} {
-		if got := Hex(lipglossColor(in)); got != "#000000" {
-			t.Errorf("Hex(%q) = %s, want black", in, got)
+		if got := Hex(lipglossColor(in)); got != "" {
+			t.Errorf("Hex(%q) = %q, want empty", in, got)
 		}
+	}
+	// And the one that is not a failure: index 0 is black on purpose.
+	if got := Hex(lipglossColor("0")); got != "#000000" {
+		t.Errorf("Hex(\"0\") = %q, want #000000", got)
 	}
 }
 
@@ -98,7 +106,9 @@ func TestValueIsWhatWasWritten(t *testing.T) {
 // colour should be.
 func TestEveryRoleHasAColour(t *testing.T) {
 	for _, r := range Default.Roles() {
-		if hex := Hex(r.Color); hex == "#000000" {
+		// Empty, not "#000000": index 0 is a real role now, so a sentinel that
+		// collides with a real answer would pass over a broken one.
+		if hex := Hex(r.Color); hex == "" {
 			t.Errorf("%s (%s) has no colour", r.Name, r.Color)
 		}
 		if r.Why == "" {

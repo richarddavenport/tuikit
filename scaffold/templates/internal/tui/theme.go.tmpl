@@ -10,7 +10,12 @@ import (
 //
 // tuikit's defaults unchanged, which is the right place to start: nine colour
 // roles named by what they are FOR, an allow-list of the non-ASCII characters
-// the interface may print, and the box it draws with. Override what you
+// the interface may print, and the box it draws with.
+//
+// The roles are the terminal's own sixteen ANSI indices — the only colours a
+// theme can redefine — so <<.Title>> is themed by whatever themed the terminal,
+// with nothing to configure and nothing to reload. Override a role and you are
+// overriding the reader's choice, so do it deliberately. Override what you
 // disagree with; do not build one from scratch, because the point of a closed
 // set is that nine decisions is the whole vocabulary.
 //

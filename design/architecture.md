@@ -50,7 +50,8 @@ Lifted wholesale from swarmctl's `internal/tui/theme`, which already solved
 this and wrote down why:
 
 - **Nine colour roles** — `Accent`, `Muted`, `Border`, `Danger`, `Pending`,
-  `Success`, `Stderr`, `SelectionBG`, `SelectionFG`. ANSI 256 indices, not
+  `Success`, `Stderr`, `SelectionBG`, `SelectionFG`. The terminal's own sixteen
+  ANSI indices — the only ones a theme can redefine (decision 28) — not
   truecolour hex, "because that is what a terminal understands and what every
   terminal has agreed on; a truecolour hex would look right on this machine and
   wrong over ssh from another." Named by role, never by hue.

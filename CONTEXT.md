@@ -15,7 +15,8 @@ adding.
 `Accent` survives someone deciding the interface should be blue; `pink` does not.
 A raw ANSI index says what a colour IS instead of what it is FOR.
 
-**Palette** — the closed set of nine roles (`Accent`, `Muted`, `Border`,
+**Palette** — the closed set of nine roles, valued as the terminal's own sixteen
+ANSI indices so a tool is themed by whatever themed the terminal (`Accent`, `Muted`, `Border`,
 `Success`, `Pending`, `Danger`, `Stderr`, `SelectionFG`, `SelectionBG`), plus
 `Extra` for a tenth meaning the nine do not cover. A tool takes `theme.Default`
 and overrides what it wants; it does not build one from scratch.

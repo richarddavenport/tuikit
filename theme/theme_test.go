@@ -28,16 +28,16 @@ func TestRolesAreTheNineInOrder(t *testing.T) {
 // changed what an accent means.
 func TestOverridingAColourKeepsTheReason(t *testing.T) {
 	blue := Default
-	blue.Accent = lipgloss.Color("33")
+	blue.Accent = lipgloss.Color("4")
 
 	before, after := Default.Roles()[0], blue.Roles()[0]
-	if after.Color != lipgloss.Color("33") {
-		t.Errorf("Accent = %s, want 33", after.Color)
+	if after.Color != lipgloss.Color("4") {
+		t.Errorf("Accent = %s, want 4", after.Color)
 	}
 	if after.Why != before.Why {
 		t.Errorf("the reason changed with the hue:\n got %q\nwant %q", after.Why, before.Why)
 	}
-	if Default.Accent != lipgloss.Color("205") {
+	if Default.Accent != lipgloss.Color("13") {
 		t.Errorf("overriding a copy mutated Default: Accent = %s", Default.Accent)
 	}
 }

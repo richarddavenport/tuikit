@@ -16,7 +16,8 @@ writes a tool which builds and passes its own checks on the first run.
 ## What is here now
 
 **`theme`** — the vocabulary. Nine colour roles named by role and never by hue,
-as ANSI 256 indices; a closed glyph allow-list; and `Hex` for anything drawing
+as the terminal's own sixteen ANSI indices, so a tool is themed by whatever
+themed the terminal; a closed glyph allow-list; and `Hex` for anything drawing
 the palette outside a terminal.
 
 ```go

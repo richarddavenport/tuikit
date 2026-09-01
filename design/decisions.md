@@ -40,7 +40,12 @@ should still feel like a decision: a shade of an existing role is not one.
 the `Why` text describes the role rather than the hue, so it survives a tool
 recolouring the palette. That is the whole reason roles are named.
 
-## 3. ANSI 256 indices, never truecolour hex
+## 3. ANSI indices, never truecolour hex
+
+> **Narrowed by decision 28 (2026-09-01): the first SIXTEEN indices, not 256.**
+> The reasoning below is unchanged and still the reason not to use hex; what it
+> got wrong is that it treated all 256 as equivalent. They are not — only the
+> first sixteen follow the reader's theme.
 
 Inherited from swarmctl. A truecolour hex looks right on the machine it was
 picked on and wrong over ssh from another; the 256 palette is what every terminal
@@ -535,3 +540,84 @@ requires believing they matter.
 Ignoring the field. Three things came back worth taking, and are filed: deleting
 `View() string` (#21), a screen stack with history (#22), and constraint layout
 (#23) — the one axis where somebody else is plainly better than us.
+
+## 28. The palette is the terminal's own sixteen
+
+Decision 3 chose ANSI indices over truecolour hex and was right about why. It
+was wrong about the scope, and the wrongness was invisible for as long as nobody
+asked the next question.
+
+**Only indices 0–15 follow the reader's theme.** Everything from 16 up is a
+formula — a 6×6×6 cube and a 24-step grey ramp — identical in every terminal,
+which no theme touches and no theme can. `theme/hex.go` has said so in a comment
+since it was written: *"the first sixteen are the terminal's own, and predate any
+formula."* Nobody joined it to the palette, which was 205/241/240 — three numbers
+in the fixed region.
+
+So a tuikit tool looked the same under gruvbox, tokyo-night and solarized. That
+is not a neutral choice. It means the interface overrides what the reader
+already decided, everywhere, forever.
+
+`theme.Value`'s doc comment had the error written down: *"205 tells a reader the
+palette is ANSI indices and will follow their terminal's own scheme."* It does
+not. **The line is not index versus hex. It is fifteen.**
+
+### The mapping
+
+The sixteen are already semantic, which is what makes this a mapping rather than
+a guess. Terminal themes agree that 0 is the background, 7 the foreground, 8 the
+dimmed grey that comments are drawn in, and 15 the brightest text. Omarchy's
+templates say it literally — `palette = 0={{ background }}`, `palette = 8={{
+muted }}` — and every other theme system does the same under other names.
+
+| Role | Was | Now | |
+|---|---|---|---|
+| Accent | 205 | **13** | bright magenta |
+| Muted | 241 | **8** | the dimmed grey |
+| Border | 240 | **8** | the same grey |
+| Success | 34 | **2** | green |
+| Pending | 214 | **3** | yellow |
+| Danger | 196 | **1** | red |
+| Stderr | 203 | **9** | bright red |
+| SelectionFG | 229 | **0** | the background |
+| SelectionBG | 57 | **7** | the foreground |
+
+### The selection is reverse video, and that is the point
+
+SelectionFG is the background and SelectionBG the foreground, so it inverts
+correctly on a light theme **by construction** rather than by detecting one. No
+`AdaptiveColor`, no `COLORFGBG` sniffing, no light profile to maintain.
+
+swarmctl's design notes reached the same place independently, exploring a light
+terminal profile: reverse video is *"the one treatment that reads identically in
+both profiles"*. Two routes to one answer is the signal this project runs on.
+
+### What it costs
+
+**One grey.** Muted and Border are the same index. They were 241 and 240 — one
+step apart on the ramp, `#626262` and `#585858`, which nobody could tell apart.
+
+**The accent is the terminal's magenta, not the theme's own accent colour.**
+ANSI has no accent slot. A tool that wants the real one reads it from wherever
+its desktop keeps it and assigns the role; that is what a plain assignment is
+for, and `guard.Tokens` still holds every *other* colour closed.
+
+### What it does not cost
+
+Nothing else. The guards are untouched, because they check that a colour came
+from the palette and not what the palette contains. **Not one golden moved**,
+because goldens are colour-stripped. And there is no reload to write: an index
+is resolved by the terminal at paint time, so changing the theme retints the
+next frame — where a tool that baked hex into a config file needs a signal
+handler and a re-read.
+
+### Two things fixed on the way
+
+`Hex` answered `#000000` both for index 0 and for a colour it could not read. It
+answers `""` for the failure now: index 0 is a real role, and a sentinel that
+collides with a legitimate answer is a check that has stopped checking — the
+test that every role converts would have passed over a broken one.
+
+And `base16` claimed to hold xterm's defaults while holding the VGA set
+(`#800000` red, `#c0c0c0` white). It matters more than it did, because those
+sixteen are now every swatch on the design system page.

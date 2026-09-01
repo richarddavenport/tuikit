@@ -28,17 +28,20 @@ func (r renderer) colorsPage() string {
 	b.WriteString(r.rolesInUse())
 
 	b.WriteString(`<h2>Why indices, not hex</h2>
-<p>The values are ANSI 256 palette <em>indices</em>, because that is what a terminal
-understands and what every terminal has agreed on. A truecolour hex would look
-right on the machine it was picked on and wrong over ssh from another. The hex
-shown here is what that index resolves to in a default palette — it is for
-drawing the interface <em>outside</em> a terminal, and is never what the code
-sends.</p>
+<p>The values are the first sixteen ANSI <em>indices</em>, because those are the only
+colours a terminal lets its user redefine — so a tuikit tool is themed by whatever
+themed the terminal. The swatches below are what a default xterm draws; on your
+own terminal they are your own theme. Everything from index 16 up is a fixed
+formula no theme touches, which is why the palette does not use it.</p>
+<p>A truecolour hex would look right on the machine it was picked on, wrong over
+ssh from another, and identical under every theme the reader has ever chosen.
+The hex shown here is for drawing the interface <em>outside</em> a terminal, and
+is never what the code sends.</p>
 <p>Names are roles, never hues. <code>Accent</code> survives someone deciding the
 interface should be blue; <code>pink</code> does not.</p>`)
 
 	return r.page("Foundations", "Colour roles",
-		"Each role is an ANSI 256 index. The interface has no other colours — guard.Tokens holds that closed.",
+		"Each role is one of the terminal's own sixteen. The interface has no other colours — guard.Tokens holds that closed.",
 		b.String())
 }
 
