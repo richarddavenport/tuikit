@@ -266,67 +266,53 @@ func (m *Model) logs(c *comp.Canvas, r comp.Rect) {
 
 func (m *Model) run(c *comp.Canvas, r comp.Rect) {
 	inner := m.box(c, r, m.plan.Name, true, comp.Region(regRun))
-	y := inner.Y
 
+	steps := make([]comp.Step, len(m.plan.Steps))
 	for i, step := range m.plan.Steps {
-		if y > inner.Y+inner.H-1 {
-			return
-		}
-		id := comp.Region(regRunStep).At(i)
-
-		var badge, label string
-		var badgeStyle, labelStyle *lipgloss.Style
+		s := comp.Step{Label: step.Name, State: stepStates[m.done[i]]}
 		switch m.done[i] {
-		case stepOK:
-			badge, badgeStyle, label = "✓", &m.sty.success, step.Name
 		case stepSkipped:
-			badge, badgeStyle, label = "●", &m.sty.muted, step.Name
+			s.Detail, s.Took = "already true", took(step.Took)
+		case stepOK:
+			s.Took = took(step.Took)
 		case stepFailed:
-			badge, badgeStyle, label = "✗", &m.sty.danger, step.Name
-		case stepRunning:
-			badge, badgeStyle, label, labelStyle = "→", &m.sty.pending, step.Name, &m.sty.pending
-		default:
-			badge, badgeStyle, label, labelStyle = "•", &m.sty.muted, step.Name, &m.sty.muted
+			s.Note = "task 3 exited 137 before the health check passed"
 		}
-
-		x := inner.X + c.Text(inner.X, y, "  ", nil, id)
-		x += c.Text(x, y, badge, badgeStyle, id)
-		x += c.Text(x, y, " ", nil, id)
-		x += c.Text(x, y, label, labelStyle, id)
-		if m.done[i] == stepSkipped {
-			c.Text(x, y, "  already true", &m.sty.muted, id)
-		}
-
-		// The duration is right-aligned against the box INSIDE, not the
-		// terminal. Measuring against the terminal put it two columns past the
-		// right edge, where it clipped to "400m…" — visible in a captured
-		// frame and in nothing else.
-		if m.done[i] == stepOK || m.done[i] == stepSkipped {
-			right := took(step.Took) + " "
-			c.Text(inner.X+inner.W-comp.Width(right), y, right, &m.sty.muted, id)
-		}
-		y++
-
-		if m.done[i] == stepFailed && y <= inner.Y+inner.H-1 {
-			c.Text(inner.X, y, "      task 3 exited 137 before the health check passed", &m.sty.danger, id)
-			y++
-		}
+		steps[i] = s
 	}
 
-	y++
-	if y > inner.Y+inner.H-1 {
-		return
+	list := comp.StepList{
+		Steps: steps,
+		Look: [5]comp.StepLook{
+			comp.StepWaiting: {Glyph: "•", Style: &m.sty.muted, LabelStyle: &m.sty.muted},
+			comp.StepRunning: {Glyph: "→", Style: &m.sty.pending, LabelStyle: &m.sty.pending},
+			comp.StepSkipped: {Glyph: "●", Style: &m.sty.muted},
+			comp.StepDone:    {Glyph: "✓", Style: &m.sty.success},
+			comp.StepFailed:  {Glyph: "✗", Style: &m.sty.danger},
+		},
+		Muted: &m.sty.muted,
 	}
-	id := comp.Region(regRun)
 	switch {
 	case m.running >= 0:
-		c.Text(inner.X, y, "  running…", &m.sty.pending, id)
+		list.Status, list.StatusStyle = "running…", &m.sty.pending
 	case len(m.done) > 0 && m.done[len(m.done)-1] == stepOK:
-		c.Text(inner.X, y, "  done", &m.sty.success, id)
+		list.Status, list.StatusStyle = "done", &m.sty.success
 	default:
-		x := c.Text(inner.X, y, "  stopped", &m.sty.danger, id)
-		c.Text(inner.X+x, y, "  r to run again · esc to go back", &m.sty.muted, id)
+		list.Status, list.StatusStyle = "stopped", &m.sty.danger
+		list.Hints = []comp.Hint{{Key: "r", Label: "to run again"}, {Key: "esc", Label: "to go back"}}
 	}
+	list.Draw(c, inner, regRunStep)
+}
+
+// stepStates maps democtl's step states onto the component's. A table rather
+// than matching integers, so renumbering either side is a compile error instead
+// of a silently wrong badge.
+var stepStates = map[stepState]comp.StepState{
+	stepWaiting: comp.StepWaiting,
+	stepRunning: comp.StepRunning,
+	stepSkipped: comp.StepSkipped,
+	stepOK:      comp.StepDone,
+	stepFailed:  comp.StepFailed,
 }
 
 // modal draws the confirm question over whatever is behind it.
