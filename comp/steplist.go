@@ -1,6 +1,10 @@
 package comp
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"strings"
+
+	"github.com/charmbracelet/lipgloss"
+)
 
 // StepState is where one step of a run has got to.
 type StepState int
@@ -82,33 +86,82 @@ type StepLook struct {
 	LabelStyle *lipgloss.Style
 }
 
-// Draw renders the list into r.
+// Rows lays the steps out as List rows, for a run longer than its pane.
+//
+// A StepList draws every step and does not scroll; a List scrolls and knows
+// nothing about steps. azctl's playbooks are longer than its pane, so it needs
+// both, and it was writing this adapter by hand — twenty lines of mechanism
+// living in a tool because the component could not do the job.
+//
+// It is the answer comp.Table's doc comment already gives for rows: a Table
+// lays out, a List selects and scrolls, and rows that do both are two
+// components composed. So this lays out, and `l.Draw(c, r, steps.Rows(r.W))`
+// scrolls.
+//
+// A note becomes a row of its own and so carries its own index, where Draw can
+// give it the step's. Nothing sets a note today; a tool that does, and wants a
+// click on it to select the step it belongs to, has a real requirement — and it
+// is not this function's to guess at.
+func (s StepList) Rows(w int) []Row {
+	out := make([]Row, 0, len(s.Steps))
+	for i := range s.Steps {
+		out = append(out, s.rowsFor(i, w)...)
+	}
+	return out
+}
+
+// rowsFor is one step's lines: the step, and its note if it has one.
+func (s StepList) rowsFor(i, w int) []Row {
+	step := s.Steps[i]
+	look := s.Look[step.State]
+
+	spans := []Segment{
+		{Text: "  "},
+		{Text: look.Glyph, Style: look.Style},
+		{Text: " "},
+		{Text: step.Label, Style: look.LabelStyle},
+	}
+	if step.Detail != "" {
+		spans = append(spans, Segment{Text: "  " + step.Detail, Style: s.Muted})
+	}
+	if step.Took != "" {
+		// Right-aligned against the RECT it is given, not the terminal's
+		// width. democtl measured against the terminal, which put the durations
+		// two columns past the edge where they clipped to "400m…" — visible in
+		// a captured frame and in nothing else.
+		took := step.Took + " "
+		if pad := w - width(spans) - Width(took); pad > 0 {
+			spans = append(spans, Segment{Text: strings.Repeat(" ", pad)})
+		}
+		spans = append(spans, Segment{Text: took, Style: s.Muted})
+	}
+
+	out := []Row{{Spans: spans}}
+	if step.Note != "" {
+		out = append(out, Row{Spans: []Segment{
+			{Text: "      " + step.Note, Style: look.Style},
+		}})
+	}
+	return out
+}
+
+// Draw renders the list into r, for a run that fits. One that does not is a
+// List drawing Rows.
 func (s StepList) Draw(c *Canvas, r Rect, name Name) {
 	c = c.Clip(r)
 	y := r.Y
-	for i, step := range s.Steps {
-		if y > r.Bottom() {
-			return
-		}
+	for i := range s.Steps {
+		// A note shares its step's ID here, because Draw can afford to know
+		// which rows belong together and a List cannot.
 		id := Region(name).At(i)
-		look := s.Look[step.State]
-
-		x := r.X + c.Text(r.X, y, "  ", nil, id)
-		x += c.Text(x, y, look.Glyph, look.Style, id)
-		x += c.Text(x, y, " ", nil, id)
-		x += c.Text(x, y, step.Label, look.LabelStyle, id)
-		if step.Detail != "" {
-			c.Text(x, y, "  "+step.Detail, s.Muted, id)
-		}
-		if step.Took != "" {
-			// Against the BOX's inside, not the terminal's width.
-			took := step.Took + " "
-			c.Text(r.Right()-Width(took)+1, y, took, s.Muted, id)
-		}
-		y++
-
-		if step.Note != "" && y <= r.Bottom() {
-			c.Text(r.X, y, "      "+step.Note, look.Style, id)
+		for _, row := range s.rowsFor(i, r.W) {
+			if y > r.Bottom() {
+				return
+			}
+			x := r.X
+			for _, span := range row.Spans {
+				x += c.Text(x, y, span.Text, span.Style, id)
+			}
 			y++
 		}
 	}

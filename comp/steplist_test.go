@@ -150,3 +150,69 @@ func TestAListTallerThanItsRectStops(t *testing.T) {
 		}
 	}
 }
+
+// A run longer than its pane is a List drawing StepList's rows. One layout,
+// two ways of showing it — which is the answer comp.Table already gives.
+func TestRowsAreTheSameLayoutDrawGives(t *testing.T) {
+	steps := StepList{Look: look(), Steps: []Step{
+		{Label: "create the machine", State: StepDone, Took: "4.2s"},
+		{Label: "install docker", State: StepRunning},
+		{Label: "already there", State: StepSkipped, Detail: "already satisfied"},
+	}}
+
+	drawn := NewCanvas(40, 4)
+	steps.Draw(drawn, drawn.Bounds(), run)
+
+	scrolled := NewCanvas(40, 5)
+	l := &List{Name: run}
+	l.Draw(scrolled, scrolled.Bounds(), steps.Rows(40))
+
+	want := strings.Split(drawn.String(), "\n")[:3]
+	got := strings.Split(scrolled.String(), "\n")[:3]
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("row %d:\n drawn %q\n  list %q", i, want[i], got[i])
+		}
+	}
+}
+
+// The duration is right-aligned against the WIDTH IT IS GIVEN. democtl measured
+// against the terminal instead of the box, which put durations two columns past
+// the edge where they clipped to "400m…".
+func TestRowsRightAlignTheDurationAgainstTheirWidth(t *testing.T) {
+	steps := StepList{Look: look(), Steps: []Step{{Label: "pull", State: StepDone, Took: "1.2s"}}}
+
+	for _, w := range []int{30, 60} {
+		c := NewCanvas(w, 1)
+		l := &List{Name: run}
+		l.Draw(c, c.Bounds(), steps.Rows(w))
+
+		line := strings.Split(c.String(), "\n")[0]
+		if !strings.HasSuffix(strings.TrimRight(line, " "), "1.2s") {
+			t.Errorf("at %d columns the duration is not at the right edge: %q", w, line)
+		}
+		if Width(line) > w {
+			t.Errorf("at %d columns the row is %d wide", w, Width(line))
+		}
+	}
+}
+
+// A scrolling step list still owns its rows by step index, so a click acts on
+// the step it landed on after the viewport has moved.
+func TestAScrolledStepListStillOwnsItsRows(t *testing.T) {
+	var steps []Step
+	for i := range 20 {
+		steps = append(steps, Step{Label: "step " + itoa(i), State: StepWaiting})
+	}
+	list := StepList{Look: look(), Steps: steps}
+
+	c := NewCanvas(40, 6)
+	l := &List{Name: run}
+	l.Draw(c, c.Bounds(), list.Rows(40))
+	l.Scroll(4)
+	l.Draw(c, c.Bounds(), list.Rows(40))
+
+	if got := c.OwnerAt(2, 0); got.Index != 4 {
+		t.Errorf("after scrolling to 4 the top row is owned by %v", got)
+	}
+}
