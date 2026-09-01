@@ -20,9 +20,10 @@ type Pointer interface {
 	Canvas() *comp.Canvas
 }
 
-// Script runs mouse actions against a model, addressed by region NAME.
+// Script drives a model with keys and mouse actions, addressed by region NAME.
 //
 //	harness.Script(t, m, `
+//	    press E j j
 //	    click services.row[2]
 //	    wheel logs -3
 //	    drag split +10
@@ -88,7 +89,14 @@ func step(m Pointer, line string) error {
 	fields := strings.Fields(line)
 	verb, rest := fields[0], fields[1:]
 	if len(rest) == 0 {
-		return fmt.Errorf("%q names no region", verb)
+		return fmt.Errorf("%q names nothing to act on", verb)
+	}
+
+	// press names keys rather than a region, so it is answered before anything
+	// tries to look one up.
+	if verb == "press" {
+		Press(m, rest...)
+		return nil
 	}
 
 	x, y, err := centre(m, rest[0])
@@ -137,7 +145,7 @@ func step(m Pointer, line string) error {
 		}
 		send(m, x+dx, y+dy, tea.MouseActionRelease, tea.MouseButtonLeft)
 	default:
-		return fmt.Errorf("no such action %q — click, rclick, wheel or drag", verb)
+		return fmt.Errorf("no such action %q — press, click, rclick, wheel, drag or shot", verb)
 	}
 	return nil
 }

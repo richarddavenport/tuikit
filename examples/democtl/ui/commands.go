@@ -2,9 +2,12 @@ package ui
 
 import (
 	"fmt"
+	"path/filepath"
 	"sort"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"github.com/richarddavenport/tuikit/harness"
 
 	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
@@ -29,6 +32,14 @@ func Commands(seed int64) spec.Command {
 		Long: "Everything here is generated from a seed, so it needs no backend and\n" +
 			"shows the same thing every run.",
 		Commands: []spec.Command{
+			{
+				Name:  "tui",
+				Short: "Open the interface",
+				// A Screen, so spec gives it --snapshot and --script and an
+				// agent can capture democtl without writing a test.
+				Screen: "dashboard",
+				Run:    func(c spec.Call) int { return open(seed, c) },
+			},
 			{
 				Name:  "status",
 				Short: "Current state",
@@ -147,4 +158,37 @@ func (m *Model) act(key string) tea.Cmd {
 		m.confirmDeploy()
 	}
 	return nil
+}
+
+// open runs the interface, or captures it.
+//
+// The whole of what a tool writes to get --snapshot: build the model, and if a
+// directory was asked for, drive it rather than opening it. Decision 10's
+// second capture mechanism, in nine lines.
+func open(seed int64, c spec.Call) int {
+	m := New(seed)
+	dir := c.Flag("snapshot")
+	if dir == "" {
+		p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion())
+		if _, err := p.Run(); err != nil {
+			_, _ = fmt.Fprintln(c.Err, "democtl:", err)
+			return spec.Fail
+		}
+		return spec.OK
+	}
+
+	script, err := harness.ScriptFile(c.Flag("script"))
+	if err != nil {
+		_, _ = fmt.Fprintln(c.Err, "democtl:", err)
+		return spec.Fail
+	}
+	frames, err := harness.Snapshot(m, dir, script)
+	if err != nil {
+		_, _ = fmt.Fprintln(c.Err, "democtl:", err)
+		return spec.Fail
+	}
+	for _, f := range frames {
+		_, _ = fmt.Fprintln(c.Out, filepath.Join(dir, f.File))
+	}
+	return spec.OK
 }

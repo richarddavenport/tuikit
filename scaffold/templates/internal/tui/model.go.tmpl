@@ -253,9 +253,10 @@ func (m *Model) onMouse(msg tea.MouseMsg) tea.Cmd {
 	})
 }
 
-// Run opens <<.Name>>'s interface.
-func Run() error {
-	p := tea.NewProgram(New(), tea.WithAltScreen(), tea.WithMouseCellMotion())
+// Run opens <<.Name>>'s interface. The model is passed in rather than built
+// here, because the caller may want to capture it instead of showing it.
+func Run(m *Model) error {
+	p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	_, err := p.Run()
 	return err
 }

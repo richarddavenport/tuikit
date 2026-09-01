@@ -21,9 +21,15 @@ You cannot see a terminal, but you can read one. Every screen has a golden in
 `internal/tui/testdata` — a captured frame with the colour stripped — so
 "what does this look like at 80 columns" is a file, not a question for a human.
 
+```sh
+<<.Name>> browse --snapshot /tmp/frames --script 'press j j; shot moved; click items.row[2]; shot picked'
+make frames     # or: render every captured screen to an HTML page
 ```
-make frames     # render every screen to an HTML page as well
-```
+
+`--snapshot` is the one that needs no test: it drives the real binary with keys
+and clicks addressed by REGION NAME, and `shot <name>` says where the
+interesting frames are. `--help` and `describe --json` both list it, so you do
+not have to be told it exists.
 
 The goldens are rendered from `fixture()` in `internal/tui/fixture_test.go`,
 not from a live backend. To see a state that does not exist yet, add it to

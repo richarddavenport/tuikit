@@ -110,7 +110,7 @@ func Describe(root Command, version string, p theme.Palette, glyphs theme.GlyphS
 				Variadic: a.Variadic, Completes: a.Complete != nil,
 			})
 		}
-		for _, f := range cmd.Flags {
+		for _, f := range flagsOf(cmd) {
 			info.Flags = append(info.Flags, FlagInfo{
 				Name: f.Name, Short: f.Short, Kind: f.Kind.String(),
 				Default: f.Default, Help: f.Help, Completes: f.Complete != nil,

@@ -82,7 +82,7 @@ func Parse(cmd Command, argv []string) (Call, error) {
 	fs.SetOutput(io.Discard) // the error is reported by Run, with usage
 
 	values := map[string]*string{}
-	for _, f := range cmd.Flags {
+	for _, f := range flagsOf(cmd) {
 		v := new(string)
 		*v = f.Default
 		if f.Kind == Bool && f.Default == "" {
@@ -153,7 +153,7 @@ func Parse(cmd Command, argv []string) (Call, error) {
 func split(cmd Command, argv []string) (flags, positional, extra []string, err error) {
 	takesValue := map[string]bool{}
 	known := map[string]bool{"json": true}
-	for _, f := range cmd.Flags {
+	for _, f := range flagsOf(cmd) {
 		known[f.Name] = true
 		if f.Kind != Bool {
 			takesValue[f.Name] = true
@@ -204,6 +204,16 @@ func split(cmd Command, argv []string) (flags, positional, extra []string, err e
 	return flags, positional, extra, nil
 }
 
+// flagsOf is a command's declared flags plus the ones every command of its kind
+// gets. A command that opens a screen can be captured, and saying so once here
+// beats every tool remembering to declare two flags identically.
+func flagsOf(cmd Command) []Flag {
+	if cmd.Screen == "" {
+		return cmd.Flags
+	}
+	return append(append([]Flag(nil), cmd.Flags...), SnapshotFlags...)
+}
+
 // flagValue adapts a string to flag.Value, so every flag is read the same way
 // whatever its kind. The kinds are for help, completion and describe; a command
 // that wants an int parses one.
@@ -240,7 +250,7 @@ func Usage(cmd Command, path []string, w io.Writer) {
 			line += " [" + a.Name + "]"
 		}
 	}
-	if len(cmd.Flags) > 0 {
+	if len(flagsOf(cmd)) > 0 {
 		line += " [flags]"
 	}
 	printf(w, "usage: %s\n", line)
@@ -270,7 +280,7 @@ func Usage(cmd Command, path []string, w io.Writer) {
 	}
 
 	printf(w, "\nflags:\n")
-	for _, f := range cmd.Flags {
+	for _, f := range flagsOf(cmd) {
 		name := "--" + f.Name
 		if f.Short != "" {
 			name = "-" + f.Short + ", " + name

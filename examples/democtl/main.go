@@ -18,8 +18,6 @@ import (
 	"fmt"
 	"os"
 
-	tea "github.com/charmbracelet/bubbletea"
-
 	"github.com/richarddavenport/tuikit/examples/democtl/ui"
 	"github.com/richarddavenport/tuikit/spec"
 )
@@ -41,7 +39,7 @@ func main() {
 
 	argv := flag.Args()
 	if len(argv) == 0 {
-		os.Exit(runTUI(*seed))
+		argv = []string{"tui"}
 	}
 
 	root := ui.Commands(*seed)
@@ -75,17 +73,9 @@ func main() {
 		}
 		os.Exit(spec.OK)
 
-	case "tui":
-		os.Exit(runTUI(*seed))
 	}
+	// `tui` is a declared command now, so it goes through spec like the rest —
+	// which is what gives it --snapshot and --script, in help and in the
+	// manifest, without democtl declaring either.
 	os.Exit(spec.Run(root, argv, os.Stdout, os.Stderr))
-}
-
-func runTUI(seed int64) int {
-	p := tea.NewProgram(ui.New(seed), tea.WithAltScreen(), tea.WithMouseCellMotion())
-	if _, err := p.Run(); err != nil {
-		fmt.Fprintln(os.Stderr, "democtl:", err)
-		return spec.Fail
-	}
-	return spec.OK
 }

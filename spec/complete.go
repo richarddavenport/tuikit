@@ -58,7 +58,7 @@ func awaitingValue(cmd Command, argv []string) (Flag, bool) {
 		return Flag{}, false
 	}
 	name := strings.TrimLeft(last, "-")
-	for _, f := range cmd.Flags {
+	for _, f := range flagsOf(cmd) {
 		if (f.Name == name || f.Short == name) && f.Kind != Bool {
 			return f, true
 		}
@@ -102,7 +102,7 @@ func offer(c Completer, prefix string) []string {
 
 func flagNames(cmd Command, prefix string) []string {
 	var out []string
-	for _, f := range cmd.Flags {
+	for _, f := range flagsOf(cmd) {
 		if name := "--" + f.Name; strings.HasPrefix(name, prefix) {
 			out = append(out, name)
 		}

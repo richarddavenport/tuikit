@@ -13,8 +13,10 @@ package cli
 
 import (
 	"fmt"
+	"path/filepath"
 	"sort"
 
+	"github.com/richarddavenport/tuikit/harness"
 	"github.com/richarddavenport/tuikit/spec"
 
 	"<<.Module>>/internal/engine"
@@ -28,10 +30,13 @@ func Commands() spec.Command {
 		Short: "<<.Short>>",
 		Commands: []spec.Command{
 			{
-				Name:   "browse",
-				Short:  "Open the interface",
+				Name:  "browse",
+				Short: "Open the interface",
+				// A Screen, so spec also gives this command --snapshot and
+				// --script: an agent can capture the interface without
+				// writing a test, and finds out how from --help.
 				Screen: "browse",
-				Run:    func(spec.Call) int { return browse() },
+				Run:    browse,
 			},
 			{
 				Name:  "list",
@@ -77,10 +82,36 @@ func names(prefix string) []string {
 	return out
 }
 
-func browse() int {
-	if err := tui.Run(); err != nil {
-		fmt.Println("<<.Name>>:", err)
+// browse opens the interface, or captures it.
+//
+// The whole of what a tool writes to get --snapshot. Decision 10: two capture
+// mechanisms, deliberately — a test helper reaches any state at all because it
+// can touch unexported fields, and this reaches what a keystroke reaches and
+// needs no test. The difference that matters is that an agent can find this one
+// from --help.
+func browse(c spec.Call) int {
+	m := tui.New()
+	dir := c.Flag("snapshot")
+	if dir == "" {
+		if err := tui.Run(m); err != nil {
+			fail(c, err)
+			return spec.Fail
+		}
+		return spec.OK
+	}
+
+	script, err := harness.ScriptFile(c.Flag("script"))
+	if err != nil {
+		fail(c, err)
 		return spec.Fail
+	}
+	frames, err := harness.Snapshot(m, dir, script)
+	if err != nil {
+		fail(c, err)
+		return spec.Fail
+	}
+	for _, f := range frames {
+		_, _ = fmt.Fprintln(c.Out, filepath.Join(dir, f.File))
 	}
 	return spec.OK
 }

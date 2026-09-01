@@ -64,6 +64,25 @@ type Arg struct {
 	Complete Completer
 }
 
+// SnapshotFlags are what a command that opens a SCREEN also takes, so an agent
+// can capture the interface without writing a test.
+//
+// Declared here rather than by each tool, so they mean the same thing in every
+// one and appear in help, completions and `describe --json` without anybody
+// remembering to add them. Decision 10: two capture mechanisms, deliberately —
+// a test helper reaches any state at all, and this reaches what a keystroke
+// reaches and needs no test.
+var SnapshotFlags = []Flag{
+	{
+		Name: "snapshot", Kind: String,
+		Help: "write frames to this directory instead of opening the interface",
+	},
+	{
+		Name: "script", Kind: String,
+		Help: "keys, mouse actions and shots to drive first; a file, or the script itself",
+	},
+}
+
 // Flag is an option.
 type Flag struct {
 	Name string
