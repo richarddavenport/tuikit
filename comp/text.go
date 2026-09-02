@@ -26,6 +26,28 @@ import (
 // asked for.
 func Truncate(s string, w int) string { return truncate(s, w, theme.DefaultChrome.Ellipsis) }
 
+// Pad returns s padded with spaces to exactly w columns, truncating if it is
+// already longer.
+//
+// Exactly, which is the whole point and why fmt.Sprintf("%-20s", s) is not this:
+// %-20s counts BYTES, so a name with an accent in it comes out a column short
+// and a CJK name comes out several too wide, and the column that was supposed
+// to line up does not. Width counts what the terminal will actually draw.
+//
+// It lives here beside Truncate because it is the same job — making a string
+// occupy a known number of columns — and because a tool that writes its own is
+// a tool computing a coordinate in disguise.
+func Pad(s string, w int) string {
+	if w <= 0 {
+		return ""
+	}
+	s = Truncate(s, w)
+	if n := w - Width(s); n > 0 {
+		return s + strings.Repeat(" ", n)
+	}
+	return s
+}
+
 // truncate is Truncate in a given chrome. Components use this, so a tool that
 // changed its ellipsis changed it everywhere rather than in the one place it
 // remembered.

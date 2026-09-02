@@ -2,6 +2,7 @@ package comp
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -100,5 +101,45 @@ func TestWrapStillWrapsWithinAParagraph(t *testing.T) {
 	}
 	if len(got) < 3 {
 		t.Errorf("got %d lines, expected the text to wrap: %q", len(got), got)
+	}
+}
+
+// TestPadCountsColumnsNotBytes is why this exists rather than
+// fmt.Sprintf("%-20s"): %-20s pads to twenty BYTES, so a name with an accent
+// comes out a column short and the column that was meant to line up does not.
+func TestPadCountsColumnsNotBytes(t *testing.T) {
+	for _, tc := range []struct {
+		in string
+		w  int
+	}{
+		{"abc", 8},
+		{"café", 8}, // é is two bytes, one column
+		{"日本語", 8},  // three runes, six columns
+		{"", 4},
+		{"exactly!", 8},
+	} {
+		got := Pad(tc.in, tc.w)
+		if Width(got) != tc.w {
+			t.Errorf("Pad(%q, %d) is %d columns wide, want %d", tc.in, tc.w, Width(got), tc.w)
+		}
+	}
+}
+
+func TestPadTruncatesWhatIsTooLong(t *testing.T) {
+	got := Pad("a very long name indeed", 10)
+	if Width(got) != 10 {
+		t.Errorf("Pad = %q, %d columns, want 10", got, Width(got))
+	}
+	if !strings.HasSuffix(got, "…") {
+		t.Errorf("Pad = %q, want it to say it was cut", got)
+	}
+}
+
+func TestPadOfNothing(t *testing.T) {
+	if got := Pad("x", 0); got != "" {
+		t.Errorf("Pad(x, 0) = %q, want empty", got)
+	}
+	if got := Pad("x", -3); got != "" {
+		t.Errorf("Pad(x, -3) = %q, want empty", got)
 	}
 }
