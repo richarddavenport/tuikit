@@ -75,6 +75,10 @@ func (k Keys) Draw(c *Canvas, r Rect, id ID) int {
 		if y <= r.Bottom() {
 			return false
 		}
+		// Cleared first: the row it replaces already has something on it, and
+		// a marker that only overwrites its first six columns reads as
+		// "… moretate".
+		c.Fill(Rect{X: r.X, Y: r.Bottom(), W: r.W, H: 1}, " ", nil, id)
 		c.Text(r.X, r.Bottom(), Truncate(c.Chrome().Ellipsis+" more", r.W), k.SectionStyle, id)
 		return true
 	}

@@ -115,3 +115,14 @@ func TestAnUnnamedSection(t *testing.T) {
 		t.Errorf("an unnamed section drew nothing:\n%s", got)
 	}
 }
+
+// The marker CLEARS the row it replaces. One that only overwrote its first few
+// columns read as "… moretate".
+func TestTheMoreMarkerClearsItsRow(t *testing.T) {
+	got := help(Keys{Sections: sections()}, 40, 4)
+	for _, line := range strings.Split(got, "\n") {
+		if strings.Contains(line, "more") && strings.TrimSpace(line) != "… more" {
+			t.Errorf("the marker row is %q, want just the marker", line)
+		}
+	}
+}
