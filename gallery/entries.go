@@ -39,6 +39,7 @@ func (m *Model) Entries() []Entry {
 		m.splitEntry(s),
 		m.layoutEntry(s),
 		m.meterEntry(s),
+		m.inputEntry(s),
 	}
 }
 
@@ -818,6 +819,48 @@ func (m *Model) meterEntry(s *styles) Entry {
 					comp.Meter{Value: 0.51, Label: "51%", Pixels: true},
 					comp.Meter{Value: 0.53, Label: "53%", Pixels: true},
 				)},
+		},
+	}
+}
+
+// inputEntry is the states that separate a real text field from an underscore
+// stuck on the end of a title.
+func (m *Model) inputEntry(s *styles) Entry {
+	draw := func(in comp.Input) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, focused bool) {
+			in.PromptStyle, in.TextStyle = &s.focused, nil
+			in.PlaceholderStyle, in.CursorBG = &s.muted, &s.selected
+			in.Focused = in.Focused && focused
+			in.Draw(c, comp.Rect{X: r.X, Y: r.Y, W: min(r.W, 44), H: 1}, comp.Region("demo.input"))
+		}
+	}
+	const long = "environments/production/services/api_gateway"
+
+	return Entry{
+		Name:    "Input",
+		Summary: "One line being typed into, with a caret you can move.",
+		From:    "democtl and azctl both fake it with a trailing underscore; the swarmctl palette cannot",
+		Keys: []comp.Hint{
+			{Key: "←→", Label: "move the caret"},
+			{Key: "^a ^e", Label: "start, end"},
+			{Key: "^w", Label: "delete the word before it"},
+			{Key: "^u", Label: "delete back to the start"},
+		},
+		Roles:  []string{"Accent", "Muted", "SelectionFG", "SelectionBG"},
+		Glyphs: []string{"…"},
+		States: []State{
+			{Name: "empty", Note: "the placeholder says what the field wants; it is not editable text",
+				Draw: draw(comp.Input{Prompt: "> ", Placeholder: "type to search 41 commands"})},
+			{Name: "typing", Note: "the caret is a painted cell, so it can sit in the middle of the text",
+				Draw: draw(comp.Input{Prompt: "> ", Text: "env", Cursor: 3, Focused: true})},
+			{Name: "caret in the middle", Note: "what an underscore on the end cannot do — fixing a typo six back costs six backspaces without it",
+				Draw: draw(comp.Input{Prompt: "> ", Text: "production", Cursor: 5, Focused: true})},
+			{Name: "longer than the box", Note: "the window follows the caret, and the ellipsis keeps its own column",
+				Draw: draw(comp.Input{Prompt: "> ", Text: long, Cursor: 0, Focused: true})},
+			{Name: "scrolled to the end", Note: "same text, caret at the end: the view came with it",
+				Draw: draw(comp.Input{Prompt: "> ", Text: long, Cursor: len([]rune(long)), Focused: true})},
+			{Name: "unfocused", Note: "no caret — an input showing one is claiming keystrokes it will not get",
+				Draw: draw(comp.Input{Prompt: "> ", Text: "env", Cursor: 3})},
 		},
 	}
 }

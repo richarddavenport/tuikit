@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               16 components
+tuikit gallery  every component, running                                                                               17 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Detail                                                                                         │
@@ -18,7 +18,7 @@ tuikit gallery  every component, running                                        
 │ Split                         │ │   owner platform                                                                               │
 │ Layout                        │ │                                                                                                │
 │ Meter                         │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Input                         │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │ roles    Accent · Muted · Danger                                                               │
 │                               │ │ from     democtl field(), azctl fields() — both carried y from call to call                    │
-│                         16/16 │ │                                                                                                │
+│                         17/17 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

@@ -1,17 +1,17 @@
 tuikit gallery  every component, running                                                                               17 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Pane                                                                                           │
-│ List                          │ │ A bordered box with a title, and the rect inside it.                                           │
-│ Pane                          │ │ ‹ title in the edge · title on a row · focused · title too long · no room · rounded · ASCII ›  │
-│ Tabs                          │ │ democtl's; the focus highlight is the pane's                                                   │
+│ Components                    │ │ Input                                                                                          │
+│ List                          │ │ One line being typed into, with a caret you can move.                                          │
+│ Pane                          │ │ ‹ empty · typing · caret in the middle · longer than the box · scrolled to the end · unfocused │
+│ Tabs                          │ │ the window follows the caret, and the ellipsis keeps its own column                            │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
-│ StepList                      │ │ │ Services                                                                                   │ │
-│ LogPane                       │ │ │ the room inside                                                                            │ │
-│ Spinner                       │ │ │                                                                                            │ │
-│ Table                         │ │ │                                                                                            │ │
-│ Detail                        │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ Confirm                       │ │ > environments/production/services/api_gate…                                                   │
+│ StepList                      │ │                                                                                                │
+│ LogPane                       │ │                                                                                                │
+│ Spinner                       │ │                                                                                                │
+│ Table                         │ │                                                                                                │
+│ Detail                        │ │                                                                                                │
 │ Menu                          │ │                                                                                                │
 │ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │
@@ -28,10 +28,10 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │ mouse    click the border belongs to the pane                                                  │
-│                               │ │ roles    Border · Accent                                                                       │
-│                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
-│                               │ │ from     swarmctl drawBox and drawBoxRaw (which disagreed), democtl box                        │
+│                               │ │ keys     ←→ move the caret · ^a ^e start, end · ^w delete the word before it · ^u delete back… │
+│                               │ │ roles    Accent · Muted · SelectionFG · SelectionBG                                            │
+│                               │ │ glyphs   …                                                                                     │
+│                               │ │ from     democtl and azctl both fake it with a trailing underscore; the swarmctl palette cann… │
 │                         17/17 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit
