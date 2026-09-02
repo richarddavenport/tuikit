@@ -46,6 +46,7 @@ func (m *Model) Entries() []Entry {
 		m.breadcrumbEntry(s),
 		m.scrollbarEntry(s),
 		m.keysEntry(s),
+		m.paletteEntry(s),
 	}
 }
 
@@ -1140,6 +1141,82 @@ func (m *Model) keysEntry(s *styles) Entry {
 				Draw: draw(comp.Keys{Sections: full}, 6)},
 			{Name: "one section", Note: "a tool with four bindings does not need headings",
 				Draw: draw(comp.Keys{Sections: full[:1]}, 0)},
+		},
+	}
+}
+
+// paletteEntry: one key to everything the tool can do right now.
+func (m *Model) paletteEntry(s *styles) Entry {
+	groups := []comp.PaletteGroup{
+		{Name: "service · api_api", Note: "2 tasks on 2 nodes", Items: []comp.PaletteItem{
+			{Label: "restart", Key: "R", Hint: "rolling, start-first"},
+			{Label: "follow logs", Hint: "both tasks, interleaved"},
+			{Label: "capture logs", Key: "L", Hint: "writes to ./capture"},
+		}},
+		{Name: "node · vm-qat-0", Note: "ready · leader", Items: []comp.PaletteItem{
+			{Label: "open a shell here", Key: "s", Hint: "ssh, over the route in use"},
+			{Label: "drain", Refused: true, Hint: "refused · leader of a 5-node swarm"},
+		}},
+		{Name: "environment · qat", Note: "5 nodes · 31 stacks", Items: []comp.PaletteItem{
+			{Label: "disk usage", Key: "D", Hint: "measures 5 nodes over ssh · ~60s"},
+			{Label: "prune unused images", Warn: true, Hint: "asks first · 8M reclaimable"},
+		}},
+		{Name: "global", Note: "works on any screen, connected or not", Items: []comp.PaletteItem{
+			{Label: "switch environment", Key: "E", Hint: "latest · qat · prd · local"},
+			{Label: "edit environments", Key: "e", Hint: "opens ~/.swarmctl/config.yaml"},
+			{Label: "keys", Key: "?", Hint: "every binding, by screen"},
+			{Label: "quit", Key: "q", Hint: "leaves running jobs alone"},
+		}},
+	}
+	draw := func(query string, moves int) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			p := &comp.Palette{
+				Title: "run", Query: query, Caret: len([]rune(query)),
+				Groups: groups, Name: "demo.palette", Item: "demo.palette.row",
+				Note:   "service api_api ‹ node vm-qat-0 ‹ environment qat ‹ global",
+				Right:  "tab pins a tier",
+				Border: &s.focused, TitleStyle: &s.title,
+				PromptStyle: &s.focused, QueryStyle: nil,
+				GroupStyle: &s.muted, LabelStyle: nil, KeyStyle: nil,
+				HintStyle: &s.muted, NoteStyle: &s.muted,
+				MatchStyle: &s.title, WarnStyle: &s.pending, DangerStyle: &s.danger,
+				SelectedFG: &s.selected, Cursor: &s.selected,
+				Hints: []comp.Hint{
+					{Key: "enter", Label: "run"}, {Key: "tab", Label: "pin tier"},
+					{Key: "↑↓", Label: "move"}, {Key: "esc", Label: "close"},
+				},
+			}
+			p.Draw(c, r)
+			for range moves {
+				p.Move(1)
+				p.Draw(c, r)
+			}
+		}
+	}
+	return Entry{
+		Name:    "Palette",
+		Summary: "One key to everything the tool can do right now — a directory of the keyboard, not a replacement for it.",
+		From:    "swarmctl's navigation design, screens 2a and 2b",
+		Keys: []comp.Hint{
+			{Key: "type", Label: "filter across every group, ranked"},
+			{Key: "↑↓", Label: "move — headings are passed over"},
+			{Key: "enter", Label: "run the selected command"},
+		},
+		Roles:  []string{"Accent", "Muted", "Pending", "Danger", "SelectionFG", "SelectionBG"},
+		Glyphs: []string{"─", "·", "…", "↑", "↓"},
+		States: []State{
+			{Name: "nothing typed", Note: "every group, in the caller's order. Each row shows its key, which is how it teaches the keyboard rather than replacing it",
+				Draw: draw("", 0)},
+			{Name: "a refusal", Note: "drain is LISTED, in Danger, with the reason where its key would be — one that vanished is indistinguishable from one that never existed",
+				Draw: draw("", 3)},
+			{Name: "a warning", Note: "asks first · 8M reclaimable — a hint you should read before pressing enter",
+				Draw: draw("", 6)},
+			{Name: "typed", Note: "flattened and ranked across every group; the matched letters are marked, so the order is checkable rather than trusted",
+				Draw: draw("env", 0)},
+			{Name: "ranked, not filtered", Note: "the groups are an order of preference, never a filter — a global command is reachable whatever you had selected",
+				Draw: draw("prune", 0)},
+			{Name: "nothing matches", Note: "an ordinary state, not an error",
+				Draw: draw("zzzz", 0)},
 		},
 	}
 }

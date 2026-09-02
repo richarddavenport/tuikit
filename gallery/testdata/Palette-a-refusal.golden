@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                               22 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ Palette                                                                                        │
+│ List                          │ │ One key to everything the tool can do right now — a directory of the keyboard, not a replacem… │
+│ Pane                          │ │ ‹ nothing typed · a refusal · a warning · typed · ranked, not filtered · nothing matches ›     │
+│ Tabs                          │ │ drain is LISTED, in Danger, with the reason where its key would be — one that vanished is ind… │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │ ┌─ run ──────────────────────────────────────────────────────────────────────────────────────┐ │
+│ StepList                      │ │ │>   type to search 11 commands                                                              │ │
+│ LogPane                       │ │ │service api_api ‹ node vm-qat-0 ‹ environment qat ‹ global                   tab pins a tier│ │
+│ Spinner                       │ │ │────────────────────────────────────────────────────────────────────────────────────────────│ │
+│ Table                         │ │ │ service · api_api                                                       2 tasks on 2 nodes │ │
+│ Detail                        │ │ │  restart                     R    rolling, start-first                                     │ │
+│ Menu                          │ │ │  follow logs                      both tasks, interleaved                                  │ │
+│ Toast                         │ │ │  capture logs                L    writes to ./capture                                      │ │
+│ Form                          │ │ │ node · vm-qat-0                                                             ready · leader │ │
+│ Split                         │ │ │  open a shell here           s    ssh, over the route in use                               │ │
+│ Layout                        │ │ │  drain                            refused · leader of a 5-node swarm                       │ │
+│ Meter                         │ │ │ environment · qat                                                      5 nodes · 31 stacks │ │
+│ Input                         │ │ │  disk usage                  D    measures 5 nodes over ssh · ~60s                         │ │
+│ Waiting                       │ │ │  prune unused images              asks first · 8M reclaimable                              │ │
+│ Breadcrumb                    │ │ │ global                                               works on any screen, connected or not │ │
+│ Scrollbar                     │ │ │  switch environment          E    latest · qat · prd · local                               │ │
+│ Keys                          │ │ │  edit environments           e    opens ~/.swarmctl/config.yaml                            │ │
+│ Palette                       │ │ │  keys                        ?    every binding, by screen                                 │ │
+│                               │ │ │                                                                                      14/15 │ │
+│                               │ │ │────────────────────────────────────────────────────────────────────────────────────────────│ │
+│                               │ │ │  enter run · tab pin tier · ↑↓ move · esc close                                            │ │
+│                               │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│                               │ │ keys     type filter across every group, ranked · ↑↓ move — headings are passed over · enter … │
+│                               │ │ roles    Accent · Muted · Pending · Danger · SelectionFG · SelectionBG                         │
+│                               │ │ glyphs   ─ · … ↑ ↓                                                                             │
+│                               │ │ from     swarmctl's navigation design, screens 2a and 2b                                       │
+│                         22/22 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

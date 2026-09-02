@@ -1,37 +1,37 @@
 tuikit gallery  every component, running                                                                               22 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Waiting                                                                                        │
-│ List                          │ │ A region whose contents have not arrived. Draw it inside the interface, not instead of it.     │
-│ Pane                          │ │ ‹ in a pane · bare · with a detail · under two seconds · taking a while · a long wait ›        │
-│ Tabs                          │ │ minutes, so a number does not run away                                                         │
+│ Components                    │ │ Palette                                                                                        │
+│ List                          │ │ One key to everything the tool can do right now — a directory of the keyboard, not a replacem… │
+│ Pane                          │ │ ‹ nothing typed · a refusal · a warning · typed · ranked, not filtered · nothing matches ›     │
+│ Tabs                          │ │ an ordinary state, not an error                                                                │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │ ┌─ Resources ────────────────────────────────────────────────────────────────────────────────┐ │
-│ StepList                      │ │ │                                                                                            │ │
-│ LogPane                       │ │ │                                                                                            │ │
-│ Spinner                       │ │ │                                                                                            │ │
-│ Table                         │ │ │                                                                                            │ │
+│ Confirm                       │ │ ┌─ run ──────────────────────────────────────────────────────────────────────────────────────┐ │
+│ StepList                      │ │ │> zzzz                                                                                      │ │
+│ LogPane                       │ │ │service api_api ‹ node vm-qat-0 ‹ environment qat ‹ global                   tab pins a tier│ │
+│ Spinner                       │ │ │────────────────────────────────────────────────────────────────────────────────────────────│ │
+│ Table                         │ │ │  nothing matches                                                                           │ │
 │ Detail                        │ │ │                                                                                            │ │
 │ Menu                          │ │ │                                                                                            │ │
 │ Toast                         │ │ │                                                                                            │ │
 │ Form                          │ │ │                                                                                            │ │
 │ Split                         │ │ │                                                                                            │ │
 │ Layout                        │ │ │                                                                                            │ │
-│ Meter                         │ │ │                                ⠋ reading the estate  2m 15s                                │ │
+│ Meter                         │ │ │                                                                                            │ │
 │ Input                         │ │ │                                                                                            │ │
 │ Waiting                       │ │ │                                                                                            │ │
 │ Breadcrumb                    │ │ │                                                                                            │ │
 │ Scrollbar                     │ │ │                                                                                            │ │
 │ Keys                          │ │ │                                                                                            │ │
 │ Palette                       │ │ │                                                                                            │ │
-│                               │ │ │                                                                                            │ │
-│                               │ │ │                                                                                            │ │
-│                               │ │ │                                                                                            │ │
-│                               │ │ │                                                                                            │ │
+│                               │ │ │                                                                                        0/0 │ │
+│                               │ │ │────────────────────────────────────────────────────────────────────────────────────────────│ │
+│                               │ │ │  enter run · tab pin tier · ↑↓ move · esc close                                            │ │
 │                               │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
-│                               │ │ roles    Muted · Pending · Border                                                              │
-│                               │ │ glyphs   ⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏ …                                                                 │
-│                               │ │ from     azctl's first estate read; swarmctl's connecting screen                               │
+│                               │ │ keys     type filter across every group, ranked · ↑↓ move — headings are passed over · enter … │
+│                               │ │ roles    Accent · Muted · Pending · Danger · SelectionFG · SelectionBG                         │
+│                               │ │ glyphs   ─ · … ↑ ↓                                                                             │
+│                               │ │ from     swarmctl's navigation design, screens 2a and 2b                                       │
 │                         22/22 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

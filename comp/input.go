@@ -61,8 +61,23 @@ func (in Input) Draw(c *Canvas, r Rect, id ID) int {
 		return r.Y + 1
 	}
 
-	if in.Text == "" && in.Placeholder != "" && !in.Focused {
-		c.Text(x, r.Y, Truncate(in.Placeholder, right-x+1), in.PlaceholderStyle, id)
+	// An empty field shows its placeholder, focused or not.
+	//
+	// It used to hide it under a live caret, on the reasoning that a prompt
+	// showing two things at once is showing two things at once. The palette
+	// design settled it the other way and is right: the caret says where you
+	// are typing and the hint says what to type, and an empty focused prompt
+	// with neither is the least useful state a field can be in. Focused, the
+	// hint follows the caret rather than replacing it.
+	if in.Text == "" && in.Placeholder != "" {
+		at := x
+		if in.Focused {
+			c.Set(x, r.Y, " ", in.CursorBG, id)
+			at = x + 2
+		}
+		if at <= right {
+			c.Text(at, r.Y, Truncate(in.Placeholder, right-at+1), in.PlaceholderStyle, id)
+		}
 		return r.Y + 1
 	}
 

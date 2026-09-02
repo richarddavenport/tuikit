@@ -29,16 +29,26 @@ func TestInputPromptAndText(t *testing.T) {
 	}
 }
 
-// TestInputPlaceholderOnlyWhenIdle. A placeholder under a live caret is a
-// prompt showing two things at once.
-func TestInputPlaceholderOnlyWhenIdle(t *testing.T) {
+// An empty field shows its placeholder whether or not it is focused. Focused,
+// the hint follows the CARET rather than replacing it: the caret says where you
+// are typing and the hint says what to type, and a prompt with neither is the
+// least useful state a field can be in.
+func TestInputAlwaysShowsItsPlaceholderWhenEmpty(t *testing.T) {
 	_, idle := drawInput(t, comp.Input{Prompt: "> ", Placeholder: "type to search"}, 30)
 	if want := "> type to search"; idle != want {
 		t.Errorf("unfocused got %q, want %q", idle, want)
 	}
-	_, live := drawInput(t, comp.Input{Prompt: "> ", Placeholder: "type to search", Focused: true}, 30)
-	if strings.Contains(live, "type to search") {
-		t.Errorf("focused input still shows the placeholder: %q", live)
+
+	c, live := drawInput(t, comp.Input{Prompt: "> ", Placeholder: "type to search", Focused: true}, 30)
+	if !strings.Contains(live, "type to search") {
+		t.Errorf("focused input dropped the placeholder: %q", live)
+	}
+	// And the caret is before it, not on it.
+	if cell, _ := c.CellAt(2, 0); cell.Style != &caret {
+		t.Error("no caret on a focused empty field")
+	}
+	if cell, _ := c.CellAt(4, 0); cell.Style == &caret {
+		t.Error("the caret is painted on the placeholder text")
 	}
 }
 
