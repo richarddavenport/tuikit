@@ -27,7 +27,7 @@ func Colors(indices ...int) map[int]color.RGBA {
 	if err != nil {
 		return nil
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck // a query we are done with
 	return QueryColors(f, DefaultTimeout, indices...)
 }
 

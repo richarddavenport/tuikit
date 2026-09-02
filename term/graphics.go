@@ -80,7 +80,7 @@ func Detect() Graphics {
 	if err != nil {
 		return None // no controlling terminal: a pipe, or a test
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck // a query we are done with
 	return Query(f, DefaultTimeout)
 }
 

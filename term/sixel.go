@@ -108,7 +108,7 @@ func bandRow(idx []int, w, h, top, want int) string {
 		if bits != 0 {
 			any = true
 		}
-		ch := byte(0x3F + bits)
+		ch := 0x3F + bits
 		if ch == runChar {
 			runLen++
 			continue

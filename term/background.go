@@ -28,7 +28,7 @@ func Background() color.RGBA {
 	if err != nil {
 		return DefaultBackground
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck // a query we are done with
 	return QueryBackground(f, DefaultTimeout)
 }
 

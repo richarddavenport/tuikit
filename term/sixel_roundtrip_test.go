@@ -38,8 +38,8 @@ func decodeSixel(t *testing.T, s string) *image.RGBA {
 	cur, x, top := 0, 0, 0
 
 	for len(body) > 0 {
-		switch c := body[0]; {
-		case c == '"': // raster attributes: "ratio;ratio;W;H
+		switch c := body[0]; c {
+		case '"': // raster attributes: "ratio;ratio;W;H
 			end := strings.IndexAny(body[1:], "#-$")
 			if end < 0 {
 				end = len(body) - 1
@@ -50,7 +50,7 @@ func decodeSixel(t *testing.T, s string) *image.RGBA {
 			img = image.NewRGBA(image.Rect(0, 0, w, h))
 			body = body[1+end:]
 
-		case c == '#': // either a definition (#n;2;r;g;b) or a selection (#n)
+		case '#': // either a definition (#n;2;r;g;b) or a selection (#n)
 			j := 1
 			for j < len(body) && body[j] >= '0' && body[j] <= '9' {
 				j++
@@ -73,16 +73,16 @@ func decodeSixel(t *testing.T, s string) *image.RGBA {
 			x = 0
 			body = body[j:]
 
-		case c == '$': // carriage return: same band, next colour
+		case '$': // carriage return: same band, next colour
 			x = 0
 			body = body[1:]
 
-		case c == '-': // next band
+		case '-': // next band
 			top += 6
 			x = 0
 			body = body[1:]
 
-		case c == '!': // run length
+		case '!': // run length
 			j := 1
 			for j < len(body) && body[j] >= '0' && body[j] <= '9' {
 				j++

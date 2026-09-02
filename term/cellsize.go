@@ -19,7 +19,7 @@ func CellSize() (w, h int) {
 	if err != nil {
 		return DefaultCellW, DefaultCellH
 	}
-	defer f.Close()
+	defer f.Close() //nolint:errcheck // a query we are done with
 	return QueryCellSize(f, DefaultTimeout)
 }
 

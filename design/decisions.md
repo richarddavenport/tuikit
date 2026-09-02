@@ -729,8 +729,52 @@ the small part.
 **A capability query with a timeout** — the one place tuikit reads from the
 terminal rather than writing to it.
 
+### The gradient is read from the terminal, not chosen here
+
+Issue 30 asked this to be settled explicitly, because it is where decision 28
+and a pixel layer pull against each other. Decision 28 put the characters on
+ANSI 0–15 so the reader's terminal theme wins. A picture carrying a literal
+`#5f00ff → #ff5faf` would walk straight back out of that: identical under all 22
+Omarchy themes while the text beside it changed, which is a worse result than
+having no picture at all.
+
+**So a component asks for a picture and never for a colour.** `Meter` has a
+`Pixels bool`, not a ramp; the gradient lives on the canvas, and the canvas read
+it from the terminal with OSC 4 — indices 5 and 13, Accent's own family. Change
+theme and the picture changes with the text. This is the same arrangement the
+nine roles give the characters, and it is what keeps `guard.Tokens` meaningful:
+a component that could pass its own gradient is a component that can escape the
+theme.
+
+Two more things are read back the same way: the background, with OSC 11, because
+Sixel has no alpha and a soft edge must be composited against a colour that is
+KNOWN rather than guessed; and the cell size, with `CSI 16 t`, because a picture
+is asked for in cells and drawn in pixels and nothing else knows the ratio.
+
+### And there is no embedded typeface
+
+The obvious next thing is a heading rendered in a real font, and it is
+deliberately absent. Sixel is opaque, so any text inside a picture's rectangle
+must be IN the picture — which means an embedded face, a licence decision, a
+real number on the binary, and the same words rendering differently depending on
+which terminal the reader has.
+
+Keeping text as cells avoids all of it. The picture is a band; the words live
+above and below it in the reader's own font at their own size, legible at any
+width, selectable, and identical on all four terminals. The pixels do what
+pixels are good at — gradients, curves, soft edges, resolution — and nothing
+else.
+
 ### What it does not cost
 
 The guards, the goldens, the harness and the mouse hit-testing are all
 untouched, because a decoration pass changes no cell and no owner ID. A frame
 with a picture over it is the same frame.
+
+### What shipped
+
+`term` (detection, cell size, background, palette, both encoders), `paint`
+(ramps, rounded panels, bars, flattening), `Canvas.Picture`, `comp.Meter`, a
+gallery entry, a meter in democtl's run screen, and `tuikit pixels` — a
+self-test that prints what your terminal answered and draws the same bar with
+and without a picture, because no test in CI can tell you whether foot draws it.

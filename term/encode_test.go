@@ -64,7 +64,11 @@ func TestSixelSkipsColoursNotInABand(t *testing.T) {
 		}
 	}
 	out := term.EncodeSixel(img)
-	bands := strings.Split(out[strings.Index(out, "#"):], "-")
+	first := strings.Index(out, "#")
+	if first < 0 {
+		t.Fatal("no colour registers in the output")
+	}
+	bands := strings.Split(out[first:], "-")
 	if len(bands) != 2 {
 		t.Fatalf("want 2 bands, got %d", len(bands))
 	}
@@ -126,7 +130,11 @@ func TestKittyChunks(t *testing.T) {
 		t.Errorf("metadata repeated on %d chunks, want 1", n)
 	}
 	for _, part := range strings.Split(out, "\x1b_G")[1:] {
-		payload := part[strings.Index(part, ";")+1 : strings.Index(part, "\x1b\\")]
+		semi, end := strings.Index(part, ";"), strings.Index(part, "\x1b\\")
+		if semi < 0 || end < semi {
+			t.Fatalf("malformed chunk: %q", part[:min(80, len(part))])
+		}
+		payload := part[semi+1 : end]
 		if len(payload) > 4096 {
 			t.Errorf("chunk of %d bytes exceeds kitty's 4096 limit", len(payload))
 		}

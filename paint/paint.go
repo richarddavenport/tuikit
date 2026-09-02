@@ -184,6 +184,7 @@ type Bar struct {
 	Radius int
 }
 
+// Image draws the bar.
 func (b Bar) Image() *image.RGBA {
 	img := image.NewRGBA(image.Rect(0, 0, b.W, b.H))
 	if b.W <= 0 || b.H <= 0 {
