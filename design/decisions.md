@@ -853,3 +853,51 @@ instead, so a model that keeps its own idea of the size — most do, for layout 
 hears about it by the same route it would in a running program. Two paths to one
 fact is how they come to disagree, and the disagreement would only show up in
 captured frames, which is the worst place to find it.
+
+## 31. "No use case" and "we don't know the shape" are different reasons
+
+The extraction rule — generalise only where two of the four tools differ
+meaningfully — has been doing more work than it should, because it was being
+used to explain three different situations that want three different answers.
+
+**A component we know how to build and nobody has asked for.** No design risk.
+Deferring is fine, but it is not a decision, and it quietly becomes "we never
+got round to it". `comp.Input` sat here for weeks: a one-line text field is not
+a mystery, it was waiting for a second consumer to make it feel earned. The rule
+did no work there at all.
+
+**A component two tools need that has not been built.** A backlog item. The rule
+says BUILD, so this case should never persist — if it does, the rule is being
+misquoted rather than applied.
+
+**A component whose shape we do not know.** Here the rule earns its keep, and
+decision 26 is the proof: azctl's `row{bucket, res}` and swarmctl's
+`diffRow{service, action, change}` look alike and are not, because each carries
+a domain payload. A shared `[]Node` would have forced both to box their data or
+keep it twice. `comp.Tree` would have been WRONG, not merely early.
+
+**So: no use case is a reason to wait. Not knowing the shape is a reason to
+refuse.** Only the second is a principle.
+
+### The tell
+
+Three of the five things filed after this conversation had their data structures
+already built, public, tested and unused:
+
+- `app.Stack.Path()` — a method for a breadcrumb nothing draws. Nothing in the
+  repo calls it.
+- `List.Offset()` and `List.Max()` — everything a scrollbar needs, exposed, with
+  no scrollbar.
+- `spec.Command.Key` — "the keyboard path to this command inside the TUI", and
+  no help screen reads it.
+
+A public, tested, uncalled accessor is the clearest evidence available that
+something is in the first case rather than the third. The shape was worked out
+when the accessor was written; only the drawing is missing.
+
+### What stays refused
+
+A general `Dialog`, form validation, a layout DSL beyond `comp.Layout`, and
+`Tree` again. Not because nobody wants them — because two tools wanting one is
+not the same as two tools wanting the SAME one, and that difference is only
+visible from a migration.
