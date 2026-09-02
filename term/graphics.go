@@ -121,11 +121,62 @@ func Query(f *os.File, timeout time.Duration) Graphics {
 	}
 	defer restore()
 
-	// \e_Gi=1,a=q\e\\ asks kitty about image id 1; \e[c is DA1.
-	if _, err := f.WriteString("\x1b_Gi=1,a=q\x1b\\\x1b[c"); err != nil {
+	if _, err := f.WriteString(QueryBytes); err != nil {
 		return None
 	}
 	return Parse(readUntilDA1(f, timeout))
+}
+
+// QueryBytes is what gets sent, and the payload is the load-bearing part.
+//
+//	ESC _ G i=31,s=1,v=1,a=q,t=d,f=24 ; AAAA ESC \  ESC [ c
+//
+// `a=q` is documented as REQUIRING image data, and the first version of this
+// sent none: `\e_Gi=1,a=q` asks a question with nothing to answer about, so
+// kitty and Ghostty say nothing at all. A terminal that says nothing is
+// indistinguishable from one that cannot draw, so this reported `none` on
+// Ghostty — which draws perfectly well.
+//
+// It therefore transmits a real image: one pixel (s=1,v=1), sent directly
+// (t=d), 24-bit RGB (f=24), payload AAAA being base64 for three zero bytes.
+// Under a=q the terminal loads it, answers, and stores nothing.
+//
+// The trailing DA1 is what makes the read terminate on terminals that ignore
+// the first half.
+const QueryBytes = "\x1b_Gi=31,s=1,v=1,a=q,t=d,f=24;AAAA\x1b\\\x1b[c"
+
+// Probe is Query, but it also hands back the raw reply.
+//
+// For diagnosis. "It says none" is not something anyone can debug: none is what
+// you get from a terminal that cannot draw, from one that can but did not
+// answer in time, and from a multiplexer that answered on the terminal's behalf
+// with its own more modest capabilities. Those are three different problems and
+// only the bytes tell them apart.
+func Probe(f *os.File, timeout time.Duration) (Graphics, string) {
+	if !raw(f) {
+		return None, ""
+	}
+	restore := makeRaw(f)
+	if restore == nil {
+		return None, ""
+	}
+	defer restore()
+
+	if _, err := f.WriteString(QueryBytes); err != nil {
+		return None, ""
+	}
+	reply := readUntilDA1(f, timeout)
+	return Parse(reply), reply
+}
+
+// ProbeTTY runs Probe against the controlling terminal.
+func ProbeTTY(timeout time.Duration) (Graphics, string) {
+	f, err := os.OpenFile("/dev/tty", os.O_RDWR, 0)
+	if err != nil {
+		return None, ""
+	}
+	defer f.Close() //nolint:errcheck // a query we are done with
+	return Probe(f, timeout)
 }
 
 // readUntilDA1 reads until the DA1 reply ends or the deadline passes.
@@ -159,7 +210,10 @@ func readUntilDA1(f *os.File, timeout time.Duration) string {
 // Kitty wins a tie. Nothing is known to answer both, but if something does, the
 // protocol that composites with text is the better one to use.
 func Parse(reply string) Graphics {
-	if strings.Contains(reply, "\x1b_G") && strings.Contains(reply, "OK") {
+	// ";OK" rather than "OK": an error reply has the same shape and carries a
+	// code where the OK goes — ESC _ G i=31;ENOENT:... — and matching loosely
+	// would read a refusal as an acceptance.
+	if strings.Contains(reply, "\x1b_G") && strings.Contains(reply, ";OK") {
 		return Kitty
 	}
 	if da1, ok := cut(reply, "\x1b[?", "c"); ok {

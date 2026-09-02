@@ -7,6 +7,7 @@ import (
 	"image/color"
 	"image/png"
 	"os"
+	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 
@@ -28,11 +29,33 @@ func pixels(args []string) {
 	fs := flag.NewFlagSet("pixels", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 	png := fs.String("png", "", "write the pictures to PNG files as well, so you can see what they should look like")
+	raw := fs.Bool("raw", false, "show the bytes the terminal replied with")
 	if err := fs.Parse(args); err != nil {
 		os.Exit(2)
 	}
 
 	p := comp.Detect()
+
+	// Printed on request, and automatically when the answer is "none" and
+	// nobody asked for that. "It says none" is not debuggable: it is what you
+	// get from a terminal that cannot draw, from one that can but was too slow,
+	// and from a multiplexer answering on the terminal's behalf. The bytes tell
+	// those apart and nothing else does.
+	showRaw := *raw
+	if p.Mode == term.None && os.Getenv(term.EnvOverride) == "" {
+		showRaw = true
+	}
+	if showRaw {
+		got, reply := term.ProbeTTY(term.DefaultTimeout)
+		fmt.Printf("query        %s\n", escape(term.QueryBytes))
+		if reply == "" {
+			fmt.Println("reply        (nothing — no controlling terminal, or it never answered)")
+		} else {
+			fmt.Printf("reply        %s\n", escape(reply))
+		}
+		fmt.Printf("read as      %s\n\n", got)
+	}
+
 	if forced := os.Getenv(term.EnvOverride); forced != "" {
 		fmt.Printf("NOTE  %s=%s is set, so nothing was detected — this is what you TOLD it.\n", term.EnvOverride, forced)
 		fmt.Println("      Forcing a protocol your terminal does not speak prints stray characters")
@@ -108,7 +131,7 @@ func pixels(args []string) {
 		return
 	}
 	fmt.Println("Not sure what you are looking at? Write the same pictures to files and open them:")
-	fmt.Println("    tuikit pixels -png ./ref")
+	fmt.Println("    tuikit pixels -png /tmp/ref")
 	fmt.Println("Whatever your terminal drew above should look like those.")
 }
 
@@ -168,6 +191,23 @@ func track(r paint.Ramp) color.RGBA {
 }
 
 func hex(c color.RGBA) string { return fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B) }
+
+// escape makes control characters visible, so a reply can be read and pasted
+// into a bug report rather than executed by the terminal printing it.
+func escape(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		switch {
+		case r == 0x1b:
+			b.WriteString("ESC")
+		case r < 0x20 || r == 0x7f:
+			fmt.Fprintf(&b, "\\x%02x", r)
+		default:
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
 
 // barStyles is the two styles the bar needs, from the default palette — which
 // is ANSI 0-15, so they are your terminal's own colours too.
