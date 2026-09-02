@@ -260,3 +260,23 @@ func makeRaw(f *os.File) func() {
 	}
 	return func() { xterm.Restore(f.Fd(), state) } //nolint:errcheck // nothing useful to do
 }
+
+// SendAndRead writes bytes to the terminal and reads whatever comes back.
+//
+// For diagnosis: it is how a caller asks a question this package does not have
+// a function for, and gets the raw answer rather than an interpretation.
+func SendAndRead(f *os.File, send string, timeout time.Duration) string {
+	if !raw(f) {
+		return ""
+	}
+	restore := makeRaw(f)
+	if restore == nil {
+		return ""
+	}
+	defer restore()
+
+	if _, err := f.WriteString(send); err != nil {
+		return ""
+	}
+	return readReply(f, timeout)
+}

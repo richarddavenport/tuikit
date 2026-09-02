@@ -165,15 +165,37 @@ func TestKittyHandlesStride(t *testing.T) {
 }
 
 func TestParseCellSize(t *testing.T) {
-	// The reply is CSI 6 ; HEIGHT ; WIDTH t — height first, which is the
-	// obvious thing to get backwards.
-	if w, h := term.ParseCellSize("\x1b[6;38;19t"); w != 19 || h != 38 {
-		t.Errorf("got %dx%d, want 19x38", w, h)
+	// CSI 16 t is answered CSI 6 ; HEIGHT ; WIDTH t — height first, which is
+	// the obvious thing to get backwards.
+	if w, h, ok := term.ParseCellSize("\x1b[6;38;19t"); w != 19 || h != 38 || !ok {
+		t.Errorf("got %dx%d measured=%v, want 19x38 measured", w, h, ok)
 	}
-	for _, bad := range []string{"", "garbage", "\x1b[6;0;0t", "\x1b[6;10t", "\x1b[6;a;bt"} {
-		w, h := term.ParseCellSize(bad)
-		if w != term.DefaultCellW || h != term.DefaultCellH {
-			t.Errorf("ParseCellSize(%q) = %dx%d, want the default", bad, w, h)
+
+	// iTerm2 declines CSI 16 t. The fallback divides the text area in pixels
+	// by the text area in cells — without it every picture there came out at
+	// the assumed 10x20 while the cells were larger, so the bars were about
+	// two thirds the width they should have been.
+	reply := "\x1b[4;1200;1680t" + "\x1b[8;60;120t" + "\x1b[?62;4c"
+	if w, h, ok := term.ParseCellSize(reply); w != 14 || h != 20 || !ok {
+		t.Errorf("fallback gave %dx%d measured=%v, want 14x20 measured", w, h, ok)
+	}
+
+	// The direct answer wins when both arrive.
+	both := "\x1b[6;38;19t\x1b[4;1200;1680t\x1b[8;60;120t"
+	if w, h, _ := term.ParseCellSize(both); w != 19 || h != 38 {
+		t.Errorf("got %dx%d, want the direct answer 19x38", w, h)
+	}
+
+	for _, bad := range []string{
+		"", "garbage", "\x1b[6;0;0t", "\x1b[6;10t", "\x1b[6;a;bt",
+		"\x1b[8;60;120t",               // cells but no pixels
+		"\x1b[4;1200;1680t",            // pixels but no cells
+		"\x1b[4;1200;1680t\x1b[8;0;0t", // would divide by zero
+	} {
+		w, h, ok := term.ParseCellSize(bad)
+		if w != term.DefaultCellW || h != term.DefaultCellH || ok {
+			t.Errorf("ParseCellSize(%q) = %dx%d measured=%v, want the default and not measured",
+				bad, w, h, ok)
 		}
 	}
 }

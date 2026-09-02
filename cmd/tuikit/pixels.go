@@ -30,6 +30,7 @@ func pixels(args []string) {
 	fs.SetOutput(os.Stderr)
 	png := fs.String("png", "", "write the pictures to PNG files as well, so you can see what they should look like")
 	raw := fs.Bool("raw", false, "show the bytes the terminal replied with")
+	debug := fs.Bool("debug", false, "send one picture with replies turned on, and print what the terminal says")
 	if err := fs.Parse(args); err != nil {
 		os.Exit(2)
 	}
@@ -74,7 +75,11 @@ func pixels(args []string) {
 		fmt.Println("background   not asked")
 		fmt.Println("ramp         not asked")
 	} else {
-		fmt.Printf("cell size    %dx%d pixels\n", p.CellW, p.CellH)
+		how := "measured"
+		if !p.CellMeasured {
+			how = "ASSUMED — the terminal declined to say, so pictures will be the wrong size"
+		}
+		fmt.Printf("cell size    %dx%d pixels (%s)\n", p.CellW, p.CellH, how)
 		fmt.Printf("background   %s\n", hex(p.Background))
 		fmt.Printf("ramp         %s → %s   (ANSI 5 and 13, read from your theme)\n",
 			hex(p.Ramp.From), hex(p.Ramp.To))
@@ -126,6 +131,10 @@ func pixels(args []string) {
 		fmt.Println()
 	}
 
+	if *debug {
+		debugKitty(p)
+		return
+	}
 	if *png != "" {
 		writeReference(*png, p)
 		return
@@ -133,6 +142,62 @@ func pixels(args []string) {
 	fmt.Println("Not sure what you are looking at? Write the same pictures to files and open them:")
 	fmt.Println("    tuikit pixels -png /tmp/ref")
 	fmt.Println("Whatever your terminal drew above should look like those.")
+}
+
+// debugKitty sends one image with q=0 and prints the terminal's answer.
+//
+// The whole point is that the normal path is silent by necessity. q=2 keeps a
+// reply from arriving in the middle of a frame and being read as a keystroke —
+// but it also means a refusal goes to nobody, and an image that never appears
+// looks exactly like an image drawn somewhere you cannot see it.
+func debugKitty(p comp.Pixels) {
+	if p.Mode != term.Kitty {
+		fmt.Printf("This terminal is %s, not kitty — nothing to ask.\n", p.Mode)
+		return
+	}
+	tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "tuikit pixels: no controlling terminal:", err)
+		os.Exit(1)
+	}
+	defer tty.Close() //nolint:errcheck // done with it
+
+	img := paint.Bar{W: 40 * p.CellW, H: p.CellH, Value: 0.6, Ramp: p.Ramp, Track: track(p.Ramp)}.Image()
+	seq := term.EncodeKittyVerbose(img, 99)
+
+	fmt.Printf("image        %d bytes of RGBA, %dx%d pixels\n",
+		len(img.Pix), img.Bounds().Dx(), img.Bounds().Dy())
+	fmt.Printf("escape       %d bytes, first chunk: %s…\n\n",
+		len(seq), escape(firstN(seq, 90)))
+
+	fmt.Println("sending it here, with a marker line under it:")
+	fmt.Println()
+	// DA1 appended so the read ends as soon as the terminal has finished,
+	// rather than sitting out the whole timeout on one that stays quiet.
+	answer := term.SendAndRead(tty, seq+"\x1b[c", term.DefaultTimeout)
+	fmt.Println("^ the bar should be on the blank line above this one")
+	fmt.Println()
+
+	switch {
+	case answer == "":
+		fmt.Println("reply        (nothing) — accepted silently, or ignored entirely.")
+		fmt.Println("             If you see no bar, the image was placed somewhere you")
+		fmt.Println("             cannot see it, or z=-1 put it under an opaque background.")
+	case strings.Contains(answer, ";OK"):
+		fmt.Printf("reply        %s\n", escape(answer))
+		fmt.Println("             Accepted. If no bar is visible, z=-1 is drawing it under")
+		fmt.Println("             the cell background rather than under the text.")
+	default:
+		fmt.Printf("reply        %s\n", escape(answer))
+		fmt.Println("             That is a refusal — the code after the id says why.")
+	}
+}
+
+func firstN(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	return s[:n]
 }
 
 // writeReference writes the pictures to PNG.

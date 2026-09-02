@@ -19,6 +19,11 @@ import (
 type Pixels struct {
 	Mode         term.Graphics
 	CellW, CellH int
+	// CellMeasured says whether the terminal actually reported the cell size
+	// or whether it was assumed. An assumed size does not fail, it scales —
+	// worth being able to say so rather than drawing something two thirds the
+	// right size and calling it done.
+	CellMeasured bool
 	// Background is what a Sixel picture is flattened against, since Sixel has
 	// no alpha. Ignored by the kitty path, which composites for real.
 	Background color.RGBA
@@ -43,8 +48,9 @@ func Detect() Pixels {
 	if mode == term.None {
 		return Pixels{} // do not spend two more round trips to learn nothing
 	}
-	w, h := term.CellSize()
-	p := Pixels{Mode: mode, CellW: w, CellH: h, Background: term.Background(), Ramp: fallbackRamp}
+	w, h, measured := term.CellSize()
+	p := Pixels{Mode: mode, CellW: w, CellH: h, CellMeasured: measured,
+		Background: term.Background(), Ramp: fallbackRamp}
 	// 5 and 13 are magenta and bright magenta — Accent's own family, per
 	// decision 28. Read from the terminal, so changing theme changes the
 	// picture as well as the text.
