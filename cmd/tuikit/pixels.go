@@ -67,6 +67,9 @@ func pixels(args []string) {
 	if prog := os.Getenv("TERM_PROGRAM"); prog != "" {
 		fmt.Printf("TERM_PROGRAM %s\n", prog)
 	}
+	if mux := term.Multiplexer(); mux != "" {
+		fmt.Printf("multiplexer  %s — see the note at the end\n", mux)
+	}
 	fmt.Printf("graphics     %s\n", p.Mode)
 	if p.Mode == term.None {
 		// Detect stops after the first answer, so reporting the rest as zeroes
@@ -138,6 +141,21 @@ func pixels(args []string) {
 	if *png != "" {
 		writeReference(*png, p)
 		return
+	}
+	if mux := term.Multiplexer(); mux != "" {
+		fmt.Printf("You are inside %s. A multiplexer is a terminal emulator too: it parses what\n", mux)
+		fmt.Println("programs write, keeps its own screen, and repaints panes — so a picture has to be")
+		fmt.Println("understood and re-emitted BY IT, not merely passed along.")
+		fmt.Println()
+		fmt.Println("  tmux 3.4+ parses Sixel natively, so Sixel usually survives.")
+		fmt.Println("  The kitty protocol travels in APC sequences, which tmux drops unless")
+		fmt.Println("  allow-passthrough is on and the program wraps them. tuikit does not wrap")
+		fmt.Println("  them yet — so kitty images vanish while the QUERY, being small and answered")
+		fmt.Println("  directly, still reports support.")
+		fmt.Println()
+		fmt.Println("Run this in a plain terminal window with no multiplexer to see what tuikit")
+		fmt.Println("actually does. That is the baseline; this is the multiplexer's answer.")
+		fmt.Println()
 	}
 	fmt.Println("Not sure what you are looking at? Write the same pictures to files and open them:")
 	fmt.Println("    tuikit pixels -png /tmp/ref")
