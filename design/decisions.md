@@ -835,6 +835,23 @@ Four things every tool set up the same way and could get subtly different:
 - **The pixel layer**, and with it the rule that detection is asked by main and
   never by a model — see decision 29.
 
+### The one-row margin is inherited, not decided — see issue 37
+
+The runner sizes the canvas at `terminal height - 1`, justified above as a
+convention because both tools here did it independently. That justification is
+weaker than it reads: democtl's own comment says the row came from "where the
+old bodyHeight arithmetic already put it", so it was inherited from swarmctl
+rather than chosen, and two tools agreeing is not two decisions when one was
+copied from the other.
+
+The plausible reasons are real — pending wrap on the bottom-right cell, and
+where the cursor parks — and neither has been measured. The counter-evidence is
+also real: azctl ran at full height until it migrated here, with no scrolling
+and no lost top line.
+
+So this is recorded as an open question rather than a settled rule. It costs
+every tool a row on faith, and issue 37 says how to find out.
+
 ### It cost the harness nothing
 
 `*app.Runner` has `View`, `Update` returning a `tea.Model`, and `Canvas`, so it
