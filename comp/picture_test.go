@@ -127,8 +127,19 @@ func TestPicturesComeAfterTheText(t *testing.T) {
 	if !strings.HasSuffix(frame, "\x1b8") {
 		t.Error("the frame does not restore the cursor")
 	}
-	if !strings.Contains(frame, "\x1b[2;3H") { // region at 2,1 → 1-based 3,2
-		t.Error("no absolute positioning before the picture")
+	// The canvas is 6 rows and the region starts at y=1, so the picture is 4
+	// rows above where the frame ended, at column 3 (1-based).
+	if !strings.Contains(frame, "\x1b[4A") {
+		t.Error("no upward move to the picture's row")
+	}
+	if !strings.Contains(frame, "\x1b[3G") {
+		t.Error("no column move to the picture's start")
+	}
+	// Absolute positioning would put the picture at the top of the WINDOW
+	// rather than on the cells it belongs to, wherever the frame happens to
+	// have been printed.
+	if strings.Contains(frame, "H\x1bP") {
+		t.Error("absolute cursor positioning is back")
 	}
 }
 

@@ -56,8 +56,10 @@ type Panel struct {
 	// 0..1 of the usable height. The panel answers a question rather than
 	// merely decorating, which is the only reason a picture earns its cells.
 	Bars []float64
-	// BarColor is the bars' colour. Zero value uses the ramp's end, which
-	// reads as "the same family, one step brighter".
+	// BarColor is the bars' colour. The zero value is a translucent shadow,
+	// which is the only default that reads against EVERY ramp — the first
+	// version used the ramp's own end colour and produced bars very nearly
+	// invisible against the gradient they sat on.
 	BarColor color.RGBA
 }
 
@@ -116,8 +118,7 @@ func (p Panel) bars(img *image.RGBA) {
 	}
 	col := p.BarColor
 	if col == (color.RGBA{}) {
-		col = p.Ramp.To
-		col.A = 255
+		col = color.RGBA{A: 150} // a shadow: darkens whatever it is over
 	}
 	pad := p.Radius + 2
 	area := image.Rect(pad, pad, p.W-pad, p.H-pad)
@@ -136,10 +137,21 @@ func (p Panel) bars(img *image.RGBA) {
 		x0 := area.Min.X + i*w
 		for x := x0; x < min(x0+bw, area.Max.X); x++ {
 			for y := area.Max.Y - h; y < area.Max.Y; y++ {
-				img.SetRGBA(x, y, col)
+				// Composited rather than assigned, so a translucent bar reads
+				// as shading over the ramp instead of replacing it — and so a
+				// bar never punches a hole in the panel's own alpha.
+				img.SetRGBA(x, y, over(col, img.RGBAAt(x, y)))
 			}
 		}
 	}
+}
+
+// over composites src onto dst, keeping dst's alpha — the panel's shape wins,
+// so a bar cannot draw outside the rounded corner it sits under.
+func over(src, dst color.RGBA) color.RGBA {
+	a := float64(src.A) / 255
+	mix := func(s, d uint8) uint8 { return uint8(float64(s)*a + float64(d)*(1-a)) }
+	return color.RGBA{mix(src.R, dst.R), mix(src.G, dst.G), mix(src.B, dst.B), dst.A}
 }
 
 // Flatten composites an image with alpha onto an opaque background.

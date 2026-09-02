@@ -99,6 +99,46 @@ func TestBarsAreDrawn(t *testing.T) {
 	}
 }
 
+// TestDefaultBarsAreVisible. The first version defaulted to the ramp's own end
+// colour, which on a panel filled with that same ramp is very nearly the
+// background — bars that are technically drawn and cannot be seen.
+func TestDefaultBarsAreVisible(t *testing.T) {
+	plain := paint.Panel{W: 60, H: 30, Ramp: ramp}.Image()
+	withBars := paint.Panel{W: 60, H: 30, Ramp: ramp, Bars: []float64{1, 1, 1}}.Image()
+
+	differs := 0
+	for y := 0; y < 30; y++ {
+		for x := 0; x < 60; x++ {
+			a, b := plain.RGBAAt(x, y), withBars.RGBAAt(x, y)
+			// Ten levels is about where a difference stops being a rendering
+			// artefact and starts being something a reader can see.
+			if abs(int(a.R)-int(b.R))+abs(int(a.G)-int(b.G))+abs(int(a.B)-int(b.B)) > 10 {
+				differs++
+			}
+		}
+	}
+	if differs < 60*30/4 {
+		t.Errorf("only %d of %d pixels visibly changed; the default bars do not read",
+			differs, 60*30)
+	}
+}
+
+// TestBarsKeepThePanelShape: a bar composited over a transparent corner must
+// not punch through it.
+func TestBarsKeepThePanelShape(t *testing.T) {
+	img := paint.Panel{W: 40, H: 20, Ramp: ramp, Radius: 8, Bars: []float64{1, 1, 1, 1}}.Image()
+	if a := img.RGBAAt(0, 0).A; a != 0 {
+		t.Errorf("corner alpha = %d after drawing bars, want 0", a)
+	}
+}
+
+func abs(n int) int {
+	if n < 0 {
+		return -n
+	}
+	return n
+}
+
 // TestBarsClamp: data outside 0..1 must not draw outside the panel.
 func TestBarsClamp(t *testing.T) {
 	paint.Panel{W: 20, H: 10, Ramp: ramp, Bars: []float64{-5, 12}}.Image()

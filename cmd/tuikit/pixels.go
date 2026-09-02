@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/png"
 	"os"
 
 	"github.com/charmbracelet/lipgloss"
@@ -26,11 +27,18 @@ import (
 func pixels(args []string) {
 	fs := flag.NewFlagSet("pixels", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
+	png := fs.String("png", "", "write the pictures to PNG files as well, so you can see what they should look like")
 	if err := fs.Parse(args); err != nil {
 		os.Exit(2)
 	}
 
 	p := comp.Detect()
+	if forced := os.Getenv(term.EnvOverride); forced != "" {
+		fmt.Printf("NOTE  %s=%s is set, so nothing was detected — this is what you TOLD it.\n", term.EnvOverride, forced)
+		fmt.Println("      Forcing a protocol your terminal does not speak prints stray characters")
+		fmt.Println("      rather than a picture. Unset it to find out what you actually have.")
+		fmt.Println()
+	}
 	fmt.Printf("TERM         %s\n", os.Getenv("TERM"))
 	if prog := os.Getenv("TERM_PROGRAM"); prog != "" {
 		fmt.Printf("TERM_PROGRAM %s\n", prog)
@@ -95,8 +103,68 @@ func pixels(args []string) {
 		fmt.Println()
 	}
 
-	fmt.Printf("If the two rows above look the same and %s says none, that is correct.\n", term.EnvOverride)
-	fmt.Printf("Force a mode with %s=none|sixel|kitty to compare.\n", term.EnvOverride)
+	if *png != "" {
+		writeReference(*png, p)
+		return
+	}
+	fmt.Println("Not sure what you are looking at? Write the same pictures to files and open them:")
+	fmt.Println("    tuikit pixels -png ./ref")
+	fmt.Println("Whatever your terminal drew above should look like those.")
+}
+
+// writeReference writes the pictures to PNG.
+//
+// This is the answer to "how do I know what it should look like". Nothing in a
+// terminal can tell you whether the thing you are seeing is the thing that was
+// sent: a protocol the emulator does not speak prints as stray characters, one
+// it half-speaks prints as a smear, and both look like a bug in the program. A
+// file you can open settles it — if the PNG is right and the terminal is not,
+// the encoder is fine and the terminal is the problem.
+func writeReference(prefix string, p comp.Pixels) {
+	ramp := p.Ramp
+	if ramp == (paint.Ramp{}) {
+		ramp = comp.NewCanvas(1, 1).Ramp()
+	}
+	cellW, cellH := p.CellW, p.CellH
+	if cellW == 0 || cellH == 0 {
+		cellW, cellH = term.DefaultCellW, term.DefaultCellH
+	}
+
+	for _, ref := range []struct {
+		name string
+		img  *image.RGBA
+	}{
+		{"bar-51", paint.Bar{W: 66 * cellW, H: cellH, Value: 0.51, Ramp: ramp, Track: track(ramp)}.Image()},
+		{"bar-53", paint.Bar{W: 66 * cellW, H: cellH, Value: 0.53, Ramp: ramp, Track: track(ramp)}.Image()},
+		{"panel", paint.Panel{W: 72 * cellW, H: 5 * cellH, Ramp: ramp, Radius: cellH,
+			Bars: []float64{.2, .5, .35, .8, .6, .95, .4, .7}}.Image()},
+	} {
+		// Flattened against the terminal background, because that is what a
+		// Sixel terminal is actually shown — a PNG with an alpha channel would
+		// open on a white page and look like a different picture.
+		name := fmt.Sprintf("%s-%s.png", prefix, ref.name)
+		f, err := os.Create(name)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "tuikit pixels:", err)
+			os.Exit(1)
+		}
+		if err := png.Encode(f, paint.Flatten(ref.img, p.Background)); err != nil {
+			fmt.Fprintln(os.Stderr, "tuikit pixels:", err)
+			os.Exit(1)
+		}
+		_ = f.Close()
+		fmt.Println("wrote", name)
+	}
+	fmt.Println()
+	fmt.Println("Open those. The two bars differ by two percent — a difference the")
+	fmt.Println("character bar cannot show at all, because it has one step per column.")
+}
+
+// track is the unfilled part of the bar: the ramp's own start, mostly clear.
+func track(r paint.Ramp) color.RGBA {
+	c := r.From
+	c.A = 60
+	return c
 }
 
 func hex(c color.RGBA) string { return fmt.Sprintf("#%02x%02x%02x", c.R, c.G, c.B) }

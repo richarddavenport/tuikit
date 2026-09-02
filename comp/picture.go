@@ -174,11 +174,20 @@ func (c *Canvas) Picture(id ID, draw func(w, h int) *image.RGBA) bool {
 // layer either way — so one ordering serves both, and the one that serves both
 // is the one Sixel demands.
 //
-// Positioning is absolute, which assumes the frame's top-left is the terminal's
-// home cell. That is true of an alt-screen program and false of one printing
-// into a scrollback, so pictures are for alt-screen interfaces. The cursor is
-// saved and restored around the whole block so that whatever the renderer
-// believed about the cursor is still true afterwards.
+// Positioning is RELATIVE to where the frame ended, not absolute.
+//
+// Absolute placement (CSI row;col H) was the first attempt and it is wrong
+// wherever the frame does not start at the terminal's home cell — which is any
+// program printing into a scrollback rather than running alt-screen. It put
+// every picture in the top-left corner of the window while the characters it
+// belonged to sat further down, and because the Sixel path blanks its region
+// first, what you saw was an empty bar and a stray image somewhere else.
+//
+// These bytes are appended after the last row, so the cursor is on row h-1 of
+// the frame. Moving up from there costs nothing in an alt-screen program and is
+// the only thing that works outside one. Columns use CSI n G, which is relative
+// to the line rather than the screen, so the horizontal half needs no
+// arithmetic at all.
 func (c *Canvas) pixels() string {
 	if c.gfx == nil || len(c.gfx.pictures) == 0 {
 		return ""
@@ -186,7 +195,10 @@ func (c *Canvas) pixels() string {
 	var b strings.Builder
 	b.WriteString("\x1b7") // save cursor
 	for _, p := range c.gfx.pictures {
-		fmt.Fprintf(&b, "\x1b[%d;%dH", p.r.Y+1, p.r.X+1) // 1-based
+		if up := c.h - 1 - p.r.Y; up > 0 {
+			fmt.Fprintf(&b, "\x1b[%dA", up)
+		}
+		fmt.Fprintf(&b, "\x1b[%dG", p.r.X+1) // column, 1-based, within the line
 		switch c.gfx.Mode {
 		case term.Sixel:
 			// Sixel has no alpha, so the soft edges are composited here
@@ -197,6 +209,9 @@ func (c *Canvas) pixels() string {
 		case term.Kitty:
 			b.WriteString(term.EncodeKitty(p.img, p.id))
 		}
+		// Back to where the frame ended, so the next picture's "up" is
+		// measured from the same place this one's was.
+		b.WriteString("\x1b8\x1b7")
 	}
 	b.WriteString("\x1b8") // restore cursor
 	return b.String()
