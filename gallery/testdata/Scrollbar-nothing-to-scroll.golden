@@ -1,23 +1,23 @@
 tuikit gallery  every component, running                                                                               20 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ List                                                                                           │
-│ List                          │ │ A scrollable, selectable list, flat or grouped. The viewport and the selection are separate.   │
-│ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · grouped · grouped, collapsed · no│
-│ Tabs                          │ │ the cursor is a memory of where you were                                                       │
+│ Components                    │ │ Scrollbar                                                                                      │
+│ List                          │ │ Where you are in a list. Its status line says how much is hidden; this says where.             │
+│ Pane                          │ │ ‹ at the top · halfway · at the end · 200,000 rows · nothing to scroll ›                       │
+│ Tabs                          │ │ draws nothing at all — a full-height thumb says only that there is a scrollbar                 │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │  api_gateway                                                                                   │
-│ StepList                      │ │  api_worker                                                                                    │
-│ LogPane                       │ │  api_migrate                                                                                   │
-│ Spinner                       │ │  web_frontend                                                                                  │
-│ Table                         │ │  web_assets                                                                                    │
-│ Detail                        │ │  data_indexer                                                                                  │
-│ Menu                          │ │                                                                                                │
-│ Toast                         │ │                                                                                                │
+│ Confirm                       │ │  row 0                                                                                         │
+│ StepList                      │ │  row 1                                                                                         │
+│ LogPane                       │ │  row 2                                                                                         │
+│ Spinner                       │ │  row 3                                                                                         │
+│ Table                         │ │  row 4                                                                                         │
+│ Detail                        │ │  row 5                                                                                         │
+│ Menu                          │ │  row 6                                                                                         │
+│ Toast                         │ │  row 7                                                                                         │
 │ Form                          │ │                                                                                                │
 │ Split                         │ │                                                                                                │
 │ Layout                        │ │                                                                                                │
-│ Meter                         │ │                                                                                                │
+│ Meter                         │ │                                                                                         8/8    │
 │ Input                         │ │                                                                                                │
 │ Waiting                       │ │                                                                                                │
 │ Breadcrumb                    │ │                                                                                                │
@@ -26,12 +26,12 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │                                                                                           6/6  │
-│                               │ │ keys     ↑↓ move the selection · j/k the same                                                  │
-│                               │ │ mouse    click select the row, anywhere across it · wheel scroll the viewport, never the sele… │
-│                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │
-│                               │ │ glyphs   ↑ ↓ ▸ ▾                                                                               │
-│                               │ │ from     pgctl window(), swarmctl pane scrolling, azctl cursor/top                             │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ mouse    wheel the list's, not the bar's — this reports, it does not act                       │
+│                               │ │ roles    Border · Accent                                                                       │
+│                               │ │ glyphs   · │                                                                                   │
+│                               │ │ from     comp.List, which exposed Offset and Max and drew neither                              │
 │                         20/20 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

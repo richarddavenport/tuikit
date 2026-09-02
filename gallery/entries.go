@@ -44,6 +44,7 @@ func (m *Model) Entries() []Entry {
 		m.inputEntry(s),
 		m.waitingEntry(s),
 		m.breadcrumbEntry(s),
+		m.scrollbarEntry(s),
 	}
 }
 
@@ -1041,6 +1042,47 @@ func (m *Model) breadcrumbEntry(s *styles) Entry {
 				Draw: draw(deep, 26)},
 			{Name: "very narrow", Note: "the screen you are on survives alone — dropping it to keep the ones you are not would answer the wrong question",
 				Draw: draw(deep, 8)},
+		},
+	}
+}
+
+// scrollbarEntry: where you are, rather than how much is hidden.
+func (m *Model) scrollbarEntry(s *styles) Entry {
+	// twelve rows in every state, so the bar is the only thing that changes.
+	const shown = 12
+	draw := func(total, offset int) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			// A list beside it, so the bar is read against something.
+			l := &comp.List{Name: "demo.sbrow", Selected: &s.selected, Unfocused: &s.focused}
+			body := comp.Rect{X: r.X, Y: r.Y, W: r.W - 2, H: min(r.H, shown)}
+			l.Scroll(offset)
+			l.DrawFunc(c, body, total, func(i int) comp.Row {
+				return comp.Row{Text: " row " + itoa(i)}
+			})
+			comp.Scrollbar{
+				Total: l.Count(), Shown: l.Shown(), Offset: l.Offset(),
+				Track: &s.border, Thumb: &s.focused,
+			}.Draw(c, comp.Rect{X: r.X + r.W - 1, Y: body.Y, W: 1, H: body.H}, comp.Region("demo.sb"))
+		}
+	}
+	return Entry{
+		Name:    "Scrollbar",
+		Summary: "Where you are in a list. Its status line says how much is hidden; this says where.",
+		From:    "comp.List, which exposed Offset and Max and drew neither",
+		Mouse:   []comp.Hint{{Key: "wheel", Label: "the list's, not the bar's — this reports, it does not act"}},
+		Roles:   []string{"Border", "Accent"},
+		Glyphs:  []string{"·", "│"},
+		States: []State{
+			{Name: "at the top", Note: "the thumb is a proportion and a position; neither can be worked out from the other",
+				Draw: draw(40, 0)},
+			{Name: "halfway", Note: "it moves under your hand, which is what makes a viewport feel like one",
+				Draw: draw(40, 14)},
+			{Name: "at the end", Note: "the last row of the list puts the thumb on the last row of the bar — nearly there and there are different answers",
+				Draw: draw(40, 28)},
+			{Name: "200,000 rows", Note: "a thumb of 0.0005 rows clamps to one: a scrollbar that vanishes when the list is longest is worse than none",
+				Draw: draw(200000, 0)},
+			{Name: "nothing to scroll", Note: "draws nothing at all — a full-height thumb says only that there is a scrollbar",
+				Draw: draw(8, 0)},
 		},
 	}
 }

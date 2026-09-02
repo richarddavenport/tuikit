@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               19 components
+tuikit gallery  every component, running                                                                               20 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Menu                                                                                           │
@@ -21,7 +21,7 @@ tuikit gallery  every component, running                                        
 │ Input                         │ │                                                                                                │
 │ Waiting                       │ │                                                                                                │
 │ Breadcrumb                    │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Scrollbar                     │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                               ┌──────────────┐ │
 │                               │ │                                                                               │ View logs  L │ │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ mouse    rclick open it on what is under the pointer · click choose — and a click on the bord… │
 │                               │ │ roles    Accent · Muted · SelectionFG · SelectionBG                                            │
 │                               │ │ from     democtl's context menu; azctl needs the same one                                      │
-│                         19/19 │ │                                                                                                │
+│                         20/20 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

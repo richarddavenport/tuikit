@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               19 components
+tuikit gallery  every component, running                                                                               20 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Input                                                                                          │
@@ -21,7 +21,7 @@ tuikit gallery  every component, running                                        
 │ Input                         │ │                                                                                                │
 │ Waiting                       │ │                                                                                                │
 │ Breadcrumb                    │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Scrollbar                     │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Accent · Muted · SelectionFG · SelectionBG                                            │
 │                               │ │ glyphs   …                                                                                     │
 │                               │ │ from     democtl and azctl both fake it with a trailing underscore; the swarmctl palette cann… │
-│                         19/19 │ │                                                                                                │
+│                         20/20 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

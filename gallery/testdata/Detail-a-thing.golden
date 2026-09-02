@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               19 components
+tuikit gallery  every component, running                                                                               20 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Detail                                                                                         │
@@ -21,7 +21,7 @@ tuikit gallery  every component, running                                        
 │ Input                         │ │                                                                                                │
 │ Waiting                       │ │                                                                                                │
 │ Breadcrumb                    │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Scrollbar                     │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │ roles    Accent · Muted · Danger                                                               │
 │                               │ │ from     democtl field(), azctl fields() — both carried y from call to call                    │
-│                         19/19 │ │                                                                                                │
+│                         20/20 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

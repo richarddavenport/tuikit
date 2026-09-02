@@ -34,6 +34,15 @@ type Chrome struct {
 	Separator string
 	// ScrollUp and ScrollDown say which way an off-screen selection went.
 	ScrollUp, ScrollDown string
+
+	// ScrollTrack and ScrollThumb are a scrollbar's two characters.
+	//
+	// The same vocabulary as comp.Meter rotated a quarter turn: a dotted track
+	// and a solid bar. Block elements (U+2580–U+259F) are the obvious choice
+	// and are excluded, because a font without them draws a scrollbar as a
+	// column of replacement boxes — which is the failure this whole set exists
+	// to prevent.
+	ScrollTrack, ScrollThumb string
 	// ChevronLeft and ChevronRight wrap a tab strip, saying it cycles and
 	// which keys do it — a fact about the keymap that no styling can carry.
 	ChevronLeft, ChevronRight string
@@ -98,10 +107,12 @@ var DefaultChrome = Chrome{
 	Divider:  " ",
 	VDivider: " ",
 
-	Ellipsis:   "…",
-	Separator:  " · ",
-	ScrollUp:   "↑",
-	ScrollDown: "↓",
+	Ellipsis:    "…",
+	Separator:   " · ",
+	ScrollTrack: "·",
+	ScrollThumb: "│",
+	ScrollUp:    "↑",
+	ScrollDown:  "↓",
 
 	ChevronLeft:  "‹",
 	ChevronRight: "›",
@@ -132,6 +143,7 @@ func (c Chrome) Glyphs() []rune {
 		c.Box.BottomLeft, c.Box.Bottom, c.Box.BottomRight,
 		c.Divider, c.VDivider,
 		c.Ellipsis, c.Separator, c.ScrollUp, c.ScrollDown,
+		c.ScrollTrack, c.ScrollThumb,
 		c.ChevronLeft, c.ChevronRight,
 		c.Collapsed, c.Expanded,
 	} {

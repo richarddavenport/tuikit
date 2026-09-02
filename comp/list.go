@@ -292,6 +292,15 @@ func (l *List) status(c *Canvas, r Rect) {
 	c.Text(r.Right()-Width(count), y, count, l.Status, id)
 }
 
+// Count is how many rows the last frame was given, and Shown how many of them
+// fit. Both, because Max is their difference and a caller cannot get back to
+// the pair from it — which is what a [Scrollbar] needs to size its thumb and
+// place it.
+func (l *List) Count() int { return l.count }
+
+// Shown is how many rows the last frame had room for.
+func (l *List) Shown() int { return l.shown }
+
 // Max is the furthest the list can be scrolled, given what the last frame drew.
 func (l *List) Max() int { return max(0, l.count-l.shown) }
 
