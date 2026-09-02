@@ -1,6 +1,8 @@
 package app
 
 import (
+	"time"
+
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/richarddavenport/tuikit/comp"
@@ -23,6 +25,22 @@ const WheelRows = 3
 // the handler that everyone writes once they have felt the bug.
 type Mouse struct {
 	dragging bool
+	// hovering is what the pointer was last over, so Hover fires on entering
+	// and leaving rather than on every event.
+	hovering comp.ID
+	// pressed and pressedAt are the last left press, for double-click.
+	pressed   comp.ID
+	pressedAt time.Time
+
+	// Now is the clock double-click measures against. Nil takes time.Now.
+	//
+	// A field rather than a call, so a capture script can double-click without
+	// real time passing — the same reason comp.Spinner takes a moment rather
+	// than counting frames.
+	Now func() time.Time
+	// DoubleClickWithin is how close two presses must be. Zero takes 400ms,
+	// which is the usual desktop default and is not worth inventing.
+	DoubleClickWithin time.Duration
 	// on is what the drag started on, so every motion is delivered to the
 	// thing that was grabbed rather than to whatever is under the pointer now.
 	on comp.ID
@@ -53,6 +71,63 @@ type Handler struct {
 	Drag func(id comp.ID, msg tea.MouseMsg) tea.Cmd
 	// Release ends it.
 	Release func(id comp.ID) tea.Cmd
+
+	// Hover is the region under the pointer, or the zero ID when it has left
+	// everything.
+	//
+	// Called only when the answer CHANGES, so a tool redraws on entering and
+	// leaving rather than on every pixel of movement. That is not a nicety: a
+	// callback per motion event is a redraw per motion event, and the cost of
+	// that is the thing to measure before leaning on it.
+	//
+	// Hover is the affordance that says a thing is clickable BEFORE you click
+	// it, and in a terminal it does more work than in a window, because there
+	// is no cursor shape to fall back on.
+	Hover func(id comp.ID) tea.Cmd
+
+	// DoubleClick is a second press on the same region, inside the interval.
+	//
+	// Press still fires for both, because the first click of a double-click is
+	// a real click — a list that only selected on single clicks would flicker
+	// its selection off on the second.
+	//
+	// Decision 19 applies with force here: double-click is the conventional
+	// "open" gesture, and an open that exists only for a mouse is an open an
+	// agent cannot perform. guard.Reachable will say so.
+	DoubleClick func(id comp.ID, msg tea.MouseMsg) tea.Cmd
+}
+
+// defaultDoubleClick is the usual desktop interval.
+const defaultDoubleClick = 400 * time.Millisecond
+
+// now is the clock, defaulting to the real one.
+func (m *Mouse) now() time.Time {
+	if m.Now != nil {
+		return m.Now()
+	}
+	return time.Now()
+}
+
+// double reports whether this press completes a double-click on id, and
+// records it either way.
+func (m *Mouse) double(id comp.ID) bool {
+	within := m.DoubleClickWithin
+	if within == 0 {
+		within = defaultDoubleClick
+	}
+	at := m.now()
+	// The same REGION, not the same pixel: a row is one thing however wide it
+	// is, and asking a reader to hit the same cell twice is asking for a skill
+	// rather than a gesture.
+	is := id == m.pressed && !m.pressedAt.IsZero() && at.Sub(m.pressedAt) <= within
+	if is {
+		// Consumed, so three clicks are a double and a single rather than two
+		// doubles — which would fire "open" twice for one gesture.
+		m.pressed, m.pressedAt = comp.ID{}, time.Time{}
+		return true
+	}
+	m.pressed, m.pressedAt = id, at
+	return false
 }
 
 // Route dispatches one event against the last frame drawn.
@@ -87,6 +162,19 @@ func (m *Mouse) Route(msg tea.MouseMsg, c *comp.Canvas, h Handler) tea.Cmd {
 	}
 	id := c.OwnerAt(msg.X, msg.Y)
 
+	// Motion with no button is the pointer moving over things. Reported only
+	// when what is under it changes.
+	if msg.Action == tea.MouseActionMotion && msg.Button == tea.MouseButtonNone {
+		if id == m.hovering {
+			return nil
+		}
+		m.hovering = id
+		if h.Hover != nil {
+			return h.Hover(id)
+		}
+		return nil
+	}
+
 	switch {
 	case msg.Button == tea.MouseButtonWheelUp:
 		if h.Wheel != nil {
@@ -104,9 +192,17 @@ func (m *Mouse) Route(msg tea.MouseMsg, c *comp.Canvas, h Handler) tea.Cmd {
 			}
 			return nil
 		}
+		// The first click of a double-click is a real click, so Press fires for
+		// both and DoubleClick is the extra meaning on the second.
+		second := m.double(id)
+		var cmds []tea.Cmd
 		if h.Press != nil {
-			return h.Press(id, msg)
+			cmds = append(cmds, h.Press(id, msg))
 		}
+		if second && h.DoubleClick != nil {
+			cmds = append(cmds, h.DoubleClick(id, msg))
+		}
+		return tea.Batch(cmds...)
 	case msg.Action == tea.MouseActionPress && msg.Button == tea.MouseButtonRight:
 		if h.RightPress != nil {
 			return h.RightPress(id, msg)

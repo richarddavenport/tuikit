@@ -9,8 +9,12 @@ import (
 	"testing"
 	"time"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/termenv"
+
+	"github.com/richarddavenport/tuikit/app"
+	"github.com/richarddavenport/tuikit/comp"
 )
 
 // The trap that put Strip in a library with a test rather than a regex at each
@@ -331,5 +335,50 @@ func TestHTMLResetClearsEverything(t *testing.T) {
 
 	if strings.Contains(got, ">plain") && strings.Contains(got, `<span style="background:#5f00ff;font-weight:600">plain`) {
 		t.Errorf("the reset did not clear the state:\n%s", got)
+	}
+}
+
+// A script can drive hover and double-click by name, like everything else.
+type probe struct {
+	canvas                    *comp.Canvas
+	mouse                     app.Mouse
+	hovered, doubled, pressed int
+}
+
+func (p *probe) View() string {
+	c := comp.NewCanvas(20, 3)
+	c.Fill(comp.Rect{X: 2, Y: 1, W: 8, H: 1}, " ", nil, comp.Region("box"))
+	p.canvas = c
+	return c.String()
+}
+func (p *probe) Canvas() *comp.Canvas { return p.canvas }
+func (p *probe) Init() tea.Cmd        { return nil }
+func (p *probe) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if mouse, ok := msg.(tea.MouseMsg); ok {
+		p.mouse.Route(mouse, p.canvas, app.Handler{
+			Hover:       func(comp.ID) tea.Cmd { p.hovered++; return nil },
+			Press:       func(comp.ID, tea.MouseMsg) tea.Cmd { p.pressed++; return nil },
+			DoubleClick: func(comp.ID, tea.MouseMsg) tea.Cmd { p.doubled++; return nil },
+		})
+	}
+	return p, nil
+}
+
+func TestHoverAndDoubleClickAreScriptable(t *testing.T) {
+	p := &probe{}
+	p.View() // a region has to be drawn before it can be addressed
+	Script(t, p, `
+	    hover box
+	    doubleclick box
+	`)
+	if p.hovered != 1 {
+		t.Errorf("hover fired %d times, want 1", p.hovered)
+	}
+	if p.doubled != 1 {
+		t.Errorf("double-click fired %d times, want 1", p.doubled)
+	}
+	// The first press of a double is a real press.
+	if p.pressed != 2 {
+		t.Errorf("press fired %d times, want 2", p.pressed)
 	}
 }

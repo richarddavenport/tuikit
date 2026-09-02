@@ -200,3 +200,45 @@ A new step 4.5, before `comp`: land `comp.Canvas` for real — wide runes, a
 `Rect`-based layout helper, typed owner IDs — and port democtl onto it. `comp`
 is then extracted on top of a substrate that already knows about the mouse,
 rather than being rewritten to learn.
+
+
+## Hover and double-click
+
+Added after the landscape survey found them missing — `design/research/tui-landscape.md`
+calls hover "the real gap", because tview, bubbleapp and cursive all have it and
+we handled `MouseActionMotion` only while dragging.
+
+**Hover fires on change, not on movement.** `app.Handler.Hover` is called when
+what is under the pointer becomes a different region, and once more with the
+zero ID when it leaves everything. A callback per motion event would be a redraw
+per motion event, which is the cost that has to be measured rather than assumed.
+Reporting the leave matters as much as the enter: a tool that highlighted a row
+needs to be told to stop.
+
+Hover is the affordance that says a thing is clickable before you click it, and
+it does more work in a terminal than in a window, because there is no cursor
+shape to fall back on.
+
+**Double-click is per REGION, not per cell.** A row is one thing however wide it
+is, and asking a reader to hit the same cell twice is asking for a skill rather
+than a gesture. Two presses on the same owner within 400ms.
+
+Three things it deliberately does:
+
+- `Press` fires for both clicks. The first click of a double-click is a real
+  click, and a list that only selected on singles would flicker its selection
+  off on the second.
+- A double is CONSUMED, so three clicks are a double and a single rather than
+  two doubles — which would fire "open" twice for one gesture.
+- The clock is a field (`Mouse.Now`), so a capture script can double-click
+  without real time passing. Same reason `comp.Spinner` takes a moment rather
+  than counting frames.
+
+**Decision 19 applies with force here.** Double-click is the conventional
+"open", and an open that exists only for a mouse is an open an agent cannot
+perform — `guard.Reachable` will say so. Whatever a double-click does, enter
+must do too.
+
+The harness has `hover <region>` and `doubleclick <region>`; the latter sends
+two presses and lets `app.Mouse` decide, because a helper that asserted the
+answer would be testing itself.

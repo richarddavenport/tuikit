@@ -28,6 +28,8 @@ type Pointer interface {
 //	    wheel logs -3
 //	    drag split +10
 //	    rclick services.row[2]
+//	    doubleclick services.row[2]
+//	    hover services.row[2]
 //	`)
 //
 // A coordinate is a guess that happens to work today. A name is a claim about
@@ -58,6 +60,16 @@ func Click(t T, m Pointer, region string) { t.Helper(); do(t, m, "click "+region
 // right-click for itself means the application never sees this, which is why
 // every menu also opens from the keyboard.
 func RClick(t T, m Pointer, region string) { t.Helper(); do(t, m, "rclick "+region) }
+
+// DoubleClick presses twice on a region.
+//
+// Whether that counts as a double is app.Mouse's decision and its clock's; this
+// only sends what a terminal sends. A helper that asserted the answer would be
+// testing itself.
+func DoubleClick(t T, m Pointer, region string) { t.Helper(); do(t, m, "doubleclick "+region) }
+
+// Hover moves the pointer over a region without pressing anything.
+func Hover(t T, m Pointer, region string) { t.Helper(); do(t, m, "hover "+region) }
 
 // Wheel turns the wheel over a region, in notches. Negative is up.
 func Wheel(t T, m Pointer, region string, notches int) {
@@ -108,6 +120,16 @@ func step(m Pointer, line string) error {
 	case "click":
 		send(m, x, y, tea.MouseActionPress, tea.MouseButtonLeft)
 		send(m, x, y, tea.MouseActionRelease, tea.MouseButtonLeft)
+	case "doubleclick":
+		// Two presses, which is what a terminal sends. Whether they count as a
+		// double is app.Mouse's decision and its clock's — a script that faked
+		// the answer would be testing itself.
+		send(m, x, y, tea.MouseActionPress, tea.MouseButtonLeft)
+		send(m, x, y, tea.MouseActionRelease, tea.MouseButtonLeft)
+		send(m, x, y, tea.MouseActionPress, tea.MouseButtonLeft)
+		send(m, x, y, tea.MouseActionRelease, tea.MouseButtonLeft)
+	case "hover":
+		send(m, x, y, tea.MouseActionMotion, tea.MouseButtonNone)
 	case "rclick":
 		send(m, x, y, tea.MouseActionPress, tea.MouseButtonRight)
 		send(m, x, y, tea.MouseActionRelease, tea.MouseButtonRight)
