@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               18 components
+tuikit gallery  every component, running                                                                               19 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Meter                                                                                          │
@@ -20,7 +20,7 @@ tuikit gallery  every component, running                                        
 │ Meter                         │ │                                                                                                │
 │ Input                         │ │                                                                                                │
 │ Waiting                       │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Breadcrumb                    │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Accent · Border · Muted                                                               │
 │                               │ │ glyphs   ─ ·                                                                                   │
 │                               │ │ from     swarmctl's run dialog and activity strip, which both wanted it and had neither        │
-│                         18/18 │ │                                                                                                │
+│                         19/19 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

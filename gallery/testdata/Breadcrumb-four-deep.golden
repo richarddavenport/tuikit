@@ -1,12 +1,12 @@
 tuikit gallery  every component, running                                                                               19 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Meter                                                                                          │
-│ List                          │ │ How far along something is — characters everywhere, pixels where they exist.                   │
-│ Pane                          │ │ ‹ part way · the range · no label · with a pixel layer · resolution is the point ›             │
-│ Tabs                          │ │ the bar is ─ and ·; block elements are excluded, so a font without them still draws a bar      │
+│ Components                    │ │ Breadcrumb                                                                                     │
+│ List                          │ │ How you got here, and how to go back. app.Stack has kept a Path since it was written.          │
+│ Pane                          │ │ ‹ the root · two deep · four deep · too narrow · very narrow ›                                 │
+│ Tabs                          │ │ root first, current last                                                                       │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │ [──────────────────────────────────···················································] 2 of 5 │
+│ Confirm                       │ │ democtl · services · api_gateway · Logs                                                        │
 │ StepList                      │ │                                                                                                │
 │ LogPane                       │ │                                                                                                │
 │ Spinner                       │ │                                                                                                │
@@ -27,11 +27,11 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │                                                                                                │
-│                               │ │                                                                                                │
-│                               │ │ roles    Accent · Border · Muted                                                               │
-│                               │ │ glyphs   ─ ·                                                                                   │
-│                               │ │ from     swarmctl's run dialog and activity strip, which both wanted it and had neither        │
+│                               │ │ keys     esc back one — the crumbs are the mouse's path                                        │
+│                               │ │ mouse    click back to that depth (app.Stack.BackTo)                                           │
+│                               │ │ roles    Accent · Muted · Border                                                               │
+│                               │ │ glyphs   · …                                                                                   │
+│                               │ │ from     app.Stack.Path(), which nothing drew until this existed                               │
 │                         19/19 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

@@ -43,6 +43,7 @@ func (m *Model) Entries() []Entry {
 		m.meterEntry(s),
 		m.inputEntry(s),
 		m.waitingEntry(s),
+		m.breadcrumbEntry(s),
 	}
 }
 
@@ -1001,6 +1002,45 @@ func (m *Model) waitingEntry(s *styles) Entry {
 				Draw: draw(comp.Waiting{Label: label, Since: at}, 9*time.Second, true)},
 			{Name: "a long wait", Note: "minutes, so a number does not run away",
 				Draw: draw(comp.Waiting{Label: label, Since: at}, 135*time.Second, true)},
+		},
+	}
+}
+
+// breadcrumbEntry: how you got here, and how to go back.
+func (m *Model) breadcrumbEntry(s *styles) Entry {
+	draw := func(crumbs []string, width int) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			w := r.W
+			if width > 0 {
+				w = min(w, width)
+			}
+			comp.Breadcrumb{
+				Crumbs: crumbs, Name: "demo.trail", Item: "demo.crumb",
+				Style: &s.muted, Current: &s.title, Separator: &s.border,
+			}.Draw(c, comp.Rect{X: r.X, Y: r.Y, W: w, H: 1})
+		}
+	}
+	deep := []string{"democtl", "services", "api_gateway", "Logs"}
+
+	return Entry{
+		Name:    "Breadcrumb",
+		Summary: "How you got here, and how to go back. app.Stack has kept a Path since it was written.",
+		From:    "app.Stack.Path(), which nothing drew until this existed",
+		Keys:    []comp.Hint{{Key: "esc", Label: "back one — the crumbs are the mouse's path"}},
+		Mouse:   []comp.Hint{{Key: "click", Label: "back to that depth (app.Stack.BackTo)"}},
+		Roles:   []string{"Accent", "Muted", "Border"},
+		Glyphs:  []string{"·", "…"},
+		States: []State{
+			{Name: "the root", Note: "one crumb is still a trail — it says you are as far out as you go",
+				Draw: draw([]string{"democtl"}, 0)},
+			{Name: "two deep", Note: "the last is the screen you are on, and is the only one coloured",
+				Draw: draw([]string{"democtl", "Logs"}, 0)},
+			{Name: "four deep", Note: "root first, current last",
+				Draw: draw(deep, 0)},
+			{Name: "too narrow", Note: "elided from the LEFT: where you are and how far in are what a breadcrumb is for; the middle is what you can lose",
+				Draw: draw(deep, 26)},
+			{Name: "very narrow", Note: "the screen you are on survives alone — dropping it to keep the ones you are not would answer the wrong question",
+				Draw: draw(deep, 8)},
 		},
 	}
 }

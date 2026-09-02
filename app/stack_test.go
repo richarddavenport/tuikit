@@ -150,3 +150,44 @@ func TestDepthSaysWhetherThereIsAWayBack(t *testing.T) {
 		t.Errorf("depth is %d, want 2", s.Depth())
 	}
 }
+
+// BackTo is what clicking a breadcrumb means. The stack had Back and
+// BackToRoot and nothing between.
+func TestBackToADepth(t *testing.T) {
+	var s Stack
+	s.Push(1, "democtl")
+	s.Push(2, "services")
+	s.Push(3, "api_gateway")
+	s.Push(4, "Logs")
+
+	if !s.BackTo(1) {
+		t.Fatal("BackTo(1) reported nothing to do")
+	}
+	if s.Depth() != 2 {
+		t.Errorf("the stack is %d deep, want 2", s.Depth())
+	}
+	if got := s.Current(); got != 2 {
+		t.Errorf("we are on screen %v, want 2", got)
+	}
+}
+
+// Out of range does nothing rather than clamping: guessing which screen a
+// reader meant is how a click ends up somewhere they did not point.
+func TestBackToOutOfRangeDoesNothing(t *testing.T) {
+	var s Stack
+	s.Push(1, "root")
+	s.Push(2, "second")
+
+	for _, depth := range []int{-1, 2, 99} {
+		if s.BackTo(depth) {
+			t.Errorf("BackTo(%d) claimed to move", depth)
+		}
+		if s.Depth() != 2 {
+			t.Fatalf("BackTo(%d) changed the stack to %d deep", depth, s.Depth())
+		}
+	}
+	// And going where you already are is not a move either.
+	if s.BackTo(1) {
+		t.Error("BackTo on the current depth claimed to move")
+	}
+}

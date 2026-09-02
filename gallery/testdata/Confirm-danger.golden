@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               18 components
+tuikit gallery  every component, running                                                                               19 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Confirm                                                                                        │
@@ -20,7 +20,7 @@ tuikit gallery  every component, running                                        
 │ Meter                         │ │                │undone.                                                       │                │
 │ Input                         │ │                │                                                              │                │
 │ Waiting                       │ │                │y confirm · n cancel                                          │                │
-│                               │ │                └──────────────────────────────────────────────────────────────┘                │
+│ Breadcrumb                    │ │                └──────────────────────────────────────────────────────────────┘                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Accent · Danger · Muted                                                               │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘ ·                                                                         │
 │                               │ │ from     swarmctl action.go, pgctl actionview.go, democtl overlay                              │
-│                         18/18 │ │                                                                                                │
+│                         19/19 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

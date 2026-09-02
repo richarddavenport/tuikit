@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               18 components
+tuikit gallery  every component, running                                                                               19 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Layout                                                                                         │
@@ -20,7 +20,7 @@ tuikit gallery  every component, running                                        
 │ Meter                         │ │                                                                                                │
 │ Input                         │ │                                                                                                │
 │ Waiting                       │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Breadcrumb                    │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │ roles    Accent · Muted · Pending                                                              │
 │                               │ │ from     the body()/bodyHeight() pair every one of the four tools writes                       │
-│                         18/18 │ │                                                                                                │
+│                         19/19 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

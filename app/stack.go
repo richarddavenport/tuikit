@@ -100,6 +100,26 @@ func (s *Stack) Back() bool {
 	return true
 }
 
+// BackTo goes back to a depth, which is what clicking a breadcrumb means.
+//
+// The stack had Back and BackToRoot and nothing between, so a trail four deep
+// could only be walked one screen at a time — fine for esc and useless for a
+// click on the second crumb of four.
+//
+// Out of range does nothing rather than clamping: a depth that is not on the
+// stack names a screen the reader is not looking at, and guessing which one
+// they meant is how a click ends up somewhere they did not point.
+func (s *Stack) BackTo(depth int) bool {
+	if depth < 0 || depth >= len(s.entries) {
+		return false
+	}
+	if depth == len(s.entries)-1 {
+		return false // already there
+	}
+	s.entries = s.entries[:depth+1]
+	return true
+}
+
 // BackToRoot unwinds to the first screen.
 func (s *Stack) BackToRoot() {
 	if len(s.entries) > 1 {
