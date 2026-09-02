@@ -38,6 +38,7 @@ func (m *Model) Entries() []Entry {
 		m.formEntry(s),
 		m.splitEntry(s),
 		m.layoutEntry(s),
+		m.meterEntry(s),
 	}
 }
 
@@ -776,5 +777,47 @@ func blit(dst *comp.Canvas, r comp.Rect, src *comp.Canvas) {
 				dst.Set(r.X+x, r.Y+y, cell.Text, cell.Style, cell.Owner)
 			}
 		}
+	}
+}
+
+// meterEntry is the only component in this gallery with a pixel layer, and the
+// states are arranged to show what that buys: the same value, drawn twice.
+func (m *Model) meterEntry(s *styles) Entry {
+	draw := func(meters ...comp.Meter) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			y := r.Y
+			for i, meter := range meters {
+				meter.Filled, meter.Empty, meter.LabelStyle = &s.focused, &s.border, &s.muted
+				meter.Track = comp.Name("demo.track" + itoa(i))
+				y = meter.Draw(c, comp.Rect{X: r.X, Y: y, W: r.W, H: 1}, comp.Region("demo.meter"))
+				y++ // a blank row between them
+			}
+		}
+	}
+	return Entry{
+		Name:    "Meter",
+		Summary: "How far along something is — characters everywhere, pixels where they exist.",
+		From:    "swarmctl's run dialog and activity strip, which both wanted it and had neither",
+		Roles:   []string{"Accent", "Border", "Muted"},
+		Glyphs:  []string{"─", "·"},
+		States: []State{
+			{Name: "part way", Note: "the bar is ─ and ·; block elements are excluded, so a font without them still draws a bar",
+				Draw: draw(comp.Meter{Value: 0.4, Label: "2 of 5"})},
+			{Name: "the range", Note: "empty, part, full — a bar that cannot reach either end is a bar nobody trusts",
+				Draw: draw(
+					comp.Meter{Value: 0, Label: "queued"},
+					comp.Meter{Value: 0.62, Label: "measuring images"},
+					comp.Meter{Value: 1, Label: "done"},
+				)},
+			{Name: "no label", Note: "the label is optional; the bar still says the number, coarsely",
+				Draw: draw(comp.Meter{Value: 0.75})},
+			{Name: "with a pixel layer", Note: "identical here — a test has no terminal, so this is the fallback and always will be",
+				Draw: draw(comp.Meter{Value: 0.62, Label: "2 of 5", Pixels: true})},
+			{Name: "resolution is the point", Note: "51% and 53% are the same cell bar; run this in foot or Ghostty and they are not",
+				Draw: draw(
+					comp.Meter{Value: 0.51, Label: "51%", Pixels: true},
+					comp.Meter{Value: 0.53, Label: "53%", Pixels: true},
+				)},
+		},
 	}
 }

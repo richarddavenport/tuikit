@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               15 components
+tuikit gallery  every component, running                                                                               16 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ List                                                                                           │
@@ -17,7 +17,7 @@ tuikit gallery  every component, running                                        
 │ Form                          │ │  edge_cache                                                                                    │
 │ Split                         │ │  auth_session                                                                                  │
 │ Layout                        │ │  auth_tokens                                                                                   │
-│                               │ │  media_upload                                                                                  │
+│ Meter                         │ │  media_upload                                                                                  │
 │                               │ │  media_transcode                                                                               │
 │                               │ │  ops_metrics                                                                                   │
 │                               │ │  ops_logs                                                                                      │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │
 │                               │ │ glyphs   ↑ ↓ ▸ ▾                                                                               │
 │                               │ │ from     pgctl window(), swarmctl pane scrolling, azctl cursor/top                             │
-│                         15/15 │ │                                                                                                │
+│                         16/16 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

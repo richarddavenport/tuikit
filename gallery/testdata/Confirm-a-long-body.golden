@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               15 components
+tuikit gallery  every component, running                                                                               16 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Confirm                                                                                        │
@@ -17,7 +17,7 @@ tuikit gallery  every component, running                                        
 │ Form                          │ │                │The plan's description can be as long as a list of every      │                │
 │ Split                         │ │                │table a widened selection adds. The plan's description can    │                │
 │ Layout                        │ │                │be as long as a list of every table a widened selection       │                │
-│                               │ │                │adds. The plan's description can be as long as a list of      │                │
+│ Meter                         │ │                │adds. The plan's description can be as long as a list of      │                │
 │                               │ │                │every table a widened selection adds.                         │                │
 │                               │ │                │                                                              │                │
 │                               │ │                │y confirm · n cancel                                          │                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Accent · Danger · Muted                                                               │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘ ·                                                                         │
 │                               │ │ from     swarmctl action.go, pgctl actionview.go, democtl overlay                              │
-│                         15/15 │ │                                                                                                │
+│                         16/16 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

@@ -164,3 +164,51 @@ func Flatten(src *image.RGBA, bg color.RGBA) *image.RGBA {
 	}
 	return out
 }
+
+// Bar is a progress bar: a rounded track with a rounded ramp-filled portion.
+//
+// The design system's cell version of this is `[` `─`×filled `·`×remaining `]`,
+// and that is what a reader sees on a terminal without graphics. This is the
+// same information with the steps taken out — which is the honest test of
+// whether a pixel layer is worth having at all. If the picture does not say
+// something the characters cannot, it is decoration.
+type Bar struct {
+	W, H  int
+	Value float64
+	Ramp  Ramp
+	// Track is the unfilled remainder. Alpha is respected, so a track can be
+	// a faint tint rather than a colour.
+	Track color.RGBA
+	// Radius defaults to half the height — a bar with square ends reads as a
+	// container rather than as a level.
+	Radius int
+}
+
+func (b Bar) Image() *image.RGBA {
+	img := image.NewRGBA(image.Rect(0, 0, b.W, b.H))
+	if b.W <= 0 || b.H <= 0 {
+		return img
+	}
+	r := b.Radius
+	if r == 0 {
+		r = b.H / 2
+	}
+	shape := Panel{W: b.W, H: b.H, Radius: r}
+	filled := int(math.Round(math.Max(0, math.Min(1, b.Value)) * float64(b.W)))
+
+	for y := 0; y < b.H; y++ {
+		for x := 0; x < b.W; x++ {
+			c := b.Track
+			if x < filled {
+				// The ramp is sampled across the WHOLE bar, not across the
+				// filled part, so the colour at a given level does not change
+				// as the level moves. A gradient that slides is a gradient
+				// that reads as motion nobody asked for.
+				c = b.Ramp.At(float64(x) / float64(b.W-1))
+			}
+			c.A = uint8(float64(c.A) * shape.coverage(float64(x)+0.5, float64(y)+0.5))
+			img.SetRGBA(x, y, c)
+		}
+	}
+	return img
+}

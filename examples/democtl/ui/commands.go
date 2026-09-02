@@ -7,6 +7,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/harness"
 
 	"github.com/richarddavenport/tuikit/app"
@@ -169,6 +170,10 @@ func open(seed int64, c spec.Call) int {
 	m := New(seed)
 	dir := c.Flag("snapshot")
 	if dir == "" {
+		// Only the interactive path asks. A --snapshot run is capturing
+		// frames for documentation and must get the characters, whatever the
+		// terminal it happens to be started from can do.
+		m.SetGraphics(comp.Detect())
 		p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion())
 		if _, err := p.Run(); err != nil {
 			_, _ = fmt.Fprintln(c.Err, "democtl:", err)

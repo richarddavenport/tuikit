@@ -19,6 +19,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/docgen"
 	"github.com/richarddavenport/tuikit/gallery"
 	"github.com/richarddavenport/tuikit/scaffold"
@@ -252,8 +253,14 @@ func galleryCmd(args []string) {
 	// The default palette, because this binary shows tuikit's own components. A
 	// tool checking its OWN palette against them calls gallery.New with it —
 	// which is the point of taking one at all.
-	p := tea.NewProgram(gallery.New(theme.Default),
-		tea.WithAltScreen(), tea.WithMouseCellMotion())
+	g := gallery.New(theme.Default)
+	// Asked here rather than inside the gallery, because detection reads
+	// /dev/tty: a model that queried in its constructor would ask the
+	// developer's real terminal during `go test`. Nothing is asked of a
+	// terminal that turns out to draw only characters.
+	g.SetGraphics(comp.Detect())
+
+	p := tea.NewProgram(g, tea.WithAltScreen(), tea.WithMouseCellMotion())
 	if _, err := p.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "tuikit gallery:", err)
 		os.Exit(1)

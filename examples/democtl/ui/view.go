@@ -24,7 +24,7 @@ var tabNames = []string{"Overview", "Config", "Events"}
 // footer, and the bottom line left alone.
 func (m *Model) View() string {
 	bands := m.bands()
-	c := comp.NewCanvas(m.width, bands[3].Bottom()+1)
+	c := comp.NewCanvas(m.width, bands[3].Bottom()+1).WithGraphics(m.pixels)
 
 	m.header(c)
 	// The default case used to be a hand-written complaint. app.Screens owns

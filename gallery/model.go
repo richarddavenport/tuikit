@@ -38,6 +38,12 @@ type Model struct {
 	width, height int
 	canvas        *comp.Canvas
 	mouse         app.Mouse
+
+	// The pixel layer, set by main and never by the model itself. Detection
+	// talks to /dev/tty, and a library that did that in its constructor would
+	// query the developer's real terminal during `go test` — which on a
+	// graphics-capable one would put escape sequences in the goldens.
+	pixels comp.Pixels
 }
 
 // New builds the gallery over a palette.
@@ -58,6 +64,10 @@ func New(p theme.Palette) *Model {
 	}
 	return m
 }
+
+// SetGraphics turns the pixel layer on. Called by main, with what the terminal
+// answered; never called by a test, which is why every golden is the fallback.
+func (m *Model) SetGraphics(p comp.Pixels) { m.pixels = p }
 
 // SetSize is what the capture harness calls instead of waiting for a terminal.
 func (m *Model) SetSize(w, h int) { m.width, m.height = w, h }
@@ -134,7 +144,7 @@ func (m *Model) press(id comp.ID, _ tea.MouseMsg) tea.Cmd {
 
 // View draws the gallery.
 func (m *Model) View() string {
-	c := comp.NewCanvas(m.width, 3+m.bodyHeight())
+	c := comp.NewCanvas(m.width, 3+m.bodyHeight()).WithGraphics(m.pixels)
 	m.header(c)
 
 	body := comp.Rect{X: 0, Y: 2, W: m.width, H: m.bodyHeight()}

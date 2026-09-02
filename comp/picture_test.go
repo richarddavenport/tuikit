@@ -28,7 +28,7 @@ func solid(got *[2]int) func(w, h int) *image.RGBA {
 
 func canvasWith(t *testing.T, mode term.Graphics) *comp.Canvas {
 	t.Helper()
-	c := comp.NewCanvas(20, 6).WithGraphics(mode, 10, 20)
+	c := comp.NewCanvas(20, 6).WithGraphics(comp.Pixels{Mode: mode, CellW: 10, CellH: 20})
 	c.Fill(comp.Rect{X: 2, Y: 1, W: 8, H: 3}, "x", nil, comp.Region(reg))
 	return c
 }

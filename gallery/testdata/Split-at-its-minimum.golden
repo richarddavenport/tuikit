@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               15 components
+tuikit gallery  every component, running                                                                               16 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Split                                                                                          │
@@ -17,7 +17,7 @@ tuikit gallery  every component, running                                        
 │ Form                          │ │ │                  │ │                                                                       │ │
 │ Split                         │ │ │                  │ │                                                                       │ │
 │ Layout                        │ │ │                  │ │                                                                       │ │
-│                               │ │ │                  │ │                                                                       │ │
+│ Meter                         │ │ │                  │ │                                                                       │ │
 │                               │ │ │                  │ │                                                                       │ │
 │                               │ │ │                  │ │                                                                       │ │
 │                               │ │ │                  │ │                                                                       │ │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ mouse    drag the gap between the panes IS the handle                                          │
 │                               │ │ roles    Border                                                                                │
 │                               │ │ from     democtl's dashboard, before it was a component                                        │
-│                         15/15 │ │                                                                                                │
+│                         16/16 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

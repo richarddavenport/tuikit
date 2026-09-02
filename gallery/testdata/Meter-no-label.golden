@@ -1,22 +1,22 @@
 tuikit gallery  every component, running                                                                               16 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Toast                                                                                          │
-│ List                          │ │ Something the interface has to say — and, where we know it, what to do about it.               │
-│ Pane                          │ │ ‹ a failure with a hint · a failure without one · a result · bottom left · a long root cause › │
-│ Tabs                          │ │ bounded, because the cause is arbitrary text from somewhere else                               │
+│ Components                    │ │ Meter                                                                                          │
+│ List                          │ │ How far along something is — characters everywhere, pixels where they exist.                   │
+│ Pane                          │ │ ‹ part way · the range · no label · with a pixel layer · resolution is the point ›             │
+│ Tabs                          │ │ the label is optional; the bar still says the number, coarsely                                 │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │                                                                                                │
-│ StepList                      │ │                                             ┌──────────────────────────────────────────────┐   │
-│ LogPane                       │ │                                             │apply failed                                  │   │
-│ Spinner                       │ │                                             │                                              │   │
-│ Table                         │ │                                             │a root cause that came from somewhere else    │   │
-│ Detail                        │ │                                             │and does not know how wide your terminal is.  │   │
-│ Menu                          │ │                                             │a root cause that came from somewhere else    │   │
-│ Toast                         │ │                                             │and does not know how wide your terminal is.  │   │
-│ Form                          │ │                                             │                                              │   │
-│ Split                         │ │                                             │run with -v for the full trace                │   │
-│ Layout                        │ │                                             └──────────────────────────────────────────────┘   │
+│ Confirm                       │ │ [─────────────────────────────────────────────────────────────────────·······················] │
+│ StepList                      │ │                                                                                                │
+│ LogPane                       │ │                                                                                                │
+│ Spinner                       │ │                                                                                                │
+│ Table                         │ │                                                                                                │
+│ Detail                        │ │                                                                                                │
+│ Menu                          │ │                                                                                                │
+│ Toast                         │ │                                                                                                │
+│ Form                          │ │                                                                                                │
+│ Split                         │ │                                                                                                │
+│ Layout                        │ │                                                                                                │
 │ Meter                         │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -29,9 +29,9 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │ roles    Danger · Success · Border · Muted                                                     │
-│                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
-│                               │ │ from     swarmctl errorView                                                                    │
+│                               │ │ roles    Accent · Border · Muted                                                               │
+│                               │ │ glyphs   ─ ·                                                                                   │
+│                               │ │ from     swarmctl's run dialog and activity strip, which both wanted it and had neither        │
 │                         16/16 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

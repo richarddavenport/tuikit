@@ -3,10 +3,73 @@ package comp
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"strings"
 
+	"github.com/richarddavenport/tuikit/paint"
 	"github.com/richarddavenport/tuikit/term"
 )
+
+// Pixels is everything a canvas needs to know to draw a picture.
+//
+// One struct rather than four arguments, because three of the four are
+// measurements only the terminal can supply and they arrive together — a call
+// site that has the mode but not the cell size is a call site that is about to
+// stretch something.
+type Pixels struct {
+	Mode         term.Graphics
+	CellW, CellH int
+	// Background is what a Sixel picture is flattened against, since Sixel has
+	// no alpha. Ignored by the kitty path, which composites for real.
+	Background color.RGBA
+	// Ramp is the gradient a picture draws with, read from the terminal's OWN
+	// palette rather than chosen here.
+	//
+	// This is the whole reason a component asks for "a picture" instead of
+	// passing colours. Decision 28 put the characters on ANSI 0–15 so the
+	// reader's theme wins; a picture carrying a literal gradient would look
+	// identical under all 22 Omarchy themes while the text beside it changed,
+	// which is a worse result than having no picture at all.
+	Ramp paint.Ramp
+}
+
+// Detect asks the terminal all three questions at once.
+//
+// Called by main, never by a model. Detection reads /dev/tty, and a constructor
+// that did it would query the developer's own terminal during `go test` — which
+// on a graphics-capable one would write escape sequences into the goldens.
+func Detect() Pixels {
+	mode := term.Detect()
+	if mode == term.None {
+		return Pixels{} // do not spend two more round trips to learn nothing
+	}
+	w, h := term.CellSize()
+	p := Pixels{Mode: mode, CellW: w, CellH: h, Background: term.Background(), Ramp: fallbackRamp}
+	// 5 and 13 are magenta and bright magenta — Accent's own family, per
+	// decision 28. Read from the terminal, so changing theme changes the
+	// picture as well as the text.
+	if got := term.Colors(rampFrom, rampTo); got != nil {
+		if c, ok := got[rampFrom]; ok {
+			p.Ramp.From = c
+		}
+		if c, ok := got[rampTo]; ok {
+			p.Ramp.To = c
+		}
+	}
+	return p
+}
+
+// The two palette entries a picture ramps between, and what to use when the
+// terminal will not say: xterm's own defaults for those indices.
+const (
+	rampFrom = 5  // magenta
+	rampTo   = 13 // bright magenta — the index Accent maps to
+)
+
+var fallbackRamp = paint.Ramp{
+	From: color.RGBA{R: 0xcd, B: 0xcd, A: 0xff},
+	To:   color.RGBA{R: 0xff, B: 0xff, A: 0xff},
+}
 
 // graphics is the pixel state, shared by every view of a canvas.
 //
@@ -15,10 +78,9 @@ import (
 // components are handed clips — has to land on the frame that is actually
 // printed, and a slice field on a copy would append into a value nobody reads.
 type graphics struct {
-	mode         term.Graphics
-	cellW, cellH int
-	pictures     []picture
-	nextID       int
+	Pixels
+	pictures []picture
+	nextID   int
 }
 
 type picture struct {
@@ -32,10 +94,25 @@ type picture struct {
 // A tool calls this once, at the top, with what [term.Detect] answered. Leave
 // it unset and every Picture call is a no-op — which is the behaviour under
 // test, and the reason goldens cannot move.
-func (c *Canvas) WithGraphics(mode term.Graphics, cellW, cellH int) *Canvas {
+func (c *Canvas) WithGraphics(p Pixels) *Canvas {
+	p.CellW, p.CellH = max(1, p.CellW), max(1, p.CellH)
+	if p.Background == (color.RGBA{}) {
+		p.Background = term.DefaultBackground
+	}
+	if p.Ramp == (paint.Ramp{}) {
+		p.Ramp = fallbackRamp
+	}
 	view := *c
-	view.gfx = &graphics{mode: mode, cellW: max(1, cellW), cellH: max(1, cellH)}
+	view.gfx = &graphics{Pixels: p}
 	return &view
+}
+
+// Ramp is the gradient a picture on this canvas draws with.
+func (c *Canvas) Ramp() paint.Ramp {
+	if c.gfx == nil {
+		return fallbackRamp
+	}
+	return c.gfx.Ramp
 }
 
 // Graphics is what this canvas can draw beyond characters.
@@ -43,7 +120,7 @@ func (c *Canvas) Graphics() term.Graphics {
 	if c.gfx == nil {
 		return term.None
 	}
-	return c.gfx.mode
+	return c.gfx.Mode
 }
 
 // Picture asks that, if this terminal can, a picture be painted over the cells
@@ -64,14 +141,14 @@ func (c *Canvas) Graphics() term.Graphics {
 // might leave its chart band empty rather than drawing bars underneath a
 // picture of bars.
 func (c *Canvas) Picture(id ID, draw func(w, h int) *image.RGBA) bool {
-	if c.gfx == nil || c.gfx.mode == term.None || draw == nil {
+	if c.gfx == nil || c.gfx.Mode == term.None || draw == nil {
 		return false
 	}
 	r, ok := c.Region(id)
 	if !ok || r.Empty() {
 		return false
 	}
-	img := draw(r.W*c.gfx.cellW, r.H*c.gfx.cellH)
+	img := draw(r.W*c.gfx.CellW, r.H*c.gfx.CellH)
 	if img == nil || img.Bounds().Empty() {
 		return false
 	}
@@ -81,7 +158,7 @@ func (c *Canvas) Picture(id ID, draw func(w, h int) *image.RGBA) bool {
 	// frames between a redraw and the image being re-sent, where it would flash
 	// back. Blanking is not tidiness; it is the only way the region has one
 	// appearance rather than two.
-	if c.gfx.mode == term.Sixel {
+	if c.gfx.Mode == term.Sixel {
 		c.Fill(r, " ", nil, id)
 	}
 
@@ -110,9 +187,13 @@ func (c *Canvas) pixels() string {
 	b.WriteString("\x1b7") // save cursor
 	for _, p := range c.gfx.pictures {
 		fmt.Fprintf(&b, "\x1b[%d;%dH", p.r.Y+1, p.r.X+1) // 1-based
-		switch c.gfx.mode {
+		switch c.gfx.Mode {
 		case term.Sixel:
-			b.WriteString(term.EncodeSixel(p.img))
+			// Sixel has no alpha, so the soft edges are composited here
+			// against the colour the terminal reported. This is the handoff's
+			// second concession — the shadow is baked, and it can only be
+			// baked against a background that is KNOWN rather than guessed.
+			b.WriteString(term.EncodeSixel(paint.Flatten(p.img, c.gfx.Background)))
 		case term.Kitty:
 			b.WriteString(term.EncodeKitty(p.img, p.id))
 		}
