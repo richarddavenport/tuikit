@@ -57,3 +57,36 @@ the point of having them.
 - The engine imports the standard library and its own backend's SDK. Nothing
   else.
 - Anything a mouse can do, a key must also do.
+
+## When comp cannot do something
+
+You will hit this. The rule is **not** to work around it quietly.
+
+If you are about to write `c.Text`, `c.Fill`, `c.Set`, or arithmetic on a Rect,
+stop: the canvas exists so a tool never does that, and a tool that had to is a
+tool the framework failed. Work around it if you must — you have a thing to
+ship — but **report it in the same commit**, or it will not be reported.
+
+```sh
+gh issue create -R richarddavenport/tuikit --template from-a-tool.md
+```
+
+The template asks for four things, and the second is the one that matters:
+
+1. what the tool was doing
+2. **the code you wrote by hand** — the actual code, not a description
+3. which component you reached for and what stopped you
+4. whether you computed a coordinate
+
+Why the code: a component gets built when two tools have hand-rolled the SAME
+thing, and "the same" is a judgement nobody can make from a description.
+`app.Toggles` exists because two tools' versions turned out to be identical.
+`comp.Tree` does *not* exist because two tools' versions turned out to differ in
+a way that mattered — one carried a bucket and a resource, the other a service
+and a change, and a shared node type would have made both of them worse.
+
+A report with the code is evidence. A report without it is a feature request,
+and tuikit does not take those.
+
+**A guess at the API is welcome and a wrong guess is useful.** Say if you have
+none.
