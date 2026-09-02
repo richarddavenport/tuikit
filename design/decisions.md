@@ -765,6 +765,23 @@ width, selectable, and identical on all four terminals. The pixels do what
 pixels are good at — gradients, curves, soft edges, resolution — and nothing
 else.
 
+### Nothing is blanked, and that took a wrong turn first
+
+The Sixel path originally blanked the cells under a picture. An opaque image
+covers them anyway, so leaving them could only make them flash back between
+redraws — which is correct about the good case and badly wrong about the bad
+one.
+
+Forcing Sixel on Ghostty, which does not speak it, showed what that costs: an
+EMPTY `[     ]` where the character bar would have been. The same happens if a
+multiplexer strips the sequence, or a terminal advertises Sixel and then
+declines the payload. Worse than having no pixel layer at all.
+
+So the characters are drawn and the image covers them. It costs a frame of text
+in a rare in-between case, and it degrades to the cell drawing in every failure —
+which is the thesis of this decision. Blanking quietly made the cells a fallback
+that only existed if the decoration worked.
+
 ### What it does not cost
 
 The guards, the goldens, the harness and the mouse hit-testing are all

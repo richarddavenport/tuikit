@@ -159,14 +159,21 @@ func (c *Canvas) Picture(id ID, draw func(w, h int) *image.RGBA) bool {
 		return false
 	}
 
-	// Sixel replaces the cells it covers and cannot blend with them, so any
-	// character left inside the rectangle would be painted over — except in the
-	// frames between a redraw and the image being re-sent, where it would flash
-	// back. Blanking is not tidiness; it is the only way the region has one
-	// appearance rather than two.
-	if c.gfx.Mode == term.Sixel {
-		c.Fill(r, " ", nil, id)
-	}
+	// Nothing is blanked, for either protocol.
+	//
+	// The Sixel path used to blank the region on the reasoning that an opaque
+	// image covers the characters anyway, so leaving them could only make them
+	// flash back between redraws. That reasoning is right about the good case
+	// and badly wrong about the bad one. Forcing Sixel on a terminal that does
+	// not speak it — or having it stripped by a multiplexer, or advertised by a
+	// terminal that then declines the payload — leaves an EMPTY bar where the
+	// character bar would have been. Worse than no pixel layer at all.
+	//
+	// Drawing the characters and letting the image cover them costs a frame of
+	// text in the rare in-between case and degrades to the cell drawing in
+	// every failure. That is the whole thesis of decision 29: the cells are the
+	// drawing, and the picture is a decoration over them. Blanking made them a
+	// fallback that only exists if the decoration works.
 
 	c.gfx.nextID++
 	c.gfx.pictures = append(c.gfx.pictures, picture{r: r, img: img, id: c.gfx.nextID})

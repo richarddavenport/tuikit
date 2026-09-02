@@ -84,19 +84,21 @@ func TestPixelSizeComesFromTheRegion(t *testing.T) {
 	}
 }
 
-// TestSixelBlanksTheRegion. Sixel is opaque, so a character left inside the
-// rectangle is a character that flashes back between redraws.
-func TestSixelBlanksTheRegion(t *testing.T) {
+// TestSixelKeepsTheCharactersUnderneath.
+//
+// An opaque image covers them, so blanking looks harmless — and it is, right up
+// until the image does not arrive. Forced onto a terminal that cannot draw
+// Sixel, or stripped by a multiplexer, blanking leaves an EMPTY bar where the
+// character bar would have been: worse than having no pixel layer at all.
+func TestSixelKeepsTheCharactersUnderneath(t *testing.T) {
 	c := canvasWith(t, term.Sixel)
 	if !c.Picture(comp.Region(reg), solid(nil)) {
 		t.Fatal("Picture declined on a sixel canvas")
 	}
 	cell, _ := c.CellAt(3, 2)
-	if cell.Text != " " {
-		t.Errorf("cell inside a sixel picture = %q, want a blank", cell.Text)
-	}
-	if owner := c.OwnerAt(3, 2); owner.Name != reg {
-		t.Errorf("blanking lost the owner: %v", owner)
+	if cell.Text != "x" {
+		t.Errorf("cell under a sixel picture is %q; it should still hold the character "+
+			"so that a picture which never arrives degrades to the cells", cell.Text)
 	}
 }
 
