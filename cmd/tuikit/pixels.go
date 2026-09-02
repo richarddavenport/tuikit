@@ -79,10 +79,17 @@ func pixels(args []string) {
 		fmt.Println("ramp         not asked")
 	} else {
 		how := "measured"
-		if !p.CellMeasured {
+		switch {
+		case os.Getenv(term.EnvCellSize) != "":
+			how = "forced by " + term.EnvCellSize
+		case !p.CellMeasured:
 			how = "ASSUMED — the terminal declined to say, so pictures will be the wrong size"
 		}
 		fmt.Printf("cell size    %dx%d pixels (%s)\n", p.CellW, p.CellH, how)
+		if p.CellMeasured && os.Getenv(term.EnvCellSize) == "" {
+			fmt.Printf("             if pictures come out half size, try %s=%dx%d\n",
+				term.EnvCellSize, p.CellW*2, p.CellH*2)
+		}
 		fmt.Printf("background   %s\n", hex(p.Background))
 		fmt.Printf("ramp         %s → %s   (ANSI 5 and 13, read from your theme)\n",
 			hex(p.Ramp.From), hex(p.Ramp.To))
@@ -193,7 +200,7 @@ func debugKitty(p comp.Pixels) {
 	// DA1 appended so the read ends as soon as the terminal has finished,
 	// rather than sitting out the whole timeout on one that stays quiet.
 	answer := term.SendAndRead(tty, seq+"\x1b[c", term.DefaultTimeout)
-	fmt.Println("^ the bar should be on the blank line above this one")
+	fmt.Println("^ the bar is drawn AT the cursor, so it lands on this line")
 	fmt.Println()
 
 	switch {

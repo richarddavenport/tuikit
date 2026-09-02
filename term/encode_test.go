@@ -129,6 +129,16 @@ func TestKittyChunks(t *testing.T) {
 	if n := strings.Count(out, "a=T"); n != 1 {
 		t.Errorf("metadata repeated on %d chunks, want 1", n)
 	}
+	// Every chunk's control data must be well formed. Written as ",m=1" the
+	// continuations came out as `ESC_G,m=1;` — a leading comma — and the
+	// terminal kept the first chunk and refused the rest. One-chunk images were
+	// unaffected, so this only broke pictures big enough to be worth drawing.
+	for i, part := range strings.Split(out, "\x1b_G")[1:] {
+		if strings.HasPrefix(part, ",") {
+			t.Errorf("chunk %d starts with a comma: %q", i, part[:min(40, len(part))])
+		}
+	}
+
 	for _, part := range strings.Split(out, "\x1b_G")[1:] {
 		semi, end := strings.Index(part, ";"), strings.Index(part, "\x1b\\")
 		if semi < 0 || end < semi {

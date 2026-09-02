@@ -23,12 +23,42 @@ const (
 // like a bug in the drawing rather than a missing measurement. That is why the
 // bool is here: an assumed size is worth saying out loud.
 func CellSize() (w, h int, measured bool) {
+	if w, h, ok := overrideCellSize(); ok {
+		return w, h, true
+	}
 	f, err := os.OpenFile("/dev/tty", os.O_RDWR, 0)
 	if err != nil {
 		return DefaultCellW, DefaultCellH, false
 	}
 	defer f.Close() //nolint:errcheck // a query we are done with
 	return QueryCellSize(f, DefaultTimeout)
+}
+
+// EnvCellSize forces the cell size, as WxH in pixels.
+//
+// It exists because terminals disagree about what a "pixel" is. On a HiDPI Mac,
+// Ghostty reports the cell in DEVICE pixels (16x34) and draws to match, while
+// iTerm2 reports it in POINTS (8x18) and draws Sixel at device resolution — so
+// every picture there comes out at exactly half the size it asked for. Nothing
+// in-band distinguishes the two, so rather than guess a scale factor this lets
+// a reader state the answer. See issue 31.
+const EnvCellSize = "TUIKIT_CELL_SIZE"
+
+func overrideCellSize() (w, h int, ok bool) {
+	v := strings.TrimSpace(os.Getenv(EnvCellSize))
+	if v == "" {
+		return 0, 0, false
+	}
+	parts := strings.SplitN(strings.ToLower(v), "x", 2)
+	if len(parts) != 2 {
+		return 0, 0, false
+	}
+	w, err1 := strconv.Atoi(strings.TrimSpace(parts[0]))
+	h, err2 := strconv.Atoi(strings.TrimSpace(parts[1]))
+	if err1 != nil || err2 != nil || w <= 0 || h <= 0 {
+		return 0, 0, false
+	}
+	return w, h, true
 }
 
 // QueryCellSize asks three questions at once, because no single one is

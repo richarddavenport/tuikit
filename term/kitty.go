@@ -85,14 +85,21 @@ func encodeKitty(img *image.RGBA, id, quiet int) string {
 			// a=T transmits and displays in one step. q=2 suppresses both the
 			// success and the failure reply: a terminal answering into the
 			// input stream mid-frame would arrive as a keystroke.
-			fmt.Fprintf(&out, "a=T,f=32,o=z,s=%d,v=%d,i=%d,z=-1,C=1,q=%d", w, h, id, quiet)
+			fmt.Fprintf(&out, "a=T,f=32,o=z,s=%d,v=%d,i=%d,z=-1,C=1,q=%d,", w, h, id, quiet)
 			first = false
 		}
 		// m=1 means another chunk follows; m=0 is the last one.
+		//
+		// The separating comma belongs to the keys BEFORE it, not to m. Written
+		// as ",m=1" it produced `ESC_G,m=1;` on every chunk after the first —
+		// a leading comma, which is malformed, so a terminal took the first
+		// chunk and refused the rest. Small images have one chunk and worked
+		// perfectly; only images past 4096 bytes of payload vanished, which is
+		// a bug that hides itself until the picture gets interesting.
 		if len(payload) > 0 {
-			out.WriteString(",m=1")
+			out.WriteString("m=1")
 		} else {
-			out.WriteString(",m=0")
+			out.WriteString("m=0")
 		}
 		out.WriteByte(';')
 		out.WriteString(chunk)
