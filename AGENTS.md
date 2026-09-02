@@ -52,3 +52,25 @@ and tuikit does not take those.
 
 **A guess at the API is welcome and a wrong guess is useful.** Say if you have
 none.
+
+## Where a tool's files go
+
+Config: `$XDG_CONFIG_HOME/<tool>/`, else `~/.config/<tool>/`. State:
+`$XDG_STATE_HOME/<tool>/`, else `~/.local/state/<tool>/`. On **every** platform,
+macOS included.
+
+**Not `os.UserConfigDir()`.** It ignores XDG on darwin and answers
+`~/Library/Application Support`, which is right for an application with a bundle
+identifier and wrong for a command-line tool — and unsyncable, so a config
+written there has to be written again on the next machine. Decision 33 has the
+evidence, including the two tools whose identical search code lands somewhere a
+third tool's never will.
+
+Config is written by a person and belongs in a dotfiles repository. State is
+written by the tool and must not follow anyone to another machine. They are
+different directories.
+
+`tuikit new` writes `internal/engine/paths.go` and its test into a generated
+tool. That file is **copied, not imported** — config is engine work, and
+`guard.Engine` denies the engine every tuikit import. It is fifteen lines the
+tool owns; change them.

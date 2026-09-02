@@ -15,6 +15,24 @@ flag the tool does not have.
   to `describe --json`, and (given a `Target`) to a context menu. Do not add it
   in more than one place; there is only one place.
 
+### Where <<.Name>>'s own files go
+
+`internal/engine/paths.go`. Config is `~/.config/<<.Name>>/` (or
+`$XDG_CONFIG_HOME`); state is `~/.local/state/<<.Name>>/` (or `$XDG_STATE_HOME`)
+— on every platform, macOS included.
+
+**Do not replace this with `os.UserConfigDir()`.** It ignores XDG on darwin and
+answers `~/Library/Application Support`, which is not where a developer's tools
+live and not a directory anybody syncs. `paths_test.go` fails if you do, and it
+names both paths when it does. tuikit decision 33.
+
+Config is written by a person and belongs in a dotfiles repository; state is
+written by <<.Name>> and must not follow anyone to another machine. Keep them
+apart.
+
+That file is copied into <<.Name>> rather than imported from tuikit, because
+config is engine work and the engine imports no tuikit. It is yours — change it.
+
 ## Looking at the screens
 
 You cannot see a terminal, but you can read one. Every screen has a golden in

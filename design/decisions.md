@@ -954,3 +954,73 @@ Issue 39 asks whether the footer case is mechanically checkable, since a footer
 is a list of `comp.Hint{Key, Label}` and a handler is a switch on
 `msg.String()`. The other two may only be a discipline: when a comment says what
 happens, there should be a test named after the sentence.
+
+## 33. Config goes in `~/.config/<tool>/`, and it is copied rather than imported
+
+Three tools, three answers, and on the machine this was written on you can see
+the disagreement on disk.
+
+| tool | how it resolves | where that lands on macOS |
+| --- | --- | --- |
+| pgctl | `os.UserConfigDir()` | `~/Library/Application Support/pgctl/config.yaml` |
+| swarmctl | `os.UserConfigDir()` | `~/Library/Application Support/swarmctl/config.yaml` |
+| azctl | `os.UserHomeDir()` + a hardcoded `.config` | `~/.config/azctl/playbooks` |
+
+`os.UserConfigDir()` honours `$XDG_CONFIG_HOME` on Linux and ignores it on
+darwin, where it returns `~/Library/Application Support`. So pgctl and swarmctl
+have byte-for-byte identical search code that can never land where azctl's does.
+
+The tell that the stdlib answer is the wrong one is what was actually found
+there: swarmctl's own `state.yaml` sitting among `com.apple.ContextStoreAgent`
+and `com.apple.avfoundation`, while the configs a person had written by hand —
+`orb.yaml`, `orb-monorepo.yaml` — were in `~/.config/swarmctl/`, where the
+search order does not look. The user put them where the convention says they go.
+That convention is not a preference: the same `~/.config` held `gh`, `git`,
+`nvim`, `fish`, `tmux`, `btop`, `sops` and `gcloud`.
+
+**So: `$XDG_CONFIG_HOME` if set, else `~/.config/<tool>/`, on every platform
+including macOS.** `os.UserConfigDir()` is right for an application with a
+bundle identifier and wrong for a developer's command-line tool. The deciding
+property is that `~/.config` is *syncable* — it is the directory people symlink
+into a dotfiles repository, and a config you cannot carry to the next machine is
+a config you will write twice.
+
+**State is not config.** Config is written by a person and belongs in that
+dotfiles repository; state is written by the tool and must not follow you to
+another machine — swarmctl's `state.yaml` maps an environment to the SSH key
+installed *on this laptop*. State goes in `$XDG_STATE_HOME`, else
+`~/.local/state/<tool>/`. One tool has state today, which is exactly when the
+pattern is cheap to set.
+
+### Why this is not a `tuikit/conf` package
+
+Two tools have hand-rolled the same fifteen lines, which is the trigger in
+decision 31 for extracting a component. It is still refused, and the reason is
+decision 22: `guard.TerminalPackages` denies
+`github.com/richarddavenport/tuikit` outright — *the engine gets nothing from
+the framework*. Config loading is engine work in both tools that do it
+(`pgctl/internal/config`, `swarmctl/internal/engine`), so a shared package would
+force one of two things, and both are worse than the duplication:
+
+- weaken the deny-list to "tuikit, except the parts we decided are not really
+  the framework", which is the "minimal UI-free surface" already rejected in
+  decision 22 — the boundary stops being checkable the moment it has an
+  exception; or
+- move config loading into the UI, where it is not domain work and the CLI
+  cannot reach it.
+
+**The extraction rule answers "is this shared?", not "should it be a package."**
+Here the answer is shared and copied. The mechanism is the scaffolder: `tuikit
+new` writes `internal/engine/paths.go` into the tool, so a new tool starts
+correct without a runtime dependency, and the code it starts with is fifteen
+lines it owns and can change.
+
+That is a real cost, honestly stated: fixing a bug in those fifteen lines means
+fixing it in every tool. It is accepted because the alternative is a layering
+rule that no longer means anything, and because the thing being copied is a
+policy that should almost never change — if it does, it is because an operating
+system moved, and that is not a patch anybody applies silently.
+
+Existing tools were deliberately **not** changed. Moving pgctl's and swarmctl's
+search order orphans a file that exists right now, and each tool's own repository
+is where that migration gets weighed.
