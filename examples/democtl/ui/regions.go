@@ -24,6 +24,11 @@ const (
 
 	regRun     comp.Name = "run"
 	regRunStep comp.Name = "run.step"
+	// The meter under the steps, and the bar inside it. Two names because the
+	// pixel layer is placed on an OWNER: the picture covers the track and not
+	// the brackets or the label around it.
+	regRunMeter comp.Name = "run.meter"
+	regRunTrack comp.Name = "run.track"
 
 	// regSplit is the column between the panes. It draws nothing — an owned
 	// blank is still trimmed from the output — but it is what a drag grabs.

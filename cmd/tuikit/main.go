@@ -43,6 +43,8 @@ func main() {
 		frames(os.Args[2:])
 	case "watch":
 		watchCmd(os.Args[2:])
+	case "pixels":
+		pixels(os.Args[2:])
 	case "gallery":
 		galleryCmd(os.Args[2:])
 	case "version":
@@ -284,6 +286,9 @@ func usage(w *os.File) {
 
   tuikit gallery
         open every component, running, with its states and keys
+
+  tuikit pixels
+        what this terminal can draw, and the same bar with and without it
 
   tuikit version
 

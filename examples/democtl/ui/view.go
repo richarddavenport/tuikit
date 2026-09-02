@@ -274,6 +274,29 @@ func (m *Model) run(c *comp.Canvas, r comp.Rect) {
 		list.Hints = []comp.Hint{{Key: "r", Label: "to run again"}, {Key: "esc", Label: "to go back"}}
 	}
 	list.Draw(c, inner, regRunStep)
+
+	// A meter under the steps: the same number the badges already imply, at a
+	// resolution they cannot reach. On foot or Ghostty it is a smooth gradient
+	// bar; everywhere else it is [─── ···], which is what the goldens record
+	// and what most people will see.
+	done := 0
+	for _, st := range m.done {
+		if st == stepOK || st == stepSkipped {
+			done++
+		}
+	}
+	if n := len(m.plan.Steps); n > 0 {
+		y := inner.Y + inner.H - 1
+		comp.Meter{
+			Value:      float64(done) / float64(n),
+			Label:      fmt.Sprintf("%d of %d", done, n),
+			Track:      regRunTrack,
+			Pixels:     true,
+			Filled:     &m.sty.focused,
+			Empty:      &m.sty.border,
+			LabelStyle: &m.sty.muted,
+		}.Draw(c, comp.Rect{X: inner.X + 2, Y: y, W: inner.W - 4, H: 1}, comp.Region(regRunMeter))
+	}
 }
 
 // stepStates maps democtl's step states onto the component's. A table rather
