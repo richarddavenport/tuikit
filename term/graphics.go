@@ -186,18 +186,21 @@ const maxReply = 4096
 // readUntilDA1 reads one reply, with a deadline. See readReply.
 func readUntilDA1(f *os.File, timeout time.Duration) string { return readReply(f, timeout) }
 
+// Parseable reports whether a reply is complete enough to stop reading.
+//
+// Exported so the read's stopping condition can be tested directly, which
+// matters more than it looks: get it wrong and the read stops early, and
+// stopping early is indistinguishable from a terminal that cannot draw.
+func Parseable(s string) bool { return da1Complete(s) }
+
 // da1Complete reports whether a full Primary Device Attributes reply has
 // arrived: CSI ? ... c.
 //
 // Precise rather than "contains a c somewhere", because the kitty answer comes
 // first and carries arbitrary text — `ENOENT:image not found` has one, and
 // stopping there would truncate the read before DA1 said whether Sixel is
-// supported. That is not hypothetical: it is how a terminal answering BOTH
-// protocols could be read as answering neither.
-// Parseable reports whether a reply is complete enough to stop reading —
-// da1Complete, exported so the stopping condition can be tested directly.
-func Parseable(s string) bool { return da1Complete(s) }
-
+// supported. That is not hypothetical: it is exactly how iTerm2, which refuses
+// the kitty query and advertises Sixel, could be read as offering neither.
 func da1Complete(s string) bool {
 	i := strings.Index(s, "\x1b[?")
 	return i >= 0 && strings.IndexByte(s[i:], 'c') >= 0
