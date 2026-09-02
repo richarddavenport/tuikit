@@ -918,3 +918,39 @@ A general `Dialog`, form validation, a layout DSL beyond `comp.Layout`, and
 `Tree` again. Not because nobody wants them — because two tools wanting one is
 not the same as two tools wanting the SAME one, and that difference is only
 visible from a migration.
+
+
+## 32. The comments are load-bearing, and that cuts both ways
+
+Three bugs in one evening had the same shape: **prose describing behaviour the
+code never had.**
+
+- azctl's mouse handler: *"a bucket header expands with enter or a click on
+  it"*, above a handler that only moved the cursor. Clicking a header did
+  nothing visible, so the mouse looked broken.
+- azctl's runner footer: `q abort (the running step finishes)`. `q` cancelled
+  the run and quit the whole program, with no question asked.
+- `comp.Spinner`'s own doc: *"azctl's single ⠿ is a spinner that has stopped,
+  which reads as hung rather than as working. Not carried."* It was carried, by
+  omission — the runner never ticked, so the spinner froze on whichever glyph
+  the last event left it on.
+
+This project writes down WHY more than most, and that is worth keeping: every
+decision here exists because a comment recorded a reason somebody would
+otherwise have had to rediscover. But a comment is a claim nothing checks, and
+three of them were claims about behaviour rather than about reasons.
+
+**A comment explaining why is documentation. A comment describing what the code
+does is an untested assertion.** The first kind ages into insight; the second
+ages into a lie, and a confident one, because it was written by someone who
+meant it.
+
+Two of the three were caught by a person running the tool, not by the 105 files
+under `testdata/`. The goldens hold the SHAPE of a frame, and none of these
+changed a frame — a click that does nothing draws the same cells as a click that
+was never wired.
+
+Issue 39 asks whether the footer case is mechanically checkable, since a footer
+is a list of `comp.Hint{Key, Label}` and a handler is a switch on
+`msg.String()`. The other two may only be a discipline: when a comment says what
+happens, there should be a test named after the sentence.
