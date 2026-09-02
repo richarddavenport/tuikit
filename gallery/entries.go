@@ -1,12 +1,14 @@
 package gallery
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/richarddavenport/tuikit/comp"
+	"github.com/richarddavenport/tuikit/fuzzy"
 	"github.com/richarddavenport/tuikit/theme"
 )
 
@@ -467,6 +469,41 @@ func (m *Model) listEntry(s *styles) Entry {
 			l.Draw(c, r, rows)
 		}
 	}
+	// The same list, built on demand rather than up front.
+	huge := func(n int, at int) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			l := &comp.List{
+				Name: "demo.list", Selected: &s.selected, Unfocused: &s.focused,
+				Status: &s.muted, Focused: true,
+			}
+			row := func(i int) comp.Row {
+				return comp.Row{Text: fmt.Sprintf("  entry %06d", i)}
+			}
+			l.DrawFunc(c, r, n, row) // once, so it knows what it can scroll
+			l.Select(at)
+			l.DrawFunc(c, r, n, row)
+		}
+	}
+	// A query, ranked, with the letters that matched marked.
+	filtered := func(query string) func(*comp.Canvas, comp.Rect, bool) {
+		commands := []string{
+			"switch environment", "edit environments", "env of this service",
+			"disk usage", "restart", "follow logs", "capture logs",
+			"prune unused images", "open a shell here", "reconnect",
+		}
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			hits := fuzzy.Rank(query, commands)
+			l := &comp.List{
+				Name: "demo.list", Empty: "  nothing matches",
+				Selected: &s.selected, Unfocused: &s.focused,
+				Status: &s.muted, EmptyStyle: &s.muted, Focused: true,
+			}
+			l.DrawFunc(c, r, len(hits), func(i int) comp.Row {
+				h := hits[i]
+				return comp.Row{Spans: comp.Highlight(" "+commands[h.Index], shift(h.At), nil, &s.title)}
+			})
+		}
+	}
 	return Entry{
 		Name:    "List",
 		Summary: "A scrollable, selectable list, flat or grouped. The viewport and the selection are separate.",
@@ -515,6 +552,14 @@ func (m *Model) listEntry(s *styles) Entry {
 				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
 					demo(rowsFor(40), true, nil)(c, comp.Rect{X: r.X, Y: r.Y, W: r.W, H: 1}, focused)
 				}},
+			{Name: "200,000 rows", Note: "built on demand — a frame costs the size of the pane, not the size of the data",
+				Draw: huge(200000, 0)},
+			{Name: "200,000 rows, deep in", Note: "the window moved; nothing else did",
+				Draw: huge(200000, 13742)},
+			{Name: "ranked by a query", Note: "the letters that matched are marked, so the order is something you can check rather than trust",
+				Draw: filtered("env")},
+			{Name: "a query matching nothing", Note: "an ordinary state, not an error",
+				Draw: filtered("zzz")},
 		},
 	}
 }
@@ -863,4 +908,14 @@ func (m *Model) inputEntry(s *styles) Entry {
 				Draw: draw(comp.Input{Prompt: "> ", Text: "env", Cursor: 3})},
 		},
 	}
+}
+
+// shift moves match indices right by one, because the rows above are drawn with
+// a leading space and the match was made against the text without it.
+func shift(at []int) []int {
+	out := make([]int, len(at))
+	for i, v := range at {
+		out[i] = v + 1
+	}
+	return out
 }

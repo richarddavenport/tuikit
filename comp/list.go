@@ -141,8 +141,28 @@ type Row struct {
 // because a viewport that only looks like one when it is scrolling is a
 // viewport you cannot tell from a short list.
 func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
+	l.DrawFunc(c, r, len(rows), func(i int) Row { return rows[i] })
+}
+
+// DrawFunc is Draw for a list whose rows are made on demand.
+//
+// From the file managers and log viewers this library keeps being compared to,
+// where a directory of 200,000 entries or a log of a million lines is ordinary.
+// Draw already only PAINTS what fits — the expensive part was never the
+// drawing, it was building a []Row for everything so that twenty of them could
+// be shown.
+//
+// row is called only for the rows actually on screen, so the cost of a frame
+// is the size of the pane rather than the size of the data. It is called with
+// indices in [0, n), and it must be cheap: it runs on every frame, for every
+// visible row.
+//
+// The obvious alternative — a Rows interface with Len and At — was not taken
+// because a func is what every call site already has, and an interface would
+// make the common case (a slice you already built) into a wrapper type.
+func (l *List) DrawFunc(c *Canvas, r Rect, n int, row func(i int) Row) {
 	c = c.Clip(r)
-	l.count = len(rows)
+	l.count = n
 	body := r
 	if r.H > 1 {
 		body.H = r.H - 1
@@ -157,7 +177,7 @@ func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
 	}
 	l.shown, l.drawn = body.H, true
 
-	if len(rows) == 0 {
+	if n == 0 {
 		if l.Empty != "" {
 			l.fill(c, Rect{X: body.X, Y: body.Y, W: body.W, H: 1}, l.EmptyStyle, Region(l.Name))
 			c.Text(body.X, body.Y, l.Empty, l.EmptyStyle, Region(l.Name))
@@ -166,7 +186,7 @@ func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
 		return
 	}
 
-	l.cursor = clamp(l.cursor, 0, len(rows)-1)
+	l.cursor = clamp(l.cursor, 0, n-1)
 	if l.Focused && l.reveal {
 		// Far enough to see the cursor, and no further.
 		if l.cursor < l.offset {
@@ -179,11 +199,14 @@ func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
 	l.reveal = false
 	l.offset = clamp(l.offset, 0, l.Max())
 
-	for i := l.offset; i < len(rows) && i-l.offset < body.H; i++ {
+	for i := l.offset; i < n && i-l.offset < body.H; i++ {
 		y := body.Y + i - l.offset
 		id := Region(l.Name).At(i)
 
-		style := rows[i].Style
+		// Asked for once per visible row per frame, and never for a row that
+		// is off screen — which is the whole point.
+		this := row(i)
+		style := this.Style
 		if i == l.cursor {
 			style = l.Unfocused
 			if l.Focused {
@@ -199,17 +222,17 @@ func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
 		// the reader's own mark on the list, and a row that kept its own
 		// colours under it would make the cursor hard to find in exactly the
 		// list where finding it matters.
-		lead := l.lead(c, rows[i], i)
-		if len(rows[i].Spans) == 0 || (i == l.cursor && style != nil) {
-			text := rows[i].Text
+		lead := l.lead(c, this, i)
+		if len(this.Spans) == 0 || (i == l.cursor && style != nil) {
+			text := this.Text
 			if text == "" {
-				text = spansText(rows[i].Spans)
+				text = spansText(this.Spans)
 			}
 			c.Text(body.X, y, lead+text, style, id)
 			continue
 		}
 		x := body.X + c.Text(body.X, y, lead, style, id)
-		for _, span := range rows[i].Spans {
+		for _, span := range this.Spans {
 			x += c.Text(x, y, span.Text, span.Style, id)
 		}
 	}

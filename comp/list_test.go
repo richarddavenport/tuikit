@@ -486,3 +486,74 @@ func TestTheIndentIsStillTheRow(t *testing.T) {
 		t.Errorf("the indent before a child is owned by %v", got)
 	}
 }
+
+// TestDrawFuncOnlyAsksForVisibleRows is the property that makes a list of two
+// hundred thousand things affordable.
+//
+// Draw already only PAINTED what fits; the expensive part was building a []Row
+// for everything so twenty of them could be shown.
+func TestDrawFuncOnlyAsksForVisibleRows(t *testing.T) {
+	const huge = 200000
+	asked := map[int]int{}
+	l := List{Name: "row"}
+	c := NewCanvas(30, 10)
+
+	l.DrawFunc(c, Rect{X: 0, Y: 0, W: 30, H: 10}, huge, func(i int) Row {
+		asked[i]++
+		return Row{Text: "row " + itoa(i)}
+	})
+
+	// Nine rows of body plus a status line.
+	if len(asked) > 12 {
+		t.Errorf("asked for %d rows to fill a 10-row pane", len(asked))
+	}
+	if len(asked) == 0 {
+		t.Fatal("asked for no rows at all")
+	}
+	for i := range asked {
+		if i >= 12 {
+			t.Errorf("asked for row %d, which is nowhere near the screen", i)
+		}
+		if asked[i] != 1 {
+			t.Errorf("row %d was built %d times in one frame", i, asked[i])
+		}
+	}
+}
+
+// TestDrawFuncScrolls: the window moves over the data without the data moving.
+func TestDrawFuncScrolls(t *testing.T) {
+	l := List{Name: "row", Focused: true}
+	c := NewCanvas(30, 6)
+	rect := Rect{X: 0, Y: 0, W: 30, H: 6}
+	row := func(i int) Row { return Row{Text: "row " + itoa(i)} }
+
+	l.DrawFunc(c, rect, 100000, row)
+	l.Select(50000)
+
+	c2 := NewCanvas(30, 6)
+	l.DrawFunc(c2, rect, 100000, row)
+	// No styles are set, so the frame carries no escape sequences and a plain
+	// contains is enough.
+	if got := c2.String(); !strings.Contains(got, "row 50000") {
+		t.Errorf("after selecting row 50000 the frame is:\n%s", got)
+	}
+}
+
+// TestDrawAndDrawFuncAgree, since Draw is now written in terms of DrawFunc and
+// nothing else would notice if it drifted.
+func TestDrawAndDrawFuncAgree(t *testing.T) {
+	rows := []Row{{Text: "one"}, {Text: "two"}, {Text: "three"}}
+	rect := Rect{X: 0, Y: 0, W: 20, H: 5}
+
+	a := List{Name: "row"}
+	ca := NewCanvas(20, 5)
+	a.Draw(ca, rect, rows)
+
+	b := List{Name: "row"}
+	cb := NewCanvas(20, 5)
+	b.DrawFunc(cb, rect, len(rows), func(i int) Row { return rows[i] })
+
+	if ca.String() != cb.String() {
+		t.Errorf("Draw and DrawFunc differ:\n%q\n%q", ca.String(), cb.String())
+	}
+}
