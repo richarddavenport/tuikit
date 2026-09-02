@@ -42,6 +42,7 @@ func (m *Model) Entries() []Entry {
 		m.layoutEntry(s),
 		m.meterEntry(s),
 		m.inputEntry(s),
+		m.waitingEntry(s),
 	}
 }
 
@@ -918,4 +919,49 @@ func shift(at []int) []int {
 		out[i] = v + 1
 	}
 	return out
+}
+
+// waitingEntry shows the states that separate "busy" from "broken".
+func (m *Model) waitingEntry(s *styles) Entry {
+	// A fixed moment, so the goldens hold. The spinner is clock-driven, which
+	// is what makes freezing the clock enough.
+	at := time.Date(2026, 9, 2, 9, 30, 0, 0, time.UTC)
+	draw := func(w comp.Waiting, on time.Duration, framed bool) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			w.Style, w.DetailStyle = &s.muted, &s.border
+			w.Spinner.Style = &s.pending
+			area := r
+			if framed {
+				// What the component's doc asks for: the interface is drawn,
+				// and the wait sits in the hole its contents will fill.
+				area = comp.Pane{
+					Title: "Resources", Border: &s.border, TitleStyle: &s.title,
+				}.Draw(c, r, comp.Region("demo.waitpane"))
+			}
+			w.Draw(c, area, at.Add(on), comp.Region("demo.waiting"))
+		}
+	}
+	const label = "reading the estate"
+
+	return Entry{
+		Name:    "Waiting",
+		Summary: "A region whose contents have not arrived. Draw it inside the interface, not instead of it.",
+		From:    "azctl's first estate read; swarmctl's connecting screen",
+		Roles:   []string{"Muted", "Pending", "Border"},
+		Glyphs:  []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏", "…"},
+		States: []State{
+			{Name: "in a pane", Note: "the shape everyone should use — framed, so it reads as pending rather than absent",
+				Draw: draw(comp.Waiting{Label: label}, 0, true)},
+			{Name: "bare", Note: "the same wait with no interface around it. This is what looked like a crash",
+				Draw: draw(comp.Waiting{Label: label}, 0, false)},
+			{Name: "with a detail", Note: "a wait is more tolerable when it is specific about what it is doing",
+				Draw: draw(comp.Waiting{Label: label, Detail: "one Resource Graph query, then grouping is free"}, 0, true)},
+			{Name: "under two seconds", Note: "no counter — one that appears and vanishes is a flicker",
+				Draw: draw(comp.Waiting{Label: label, Since: at}, 900*time.Millisecond, true)},
+			{Name: "taking a while", Note: "past the threshold the count is the difference between working and hung",
+				Draw: draw(comp.Waiting{Label: label, Since: at}, 9*time.Second, true)},
+			{Name: "a long wait", Note: "minutes, so a number does not run away",
+				Draw: draw(comp.Waiting{Label: label, Since: at}, 135*time.Second, true)},
+		},
+	}
 }

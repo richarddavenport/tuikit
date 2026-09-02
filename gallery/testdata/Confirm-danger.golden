@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               17 components
+tuikit gallery  every component, running                                                                               18 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Confirm                                                                                        │
@@ -19,7 +19,7 @@ tuikit gallery  every component, running                                        
 │ Layout                        │ │                │The service and its tasks are removed. This cannot be         │                │
 │ Meter                         │ │                │undone.                                                       │                │
 │ Input                         │ │                │                                                              │                │
-│                               │ │                │y confirm · n cancel                                          │                │
+│ Waiting                       │ │                │y confirm · n cancel                                          │                │
 │                               │ │                └──────────────────────────────────────────────────────────────┘                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Accent · Danger · Muted                                                               │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘ ·                                                                         │
 │                               │ │ from     swarmctl action.go, pgctl actionview.go, democtl overlay                              │
-│                         17/17 │ │                                                                                                │
+│                         18/18 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

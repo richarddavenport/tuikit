@@ -1,14 +1,14 @@
 tuikit gallery  every component, running                                                                               18 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Split                                                                                          │
-│ List                          │ │ Two panes and the divider between them, which you can grab and drag.                           │
-│ Pane                          │ │ ‹ a third · dragged · at its minimum · stacked · a wider gap · a visible seam ›                │
-│ Tabs                          │ │ the same divider, between rows                                                                 │
+│ Components                    │ │ Waiting                                                                                        │
+│ List                          │ │ A region whose contents have not arrived. Draw it inside the interface, not instead of it.     │
+│ Pane                          │ │ ‹ in a pane · bare · with a detail · under two seconds · taking a while · a long wait ›        │
+│ Tabs                          │ │ minutes, so a number does not run away                                                         │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
-│ StepList                      │ │ │ first                                                                                      │ │
-│ LogPane                       │ │ │ 94 columns                                                                                 │ │
+│ Confirm                       │ │ ┌─ Resources ────────────────────────────────────────────────────────────────────────────────┐ │
+│ StepList                      │ │ │                                                                                            │ │
+│ LogPane                       │ │ │                                                                                            │ │
 │ Spinner                       │ │ │                                                                                            │ │
 │ Table                         │ │ │                                                                                            │ │
 │ Detail                        │ │ │                                                                                            │ │
@@ -16,11 +16,11 @@ tuikit gallery  every component, running                                        
 │ Toast                         │ │ │                                                                                            │ │
 │ Form                          │ │ │                                                                                            │ │
 │ Split                         │ │ │                                                                                            │ │
-│ Layout                        │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
-│ Meter                         │ │                                                                                                │
-│ Input                         │ │ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
-│ Waiting                       │ │ │ second                                                                                     │ │
-│                               │ │ │ 94 columns                                                                                 │ │
+│ Layout                        │ │ │                                                                                            │ │
+│ Meter                         │ │ │                                ⠋ reading the estate  2m 15s                                │ │
+│ Input                         │ │ │                                                                                            │ │
+│ Waiting                       │ │ │                                                                                            │ │
+│                               │ │ │                                                                                            │ │
 │                               │ │ │                                                                                            │ │
 │                               │ │ │                                                                                            │ │
 │                               │ │ │                                                                                            │ │
@@ -29,9 +29,9 @@ tuikit gallery  every component, running                                        
 │                               │ │ │                                                                                            │ │
 │                               │ │ │                                                                                            │ │
 │                               │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
-│                               │ │ mouse    drag the gap between the panes IS the handle                                          │
-│                               │ │ roles    Border                                                                                │
-│                               │ │ from     democtl's dashboard, before it was a component                                        │
+│                               │ │ roles    Muted · Pending · Border                                                              │
+│                               │ │ glyphs   ⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏ …                                                                 │
+│                               │ │ from     azctl's first estate read; swarmctl's connecting screen                               │
 │                         18/18 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

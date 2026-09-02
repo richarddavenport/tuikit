@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               17 components
+tuikit gallery  every component, running                                                                               18 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Toast                                                                                          │
@@ -19,7 +19,7 @@ tuikit gallery  every component, running                                        
 │ Layout                        │ │                                                                                                │
 │ Meter                         │ │                                                                                                │
 │ Input                         │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Waiting                       │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Danger · Success · Border · Muted                                                     │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
 │                               │ │ from     swarmctl errorView                                                                    │
-│                         17/17 │ │                                                                                                │
+│                         18/18 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

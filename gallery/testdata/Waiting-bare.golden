@@ -1,12 +1,12 @@
 tuikit gallery  every component, running                                                                               18 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ LogPane                                                                                        │
-│ List                          │ │ A stream of lines, tailing. Following is a place, not a mode.                                  │
-│ Pane                          │ │ ‹ following · detached · empty · one line ›                                                    │
-│ Tabs                          │ │ no scrolling to do, and it still says so                                                       │
+│ Components                    │ │ Waiting                                                                                        │
+│ List                          │ │ A region whose contents have not arrived. Draw it inside the interface, not instead of it.     │
+│ Pane                          │ │ ‹ in a pane · bare · with a detail · under two seconds · taking a while · a long wait ›        │
+│ Tabs                          │ │ the same wait with no interface around it. This is what looked like a crash                    │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │   09:10:00 api_gateway: handled request in 121ms                                               │
+│ Confirm                       │ │                                                                                                │
 │ StepList                      │ │                                                                                                │
 │ LogPane                       │ │                                                                                                │
 │ Spinner                       │ │                                                                                                │
@@ -17,7 +17,7 @@ tuikit gallery  every component, running                                        
 │ Form                          │ │                                                                                                │
 │ Split                         │ │                                                                                                │
 │ Layout                        │ │                                                                                                │
-│ Meter                         │ │                                                                                                │
+│ Meter                         │ │                                      ⠋ reading the estate                                      │
 │ Input                         │ │                                                                                                │
 │ Waiting                       │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -27,11 +27,11 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │                                                                                     following  │
-│                               │ │ keys     ↑↓ scroll, detaching from the tail                                                    │
-│                               │ │ mouse    wheel the same                                                                        │
-│                               │ │ roles    Muted · Stderr                                                                        │
-│                               │ │ from     swarmctl logspane.go                                                                  │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ roles    Muted · Pending · Border                                                              │
+│                               │ │ glyphs   ⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏ …                                                                 │
+│                               │ │ from     azctl's first estate read; swarmctl's connecting screen                               │
 │                         18/18 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit
