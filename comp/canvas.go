@@ -49,6 +49,18 @@ func (r Rect) Inset(n int) Rect {
 	return Rect{r.X + n, r.Y + n, max(0, r.W-2*n), max(0, r.H-2*n)}
 }
 
+// Narrow shrinks a rect by n on the left and right only.
+//
+// [Inset] takes a column off every edge, which turns a one-row band into no
+// band at all — so a tool that wanted a title indented inside a full-width row
+// had to write the arithmetic itself. azctl did, twice, with a comment
+// explaining why Inset would not do. Two lines of coordinate arithmetic in a
+// tool that is otherwise entirely free of it is exactly the kind of thing that
+// belongs here instead.
+func (r Rect) Narrow(n int) Rect {
+	return Rect{r.X + n, r.Y, max(0, r.W-2*n), r.H}
+}
+
 // Empty reports whether the rect has no cells. Worth asking before drawing into
 // it: a pane squeezed to nothing by a narrow terminal is a normal state, not a
 // failure.

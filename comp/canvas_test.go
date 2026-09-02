@@ -459,3 +459,25 @@ func TestAClippedViewKeepsItsChrome(t *testing.T) {
 		t.Errorf("a clipped view draws its corners with %q", got)
 	}
 }
+
+// TestNarrowKeepsTheRows is the difference from Inset, and the reason it
+// exists: a one-row band inset on every edge is no band at all.
+func TestNarrowKeepsTheRows(t *testing.T) {
+	band := Rect{X: 0, Y: 3, W: 20, H: 1}
+
+	if got := band.Inset(1); !got.Empty() {
+		t.Errorf("Inset(1) on a one-row band gave %v, want empty — that is the problem", got)
+	}
+	got := band.Narrow(1)
+	if want := (Rect{X: 1, Y: 3, W: 18, H: 1}); got != want {
+		t.Errorf("Narrow(1) = %v, want %v", got, want)
+	}
+}
+
+// TestNarrowClamps: narrowing past the middle gives no width rather than a
+// negative one, the same as Inset.
+func TestNarrowClamps(t *testing.T) {
+	if got := (Rect{X: 0, Y: 0, W: 4, H: 2}).Narrow(9); got.W != 0 || got.H != 2 {
+		t.Errorf("Narrow(9) on a 4-wide rect = %v, want no width and the rows kept", got)
+	}
+}
