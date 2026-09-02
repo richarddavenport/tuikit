@@ -3,6 +3,8 @@ package comp
 import (
 	"strings"
 	"testing"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 const formName Name = "form"
@@ -139,6 +141,74 @@ func TestAFormStaysInsideItsRect(t *testing.T) {
 		}
 		if i >= 2 && strings.TrimSpace(line) != "" {
 			t.Errorf("drew row %d into a two-row rect: %q", i+1, line)
+		}
+	}
+}
+
+// TestAFormCanBeTypedInto: the focused text field is drawn by Input, so it has
+// a caret and it scrolls. A form without one can only be corrected by deleting
+// back to the mistake.
+func TestAFormCanBeTypedInto(t *testing.T) {
+	block := lipgloss.NewStyle().Reverse(true)
+	f := Form{
+		Fields: []Field{
+			{Label: "env", Kind: FieldText, Text: "production"},
+			{Label: "note", Kind: FieldText, Text: "second"},
+		},
+		Cursor: 0, Focused: true, Marker: "> ", Blank: "  ",
+		Caret: 4, CursorBG: &block,
+	}
+	c := NewCanvas(40, 3)
+	f.Draw(c, Rect{X: 0, Y: 0, W: 40, H: 3}, "form")
+
+	// The caret sits ON the fifth character of "production", not after it.
+	found := false
+	for x := 0; x < 40; x++ {
+		if cell, _ := c.CellAt(x, 0); cell.Style == &block {
+			if cell.Text != "u" {
+				t.Errorf("the caret is on %q, want the rune at index 4", cell.Text)
+			}
+			found = true
+		}
+	}
+	if !found {
+		t.Error("no caret was painted on the focused field")
+	}
+	// The unfocused row has none.
+	for x := 0; x < 40; x++ {
+		if cell, _ := c.CellAt(x, 1); cell.Style == &block {
+			t.Error("a caret was painted on a field that is not being edited")
+		}
+	}
+}
+
+// TestAFormWithoutACursorIsUnchanged, so every existing form draws as it did.
+func TestAFormWithoutACursorIsUnchanged(t *testing.T) {
+	fields := []Field{{Label: "env", Kind: FieldText, Text: "production"}}
+	plain := Form{Fields: fields, Focused: true, Marker: "> ", Blank: "  "}
+	withCaret := plain
+	withCaret.Caret = 4 // but no CursorBG
+
+	a, b := NewCanvas(40, 2), NewCanvas(40, 2)
+	plain.Draw(a, Rect{X: 0, Y: 0, W: 40, H: 2}, "form")
+	withCaret.Draw(b, Rect{X: 0, Y: 0, W: 40, H: 2}, "form")
+	if a.String() != b.String() {
+		t.Error("a form with no cursor style drew differently")
+	}
+}
+
+// A choice or a toggle is never "typed into", whatever the caret says.
+func TestOnlyTextFieldsGetACaret(t *testing.T) {
+	block := lipgloss.NewStyle().Reverse(true)
+	f := Form{
+		Fields:  []Field{{Label: "how", Kind: FieldChoice, Choices: []string{"a", "b"}}},
+		Focused: true, Marker: "> ", Blank: "  ", Caret: 0, CursorBG: &block,
+	}
+	c := NewCanvas(40, 2)
+	f.Draw(c, Rect{X: 0, Y: 0, W: 40, H: 2}, "form")
+	for x := 0; x < 40; x++ {
+		if cell, _ := c.CellAt(x, 0); cell.Style == &block {
+			t.Error("a choice field was drawn with a caret")
 		}
 	}
 }

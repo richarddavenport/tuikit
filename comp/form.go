@@ -48,6 +48,17 @@ type Form struct {
 	// LabelWidth aligns the values into a column. Zero measures the labels.
 	LabelWidth int
 
+	// Caret is where you are typing in the focused text field, as a rune
+	// index, and CursorFG/CursorBG paint that one cell.
+	//
+	// A form without a caret is a form you can only correct by deleting back
+	// to the mistake — which is fine for a phrase you type once and wrong for
+	// a value you are editing. Set them and the focused text field is drawn by
+	// [Input], so it scrolls when the value outgrows the column and shows
+	// where you are; leave them and it is drawn flat, as it always was.
+	Caret              int
+	CursorFG, CursorBG *lipgloss.Style
+
 	Label, FocusLabel, Value, Muted, Danger *lipgloss.Style
 }
 
@@ -133,11 +144,15 @@ func (f Form) Draw(c *Canvas, r Rect, name Name) {
 
 		x := r.X + c.Text(r.X, y, mark, f.FocusLabel, id)
 		x += c.Text(x, y, fit(field.Label, width, false)+"  ", label, id)
-		f.value(c, x, y, r.Right(), field, id)
+		// Only the focused, enabled text field is being typed into, and only
+		// when the caller supplied a cursor to paint it with.
+		editing := i == f.Cursor && f.Focused && !field.Disabled &&
+			field.Kind == FieldText && f.CursorBG != nil
+		f.value(c, x, y, r.Right(), field, id, editing)
 	}
 }
 
-func (f Form) value(c *Canvas, x, y, right int, field Field, id ID) {
+func (f Form) value(c *Canvas, x, y, right int, field Field, id ID, editing bool) {
 	switch field.Kind {
 	case FieldToggle:
 		text, style := "no", f.Muted
@@ -159,6 +174,18 @@ func (f Form) value(c *Canvas, x, y, right int, field Field, id ID) {
 		}
 
 	default:
+		// The field being typed into is an Input, so the caret, the scrolling
+		// and the ellipsis are one implementation rather than two.
+		if editing {
+			Input{
+				Text: field.Text, Cursor: f.Caret, Placeholder: field.Placeholder,
+				Focused:          true,
+				TextStyle:        f.Value,
+				PlaceholderStyle: f.Muted,
+				CursorFG:         f.CursorFG, CursorBG: f.CursorBG,
+			}.Draw(c, Rect{X: x, Y: y, W: right - x + 1, H: 1}, id)
+			return
+		}
 		if field.Text == "" {
 			c.Text(x, y, field.Placeholder, f.Muted, id)
 			return
