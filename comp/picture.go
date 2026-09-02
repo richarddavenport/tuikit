@@ -213,7 +213,9 @@ func (c *Canvas) pixels() string {
 			// baked against a background that is KNOWN rather than guessed.
 			b.WriteString(term.EncodeSixel(paint.Flatten(p.img, c.gfx.Background)))
 		case term.Kitty:
-			b.WriteString(term.EncodeKitty(p.img, p.id))
+			// The footprint in cells is the region the component owns, which
+			// is exact — unlike any cell-size measurement.
+			b.WriteString(term.EncodeKitty(p.img, p.id, p.r.W, p.r.H))
 		}
 		// Back to where the frame ended, so the next picture's "up" is
 		// measured from the same place this one's was.

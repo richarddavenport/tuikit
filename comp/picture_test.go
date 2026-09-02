@@ -184,3 +184,37 @@ func TestDrawReturningNil(t *testing.T) {
 }
 
 var _ = color.RGBA{}
+
+// TestKittyFootprintComesFromTheRegion is what makes the kitty path immune to
+// the cell-size disagreement in issue 31.
+//
+// Without c and r the terminal divides the image's pixel size by its own idea
+// of a cell — the one number nobody agrees on. Ghostty reports it in device
+// pixels and iTerm2 in points, so the same picture came out at two different
+// scales, one of them overlapping the text above it. The region knows how many
+// cells it is, exactly, and that is what gets sent.
+func TestKittyFootprintComesFromTheRegion(t *testing.T) {
+	c := canvasWith(t, term.Kitty) // region is 8×3 cells
+	if !c.Picture(comp.Region(reg), solid(nil)) {
+		t.Fatal("Picture declined")
+	}
+	if got := c.String(); !strings.Contains(got, "c=8,r=3") {
+		t.Error("the kitty placement does not state its footprint in cells")
+	}
+}
+
+// TestAWrongCellSizeStillPlacesTheRightFootprint: the pixels change, the cells
+// do not. That is the property — a bad measurement makes a blurrier picture,
+// not a misplaced one.
+func TestAWrongCellSizeStillPlacesTheRightFootprint(t *testing.T) {
+	for _, cell := range [][2]int{{8, 18}, {16, 34}, {1, 1}} {
+		c := comp.NewCanvas(20, 6).WithGraphics(comp.Pixels{
+			Mode: term.Kitty, CellW: cell[0], CellH: cell[1],
+		})
+		c.Fill(comp.Rect{X: 2, Y: 1, W: 8, H: 3}, "x", nil, comp.Region(reg))
+		c.Picture(comp.Region(reg), solid(nil))
+		if got := c.String(); !strings.Contains(got, "c=8,r=3") {
+			t.Errorf("cell %v changed the footprint", cell)
+		}
+	}
+}

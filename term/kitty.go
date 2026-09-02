@@ -37,7 +37,9 @@ const kittyChunk = 4096
 // diacritic table to address rows and columns, and it is the better long-term
 // answer. This is direct placement: simpler, no table, and it is re-sent when
 // the frame around it changes. See issue 29.
-func EncodeKitty(img *image.RGBA, id int) string { return encodeKitty(img, id, 2) }
+func EncodeKitty(img *image.RGBA, id, cols, rows int) string {
+	return encodeKitty(img, id, cols, rows, 2)
+}
 
 // EncodeKittyVerbose is the same bytes with replies turned back on (q=0).
 //
@@ -46,9 +48,11 @@ func EncodeKitty(img *image.RGBA, id int) string { return encodeKitty(img, id, 2
 // nobody, and "the picture did not appear" is then indistinguishable from "the
 // picture appeared behind an opaque background". One of those is a bug in this
 // encoder and the other is not.
-func EncodeKittyVerbose(img *image.RGBA, id int) string { return encodeKitty(img, id, 0) }
+func EncodeKittyVerbose(img *image.RGBA, id, cols, rows int) string {
+	return encodeKitty(img, id, cols, rows, 0)
+}
 
-func encodeKitty(img *image.RGBA, id, quiet int) string {
+func encodeKitty(img *image.RGBA, id, cols, rows, quiet int) string {
 	b := img.Bounds()
 	w, h := b.Dx(), b.Dy()
 	if w <= 0 || h <= 0 {
@@ -85,7 +89,18 @@ func encodeKitty(img *image.RGBA, id, quiet int) string {
 			// a=T transmits and displays in one step. q=2 suppresses both the
 			// success and the failure reply: a terminal answering into the
 			// input stream mid-frame would arrive as a keystroke.
-			fmt.Fprintf(&out, "a=T,f=32,o=z,s=%d,v=%d,i=%d,z=-1,C=1,q=%d,", w, h, id, quiet)
+			// c and r say the footprint in CELLS, and the terminal scales the
+			// image into exactly that rectangle.
+			//
+			// Without them the terminal divides the pixel size by its own idea
+			// of a cell — which is the one number nobody agrees on. Ghostty
+			// reports the cell in device pixels, iTerm2 in points, and a
+			// picture sized from the wrong one comes out at the wrong scale and
+			// overlapping the text above it. Stating the footprint removes the
+			// measurement from the answer entirely: it is the caller who knows
+			// how many cells the picture is FOR, and that number is exact.
+			fmt.Fprintf(&out, "a=T,f=32,o=z,s=%d,v=%d,c=%d,r=%d,i=%d,z=-1,C=1,q=%d,",
+				w, h, cols, rows, id, quiet)
 			first = false
 		}
 		// m=1 means another chunk follows; m=0 is the last one.

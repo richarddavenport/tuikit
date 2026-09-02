@@ -84,7 +84,7 @@ func TestSixelEmptyImage(t *testing.T) {
 }
 
 func TestKittyFlags(t *testing.T) {
-	out := term.EncodeKitty(fill(4, 4, color.RGBA{1, 2, 3, 255}), 7)
+	out := term.EncodeKitty(fill(4, 4, color.RGBA{1, 2, 3, 255}), 7, 2, 1)
 
 	for _, want := range []string{
 		"\x1b_G",  // application programmable command
@@ -93,6 +93,7 @@ func TestKittyFlags(t *testing.T) {
 		"o=z",     // zlib, because RGBA is four bytes a pixel
 		"s=4,v=4", // the size
 		"i=7",     // the id, so it can be deleted later
+		"c=2,r=1", // the footprint in CELLS, so no cell-size measurement is involved
 		"z=-1",    // BEHIND the text: the whole reason to prefer this protocol
 		"C=1",     // do not move the cursor
 		"q=2",     // no reply — one arriving mid-frame would read as a keystroke
@@ -117,7 +118,7 @@ func TestKittyChunks(t *testing.T) {
 		seed = seed*1664525 + 1013904223
 		img.Pix[i] = byte(seed >> 24)
 	}
-	out := term.EncodeKitty(img, 1)
+	out := term.EncodeKitty(img, 1, 20, 10)
 
 	if n := strings.Count(out, "m=1"); n < 1 {
 		t.Fatalf("a large image produced %d continuation chunks, want at least 1", n)
@@ -152,7 +153,7 @@ func TestKittyChunks(t *testing.T) {
 }
 
 func TestKittyEmptyImage(t *testing.T) {
-	if out := term.EncodeKitty(image.NewRGBA(image.Rect(0, 0, 0, 0)), 1); out != "" {
+	if out := term.EncodeKitty(image.NewRGBA(image.Rect(0, 0, 0, 0)), 1, 1, 1); out != "" {
 		t.Errorf("empty image encoded as %q", out)
 	}
 }
@@ -168,7 +169,7 @@ func TestDeleteKitty(t *testing.T) {
 func TestKittyHandlesStride(t *testing.T) {
 	full := fill(100, 100, color.RGBA{9, 9, 9, 255})
 	sub := full.SubImage(image.Rect(10, 10, 20, 20)).(*image.RGBA)
-	out := term.EncodeKitty(sub, 1)
+	out := term.EncodeKitty(sub, 1, 5, 2)
 	if !strings.Contains(out, "s=10,v=10") {
 		t.Errorf("sub-image encoded with the wrong size:\n%q", out[:min(120, len(out))])
 	}

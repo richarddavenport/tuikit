@@ -86,7 +86,10 @@ func pixels(args []string) {
 			how = "ASSUMED — the terminal declined to say, so pictures will be the wrong size"
 		}
 		fmt.Printf("cell size    %dx%d pixels (%s)\n", p.CellW, p.CellH, how)
-		if p.CellMeasured && os.Getenv(term.EnvCellSize) == "" {
+		// Only Sixel is at the mercy of this. The kitty placement states its
+		// footprint in CELLS, so a wrong pixel measurement makes a blurrier
+		// picture rather than a misplaced one.
+		if p.Mode == term.Sixel && p.CellMeasured && os.Getenv(term.EnvCellSize) == "" {
 			fmt.Printf("             if pictures come out half size, try %s=%dx%d\n",
 				term.EnvCellSize, p.CellW*2, p.CellH*2)
 		}
@@ -188,7 +191,7 @@ func debugKitty(p comp.Pixels) {
 	defer tty.Close() //nolint:errcheck // done with it
 
 	img := paint.Bar{W: 40 * p.CellW, H: p.CellH, Value: 0.6, Ramp: p.Ramp, Track: track(p.Ramp)}.Image()
-	seq := term.EncodeKittyVerbose(img, 99)
+	seq := term.EncodeKittyVerbose(img, 99, 40, 1)
 
 	fmt.Printf("image        %d bytes of RGBA, %dx%d pixels\n",
 		len(img.Pix), img.Bounds().Dx(), img.Bounds().Dy())
