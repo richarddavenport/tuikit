@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                               18 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ List                                                                                           │
+│ List                          │ │ A scrollable, selectable list, flat or grouped. The viewport and the selection are separate.   │
+│ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · grouped · grouped, collapsed · no│
+│ Tabs                          │ │ ↑↓ passes over the headings, so j/k never appear to do nothing — and a click on one is ignore… │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │  SERVICES                                                                                      │
+│ StepList                      │ │    api_gateway                                                                                 │
+│ LogPane                       │ │    api_migrate                                                                                 │
+│ Spinner                       │ │                                                                                                │
+│ Table                         │ │  NODES                                                                                         │
+│ Detail                        │ │    vm-qat-0                                                                                    │
+│ Menu                          │ │    vm-qat-1                                                                                    │
+│ Toast                         │ │                                                                                                │
+│ Form                          │ │                                                                                                │
+│ Split                         │ │                                                                                                │
+│ Layout                        │ │                                                                                                │
+│ Meter                         │ │                                                                                                │
+│ Input                         │ │                                                                                                │
+│ Waiting                       │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                           7/7  │
+│                               │ │ keys     ↑↓ move the selection · j/k the same                                                  │
+│                               │ │ mouse    click select the row, anywhere across it · wheel scroll the viewport, never the sele… │
+│                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │
+│                               │ │ glyphs   ↑ ↓ ▸ ▾                                                                               │
+│                               │ │ from     pgctl window(), swarmctl pane scrolling, azctl cursor/top                             │
+│                         18/18 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

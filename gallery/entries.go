@@ -579,6 +579,23 @@ func (m *Model) listEntry(s *styles) Entry {
 				Draw: huge(200000, 0)},
 			{Name: "200,000 rows, deep in", Note: "the window moved; nothing else did",
 				Draw: huge(200000, 13742)},
+			{Name: "grouped with headings", Note: "↑↓ passes over the headings, so j/k never appear to do nothing — and a click on one is ignored rather than selecting its neighbour",
+				Draw: func(c *comp.Canvas, r comp.Rect, _ bool) {
+					l := &comp.List{
+						Name: "demo.list", Selected: &s.selected, Unfocused: &s.focused,
+						Status: &s.muted, Focused: true,
+					}
+					rows := []comp.Row{
+						{Text: " SERVICES", Skip: true, Style: &s.muted},
+						{Text: "   api_gateway"}, {Text: "   api_migrate"},
+						{Text: "", Skip: true},
+						{Text: " NODES", Skip: true, Style: &s.muted},
+						{Text: "   vm-qat-0"}, {Text: "   vm-qat-1"},
+					}
+					l.Draw(c, r, rows)
+					l.Move(2) // over api_migrate, the blank and the heading
+					l.Draw(c, r, rows)
+				}},
 			{Name: "ranked by a query", Note: "the letters that matched are marked, so the order is something you can check rather than trust",
 				Draw: filtered("env")},
 			{Name: "a query matching nothing", Note: "an ordinary state, not an error",

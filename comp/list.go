@@ -73,6 +73,8 @@ type List struct {
 	// caller that can assign either can reintroduce the bug this exists to
 	// prevent, and it will, because assigning looks harmless.
 	cursor, offset int
+	// pending is moves not yet resolved against the rows. See Move.
+	pending int
 
 	// reveal says the cursor MOVED and should be brought into view on the next
 	// draw. A flag rather than doing it in Draw, because "keep the cursor
@@ -110,6 +112,19 @@ type Row struct {
 	Text  string
 	Style *lipgloss.Style
 	Spans []Segment
+
+	// Skip makes a row one the cursor passes over: a heading, a blank line
+	// between groups, a rule.
+	//
+	// The zero value is selectable, so a list that has never heard of this
+	// behaves exactly as it did.
+	//
+	// Without it, a list containing a heading breaks three ways at once: ↑↓
+	// appears to do nothing, whatever sits beside the list has nothing to show,
+	// and enter acts on a row that is not a thing. swarmctl hit this and
+	// hand-rolled `navigable()`; the command palette needs the same for its
+	// tier headers.
+	Skip bool
 
 	// Depth indents the row, in levels — the flattened-hierarchy shape that
 	// two of the four tools already have in five separate places, every one of
@@ -186,7 +201,7 @@ func (l *List) DrawFunc(c *Canvas, r Rect, n int, row func(i int) Row) {
 		return
 	}
 
-	l.cursor = clamp(l.cursor, 0, n-1)
+	l.resolve(n, row)
 	if l.Focused && l.reveal {
 		// Far enough to see the cursor, and no further.
 		if l.cursor < l.offset {
@@ -285,18 +300,94 @@ func (l *List) Max() int { return max(0, l.count-l.shown) }
 func (l *List) Scroll(by int) { l.offset = clamp(l.offset+by, 0, l.Max()) }
 
 // Move moves the cursor, and asks for it to be brought into view.
-func (l *List) Move(by int) { l.Select(l.cursor + by) }
+//
+// The move is RECORDED and resolved at draw time, because the list does not
+// hold its rows — they arrive at Draw — so nothing here can know which of them
+// the cursor is allowed to land on. That is the same arrangement Select and the
+// viewport already use: "clamped at draw time rather than here".
+//
+// It means Cursor() between a Move and a Draw is the old value. Every caller in
+// this repo and in the tools moves in Update and reads in Draw, which is the
+// order a Bubble Tea program runs in anyway.
+func (l *List) Move(by int) { l.pending += by; l.reveal = true }
 
 // Select puts the cursor on a row by its index in the LIST.
 //
-// Clamped at draw time rather than here, so a caller may point at row 40 of a
-// list this component has not been shown yet — which is what happens whenever
-// state is restored before the first frame.
-func (l *List) Select(i int) { l.cursor, l.reveal = max(0, i), true }
+// Immediate, unlike Move: a caller that just clicked row 3 means row 3, and
+// asks about it in the same breath. If that row turns out to be one the cursor
+// may not hold, the draw moves off it — a click on a heading does nothing
+// rather than selecting its neighbour, because a cursor that lands somewhere
+// you did not click is worse than a click that is ignored.
+func (l *List) Select(i int) { l.cursor, l.pending, l.reveal = max(0, i), 0, true }
 
 // Reset puts the list back to the top, for when the rows underneath it have
 // changed out from under the cursor — a filter, usually.
-func (l *List) Reset() { l.cursor, l.offset, l.reveal = 0, 0, false }
+func (l *List) Reset() { l.cursor, l.offset, l.pending, l.reveal = 0, 0, 0, false }
+
+// resolve settles the cursor against the rows that actually exist.
+//
+// Three jobs, in order, and the order matters: apply the moves that were
+// recorded since the last frame, keep the cursor inside the list, and get it
+// off a row it may not hold.
+//
+// row is asked about individual indices rather than handed a slice, so this
+// works for DrawFunc's list of two hundred thousand as well: with no skipped
+// rows it costs one call per step.
+func (l *List) resolve(n int, row func(int) Row) {
+	if n == 0 {
+		l.cursor, l.pending = 0, 0
+		return
+	}
+	cur := clamp(l.cursor, 0, n-1)
+	step, dir := l.pending, 1
+	l.pending = 0
+	if step < 0 {
+		dir = -1
+	}
+
+	for ; step != 0; step -= dir {
+		next, ok := l.step(n, row, cur, dir)
+		if !ok {
+			// Off the end. Stay where we are rather than sticking on a
+			// trailing heading, and drop the rest of the move: pressing ↓ ten
+			// times at the bottom should not queue ten moves back up.
+			break
+		}
+		cur = next
+	}
+
+	// A click, a restored cursor, or rows that changed underneath can all leave
+	// it on a row it may not hold.
+	if row(cur).Skip {
+		if i, ok := l.nearest(n, row, cur); ok {
+			cur = i
+		}
+	}
+	l.cursor = cur
+}
+
+// step is the next selectable row in one direction, or false at the end.
+func (l *List) step(n int, row func(int) Row, from, dir int) (int, bool) {
+	for i := from + dir; i >= 0 && i < n; i += dir {
+		if !row(i).Skip {
+			return i, true
+		}
+	}
+	return 0, false
+}
+
+// nearest is the closest selectable row to i, forwards first.
+//
+// Forwards first because a list usually opens with a heading, and the row a
+// reader means is the one under it. Returns false when every row is skipped —
+// a list of nothing but headings, which is a legitimate empty-ish state and
+// must not spin looking for a cursor that cannot exist.
+func (l *List) nearest(n int, row func(int) Row, i int) (int, bool) {
+	if next, ok := l.step(n, row, i, 1); ok {
+		return next, true
+	}
+	return l.step(n, row, i, -1)
+}
 
 // lead is everything drawn before a row's text: its indent, then either its own
 // prefix or the cursor's mark.

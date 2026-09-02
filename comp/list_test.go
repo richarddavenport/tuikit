@@ -3,6 +3,7 @@ package comp
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/charmbracelet/lipgloss"
 
@@ -514,8 +515,15 @@ func TestDrawFuncOnlyAsksForVisibleRows(t *testing.T) {
 		if i >= 12 {
 			t.Errorf("asked for row %d, which is nowhere near the screen", i)
 		}
-		if asked[i] != 1 {
-			t.Errorf("row %d was built %d times in one frame", i, asked[i])
+		// The cursor's row is asked about twice: once to settle the cursor
+		// against the rows that exist, and once to draw it. Every other row is
+		// built exactly once.
+		want := 1
+		if i == l.Cursor() {
+			want = 2
+		}
+		if asked[i] > want {
+			t.Errorf("row %d was built %d times in one frame, want %d", i, asked[i], want)
 		}
 	}
 }
@@ -555,5 +563,162 @@ func TestDrawAndDrawFuncAgree(t *testing.T) {
 
 	if ca.String() != cb.String() {
 		t.Errorf("Draw and DrawFunc differ:\n%q\n%q", ca.String(), cb.String())
+	}
+}
+
+// grouped is a list with headings the cursor may not hold: rows 0, 4 and 7.
+func grouped() []Row {
+	return []Row{
+		{Text: "GROUP ONE", Skip: true},
+		{Text: "alpha"}, {Text: "beta"}, {Text: "gamma"},
+		{Text: "GROUP TWO", Skip: true},
+		{Text: "delta"}, {Text: "epsilon"},
+		{Text: "GROUP THREE", Skip: true},
+		{Text: "zeta"},
+	}
+}
+
+func drawGrouped(l *List, rows []Row) {
+	c := NewCanvas(30, 12)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 30, H: 12}, rows)
+}
+
+// The first frame lands on the first row the cursor may hold, not on row 0 —
+// which in a grouped list is a heading.
+func TestTheCursorStartsOnASelectableRow(t *testing.T) {
+	l := &List{Name: services, Focused: true}
+	drawGrouped(l, grouped())
+	if l.Cursor() != 1 {
+		t.Errorf("the cursor opened on row %d, want 1 — row 0 is a heading", l.Cursor())
+	}
+}
+
+// Moving passes over headings, so j/k never appear to do nothing.
+func TestMovingPassesOverHeadings(t *testing.T) {
+	l := &List{Name: services, Focused: true}
+	rows := grouped()
+	drawGrouped(l, rows)
+
+	for _, want := range []int{2, 3, 5, 6, 8} {
+		l.Move(1)
+		drawGrouped(l, rows)
+		if l.Cursor() != want {
+			t.Fatalf("moving down reached row %d, want %d", l.Cursor(), want)
+		}
+	}
+	for _, want := range []int{6, 5, 3, 2, 1} {
+		l.Move(-1)
+		drawGrouped(l, rows)
+		if l.Cursor() != want {
+			t.Fatalf("moving up reached row %d, want %d", l.Cursor(), want)
+		}
+	}
+}
+
+// At the end it stays put, rather than sticking on a trailing heading — and it
+// does not queue the moves it could not make.
+func TestMovingOffTheEndStaysPut(t *testing.T) {
+	l := &List{Name: services, Focused: true}
+	rows := grouped()
+	drawGrouped(l, rows)
+
+	for range 10 {
+		l.Move(1)
+	}
+	drawGrouped(l, rows)
+	if l.Cursor() != 8 {
+		t.Fatalf("the cursor is on %d, want the last selectable row 8", l.Cursor())
+	}
+	// One press back should move one row, not undo ten queued ones.
+	l.Move(-1)
+	drawGrouped(l, rows)
+	if l.Cursor() != 6 {
+		t.Errorf("after ten downs and one up the cursor is on %d, want 6", l.Cursor())
+	}
+}
+
+// Clicking a heading does nothing. A cursor that lands somewhere you did not
+// click is worse than a click that is ignored.
+func TestSelectingAHeadingMovesOffIt(t *testing.T) {
+	l := &List{Name: services, Focused: true}
+	rows := grouped()
+	drawGrouped(l, rows)
+
+	l.Select(4) // GROUP TWO
+	drawGrouped(l, rows)
+	if l.Cursor() == 4 {
+		t.Error("the cursor sat on a heading")
+	}
+	if l.Cursor() != 5 {
+		t.Errorf("the cursor went to %d, want 5 — the row under the heading", l.Cursor())
+	}
+}
+
+// A list of nothing but headings has no cursor to find, and must not spin
+// looking for one.
+func TestAListOfOnlyHeadings(t *testing.T) {
+	l := &List{Name: services, Focused: true}
+	rows := []Row{{Text: "ONE", Skip: true}, {Text: "TWO", Skip: true}}
+
+	done := make(chan struct{})
+	go func() {
+		drawGrouped(l, rows)
+		l.Move(1)
+		drawGrouped(l, rows)
+		l.Move(-5)
+		drawGrouped(l, rows)
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("a list of only headings hung looking for a cursor")
+	}
+}
+
+// The wheel moves the viewport and never the cursor, so a skipped row is just
+// a row to it.
+func TestTheWheelIgnoresSkippedRows(t *testing.T) {
+	l := &List{Name: services, Focused: true}
+	rows := grouped()
+	c := NewCanvas(30, 5)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 30, H: 5}, rows)
+
+	before := l.Cursor()
+	l.Scroll(2)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 30, H: 5}, rows)
+	if l.Cursor() != before {
+		t.Errorf("the wheel moved the cursor from %d to %d", before, l.Cursor())
+	}
+	if l.Offset() != 2 {
+		t.Errorf("the viewport is at %d, want 2", l.Offset())
+	}
+}
+
+// The status line counts every row: it describes the viewport, not the
+// selection.
+func TestTheCountIncludesHeadings(t *testing.T) {
+	muted := lipgloss.NewStyle()
+	l := &List{Name: services, Focused: true, Status: &muted}
+	c := NewCanvas(30, 5)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 30, H: 5}, grouped())
+	// The status is last-shown/total. Nine rows, headings included.
+	if got := c.String(); !strings.Contains(got, "/9") {
+		t.Errorf("the status does not count all nine rows:\n%s", got)
+	}
+}
+
+// A list with no skipped rows behaves exactly as it did.
+func TestAnUnmarkedListIsUnchanged(t *testing.T) {
+	rows := make([]Row, 6)
+	for i := range rows {
+		rows[i] = Row{Text: "row " + itoa(i)}
+	}
+	l := &List{Name: services, Focused: true}
+	drawGrouped(l, rows)
+	l.Move(3)
+	drawGrouped(l, rows)
+	if l.Cursor() != 3 {
+		t.Errorf("the cursor is on %d, want 3", l.Cursor())
 	}
 }
