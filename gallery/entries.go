@@ -173,6 +173,16 @@ func (m *Model) formEntry(s *styles) Entry {
 					{Label: "service", Kind: comp.FieldText, Text: "api_gateway", Disabled: true},
 					{Label: "type the name", Kind: comp.FieldText, Must: "api_gateway", Text: "api_gateway"},
 				}})},
+			{Name: "a secret being typed", Note: "masked while you type it, and NO caret — one moving over eight identical bullets says nothing, and one that stops early says how long the secret is",
+				Draw: draw(comp.Form{Focused: true, Cursor: 1, Fields: []comp.Field{
+					{Label: "registry", Kind: comp.FieldText, Text: "ghcr.io"},
+					{Label: "token", Kind: comp.FieldText, Text: "ghp_R3alT0kenValue", Secret: true},
+				}})},
+			{Name: "a secret not yet given", Note: "an unanswered field looks unanswered rather than like a value that is hidden",
+				Draw: draw(comp.Form{Focused: true, Cursor: 1, Fields: []comp.Field{
+					{Label: "registry", Kind: comp.FieldText, Text: "ghcr.io"},
+					{Label: "token", Kind: comp.FieldText, Placeholder: "required", Secret: true},
+				}})},
 			{Name: "no room", Note: "stops at the edge like everything else",
 				Draw: func(c *comp.Canvas, r comp.Rect, focused bool) {
 					draw(comp.Form{Fields: fields, Cursor: 0, Focused: true})(
@@ -320,6 +330,18 @@ func (m *Model) detailEntry(s *styles) Entry {
 				Draw: draw(comp.Detail{Title: "api_migrate", Blocks: []comp.Block{{Facts: []comp.Fact{
 					{Label: "state", Value: "failed", Style: &s.danger},
 					{Label: "replicas", Value: "0/1"},
+				}}}})},
+			{Name: "a secret", Note: "masked is the state you should be in by default — revealing is a keystroke, hiding should not be something you remember",
+				Draw: draw(comp.Detail{Title: "ghcr-bot", Blocks: []comp.Block{{Facts: []comp.Fact{
+					{Label: "user", Value: "mbp-ci"},
+					{Label: "token", Value: "ghp_R3alT0kenValue", Secret: true},
+					{Label: "scopes", Value: "read:packages"},
+				}}}})},
+			{Name: "revealed", Note: "the same fact, shown. Which secrets are showing is the TOOL's — app.Toggles, keyed by a stable id",
+				Draw: draw(comp.Detail{Title: "ghcr-bot", Blocks: []comp.Block{{Facts: []comp.Fact{
+					{Label: "user", Value: "mbp-ci"},
+					{Label: "token", Value: "ghp_R3alT0kenValue"},
+					{Label: "scopes", Value: "read:packages"},
 				}}}})},
 			{Name: "prose", Note: "a note wraps; a fact truncates — losing the end of a sentence loses the point",
 				Draw: draw(comp.Detail{

@@ -67,6 +67,28 @@ type Fact struct {
 	// Style paints the VALUE. A state that is red in the list and plain here
 	// is the same fact told twice, differently.
 	Style *lipgloss.Style
+
+	// Secret hides the value behind [Mask].
+	//
+	// The COMPONENT decides what reaches the canvas, not the caller: a tool
+	// that masked by choosing which string to pass would put the real one in
+	// the frame every time it got the condition backwards, and nothing could
+	// tell. Pass the value and say whether it is showing.
+	//
+	// Which secrets are showing is the tool's, and app.Toggles is the shape
+	// for it — keyed by a stable id, because a filter rebuilds the rows and an
+	// index survives none of it. Masked is the state you should be in by
+	// default: revealing is a keystroke, hiding should not be something you
+	// have to remember.
+	Secret bool
+}
+
+// shown is what actually reaches the canvas.
+func (f Fact) shown() string {
+	if f.Secret {
+		return Mask()
+	}
+	return f.Value
 }
 
 // Draw renders into r and returns the row after the last one it used, so a
@@ -130,7 +152,7 @@ func (d Detail) facts(c *Canvas, r Rect, y *int, b Block, level int, id ID) {
 	// long value truncates and a long label does not shove it out of line.
 	cells := make([][]string, len(b.Facts))
 	for i, f := range b.Facts {
-		cells[i] = []string{f.Label, f.Value}
+		cells[i] = []string{f.Label, f.shown()}
 	}
 	lines := Table{Gap: 1, Columns: []Column{{}, {Fill: true}}}.Rows(width, cells)
 
@@ -152,7 +174,7 @@ func (d Detail) facts(c *Canvas, r Rect, y *int, b Block, level int, id ID) {
 			continue
 		}
 		x := c.Text(r.X+indent, *y, fit(f.Label, labelWidth, false)+" ", d.LabelStyle, id)
-		c.Text(r.X+indent+x, *y, Truncate(f.Value, max(0, width-x)), f.Style, id)
+		c.Text(r.X+indent+x, *y, Truncate(f.shown(), max(0, width-x)), f.Style, id)
 		*y++
 	}
 }

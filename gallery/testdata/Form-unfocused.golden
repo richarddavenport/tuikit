@@ -3,7 +3,7 @@ tuikit gallery  every component, running                                        
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Form                                                                                           │
 │ List                          │ │ Every field at once, so you can see what you have chosen rather than remember it.              │
-│ Pane                          │ │ ‹ focused · unfocused · type the name · phrase matched · no room ›                             │
+│ Pane                          │ │ ‹ focused · unfocused · type the name · phrase matched · a secret being typed · a secret not ye│
 │ Tabs                          │ │ still shows every value — seeing what you chose is the point                                   │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │   target   staging  production                                                                 │

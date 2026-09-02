@@ -97,6 +97,15 @@ type Field struct {
 	// Disabled greys a field out. It still shows its value: a choice you
 	// cannot change is one you may still need to read.
 	Disabled bool
+
+	// Secret hides a text field's value behind [Mask], including while it is
+	// being typed into. See Fact.Secret for why the component decides rather
+	// than the caller.
+	//
+	// The caret is not drawn on a masked field. A caret moving over eight
+	// identical bullets says nothing, and one that stops early says how long
+	// the secret is.
+	Secret bool
 }
 
 // Complete reports whether every field that has to be answered has been.
@@ -146,7 +155,7 @@ func (f Form) Draw(c *Canvas, r Rect, name Name) {
 		x += c.Text(x, y, fit(field.Label, width, false)+"  ", label, id)
 		// Only the focused, enabled text field is being typed into, and only
 		// when the caller supplied a cursor to paint it with.
-		editing := i == f.Cursor && f.Focused && !field.Disabled &&
+		editing := i == f.Cursor && f.Focused && !field.Disabled && !field.Secret &&
 			field.Kind == FieldText && f.CursorBG != nil
 		f.value(c, x, y, r.Right(), field, id, editing)
 	}
@@ -174,6 +183,10 @@ func (f Form) value(c *Canvas, x, y, right int, field Field, id ID, editing bool
 		}
 
 	default:
+		if field.Secret && field.Text != "" {
+			c.Text(x, y, Mask(), f.Value, id)
+			return
+		}
 		// The field being typed into is an Input, so the caret, the scrolling
 		// and the ellipsis are one implementation rather than two.
 		if editing {

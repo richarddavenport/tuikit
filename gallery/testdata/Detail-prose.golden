@@ -3,7 +3,7 @@ tuikit gallery  every component, running                                        
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Detail                                                                                         │
 │ List                          │ │ What a pane says about the one thing you have selected.                                        │
-│ Pane                          │ │ ‹ a thing · a value with its own colour · prose · no room ›                                    │
+│ Pane                          │ │ ‹ a thing · a value with its own colour · a secret · revealed · prose · no room ›              │
 │ Tabs                          │ │ a note wraps; a fact truncates — losing the end of a sentence loses the point                  │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ api_migrate                                                                                    │

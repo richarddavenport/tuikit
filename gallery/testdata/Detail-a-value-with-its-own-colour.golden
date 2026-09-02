@@ -3,7 +3,7 @@ tuikit gallery  every component, running                                        
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Detail                                                                                         │
 │ List                          │ │ What a pane says about the one thing you have selected.                                        │
-│ Pane                          │ │ ‹ a thing · a value with its own colour · prose · no room ›                                    │
+│ Pane                          │ │ ‹ a thing · a value with its own colour · a secret · revealed · prose · no room ›              │
 │ Tabs                          │ │ a state that is red in the list and grey here is one fact told twice                           │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ api_migrate                                                                                    │
