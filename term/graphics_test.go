@@ -112,3 +112,43 @@ func TestGraphicsString(t *testing.T) {
 		}
 	}
 }
+
+// TestDA1Complete is the read's stopping condition, and it has to be precise.
+//
+// The kitty answer arrives BEFORE the DA1 answer and carries arbitrary text, so
+// "contains a c" stops early on a refusal like `ENOENT:image not found` — and
+// stopping early means never seeing whether DA1 advertised Sixel. A terminal
+// that supports both would be read as supporting neither.
+func TestDA1Complete(t *testing.T) {
+	complete := []string{
+		"\x1b[?62;4c",
+		"\x1b_Gi=31;OK\x1b\\\x1b[?64;1;2;4;6;17;18;21;22c",
+		"\x1b_Gi=31;ENOENT:image not found\x1b\\\x1b[?62;4c",
+	}
+	partial := []string{
+		"",
+		"\x1b_Gi=31;ENOENT:image not found\x1b\\", // kitty answered, DA1 has not
+		"\x1b_Gi=31;OK\x1b\\",                     // ditto
+		"\x1b[?62;4",                              // mid-reply
+	}
+	for _, s := range complete {
+		if !term.Parseable(s) {
+			t.Errorf("%q should be a complete reply", s)
+		}
+	}
+	for _, s := range partial {
+		if term.Parseable(s) {
+			t.Errorf("%q should not be complete — the read would stop early", s)
+		}
+	}
+}
+
+// TestBothProtocolsAnswered is iTerm2's actual reply: it refuses the kitty
+// query AND advertises Sixel as attribute 4. Reading only the first half loses
+// the Sixel answer entirely.
+func TestBothProtocolsAnswered(t *testing.T) {
+	reply := "\x1b_Gi=31;invalid payload\x1b\\\x1b[?64;1;2;4;6;17;18;21;22c"
+	if got := term.Parse(reply); got != term.Sixel {
+		t.Errorf("Parse = %v, want Sixel — DA1 advertised attribute 4", got)
+	}
+}

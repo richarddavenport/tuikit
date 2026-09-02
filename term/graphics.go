@@ -179,28 +179,28 @@ func ProbeTTY(timeout time.Duration) (Graphics, string) {
 	return Probe(f, timeout)
 }
 
-// readUntilDA1 reads until the DA1 reply ends or the deadline passes.
-//
-// The deadline is on the file, not on a goroutine, so a terminal that answers
-// nothing costs exactly one timeout and leaves nothing running behind it.
-func readUntilDA1(f *os.File, timeout time.Duration) string {
-	if err := f.SetReadDeadline(time.Now().Add(timeout)); err != nil {
-		return "" // a platform that cannot deadline a tty gets cells
-	}
-	defer f.SetReadDeadline(time.Time{}) //nolint:errcheck // best effort
+// maxReply bounds the read. A terminal answering more than this is not
+// answering these questions.
+const maxReply = 4096
 
-	var b strings.Builder
-	buf := make([]byte, 64)
-	for b.Len() < 4096 {
-		n, err := f.Read(buf)
-		b.Write(buf[:n])
-		// 'c' terminates a DA1 reply. Stopping on it rather than on the
-		// timeout is what makes start-up fast on a terminal that does answer.
-		if err != nil || strings.Contains(b.String(), "c") && strings.Contains(b.String(), "\x1b[?") {
-			break
-		}
-	}
-	return b.String()
+// readUntilDA1 reads one reply, with a deadline. See readReply.
+func readUntilDA1(f *os.File, timeout time.Duration) string { return readReply(f, timeout) }
+
+// da1Complete reports whether a full Primary Device Attributes reply has
+// arrived: CSI ? ... c.
+//
+// Precise rather than "contains a c somewhere", because the kitty answer comes
+// first and carries arbitrary text — `ENOENT:image not found` has one, and
+// stopping there would truncate the read before DA1 said whether Sixel is
+// supported. That is not hypothetical: it is how a terminal answering BOTH
+// protocols could be read as answering neither.
+// Parseable reports whether a reply is complete enough to stop reading —
+// da1Complete, exported so the stopping condition can be tested directly.
+func Parseable(s string) bool { return da1Complete(s) }
+
+func da1Complete(s string) bool {
+	i := strings.Index(s, "\x1b[?")
+	return i >= 0 && strings.IndexByte(s[i:], 'c') >= 0
 }
 
 // Parse reads a reply. Exported so a test can exercise the decision without a
