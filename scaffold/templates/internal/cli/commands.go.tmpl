@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/harness"
 	"github.com/richarddavenport/tuikit/spec"
 
@@ -105,7 +106,11 @@ func browse(c spec.Call) int {
 		fail(c, err)
 		return spec.Fail
 	}
-	frames, err := harness.Snapshot(m, dir, script)
+	// Wrapped in a runner because the model has no View: the runner owns the
+	// canvas, so it is what the harness drives. No pixel layer here — a
+	// snapshot is capturing frames for documentation and must record the
+	// characters, whatever terminal it was started from.
+	frames, err := harness.Snapshot(app.New(m), dir, script)
 	if err != nil {
 		fail(c, err)
 		return spec.Fail

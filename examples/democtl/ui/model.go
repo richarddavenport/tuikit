@@ -88,11 +88,6 @@ type Model struct {
 	split comp.Split
 
 	width, height int
-	// The pixel layer, set by main and never here. Detection talks to
-	// /dev/tty, and a model that queried in its constructor would ask the
-	// developer's real terminal during `go test`.
-	pixels comp.Pixels
-
 	// canvas is the last frame drawn, kept so a mouse event can ask what it
 	// landed on. The frame is its own region list.
 	canvas *comp.Canvas
@@ -170,9 +165,6 @@ func (m *Model) SetSize(w, h int) { m.width, m.height = w, h }
 // what harness.Driver wants, and it is three lines because the frame already
 // knows.
 func (m *Model) Canvas() *comp.Canvas { return m.canvas }
-
-// SetGraphics turns the pixel layer on, with what the terminal answered.
-func (m *Model) SetGraphics(p comp.Pixels) { m.pixels = p }
 
 // Now freezes the clock.
 func (m *Model) Now(t time.Time) { m.now = t }

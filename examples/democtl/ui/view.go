@@ -12,7 +12,7 @@ import (
 
 var tabNames = []string{"Overview", "Config", "Events"}
 
-// View draws the whole window.
+// Draw paints the whole window into the canvas the runner owns.
 //
 // Everything below draws CELLS into a canvas rather than returning strings to
 // be joined. That is what makes a click land somewhere: every cell records who
@@ -22,10 +22,7 @@ var tabNames = []string{"Overview", "Config", "Events"}
 // The canvas is one row shorter than the terminal, which is where the old
 // bodyHeight arithmetic already put it: two rows of header, the body, one of
 // footer, and the bottom line left alone.
-func (m *Model) View() string {
-	bands := m.bands()
-	c := comp.NewCanvas(m.width, bands[3].Bottom()+1).WithGraphics(m.pixels)
-
+func (m *Model) Draw(c *comp.Canvas, _ comp.Rect) {
 	m.header(c)
 	// The default case used to be a hand-written complaint. app.Screens owns
 	// it now, so every tool's missing screen says the same thing in the same
@@ -42,7 +39,6 @@ func (m *Model) View() string {
 	// Kept so a mouse event can ask what it landed on. The frame IS the region
 	// list, so there is nothing else to keep in step with it.
 	m.canvas = c
-	return c.String()
 }
 
 func (m *Model) header(c *comp.Canvas) {

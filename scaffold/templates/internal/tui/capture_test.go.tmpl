@@ -3,6 +3,7 @@ package tui
 import (
 	"testing"
 
+	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/harness"
 )
 
@@ -32,7 +33,7 @@ func states() []struct {
 // test that only draws at the end is testing a state the program never has.
 func press(m *Model, keys ...string) *Model {
 	m.SetSize(132, 38)
-	harness.Press(m, keys...)
+	harness.Press(run(m), keys...)
 	return m
 }
 
@@ -41,11 +42,19 @@ func sized(m *Model, w, h int) *Model {
 	return m
 }
 
+// run wraps a model so the harness can drive it. The model has no View — the
+// runner owns the canvas, so Update, View and Canvas belong to it.
+func run(m *Model) *app.Runner { return app.New(m, app.WithSize(m.width, m.height)) }
+
+// view draws the model the way the runner does, for a test that wants the frame
+// as a string.
+func view(m *Model) string { return run(m).View() }
+
 // The screens as goldens.
 func TestFramesMatchTheirGoldens(t *testing.T) {
 	for _, st := range states() {
 		t.Run(st.name, func(t *testing.T) {
-			harness.Golden(t, "testdata", st.name, sized(st.build(), 132, 38).View())
+			harness.Golden(t, "testdata", st.name, view(sized(st.build(), 132, 38)))
 		})
 	}
 }
@@ -55,7 +64,7 @@ func TestFramesMatchTheirGoldens(t *testing.T) {
 func TestFramesAtEightyColumns(t *testing.T) {
 	for _, st := range states() {
 		t.Run(st.name, func(t *testing.T) {
-			harness.Golden(t, "testdata/80", st.name, sized(st.build(), 80, 24).View())
+			harness.Golden(t, "testdata/80", st.name, view(sized(st.build(), 80, 24)))
 		})
 	}
 }
@@ -69,7 +78,7 @@ func TestColourDoesNotChangeTheShape(t *testing.T) {
 	for _, size := range []struct{ w, h int }{{132, 38}, {80, 24}} {
 		for _, st := range states() {
 			harness.ShapeSurvivesColour(t, st.name, func() string {
-				return sized(st.build(), size.w, size.h).View()
+				return view(sized(st.build(), size.w, size.h))
 			})
 		}
 	}
@@ -86,7 +95,7 @@ func TestCaptureFrames(t *testing.T) {
 	}
 	s := harness.Capture(t, dir, harness.Size(132, 38))
 	for _, st := range states() {
-		s.Shot(st.name, sized(st.build(), 132, 38))
+		s.Shot(st.name, run(sized(st.build(), 132, 38)))
 	}
 	s.Done()
 }

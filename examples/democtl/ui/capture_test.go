@@ -30,7 +30,7 @@ func TestCaptureFrames(t *testing.T) {
 		harness.WithMode(harness.Fixture))
 
 	for _, st := range states() {
-		s.Shot(st.name, st.build())
+		s.Shot(st.name, run(st.build()))
 	}
 	t.Log(s)
 	s.Done()
@@ -47,7 +47,7 @@ func TestFramesMatchTheirGoldens(t *testing.T) {
 			m := st.build()
 			m.SetSize(132, 38)
 			m.Now(fleet.Epoch)
-			harness.Golden(t, "testdata", st.name, m.View())
+			harness.Golden(t, "testdata", st.name, view(m))
 		})
 	}
 }
@@ -60,7 +60,7 @@ func TestFramesAtEightyColumns(t *testing.T) {
 			m := st.build()
 			m.SetSize(80, 24)
 			m.Now(fleet.Epoch)
-			harness.Golden(t, "testdata/80", st.name, m.View())
+			harness.Golden(t, "testdata/80", st.name, view(m))
 		})
 	}
 }
@@ -86,7 +86,7 @@ func TestColourDoesNotChangeTheShape(t *testing.T) {
 					m := st.build()
 					m.SetSize(size.w, size.h)
 					m.Now(fleet.Epoch)
-					return m.View()
+					return view(m)
 				})
 			}
 		})

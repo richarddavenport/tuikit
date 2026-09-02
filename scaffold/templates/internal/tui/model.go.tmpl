@@ -132,7 +132,7 @@ func (m *Model) fetch() tea.Cmd {
 }
 
 // Update handles one message.
-func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) (app.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
@@ -256,7 +256,12 @@ func (m *Model) onMouse(msg tea.MouseMsg) tea.Cmd {
 // Run opens <<.Name>>'s interface. The model is passed in rather than built
 // here, because the caller may want to capture it instead of showing it.
 func Run(m *Model) error {
-	p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion())
+	// The runner owns the canvas, its size, its chrome and its pixel layer.
+	// comp.Detect asks the terminal what it can draw beyond characters; on one
+	// that can only draw characters it costs one query and changes nothing.
+	p := tea.NewProgram(
+		app.New(m, app.WithChrome(Chrome), app.WithPixels(comp.Detect())),
+		tea.WithAltScreen(), tea.WithMouseCellMotion())
 	_, err := p.Run()
 	return err
 }

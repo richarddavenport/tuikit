@@ -199,7 +199,7 @@ func states(t *testing.T, w, h int, do func(name string, m *Model)) {
 func TestGalleryGoldens(t *testing.T) {
 	states(t, 132, 38, func(name string, m *Model) {
 		t.Run(name, func(t *testing.T) {
-			harness.Golden(t, "testdata", name, m.View())
+			harness.Golden(t, "testdata", name, view(m))
 		})
 	})
 }
@@ -208,7 +208,7 @@ func TestGalleryGoldens(t *testing.T) {
 func TestGalleryAtEightyColumns(t *testing.T) {
 	states(t, 80, 24, func(name string, m *Model) {
 		t.Run(name, func(t *testing.T) {
-			frame := m.View()
+			frame := view(m)
 			if got := harness.Width(frame); got > 80 {
 				t.Errorf("%s is %d columns wide", name, got)
 			}
@@ -225,7 +225,7 @@ func TestColourDoesNotChangeTheShape(t *testing.T) {
 				fresh.index = m.index
 				fresh.state = m.state
 				fresh.SetSize(size.w, size.h)
-				return fresh.View()
+				return view(fresh)
 			})
 		})
 	}
@@ -242,6 +242,6 @@ func TestCaptureFrames(t *testing.T) {
 	lipgloss.SetColorProfile(termenv.TrueColor)
 
 	s := harness.Capture(t, dir, harness.Size(132, 38))
-	states(t, 132, 38, func(name string, m *Model) { s.Shot(name, m) })
+	states(t, 132, 38, func(name string, m *Model) { s.Shot(name, run(m)) })
 	s.Done()
 }

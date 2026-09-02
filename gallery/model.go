@@ -38,12 +38,6 @@ type Model struct {
 	width, height int
 	canvas        *comp.Canvas
 	mouse         app.Mouse
-
-	// The pixel layer, set by main and never by the model itself. Detection
-	// talks to /dev/tty, and a library that did that in its constructor would
-	// query the developer's real terminal during `go test` — which on a
-	// graphics-capable one would put escape sequences in the goldens.
-	pixels comp.Pixels
 }
 
 // New builds the gallery over a palette.
@@ -65,10 +59,6 @@ func New(p theme.Palette) *Model {
 	return m
 }
 
-// SetGraphics turns the pixel layer on. Called by main, with what the terminal
-// answered; never called by a test, which is why every golden is the fallback.
-func (m *Model) SetGraphics(p comp.Pixels) { m.pixels = p }
-
 // SetSize is what the capture harness calls instead of waiting for a terminal.
 func (m *Model) SetSize(w, h int) { m.width, m.height = w, h }
 
@@ -85,7 +75,7 @@ func (m *Model) entry() Entry {
 func (m *Model) Init() tea.Cmd { return nil }
 
 // Update handles one message.
-func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) (app.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
@@ -142,9 +132,12 @@ func (m *Model) press(id comp.ID, _ tea.MouseMsg) tea.Cmd {
 	return nil
 }
 
-// View draws the gallery.
-func (m *Model) View() string {
-	c := comp.NewCanvas(m.width, 3+m.bodyHeight()).WithGraphics(m.pixels)
+// Draw paints the gallery into the canvas the runner owns.
+//
+// The rect is the whole canvas and the gallery uses its own arithmetic inside
+// it, which is allowed: a screen may lay itself out however it likes as long as
+// it does so IN CELLS, in the canvas it was handed.
+func (m *Model) Draw(c *comp.Canvas, _ comp.Rect) {
 	m.header(c)
 
 	body := comp.Rect{X: 0, Y: 2, W: m.width, H: m.bodyHeight()}
@@ -154,7 +147,6 @@ func (m *Model) View() string {
 
 	m.footer(c)
 	m.canvas = c
-	return c.String()
 }
 
 func (m *Model) bodyHeight() int { return max(6, m.height-4) }

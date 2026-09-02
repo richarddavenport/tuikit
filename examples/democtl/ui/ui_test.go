@@ -73,7 +73,7 @@ func states() []struct {
 			// is the case the marker exists for.
 			m.SetSize(132, 38)
 			m.Now(fleet.Epoch)
-			m.View()
+			view(m)
 			m.list.Scroll(12)
 			return m
 		}},
@@ -145,7 +145,7 @@ func TestNothingIsWiderThanTheTerminal(t *testing.T) {
 			t.Run(s.name, func(t *testing.T) {
 				m := s.build()
 				m.SetSize(width, 38)
-				for i, line := range strings.Split(m.View(), "\n") {
+				for i, line := range strings.Split(view(m), "\n") {
 					if w := lipgloss.Width(line); w > width {
 						t.Errorf("at %d columns, line %d is %d wide:\n%q", width, i+1, w, line)
 					}
@@ -225,7 +225,7 @@ func TestASkippedStepIsNotDrawnAsSuccess(t *testing.T) {
 	press(m, "D", "y")
 	settle(m, 20)
 
-	if !strings.Contains(m.View(), "already true") {
+	if !strings.Contains(view(m), "already true") {
 		t.Error("the skipped step is indistinguishable from one that ran")
 	}
 }
@@ -237,7 +237,7 @@ func TestAFilterMatchingNothingSaysSo(t *testing.T) {
 	m.SetSize(100, 38)
 	press(m, "/", "z", "z", "z")
 
-	if !strings.Contains(m.View(), "nothing matches") {
+	if !strings.Contains(view(m), "nothing matches") {
 		t.Error("a filter matching nothing drew an empty pane with no explanation")
 	}
 }
@@ -261,7 +261,7 @@ func press(m *Model, keys ...string) {
 		// that scrolls needs to know what the last frame could show, and a
 		// helper that skips the draw hands the next key a model that has never
 		// seen its own size — which reads as "the key did nothing".
-		m.View()
+		view(m)
 	}
 }
 
@@ -345,12 +345,12 @@ func TestAModalDoesNotWipeTheFrameBehindIt(t *testing.T) {
 	// Counted rather than checked line by line: the assertion is that the
 	// modal destroyed no framed row, and counting says that without having to
 	// name which rows the modal happens to land on.
-	before, after := framedRows(closed.View()), framedRows(open.View())
+	before, after := framedRows(view(closed)), framedRows(view(open))
 	if before != after {
 		t.Errorf("the modal wiped %d framed rows out of %d — it is punching a hole "+
 			"through the panes rather than sitting on them", before-after, before)
 	}
-	if !strings.Contains(open.View(), "Deploy api_gateway?") {
+	if !strings.Contains(view(open), "Deploy api_gateway?") {
 		t.Fatal("the modal is not on screen at all")
 	}
 }
@@ -374,7 +374,7 @@ func TestAStepsDurationFitsInsideTheBox(t *testing.T) {
 	press(m, "D", "y")
 	settle(m, 20)
 
-	view := m.View()
+	view := view(m)
 	if !strings.Contains(view, "400ms") {
 		t.Error("the first step's duration is truncated")
 	}

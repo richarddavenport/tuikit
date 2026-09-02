@@ -167,13 +167,20 @@ func (m *Model) act(key string) tea.Cmd {
 // directory was asked for, drive it rather than opening it. Decision 10's
 // second capture mechanism, in nine lines.
 func open(seed int64, c spec.Call) int {
-	m := New(seed)
 	dir := c.Flag("snapshot")
+
+	// Only the interactive path asks about graphics. A --snapshot run is
+	// capturing frames for documentation and must get the characters, whatever
+	// the terminal it was started from happens to support.
+	var opts []app.Option
 	if dir == "" {
-		// Only the interactive path asks. A --snapshot run is capturing
-		// frames for documentation and must get the characters, whatever the
-		// terminal it happens to be started from can do.
-		m.SetGraphics(comp.Detect())
+		opts = append(opts, app.WithPixels(comp.Detect()))
+	}
+	// The runner owns the canvas, its size and its pixel layer; the model has
+	// no View to hand back a string through. See app.Model.
+	m := app.New(New(seed), opts...)
+
+	if dir == "" {
 		p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion())
 		if _, err := p.Run(); err != nil {
 			_, _ = fmt.Fprintln(c.Err, "democtl:", err)

@@ -10,22 +10,23 @@ import (
 	"<<.Module>>/internal/engine"
 )
 
-// View draws the whole window and returns the frame.
+// Draw paints the whole window into the canvas the runner owns.
 //
-// Everything below draws CELLS into a canvas rather than returning strings to
-// be joined. That is what makes a click land somewhere: every cell records who
-// drew it, so the frame is its own map. It also deletes a category of bug —
-// there is no way to draw past the edge, because the coordinate does not exist.
-func (m *Model) View() string {
-	c := comp.NewCanvas(m.width, 3+m.bodyHeight()).WithChrome(Chrome)
-
+// There is no View returning a string, and that is deliberate: a string is a
+// seam a tool can smuggle a hand-joined frame through, and no guard could tell.
+// Handed a canvas and a rect, a model has nowhere else to put anything.
+//
+// Everything below draws CELLS. That is what makes a click land somewhere:
+// every cell records who drew it, so the frame is its own map. It also deletes
+// a category of bug — there is no way to draw past the edge, because the
+// coordinate does not exist.
+func (m *Model) Draw(c *comp.Canvas, _ comp.Rect) {
 	m.header(c)
 	m.dashboard(c, m.body())
 	m.footer(c)
 
 	// Kept so a mouse event can ask what it landed on.
 	m.canvas = c
-	return c.String()
 }
 
 // body is the space between the header and the footer.

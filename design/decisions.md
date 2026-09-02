@@ -778,3 +778,61 @@ with a picture over it is the same frame.
 gallery entry, a meter in democtl's run screen, and `tuikit pixels` — a
 self-test that prints what your terminal answered and draws the same bar with
 and without a picture, because no test in CI can tell you whether foot draws it.
+
+## 30. The model draws into a canvas; there is no `View() string`
+
+TEA's third step is `View() string`, and that string is a seam.
+
+A tuikit model is supposed to compute no coordinates: components take rects,
+the canvas owns the grid, and the tool declares what goes where. azctl was got
+to the point where `grep -c 'c.Text(|c.Fill(|c.Set(' internal/tui/*.go` is
+**zero** — a real result, and one nothing enforced. A model returning a string
+can hand back a hand-joined pile of lipgloss, or a canvas frame with something
+concatenated onto it, and the goldens will record whatever comes out. It was a
+habit, and a habit is not a property.
+
+```go
+type Model interface {
+	Init() tea.Cmd
+	Update(tea.Msg) (Model, tea.Cmd)
+	Draw(c *comp.Canvas, r comp.Rect)
+}
+```
+
+Handed a canvas and a rect, a model has nowhere else to put anything. Update
+returns a `Model` rather than a `tea.Model` for the same reason: a signature
+accepting `tea.Model` accepts anything with a View, which is the escape hatch
+this exists to close.
+
+### What the runner took over
+
+Four things every tool set up the same way and could get subtly different:
+
+- **The canvas**, and the one place `comp.NewCanvas` is called in a program.
+- **Its size.** One row shorter than the terminal — which both tools here
+  already did, independently, with different arithmetic (democtl through its
+  band layout, the gallery through a `bodyHeight` helper). Two of two is a
+  convention, not a preference.
+- **The chrome**, so one pane cannot end up with different box characters
+  because somebody threaded it through five call sites and missed one.
+- **The pixel layer**, and with it the rule that detection is asked by main and
+  never by a model — see decision 29.
+
+### It cost the harness nothing
+
+`*app.Runner` has `View`, `Update` returning a `tea.Model`, and `Canvas`, so it
+satisfies `harness.Model`, `Driver` and `Pointer` unchanged. Tests wrap the
+model and drive the runner; assertions still read the model's fields. Nothing in
+`harness/` was touched.
+
+**Not one golden moved**, in either tool, which is the check that matters: the
+runner reproduces frames that four hundred lines of layout used to produce by
+hand.
+
+### `SetSize` goes through Update
+
+The runner could set its own fields and be done. It sends a `tea.WindowSizeMsg`
+instead, so a model that keeps its own idea of the size — most do, for layout —
+hears about it by the same route it would in a running program. Two paths to one
+fact is how they come to disagree, and the disagreement would only show up in
+captured frames, which is the worst place to find it.

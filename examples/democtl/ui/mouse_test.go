@@ -3,6 +3,7 @@ package ui
 import (
 	"testing"
 
+	"github.com/richarddavenport/tuikit/app"
 	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/examples/democtl/fleet"
 	"github.com/richarddavenport/tuikit/harness"
@@ -11,20 +12,24 @@ import (
 
 // drawn builds a model and renders once, because a region cannot be clicked
 // before it has been drawn — which is the point, not a limitation.
-func drawn(w, h int) *Model {
+// Returns the model AND the runner: the runner is what the harness drives
+// (Update, View and Canvas belong to it now), while the model is what a test
+// makes assertions about.
+func drawn(w, h int) (*Model, *app.Runner) {
 	m := New(1)
 	m.SetSize(w, h)
 	m.Now(fleet.Epoch)
-	m.View()
-	return m
+	drv := run(m)
+	drv.View()
+	return m, drv
 }
 
 // Clicking a row selects THAT service, addressed by name.
 func TestClickingARowSelectsIt(t *testing.T) {
-	m := drawn(132, 38)
+	m, drv := drawn(132, 38)
 	m.focus = paneDetail
 
-	harness.Click(t, m, "services.row[3]")
+	harness.Click(t, drv, "services.row[3]")
 
 	if m.list.Cursor() != 3 {
 		t.Errorf("the cursor is on %d, not 3", m.list.Cursor())
@@ -39,8 +44,8 @@ func TestClickingARowSelectsIt(t *testing.T) {
 // rather than the glyph — in a string world this is a manual rect calculation
 // that is wrong the first time.
 func TestClickingPastTheNameStillSelectsTheRow(t *testing.T) {
-	m := drawn(132, 38)
-	c := m.Canvas()
+	_, drv := drawn(132, 38)
+	c := drv.Canvas()
 
 	r, ok := c.Region(comp.Region(regServicesRow).At(2))
 	if !ok {
@@ -53,8 +58,8 @@ func TestClickingPastTheNameStillSelectsTheRow(t *testing.T) {
 
 // Clicking a tab selects it and focuses the pane it belongs to.
 func TestClickingATabSelectsIt(t *testing.T) {
-	m := drawn(132, 38)
-	harness.Click(t, m, "detail.tab[2]")
+	m, drv := drawn(132, 38)
+	harness.Click(t, drv, "detail.tab[2]")
 
 	if m.tab != 2 {
 		t.Errorf("the tab is %d, not 2", m.tab)
@@ -68,10 +73,10 @@ func TestClickingATabSelectsIt(t *testing.T) {
 // than the selection. Wiring it to the cursor instead makes scrolling appear to
 // pick services at random.
 func TestTheWheelScrollsTheViewportNotTheSelection(t *testing.T) {
-	m := drawn(132, 12) // short enough that the list overflows
+	m, drv := drawn(132, 12) // short enough that the list overflows
 	before := m.list.Cursor()
 
-	harness.Wheel(t, m, "services", +2)
+	harness.Wheel(t, drv, "services", +2)
 
 	if m.list.Offset() == 0 {
 		t.Errorf("the wheel did not scroll the list")
@@ -85,17 +90,17 @@ func TestTheWheelScrollsTheViewportNotTheSelection(t *testing.T) {
 // constant instead is how a five-line pane scrolls into empty space and blanks
 // itself.
 func TestScrollingStopsAtTheEnd(t *testing.T) {
-	m := drawn(132, 12)
-	harness.Wheel(t, m, "services", +50)
+	m, drv := drawn(132, 12)
+	harness.Wheel(t, drv, "services", +50)
 
 	if m.list.Offset() > m.list.Max() {
 		t.Errorf("scrolled to %d, past the %d there is", m.list.Offset(), m.list.Max())
 	}
-	if got := m.View(); got == "" {
+	if got := drv.View(); got == "" {
 		t.Error("the pane scrolled itself blank")
 	}
 
-	harness.Wheel(t, m, "services", -50)
+	harness.Wheel(t, drv, "services", -50)
 	if m.list.Offset() != 0 {
 		t.Errorf("scrolling back up stopped at %d", m.list.Offset())
 	}
@@ -106,10 +111,10 @@ func TestScrollingStopsAtTheEnd(t *testing.T) {
 // passes every test until something scrolls, and then acts on the wrong item
 // rather than failing visibly.
 func TestAfterScrollingAClickSelectsWhatIsUnderIt(t *testing.T) {
-	m := drawn(132, 12)
-	harness.Wheel(t, m, "services", +1)
+	m, drv := drawn(132, 12)
+	harness.Wheel(t, drv, "services", +1)
 
-	c := m.Canvas()
+	c := drv.Canvas()
 	inner, ok := c.Region(comp.Region(regServices))
 	if !ok {
 		t.Fatal("no list was drawn")
@@ -120,7 +125,7 @@ func TestAfterScrollingAClickSelectsWhatIsUnderIt(t *testing.T) {
 	if top.Index != m.list.Offset() {
 		t.Fatalf("the top row is owned by %v, want index %d", top, m.list.Offset())
 	}
-	harness.Click(t, m, top.String())
+	harness.Click(t, drv, top.String())
 	if m.list.Cursor() != m.list.Offset() {
 		t.Errorf("clicking the top row selected %d, want %d", m.list.Cursor(), m.list.Offset())
 	}
@@ -129,10 +134,10 @@ func TestAfterScrollingAClickSelectsWhatIsUnderIt(t *testing.T) {
 // Dragging the divider moves it, and a drag survives the pointer outrunning
 // what it grabbed — which happens on every real drag.
 func TestDraggingTheDividerMovesIt(t *testing.T) {
-	m := drawn(132, 38)
+	m, drv := drawn(132, 38)
 	before := m.paneWidth()
 
-	harness.Drag(t, m, "split", +10)
+	harness.Drag(t, drv, "split", +10)
 
 	if got := m.paneWidth(); got != before+10 {
 		t.Errorf("the divider moved to %d, want %d", got, before+10)
@@ -144,8 +149,8 @@ func TestDraggingTheDividerMovesIt(t *testing.T) {
 
 // A divider cannot be dragged to nothing, or it is a pane you cannot get back.
 func TestTheDividerKeepsBothPanesUsable(t *testing.T) {
-	m := drawn(132, 38)
-	harness.Drag(t, m, "split", -100)
+	m, drv := drawn(132, 38)
+	harness.Drag(t, drv, "split", -100)
 
 	if m.paneWidth() < minPane {
 		t.Errorf("the list pane is %d columns, under the %d minimum", m.paneWidth(), minPane)
@@ -154,8 +159,8 @@ func TestTheDividerKeepsBothPanesUsable(t *testing.T) {
 
 // Right-click opens the menu for what is under it.
 func TestRightClickOpensTheMenuForThatRow(t *testing.T) {
-	m := drawn(132, 38)
-	harness.RClick(t, m, "services.row[4]")
+	m, drv := drawn(132, 38)
+	harness.RClick(t, drv, "services.row[4]")
 
 	if m.menu == nil {
 		t.Fatal("no menu opened")
@@ -175,8 +180,8 @@ func TestRightClickOpensTheMenuForThatRow(t *testing.T) {
 // for asking — so an action whose only path is a context menu is broken for
 // everyone inside herdr or tmux, and the tool cannot detect it to say so.
 func TestTheMenuOpensFromTheKeyboard(t *testing.T) {
-	m := drawn(132, 38)
-	harness.Press(m, "j", "j", "m")
+	m, drv := drawn(132, 38)
+	harness.Press(drv, "j", "j", "m")
 
 	if m.menu == nil {
 		t.Fatal("m did not open the menu")
@@ -189,8 +194,8 @@ func TestTheMenuOpensFromTheKeyboard(t *testing.T) {
 // Every action in the menu carries the key that does the same thing, so the two
 // paths are one list and cannot drift.
 func TestEveryMenuActionNamesItsKey(t *testing.T) {
-	m := drawn(132, 38)
-	harness.Press(m, "m")
+	m, drv := drawn(132, 38)
+	harness.Press(drv, "m")
 
 	for _, item := range m.menu.items {
 		if item.Key == "" {
@@ -204,12 +209,12 @@ func TestEveryMenuActionNamesItsKey(t *testing.T) {
 
 // Choosing from the menu does the same thing the key does.
 func TestTheMenuAndTheKeyDoTheSameThing(t *testing.T) {
-	byKey := drawn(132, 38)
-	harness.Press(byKey, "D")
+	byKey, keyDrv := drawn(132, 38)
+	harness.Press(keyDrv, "D")
 
-	byMenu := drawn(132, 38)
-	harness.Press(byMenu, "m")
-	harness.Click(t, byMenu, "menu.item[1]") // Deploy
+	byMenu, menuDrv := drawn(132, 38)
+	harness.Press(menuDrv, "m")
+	harness.Click(t, menuDrv, "menu.item[1]") // Deploy
 
 	if byMenu.confirm == nil {
 		t.Fatal("the menu did not open the confirm")
@@ -222,11 +227,11 @@ func TestTheMenuAndTheKeyDoTheSameThing(t *testing.T) {
 // A modal takes the mouse the way it takes the keyboard: clicking the frame
 // behind a question is not an answer to it.
 func TestAModalTakesTheMouse(t *testing.T) {
-	m := drawn(132, 38)
-	harness.Press(m, "D")
+	m, drv := drawn(132, 38)
+	harness.Press(drv, "D")
 	before := m.list.Cursor()
 
-	harness.Click(t, m, "services.row[5]")
+	harness.Click(t, drv, "services.row[5]")
 
 	if m.list.Cursor() != before {
 		t.Errorf("a click behind the modal moved the cursor to %d", m.list.Cursor())
@@ -239,10 +244,10 @@ func TestAModalTakesTheMouse(t *testing.T) {
 // A script names regions, and a name that was not drawn is an error rather than
 // a click into empty space that reports success.
 func TestAScriptCannotNameARegionThatWasNotDrawn(t *testing.T) {
-	m := drawn(132, 38)
+	_, drv := drawn(132, 38)
 	rec := &recorder{}
 
-	harness.Click(rec, m, "services.row[999]")
+	harness.Click(rec, drv, "services.row[999]")
 
 	if !rec.failed {
 		t.Error("clicking a region nobody drew was accepted")
@@ -251,9 +256,9 @@ func TestAScriptCannotNameARegionThatWasNotDrawn(t *testing.T) {
 
 // The whole thing as a script, which is how a capture will read.
 func TestAScriptDrivesTheInterfaceByName(t *testing.T) {
-	m := drawn(132, 38)
+	m, drv := drawn(132, 38)
 
-	harness.Script(t, m, `
+	harness.Script(t, drv, `
 		# select a service, look at its Config tab, then open its menu
 		click services.row[2]
 		click detail.tab[1]
@@ -276,8 +281,8 @@ func (r *recorder) Fatalf(format string, args ...any) { r.failed = true }
 // The menu is the declaration, not a list kept in step with it. A command given
 // a Target appears here without anybody editing the menu.
 func TestTheMenuComesFromTheDeclaration(t *testing.T) {
-	m := drawn(132, 38)
-	harness.Press(m, "m")
+	m, drv := drawn(132, 38)
+	harness.Press(drv, "m")
 
 	if m.menu == nil {
 		t.Fatal("no menu")
@@ -296,12 +301,12 @@ func TestTheMenuComesFromTheDeclaration(t *testing.T) {
 // The menu entry and the keystroke run the same call, which is the only
 // arrangement in which they cannot drift.
 func TestTheMenuEntryAndItsKeyDoTheSameThing(t *testing.T) {
-	byKey := drawn(132, 38)
-	harness.Press(byKey, "L")
+	byKey, keyDrv := drawn(132, 38)
+	harness.Press(keyDrv, "L")
 
-	byMenu := drawn(132, 38)
-	harness.Press(byMenu, "m")
-	harness.Click(t, byMenu, "menu.item[0]") // View logs
+	byMenu, menuDrv := drawn(132, 38)
+	harness.Press(menuDrv, "m")
+	harness.Click(t, menuDrv, "menu.item[0]") // View logs
 
 	if byKey.at() != screenLogs || byMenu.at() != screenLogs {
 		t.Errorf("the key reached screen %v and the menu %v", byKey.at(), byMenu.at())
