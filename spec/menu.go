@@ -53,3 +53,25 @@ func Unreachable(root Command) []string {
 	})
 	return out
 }
+
+// Keyed is a command that has a keyboard path, and the path.
+type Keyed struct {
+	Name string
+	Key  string
+}
+
+// WithKeys is every command in the tree that has a Key.
+//
+// For guard.Keys, which asks whether the help screen names them all. Separate
+// from Unreachable because that asks the opposite question — a command with a
+// Target and no Key — and a function answering both would be answering neither
+// clearly.
+func WithKeys(root Command) []Keyed {
+	var out []Keyed
+	walk(root, nil, func(cmd Command, path []string) {
+		if cmd.Key != "" {
+			out = append(out, Keyed{Name: join(path), Key: cmd.Key})
+		}
+	})
+	return out
+}

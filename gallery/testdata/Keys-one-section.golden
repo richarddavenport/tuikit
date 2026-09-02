@@ -1,15 +1,15 @@
 tuikit gallery  every component, running                                                                               21 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│ Components                    │ │ Meter                                                                                          │
-│ List                          │ │ How far along something is — characters everywhere, pixels where they exist.                   │
-│ Pane                          │ │ ‹ part way · the range · no label · with a pixel layer · resolution is the point ›             │
-│ Tabs                          │ │ the label is optional; the bar still says the number, coarsely                                 │
+│ Components                    │ │ Keys                                                                                           │
+│ List                          │ │ Every binding, by screen. A footer says what acts on THIS; this says what exists.              │
+│ Pane                          │ │ ‹ by screen · as an overlay · too short · one section ›                                        │
+│ Tabs                          │ │ a tool with four bindings does not need headings                                               │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │ [─────────────────────────────────────────────────────────────────────·······················] │
-│ StepList                      │ │                                                                                                │
-│ LogPane                       │ │                                                                                                │
-│ Spinner                       │ │                                                                                                │
+│ Confirm                       │ │ Everywhere                                                                                     │
+│ StepList                      │ │ ?       these keys                                                                             │
+│ LogPane                       │ │ ctrl-k  run a command                                                                          │
+│ Spinner                       │ │ q       quit                                                                                   │
 │ Table                         │ │                                                                                                │
 │ Detail                        │ │                                                                                                │
 │ Menu                          │ │                                                                                                │
@@ -28,10 +28,10 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
-│                               │ │                                                                                                │
-│                               │ │ roles    Accent · Border · Muted                                                               │
-│                               │ │ glyphs   ─ ·                                                                                   │
-│                               │ │ from     swarmctl's run dialog and activity strip, which both wanted it and had neither        │
+│                               │ │ keys     ? open it · esc close it                                                              │
+│                               │ │ roles    Accent · Muted · Border                                                               │
+│                               │ │ glyphs   ↑ ↓ …                                                                                 │
+│                               │ │ from     every tool writes a footer and none has a help screen                                 │
 │                         21/21 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

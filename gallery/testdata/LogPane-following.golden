@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               20 components
+tuikit gallery  every component, running                                                                               21 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ LogPane                                                                                        │
@@ -22,7 +22,7 @@ tuikit gallery  every component, running                                        
 │ Waiting                       │ │   09:12:04 api_gateway: handled request in 621ms                                               │
 │ Breadcrumb                    │ │   09:13:01 api_gateway: handled request in 721ms                                               │
 │ Scrollbar                     │ │   09:14:08 api_gateway: handled request in 821ms                                               │
-│                               │ │   09:15:05 api_gateway: handled request in 921ms                                               │
+│ Keys                          │ │   09:15:05 api_gateway: handled request in 921ms                                               │
 │                               │ │   09:16:02 api_gateway: handled request in 121ms                                               │
 │                               │ │   09:17:09 api_gateway: handled request in 221ms                                               │
 │                               │ │   09:18:06 api_gateway: upstream timed out after 3s                                            │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ mouse    wheel the same                                                                        │
 │                               │ │ roles    Muted · Stderr                                                                        │
 │                               │ │ from     swarmctl logspane.go                                                                  │
-│                         20/20 │ │                                                                                                │
+│                         21/21 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

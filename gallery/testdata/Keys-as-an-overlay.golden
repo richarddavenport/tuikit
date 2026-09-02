@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                               21 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ Keys                                                                                           │
+│ List                          │ │ Every binding, by screen. A footer says what acts on THIS; this says what exists.              │
+│ Pane                          │ │ ‹ by screen · as an overlay · too short · one section ›                                        │
+│ Tabs                          │ │ the interface stays behind it: "what was I looking at" is half of what you open help to answer │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │ ┌─ Resources ────────────────────────────────────────────────────────────────────────────────┐ │
+│ StepList                      │ │ │                                                                                            │ │
+│ LogPane                       │ │ │              ┌──────────────────────────────────────────────────────────────┐              │ │
+│ Spinner                       │ │ │              │Keys                                                          │              │ │
+│ Table                         │ │ │              │                                                              │              │ │
+│ Detail                        │ │ │              │Everywhere                                                    │              │ │
+│ Menu                          │ │ │              │?       these keys                                            │              │ │
+│ Toast                         │ │ │              │ctrl-k  run a command                                         │              │ │
+│ Form                          │ │ │              │q       quit                                                  │              │ │
+│ Split                         │ │ │              │                                                              │              │ │
+│ Layout                        │ │ │              │The estate                                                    │              │ │
+│ Meter                         │ │ │              │j/k     move                                                  │              │ │
+│ Input                         │ │ │              │enter   expand a group                                        │              │ │
+│ Waiting                       │ │ │              │g       pivot: group, type, location, tag                     │              │ │
+│ Breadcrumb                    │ │ │              │/       filter                                                │              │ │
+│ Scrollbar                     │ │ │              │                                                              │              │ │
+│ Keys                          │ │ │              │A run                                                         │              │ │
+│                               │ │ │              │↑↓      scroll the output                                     │              │ │
+│                               │ │ │              │esc     back to the estate                                    │              │ │
+│                               │ │ │              └──────────────────────────────────────────────────────────────┘              │ │
+│                               │ │ │                                                                                            │ │
+│                               │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│                               │ │ keys     ? open it · esc close it                                                              │
+│                               │ │ roles    Accent · Muted · Border                                                               │
+│                               │ │ glyphs   ↑ ↓ …                                                                                 │
+│                               │ │ from     every tool writes a footer and none has a help screen                                 │
+│                         21/21 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

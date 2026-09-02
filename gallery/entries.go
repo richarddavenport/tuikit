@@ -45,6 +45,7 @@ func (m *Model) Entries() []Entry {
 		m.waitingEntry(s),
 		m.breadcrumbEntry(s),
 		m.scrollbarEntry(s),
+		m.keysEntry(s),
 	}
 }
 
@@ -1083,6 +1084,62 @@ func (m *Model) scrollbarEntry(s *styles) Entry {
 				Draw: draw(200000, 0)},
 			{Name: "nothing to scroll", Note: "draws nothing at all — a full-height thumb says only that there is a scrollbar",
 				Draw: draw(8, 0)},
+		},
+	}
+}
+
+// keysEntry: what exists, as against what the footer says acts on this.
+func (m *Model) keysEntry(s *styles) Entry {
+	full := []comp.KeySection{
+		{Name: "Everywhere", Keys: []comp.Hint{
+			{Key: "?", Label: "these keys"},
+			{Key: "ctrl-k", Label: "run a command"},
+			{Key: "q", Label: "quit"},
+		}},
+		{Name: "The estate", Keys: []comp.Hint{
+			{Key: "j/k", Label: "move"},
+			{Key: "enter", Label: "expand a group"},
+			{Key: "g", Label: "pivot: group, type, location, tag"},
+			{Key: "/", Label: "filter"},
+		}},
+		{Name: "A run", Keys: []comp.Hint{
+			{Key: "↑↓", Label: "scroll the output"},
+			{Key: "esc", Label: "back to the estate"},
+		}},
+	}
+	draw := func(k comp.Keys, height int) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			k.SectionStyle, k.KeyStyle = &s.title, &s.focused
+			k.LabelStyle, k.TitleStyle, k.Border = &s.muted, &s.title, &s.border
+			area := r
+			if height > 0 {
+				area.H = min(r.H, height)
+			}
+			if k.Overlay {
+				// Something behind it, so "over the interface" is visible.
+				comp.Pane{Title: "Resources", Border: &s.border, TitleStyle: &s.muted}.
+					Draw(c, r, comp.Region("demo.keysbehind"))
+				area = r
+			}
+			k.Draw(c, area, comp.Region("demo.keys"))
+		}
+	}
+	return Entry{
+		Name:    "Keys",
+		Summary: "Every binding, by screen. A footer says what acts on THIS; this says what exists.",
+		From:    "every tool writes a footer and none has a help screen",
+		Keys:    []comp.Hint{{Key: "?", Label: "open it"}, {Key: "esc", Label: "close it"}},
+		Roles:   []string{"Accent", "Muted", "Border"},
+		Glyphs:  []string{"↑", "↓", "…"},
+		States: []State{
+			{Name: "by screen", Note: "grouped by screen because that is how a reader looks — a flat list of forty is a reference, not an answer",
+				Draw: draw(comp.Keys{Sections: full}, 0)},
+			{Name: "as an overlay", Note: "the interface stays behind it: \"what was I looking at\" is half of what you open help to answer",
+				Draw: draw(comp.Keys{Sections: full, Overlay: true, Title: "Keys"}, 0)},
+			{Name: "too short", Note: "says it was cut — a help screen that quietly omits half the keys is worse, because a reader believes it",
+				Draw: draw(comp.Keys{Sections: full}, 6)},
+			{Name: "one section", Note: "a tool with four bindings does not need headings",
+				Draw: draw(comp.Keys{Sections: full[:1]}, 0)},
 		},
 	}
 }
