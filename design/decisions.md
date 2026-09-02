@@ -705,12 +705,22 @@ The expensive part is shared. The panel is rasterised once into an
 nothing. Ordering follows the audience, not the polish: cells, then Sixel for
 the default, then kitty.
 
-### What it costs
+### The canvas owns the bytes, not the runner
 
-**The runner has to own the final bytes.** Today every model ends
-`return c.String()`, and a decoration pass has nowhere to run — see issue 21,
-which was filed for a different reason and turns out to be load-bearing for
-this one.
+First reading of this said the runner had to own the final bytes, and that
+issue 21 (delete `View() string`) was therefore a prerequisite. That was wrong,
+and worth writing down because the mistake is the instructive part.
+
+Every tuikit model already ends `return c.String()`. **The canvas is already the
+last thing to touch the frame**, so the decoration pass belongs there — and for
+the kitty protocol that is not merely adequate but correct, because placement
+bytes are part of the frame and want to travel with it.
+
+Issue 21 remains worth doing for the reason it was filed — a `string` seam lets
+a tool hand back a hand-joined frame and no guard will catch it. But it is a
+guard question, not a pixel one, and the ladder does not wait for it.
+
+### What it costs
 
 **A raster path and an embedded typeface**, which is a new asset class and a
 real number on the binary. This is the actual work; the escape sequences are

@@ -136,6 +136,11 @@ type Canvas struct {
 	// that can be handed the wrong one — or none, and draw a frame out of
 	// empty strings.
 	chrome theme.Chrome
+	// gfx is the pixel layer, or nil on a canvas that has none — which is
+	// every canvas in every test, and every canvas on a terminal that draws
+	// only characters. A pointer so that a clipped VIEW of this canvas records
+	// its pictures onto the frame that is actually printed.
+	gfx *graphics
 }
 
 // NewCanvas makes a canvas of blanks.
@@ -394,6 +399,10 @@ func (c *Canvas) String() string {
 			b.WriteByte('\n')
 		}
 	}
+	// Pictures go after the text: Sixel is opaque and a space printed over it
+	// erases it. On a canvas with no pixel layer this is the empty string, so
+	// the frame is byte-for-byte what it has always been.
+	b.WriteString(c.pixels())
 	return b.String()
 }
 
