@@ -89,9 +89,9 @@ func pixels(args []string) {
 		// Only Sixel is at the mercy of this. The kitty placement states its
 		// footprint in CELLS, so a wrong pixel measurement makes a blurrier
 		// picture rather than a misplaced one.
-		if p.Mode == term.Sixel && p.CellMeasured && os.Getenv(term.EnvCellSize) == "" {
-			fmt.Printf("             if pictures come out half size, try %s=%dx%d\n",
-				term.EnvCellSize, p.CellW*2, p.CellH*2)
+		if p.Mode == term.Sixel && !p.CellMeasured && os.Getenv(term.EnvCellSize) == "" {
+			fmt.Printf("             nothing would say, so this is a guess — if pictures come out\n"+
+				"             the wrong size, set %s=WxH\n", term.EnvCellSize)
 		}
 		// The kernel's opinion, from TIOCGWINSZ, which is a different channel
 		// from CSI 14t: the terminal answers the escape and chooses points or
@@ -100,7 +100,7 @@ func pixels(args []string) {
 		// factor and issue 31 stops needing a guess.
 		if tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0); err == nil {
 			if px, py, ok := term.WindowPixels(tty); ok {
-				line := fmt.Sprintf("kernel       window is %dx%d pixels (TIOCGWINSZ)", px, py)
+				line := fmt.Sprintf("kernel       window is %dx%d pixels (TIOCGWINSZ, and where the cell size above came from)", px, py)
 				if cols, rows, ok := term.WindowCells(tty); ok && cols > 0 && rows > 0 {
 					kw, kh := px/cols, py/rows
 					line += fmt.Sprintf(", so a cell is %dx%d", kw, kh)

@@ -31,17 +31,68 @@ func CellSize() (w, h int, measured bool) {
 		return DefaultCellW, DefaultCellH, false
 	}
 	defer f.Close() //nolint:errcheck // a query we are done with
+
+	// The kernel first, because it turned out to be the honest channel.
+	// Measured on one HiDPI Mac, both terminals on the same display:
+	//
+	//	              CSI 14t says   TIOCGWINSZ says   draws at
+	//	  Ghostty        16x34            16x34         16x34
+	//	  iTerm2          8x17            16x34         16x34
+	//
+	// The escape is answered by the terminal application, which picks points or
+	// device pixels and says which nowhere. ws_xpixel is what that same
+	// terminal wrote into the tty, and both wrote device pixels. So the ratio
+	// issue 31 refused to guess is not a guess: it is this division.
+	if w, h, ok := kernelCellSize(f); ok {
+		return w, h, true
+	}
 	return QueryCellSize(f, DefaultTimeout)
+}
+
+// kernelCellSize divides the window's pixels by its cells.
+//
+// Refused rather than trusted when the answer is not a plausible cell, because
+// a terminal that fills the pixel fields with something else would otherwise
+// take the picture with it — and the escape, which is right on most terminals,
+// would never be asked.
+func kernelCellSize(f *os.File) (w, h int, ok bool) {
+	px, py, ok := WindowPixels(f)
+	if !ok {
+		return 0, 0, false
+	}
+	cols, rows, ok := WindowCells(f)
+	if !ok || cols <= 0 || rows <= 0 {
+		return 0, 0, false
+	}
+	return cellFrom(px, py, cols, rows)
+}
+
+// cellFrom is the arithmetic, split out so it can be tested without a tty.
+func cellFrom(px, py, cols, rows int) (w, h int, ok bool) {
+	if px <= 0 || py <= 0 || cols <= 0 || rows <= 0 {
+		return 0, 0, false
+	}
+	// Rounded, not truncated: 3832 pixels over 239 columns is 16.03, and a cell
+	// one pixel narrow tiles a whole row of pictures short.
+	w, h = (px+cols/2)/cols, (py+rows/2)/rows
+	if w < 2 || h < 2 || w > 200 || h > 200 {
+		return 0, 0, false
+	}
+	return w, h, true
 }
 
 // EnvCellSize forces the cell size, as WxH in pixels.
 //
-// It exists because terminals disagree about what a "pixel" is. On a HiDPI Mac,
-// Ghostty reports the cell in DEVICE pixels (16x34) and draws to match, while
-// iTerm2 reports it in POINTS (8x18) and draws Sixel at device resolution — so
-// every picture there comes out at exactly half the size it asked for. Nothing
-// in-band distinguishes the two, so rather than guess a scale factor this lets
-// a reader state the answer. See issue 31.
+// It exists because terminals disagree about what a "pixel" is: on a HiDPI Mac
+// iTerm2 answers CSI 14t in POINTS and draws at device resolution, so every
+// Sixel picture came out at exactly half size. That is now DETECTED rather than
+// declared — [CellSize] asks the kernel first, and TIOCGWINSZ reported true
+// device pixels on both terminals measured (issue 31).
+//
+// So this is no longer the answer to HiDPI. It stays as the override of last
+// resort, for a terminal that fills neither channel honestly, and because
+// something that draws pictures should let a reader state a measurement it got
+// wrong.
 const EnvCellSize = "TUIKIT_CELL_SIZE"
 
 func overrideCellSize() (w, h int, ok bool) {

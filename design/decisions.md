@@ -1404,3 +1404,47 @@ looks like it covers the class and does not, because then nobody looks for the
 rest. Decision 32 remains the discipline for everything unreachable this way —
 a comment or a label describing behaviour is an untested assertion, and the
 answer to one is a test named after the sentence.
+
+## 41. The kernel knows what a pixel is
+
+Issue 31. On a HiDPI Mac, Ghostty reported a cell as 16×34 and drew at 16×34;
+iTerm2 reported 8×17 and drew at 16×34, so every Sixel picture came out at
+exactly half size. Both answered `CSI 14 t` honestly and disagreed about the
+unit, and nothing in-band says which. The issue refused to add a scale-factor
+guess until three questions were answered.
+
+**The first question answered the other two.** `TIOCGWINSZ` is a different
+channel: `CSI 14 t` is answered by the terminal application, which picks points
+or device pixels; `ws_xpixel`/`ws_ypixel` are what that same terminal wrote into
+the tty. Measured on one display, both terminals:
+
+| | `CSI 14 t` | `TIOCGWINSZ` ÷ cells | draws at |
+| --- | --- | --- | --- |
+| Ghostty | 16×34 | **16×34** | 16×34 |
+| iTerm2 | 8×17 | **16×34** | 16×34 |
+
+The kernel channel is right in both cases, including the one where the escape
+lies. So this was never a scale factor to guess — **it is a division**, and the
+answer was available all along on a channel nobody had asked.
+
+`CellSize` now asks the kernel first and falls back to the escape. It refuses an
+implausible answer (a cell under 2px or over 200) rather than trusting the
+fields blindly, so a terminal that fills them with something else does not take
+the picture with it and the escape still gets asked. The division rounds rather
+than truncates: 3832 pixels over 239 columns is 16.03, and a cell one pixel
+narrow tiles a whole row of pictures short.
+
+### What this closes and what it does not
+
+The other two questions — is it iTerm2-specific, and does it matter on Linux —
+**no longer need answering to fix the bug**, because the fix does not depend on
+knowing which terminals lie. It depends on a channel that was right on both. A
+terminal where the kernel is also wrong would still need `TUIKIT_CELL_SIZE`, and
+that is now what the variable is for: the override of last resort, rather than
+the answer to HiDPI.
+
+Worth recording that the visible symptom was Sixel-only and always would have
+been. The kitty placement states its footprint in CELLS (`c=`/`r=`), so a wrong
+pixel measurement there makes a blurrier picture rather than a misplaced one —
+which is why both terminals looked right in the screenshots that settled this,
+both having negotiated kitty.
