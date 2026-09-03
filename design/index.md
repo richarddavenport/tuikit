@@ -18,3 +18,5 @@ people using it.
 The design system bundle is generated rather than written: `make designsystem`
 renders `theme` as HTML. There is no hand-maintained palette page here, and there
 should never be one — see decision 7.
+- [keys.md](keys.md) — the keyboard meanings that turned out to be worth
+  writing down, and the one that is still open

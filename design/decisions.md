@@ -1298,3 +1298,53 @@ the same missing datapoint as issue 31, and worth collecting in the same sitting
 **What was actually wrong here was not the row.** It was that a hedge had been
 written down as a rule, and a tool paying a cost could not find out why. That is
 fixed whichever way the measurement eventually goes.
+
+## 39. No leave-confirm in the framework: the second tool wanted the opposite
+
+Issue 41 recorded azctl's "leaving would lose something" pattern and parked it
+for a second consumer, per decision 31. The second consumer arrived, and it
+settles the question the other way.
+
+**azctl**, mid-playbook, `q` or `esc` opens a confirm:
+
+> The run is still going. Leaving stops it where it is — **the steps that have
+> already run are not undone.**
+
+**pgctl**, mid-operation, `q` cancels immediately with no question at all
+(`internal/tui/app.go:330`):
+
+```go
+case "q":
+    if m.active != nil && m.active.running {
+        // A running operation is cancelled rather than abandoned, so the
+        // engine's failure hooks get to bring an environment back up.
+        m.active.cancel()
+```
+
+Both are right. The difference is not taste and not maturity: **azctl's work
+cannot be undone and pgctl's can.** A half-run playbook leaves an environment
+neither finished nor untouched, so the reader has to be told before it happens.
+A cancelled pgctl operation runs its failure hooks and brings the database back
+up, so a confirmation would be a dialog standing between a reader and the safest
+available action — and one that makes cancelling *slower* in exactly the moment
+someone is trying to stop something.
+
+An `app.Keys{Leaving: …}` field, or a stack that refuses to be popped, would
+have imposed azctl's answer on pgctl. The framework cannot tell these apart,
+because the question is whether the domain's work is recoverable, and that is
+the engine's knowledge — decision 22 says the engine tells the UI nothing about
+terminals, and this is the same boundary from the other side.
+
+So: **refused**, and this is the `comp.Tree` outcome rather than the
+`app.Toggles` one. Two tools wrote something similar-looking, and the parts that
+differ are the parts that matter.
+
+What is worth keeping is the wording rule, which both tools already follow and
+which is about writing rather than about mechanism: **"are you sure" is a
+question about nothing.** A confirm names what is lost, or it is theatre. That
+belongs in the design notes and not in a component.
+
+The second half of azctl's pattern also survives as a general point and is now
+in `design/keys.md`: `ctrl+c` never asks — a confirmation on the universal
+escape hatch is a program arguing with it — and the key that OPENED a question
+must not also answer yes.
