@@ -1252,3 +1252,49 @@ Three more were latent overruns in the gallery's own demo drawing, invisible at
 which is the point: **nothing that existed could have caught any of these**, and
 a frame that is wrong only at a width nobody captured is exactly the bug this
 project keeps finding by looking.
+
+## 38. The reserved bottom row is a hedge, and now it says so
+
+Issue 37: `app.Runner` sized the canvas at `terminal height - 1` and nothing in
+the repo said why. Every mention was a description — *"the bottom line is left
+for the terminal"*, *"which is where the old bodyHeight arithmetic already put
+it"*. The second is the tell: democtl inherited it from swarmctl. It was then
+promoted to a framework rule in decision 30 on the grounds that two tools did it
+independently, **which is not two decisions if one was copied**.
+
+**Measured.** tmux 3.5a, 24×10, `tea.WithAltScreen`, a frame of exactly the
+terminal height with a bordered pane so the bottom-right cell is genuinely
+written:
+
+```
+┌──────────────────────┐   ← row 1, intact
+│ ROW01                │
+…
+└──────────────────────┘   ← row 10, the last cell written
+```
+
+No scroll, no lost top line. The reserved version simply leaves row 10 blank.
+
+The pending-wrap hazard is real in general and does not fire here, because
+nothing is written *after* the last cell — the flag is set and the frame ends.
+The issue's own hypothesis looks right: this is an INLINE-renderer workaround
+carried into alt-screen code, where it does not apply. azctl is corroborating
+evidence, having run at full height for months before it migrated with no report
+of a lost line.
+
+### So why is it still the default
+
+Because one emulator family has been measured and the failure mode is a top line
+eaten on some *other* terminal. That asymmetry decides it: being wrong costs a
+reader the top of their interface and a bug nobody can reproduce; being right
+costs one row. Flipping the default would also move every golden in every tool,
+which is a large diff to buy a row on the strength of a single measurement.
+
+`app.WithFullHeight()` gives the row back to any tool that wants it, and the
+option's doc carries the measurement so the next person inherits evidence rather
+than a convention. The default flips if foot and one Windows terminal agree —
+the same missing datapoint as issue 31, and worth collecting in the same sitting.
+
+**What was actually wrong here was not the row.** It was that a hedge had been
+written down as a rule, and a tool paying a cost could not find out why. That is
+fixed whichever way the measurement eventually goes.

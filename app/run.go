@@ -48,10 +48,32 @@ type Runner struct {
 	canvas *comp.Canvas
 	chrome theme.Chrome
 	pixels comp.Pixels
+	// fullHeight gives the reserved bottom row back to the canvas.
+	fullHeight bool
 }
 
 // Option configures a Runner.
 type Option func(*Runner)
+
+// WithFullHeight draws into every row of the terminal, including the last.
+//
+// The default keeps one row back. Nobody had written down why (issue 37), and
+// the answer turned out to be that nobody decided it: democtl inherited the
+// arithmetic from swarmctl and it was then promoted to a rule on the grounds
+// that two tools did it "independently".
+//
+// Measured since, in tmux 3.5a at 24x10 under tea.WithAltScreen: a frame of
+// exactly the terminal height, with a bordered pane so the bottom-right cell is
+// genuinely written, renders with its top line intact and does not scroll. The
+// pending-wrap hazard is real in general and does not fire here, because
+// nothing is written after the last cell. azctl also ran full height for months
+// before it migrated, with no report of a lost line.
+//
+// So this is safe as far as anyone has looked, and the default still keeps the
+// row: one emulator family has been measured, the failure mode is a top line
+// eaten on some OTHER terminal, and that is a bad trade against one row. Turn it
+// on for a tool where the row matters and say which terminals you checked.
+func WithFullHeight() Option { return func(r *Runner) { r.fullHeight = true } }
 
 // WithChrome sets the characters components draw with.
 func WithChrome(ch theme.Chrome) Option { return func(r *Runner) { r.chrome = ch } }
@@ -98,13 +120,17 @@ func (r *Runner) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 // View builds the frame.
 //
-// The canvas is one row shorter than the terminal. Both tools in this repo
-// already did that, independently and with different arithmetic — democtl
-// through its band layout and the gallery through a bodyHeight helper — so it
-// is a convention rather than a preference, and it belongs here rather than
-// being rediscovered per tool. The bottom line is left for the terminal.
+// The canvas is one row shorter than the terminal unless [WithFullHeight] says
+// otherwise. Decision 38 has the measurement and the argument; the short version
+// is that the reserved row is a hedge, not a requirement, and it is kept by
+// default because the cost of being wrong is a lost top line and the cost of
+// being right is one row.
 func (r *Runner) View() string {
-	c := comp.NewCanvas(r.w, max(1, r.h-1)).WithChrome(r.chrome).WithGraphics(r.pixels)
+	h := r.h - 1
+	if r.fullHeight {
+		h = r.h
+	}
+	c := comp.NewCanvas(r.w, max(1, h)).WithChrome(r.chrome).WithGraphics(r.pixels)
 	r.model.Draw(c, c.Bounds())
 	// Kept so a mouse event can ask what it landed on. The frame IS the region
 	// list, so there is nothing else to keep in step with it.
