@@ -4,7 +4,7 @@
 //	tuikit designsystem  write the foundations bundle as HTML
 //	tuikit frames        turn a captured run of frames into a page
 //	tuikit watch         recapture on save and reload the browser
-//	tuikit gallery       open every component, running
+//	tuikit gallery       open every component, running (-list to print it)
 package main
 
 import (
@@ -262,8 +262,25 @@ func watchCmd(args []string) {
 // the vocabulary so you can review it; this lets you use it.
 func galleryCmd(args []string) {
 	fs := flag.NewFlagSet("gallery", flag.ExitOnError)
+	list := fs.Bool("list", false, "print the inventory as text instead of running it")
 	if err := fs.Parse(args); err != nil {
 		os.Exit(2)
+	}
+
+	// The gallery is the one COMPLETE list of what tuikit offers —
+	// TestEveryComponentIsInTheGallery holds it closed against the package, so
+	// a component cannot exist without an entry. That makes it the right answer
+	// to "what does tuikit already have", and running a TUI is the wrong way to
+	// ask: an agent building a tool cannot see a terminal, and a hand-written
+	// list in a tool's AGENTS.md goes stale the week after it is written.
+	if *list {
+		for _, e := range gallery.New(theme.Default).Entries() {
+			fmt.Printf("%-12s %s\n", e.Name, e.Summary)
+			if e.From != "" {
+				fmt.Printf("%-12s from %s\n", "", e.From)
+			}
+		}
+		return
 	}
 
 	// The default palette, because this binary shows tuikit's own components. A
@@ -300,8 +317,10 @@ func usage(w *os.File) {
   tuikit watch <dir> -capture "<command>" -frames <dir>
         recapture on save, rebuild the page, reload the browser
 
-  tuikit gallery
-        open every component, running, with its states and keys
+  tuikit gallery [-list]
+        open every component, running, with its states and keys.
+        -list prints the inventory as text — what tuikit already has,
+        which is the list to read before hand-rolling anything
 
   tuikit pixels
         what this terminal can draw, and the same bar with and without it
