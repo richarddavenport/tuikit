@@ -4,6 +4,7 @@
 //	tuikit designsystem  write the foundations bundle as HTML
 //	tuikit frames        turn a captured run of frames into a page
 //	tuikit watch         recapture on save and reload the browser
+//	tuikit news          what tuikit decided since this tool last looked
 //	tuikit gallery       open every component, running (-list to print it)
 package main
 
@@ -23,6 +24,7 @@ import (
 	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/docgen"
 	"github.com/richarddavenport/tuikit/gallery"
+	"github.com/richarddavenport/tuikit/news"
 	"github.com/richarddavenport/tuikit/scaffold"
 	"github.com/richarddavenport/tuikit/theme"
 	"github.com/richarddavenport/tuikit/watch"
@@ -46,6 +48,8 @@ func main() {
 		watchCmd(os.Args[2:])
 	case "pixels":
 		pixels(os.Args[2:])
+	case "news":
+		newsCmd(os.Args[2:])
 	case "gallery":
 		galleryCmd(os.Args[2:])
 	case "version":
@@ -260,6 +264,94 @@ func watchCmd(args []string) {
 // it feels like to arrow through, what it does at 80 columns, what it looks
 // like empty — is not a thing a screenshot answers. tuikit designsystem renders
 // the vocabulary so you can review it; this lets you use it.
+// newsCmd prints what tuikit has decided since a tool last looked.
+//
+// Run from inside the tool, with no arguments: it reads the tool's own go.mod
+// to find the tuikit it builds against, and the tool's AGENTS.md for the
+// decision it recorded. Both defaults exist so the command is one word — a
+// check nobody has to remember the arguments for is a check that gets run.
+func newsCmd(args []string) {
+	fs := flag.NewFlagSet("news", flag.ExitOnError)
+	since := fs.Int("since", -1, "decision number to report from; default is the one recorded in AGENTS.md")
+	dir := fs.String("tuikit", "", "the tuikit checkout; default is the replace directive in ./go.mod")
+	notes := fs.String("marker", "AGENTS.md", "the file holding \"reconciled with tuikit through decision N\"")
+	if err := fs.Parse(args); err != nil {
+		os.Exit(2)
+	}
+
+	root := *dir
+	if root == "" {
+		found, ok := news.Checkout("go.mod")
+		if !ok {
+			fmt.Fprintln(os.Stderr, "tuikit news: no tuikit replace directive in ./go.mod — run this from a tool, or pass -tuikit <path>")
+			os.Exit(2)
+		}
+		root = found
+	}
+
+	all, err := news.Read(filepath.Join(root, "design", "decisions.md"))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "tuikit news:", err)
+		os.Exit(1)
+	}
+
+	from := *since
+	if from < 0 {
+		n, ok := news.Marker(*notes)
+		if !ok {
+			fmt.Fprintf(os.Stderr, "tuikit news: %s does not say which decision this tool reconciled with.\n\n"+
+				"Add a line to it:\n\n    Reconciled with tuikit through decision %d.\n\n"+
+				"Then this command reports only what lands after it. To read everything, -since 0.\n",
+				*notes, news.Latest(all))
+			os.Exit(2)
+		}
+		from = n
+	}
+
+	fresh := news.Since(all, from)
+	if len(fresh) == 0 {
+		fmt.Printf("Up to date with tuikit through decision %d.\n", news.Latest(all))
+		return
+	}
+
+	fmt.Printf("%d decisions since %d:\n", len(fresh), from)
+	for _, d := range fresh {
+		fmt.Printf("\n  %d. %s\n", d.Number, d.Title)
+		for _, line := range wrap(d.Lede, 74) {
+			fmt.Println("     " + line)
+		}
+	}
+	// Said every time, because the cost of keying this to decisions is that a
+	// change nobody wrote a decision for does not appear above.
+	fmt.Printf("\n  Not every addition gets a decision. `tuikit gallery -list` is the\n"+
+		"  complete inventory, and a test holds it closed against the package.\n\n"+
+		"  When you have read these, record it:\n\n      Reconciled with tuikit through decision %d.\n",
+		news.Latest(all))
+}
+
+// wrap breaks a lede to width, so a terminal shows a paragraph rather than one
+// line it has to scroll.
+func wrap(s string, width int) []string {
+	var out []string
+	line := ""
+	for _, word := range strings.Fields(s) {
+		if line == "" {
+			line = word
+			continue
+		}
+		if len(line)+1+len(word) > width {
+			out = append(out, line)
+			line = word
+			continue
+		}
+		line += " " + word
+	}
+	if line != "" {
+		out = append(out, line)
+	}
+	return out
+}
+
 func galleryCmd(args []string) {
 	fs := flag.NewFlagSet("gallery", flag.ExitOnError)
 	list := fs.Bool("list", false, "print the inventory as text instead of running it")
@@ -316,6 +408,10 @@ func usage(w *os.File) {
 
   tuikit watch <dir> -capture "<command>" -frames <dir>
         recapture on save, rebuild the page, reload the browser
+
+  tuikit news [-since N] [-tuikit path]
+        what tuikit has decided since this tool last looked.
+        Run it from inside a tool, with no arguments.
 
   tuikit gallery [-list]
         open every component, running, with its states and keys.

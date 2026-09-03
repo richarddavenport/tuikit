@@ -95,3 +95,35 @@ makes the Markdown worth committing. Do not hand-edit it.
 
 Images are SVG, never PNG — decision 34. A PNG needs a typeface and decision 30
 is deliberately still open.
+
+## Telling the tools what changed
+
+`comp` cannot do something → a tool files an issue here. This is the other
+direction, and it needs its own mechanism because there is no upgrade event to
+attach one to: a tool resolves tuikit through `replace => ../tuikit`, so a pull
+here changes its behaviour with no version to bump and nothing to read.
+
+`design/decisions.md` is the marker. It is numbered and append-only, and a tool
+records the number it has reconciled with:
+
+```
+Reconciled with tuikit through decision 34.
+```
+
+Run from inside the tool, with no arguments — it reads the tool's own `go.mod`
+for the tuikit it builds against, and its `AGENTS.md` for that line:
+
+```sh
+tuikit news
+```
+
+**So when a change here affects the tools, write it a decision.** A change with
+no decision is one `tuikit news` cannot report, and the cost of that is paid by
+whoever is surprised by it later. `tuikit gallery -list` is the other half — the
+complete inventory, held closed against `comp` by a test — for the additions
+that are new components rather than new rules.
+
+Do not hand-write "what tuikit has that this tool has not taken up" into a
+tool's AGENTS.md. One of those existed, said "One thing", and named two of the
+nine that had landed since (decision 32: a comment describing what the code does
+is an untested assertion, and a list of features is the same claim).
