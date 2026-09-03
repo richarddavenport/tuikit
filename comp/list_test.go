@@ -1,14 +1,20 @@
 package comp
 
 import (
+	"regexp"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/termenv"
 
 	"github.com/richarddavenport/tuikit/theme"
 )
+
+// uncoloured strips SGR sequences. Local rather than harness.Strip, because
+// harness imports comp and a test cannot import it back.
+var uncoloured = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 const services Name = "services"
 
@@ -721,4 +727,185 @@ func TestAnUnmarkedListIsUnchanged(t *testing.T) {
 	if l.Cursor() != 3 {
 		t.Errorf("the cursor is on %d, want 3", l.Cursor())
 	}
+}
+
+// A glyph that IS the state keeps its colour on the selected row.
+//
+// From issue 44, and from a person: "when highlighting I can't see the color of
+// the dot." A selected row is otherwise one colour whatever its spans say,
+// which is right for a label and wrong for a status glyph — the one row a
+// reader is looking at became the one row whose status they could not read.
+func TestALeadKeepsItsColourWhenTheRowIsSelected(t *testing.T) {
+	lipgloss.SetColorProfile(termenv.TrueColor)
+
+	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+	sel := lipgloss.NewStyle().Foreground(lipgloss.Color("0")).Background(lipgloss.Color("7"))
+
+	l := &List{Name: "conns", Selected: &sel, Focused: true}
+	c := NewCanvas(20, 3)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 3}, []Row{
+		{Lead: "●", LeadStyle: &green, Text: " local"},
+	})
+
+	out := c.String()
+	if !strings.Contains(out, green.Render("●")) {
+		t.Errorf("the state glyph lost its colour under the selection:\n%q", out)
+	}
+	// The label still takes the selection — this must not become "every row
+	// keeps its own colours", which is the change that makes a cursor hard to
+	// find in exactly the list where finding it matters.
+	if !strings.Contains(out, "local") {
+		t.Fatal("the label was not drawn")
+	}
+	if !strings.Contains(out, opening(sel)+" local") {
+		t.Errorf("the label did not take the selection style:\n%q", out)
+	}
+}
+
+// Without a LeadStyle nothing changes, so a list that has never heard of this
+// draws exactly what it drew before.
+func TestALeadWithNoStyleOfItsOwnTakesTheRowsStyle(t *testing.T) {
+	lipgloss.SetColorProfile(termenv.TrueColor)
+	sel := lipgloss.NewStyle().Foreground(lipgloss.Color("0")).Background(lipgloss.Color("7"))
+
+	l := &List{Name: "conns", Selected: &sel, Focused: true}
+	c := NewCanvas(20, 3)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 3}, []Row{{Lead: "▸", Text: " group"}})
+
+	if out := c.String(); !strings.Contains(out, opening(sel)+"▸ group") {
+		t.Errorf("an unstyled lead did not take the selection:\n%q", out)
+	}
+}
+
+// opening is the escape sequence a style starts with, so a test can assert
+// "this text is drawn in that style" without depending on the row's padding.
+func opening(s lipgloss.Style) string {
+	before, _, _ := strings.Cut(s.Render("\x00"), "\x00")
+	return before
+}
+
+// The lead is still in the marker's column on an unselected row, so a styled
+// lead does not shift the text of one row out of line with the others.
+func TestAStyledLeadDoesNotMoveTheText(t *testing.T) {
+	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+
+	styled := NewCanvas(20, 4)
+	plain := NewCanvas(20, 4)
+	rows := []Row{{Lead: "●", Text: " one"}, {Lead: "○", Text: " two"}}
+
+	(&List{Name: "a"}).Draw(plain, Rect{X: 0, Y: 0, W: 20, H: 4}, rows)
+	rows[0].LeadStyle = &green
+	(&List{Name: "a"}).Draw(styled, Rect{X: 0, Y: 0, W: 20, H: 4}, rows)
+
+	if uncoloured.ReplaceAllString(styled.String(), "") != uncoloured.ReplaceAllString(plain.String(), "") {
+		t.Errorf("styling a lead moved the row:\n%q\n%q", styled.String(), plain.String())
+	}
+}
+
+// NoStatus gives the row back. From issue 46: pgctl stacks five lists in one
+// column, and five status rows are a quarter of an 80x24 body spent on counters
+// that read 3/3 beside panel titles already saying (3).
+func TestNoStatusGivesTheRowBackToTheRows(t *testing.T) {
+	const h = 5
+
+	with := &List{Name: "a"}
+	c := NewCanvas(20, h)
+	with.Draw(c, Rect{X: 0, Y: 0, W: 20, H: h}, rows(10))
+
+	without := &List{Name: "a", NoStatus: true}
+	c2 := NewCanvas(20, h)
+	without.Draw(c2, Rect{X: 0, Y: 0, W: 20, H: h}, rows(10))
+
+	if without.Shown() != with.Shown()+1 {
+		t.Errorf("NoStatus showed %d rows, want one more than %d", without.Shown(), with.Shown())
+	}
+	if strings.Contains(c2.String(), "/10") {
+		t.Errorf("the counter was drawn anyway:\n%s", c2.String())
+	}
+	if !strings.Contains(c.String(), "/10") {
+		t.Errorf("the default stopped drawing its counter:\n%s", c.String())
+	}
+}
+
+// Overhead is the component answering the question a tool was encoding as a
+// constant, so a tool laying out several lists cannot go silently wrong when
+// the answer changes.
+func TestOverheadSaysWhatTheListSpendsOnItself(t *testing.T) {
+	if got := (&List{}).Overhead(); got != 1 {
+		t.Errorf("a list with a status row reports %d", got)
+	}
+	if got := (&List{NoStatus: true}).Overhead(); got != 0 {
+		t.Errorf("a list without one reports %d", got)
+	}
+
+	// And it agrees with what Draw actually does, which is the half that keeps
+	// it from becoming another untested assertion.
+	for _, l := range []*List{{Name: "a"}, {Name: "a", NoStatus: true}} {
+		const h = 6
+		l.Draw(NewCanvas(20, h), Rect{X: 0, Y: 0, W: 20, H: h}, rows(20))
+		if want := h - l.Overhead(); l.Shown() != want {
+			t.Errorf("Overhead says %d but Draw showed %d of %d rows", l.Overhead(), l.Shown(), h)
+		}
+	}
+}
+
+// Clamping the cursor to where it already is must not eat a pending move.
+//
+// Issue 45: every one of these tools arrived at "clamp every cursor whenever
+// the data changes" independently, from when a cursor was a plain int. With the
+// deferred Move that clamp reads as Select(Cursor()), which zeroed the move the
+// arrow key had just recorded. The key did nothing and nothing errored.
+func TestClampingToWhereTheCursorAlreadyIsKeepsAPendingMove(t *testing.T) {
+	l := &List{Name: "a", Focused: true}
+	c := NewCanvas(20, 6)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 6}, rows(10))
+
+	l.Move(1)
+	l.Select(clampTo(l.Cursor(), 9)) // the tools' clampCursors, in one line
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 6}, rows(10))
+
+	if l.Cursor() != 1 {
+		t.Errorf("the cursor is on %d; the move was discarded by the clamp", l.Cursor())
+	}
+}
+
+// A real Select still discards, because a click means that row and a queued
+// arrow key landing on top of a click would be worse than the bug.
+func TestSelectingADifferentRowStillDiscardsAPendingMove(t *testing.T) {
+	l := &List{Name: "a", Focused: true}
+	c := NewCanvas(20, 6)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 6}, rows(10))
+
+	l.Move(3)
+	l.Select(7)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 6}, rows(10))
+
+	if l.Cursor() != 7 {
+		t.Errorf("the cursor is on %d, not the row that was clicked", l.Cursor())
+	}
+}
+
+// And a clamp that really does move the cursor — the case the pattern was
+// written for — still moves it.
+func TestAClampThatActuallyMovesTheCursorStillDoes(t *testing.T) {
+	l := &List{Name: "a", Focused: true}
+	c := NewCanvas(20, 6)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 6}, rows(10))
+	l.Select(8)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 6}, rows(10))
+
+	// The list shrinks under the cursor, and the tool clamps.
+	l.Select(clampTo(l.Cursor(), 2))
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 6}, rows(3))
+
+	if l.Cursor() != 2 {
+		t.Errorf("the cursor is on %d after the list shrank to 3 rows", l.Cursor())
+	}
+}
+
+func clampTo(i, hi int) int {
+	if i > hi {
+		return hi
+	}
+	return max(0, i)
 }

@@ -67,6 +67,21 @@ type List struct {
 	// Styles. Selected is the cursor row when focused, Unfocused when not.
 	Selected, Unfocused, Status, EmptyStyle *lipgloss.Style
 
+	// NoStatus gives the status row back to the rows.
+	//
+	// The default reserves it whether or not the list overflows, because a
+	// viewport that only looks like one when it is scrolling is a viewport you
+	// cannot tell from a short list. That reasoning holds for one big list and
+	// stops holding for several small ones: pgctl stacks FIVE lists in a
+	// column, and at 80x24 their status rows are five of about twenty-one body
+	// rows — a quarter of the column spent on counters reading 3/3, 3/3, 1/1,
+	// 1/1 and blank, next to panel titles that already say the same number.
+	//
+	// Off by default, so a list that has never heard of this keeps the row and
+	// the guarantee that comes with it. Turn it off only where something else
+	// on screen says how much there is.
+	NoStatus bool
+
 	// The cursor and the offset are not settable, only movable. Two fields
 	// because looking around and choosing are different operations — and
 	// unexported because the invariant between them is the whole component. A
@@ -147,6 +162,31 @@ type Row struct {
 	// is, and two glyphs fighting for one column is how a tree ends up with
 	// its headers a character out of line with its children.
 	Lead string
+
+	// LeadStyle draws Lead in the row's own colour, and keeps it there when the
+	// row is selected.
+	//
+	// Nil means the lead takes whatever the rest of the row takes, which is
+	// what every list did before this existed.
+	//
+	// It is here because a selected row is otherwise one colour whatever its
+	// spans say, and that is right for a LABEL and wrong for a glyph that IS
+	// the state. pgctl's connection list marks reachability with ● ○ ✗ in the
+	// first column; on the cursor row all three came out bold black on white,
+	// so the one row a reader is looking at was the one row whose status they
+	// could not read. A person using it said so.
+	//
+	// It is also an accessibility rule and not only a legibility one. A black ●
+	// on light grey does not read as "green ● that is highlighted", it reads as
+	// a DIFFERENT state — off, disabled. pgctl was saved by using distinct
+	// shapes as well as colours; a tool encoding state in colour alone would
+	// have lost it outright, and nothing in the API would have said so.
+	//
+	// Only the lead, deliberately. Letting every styled span survive selection
+	// is more elegant and makes the cursor's prominence depend on how colourful
+	// a row happens to be — the selection would be strong on a plain list and
+	// nearly invisible on a busy one, which is the opposite of what it is for.
+	LeadStyle *lipgloss.Style
 }
 
 // Draw renders the rows into r.
@@ -179,7 +219,7 @@ func (l *List) DrawFunc(c *Canvas, r Rect, n int, row func(i int) Row) {
 	c = c.Clip(r)
 	l.count = n
 	body := r
-	if r.H > 1 {
+	if r.H > 1 && !l.NoStatus {
 		body.H = r.H - 1
 	}
 	// A pane that changed size under the cursor reveals it again. The reveal
@@ -238,15 +278,24 @@ func (l *List) DrawFunc(c *Canvas, r Rect, n int, row func(i int) Row) {
 		// colours under it would make the cursor hard to find in exactly the
 		// list where finding it matters.
 		lead := l.lead(c, this, i)
+
+		// The lead keeps its own colour through the selection when it has one,
+		// because it is the row's state and not the row's label.
+		leadStyle := style
+		if this.LeadStyle != nil {
+			leadStyle = this.LeadStyle
+		}
+
 		if len(this.Spans) == 0 || (i == l.cursor && style != nil) {
 			text := this.Text
 			if text == "" {
 				text = spansText(this.Spans)
 			}
-			c.Text(body.X, y, lead+text, style, id)
+			x := body.X + c.Text(body.X, y, lead, leadStyle, id)
+			c.Text(x, y, text, style, id)
 			continue
 		}
-		x := body.X + c.Text(body.X, y, lead, style, id)
+		x := body.X + c.Text(body.X, y, lead, leadStyle, id)
 		for _, span := range this.Spans {
 			x += c.Text(x, y, span.Text, span.Style, id)
 		}
@@ -264,9 +313,24 @@ func (l *List) fill(c *Canvas, r Rect, s *lipgloss.Style, id ID) {
 	c.Fill(r, " ", s, id)
 }
 
+// Overhead is how many rows of a band the list spends on itself rather than on
+// rows — 1 for the status row, 0 with NoStatus.
+//
+// It exists so a tool laying out several lists does not encode this
+// component's internals as a constant. pgctl had `const chrome = 3` (two
+// borders and "the row comp.List keeps for its position counter"), which is a
+// number that goes silently wrong the moment the answer changes — the class
+// decision 32 is about.
+func (l *List) Overhead() int {
+	if l.NoStatus {
+		return 0
+	}
+	return 1
+}
+
 // status draws the count, and which way an off-screen selection went.
 func (l *List) status(c *Canvas, r Rect) {
-	if r.H < 2 {
+	if r.H < 2 || l.NoStatus {
 		return
 	}
 	y := r.Bottom()
@@ -327,7 +391,31 @@ func (l *List) Move(by int) { l.pending += by; l.reveal = true }
 // may not hold, the draw moves off it — a click on a heading does nothing
 // rather than selecting its neighbour, because a cursor that lands somewhere
 // you did not click is worse than a click that is ignored.
-func (l *List) Select(i int) { l.cursor, l.pending, l.reveal = max(0, i), 0, true }
+//
+// Selecting the row the cursor is ALREADY on keeps a pending Move, because it
+// is not a selection — it is a caller saying the cursor is fine where it is.
+// The distinction matters because "clamp every cursor whenever the data
+// changes" is a pattern all four tools arrived at independently, back when a
+// cursor was a plain int that could point past a list which had shrunk under
+// it:
+//
+//	m.list.Select(clamp(m.list.Cursor(), n-1))
+//
+// With the cursor in range that clamp is `Select(Cursor())`, and it used to
+// zero the pending move recorded by the arrow key in the same Update. The move
+// was applied and immediately discarded, so the key did nothing and nothing
+// errored (issue 45). Out of range it still selects for real, which is the case
+// the clamp was written for.
+//
+// Not the wider fix of applying pending on top of any Select: a click means
+// that row, and a queued arrow key landing on top of a click would be worse
+// than the bug.
+func (l *List) Select(i int) {
+	if at := max(0, i); at != l.cursor {
+		l.cursor, l.pending = at, 0
+	}
+	l.reveal = true
+}
 
 // Reset puts the list back to the top, for when the rows underneath it have
 // changed out from under the cursor — a filter, usually.

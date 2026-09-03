@@ -532,6 +532,34 @@ func (m *Model) listEntry(s *styles) Entry {
 			})
 		}
 	}
+	// A state glyph in the lead column, which keeps its colour under the
+	// selection. Issue 44: the row a reader is looking at was the one row whose
+	// status they could not read.
+	marks := func(styled bool) func(*comp.Canvas, comp.Rect, bool) {
+		type conn struct {
+			glyph string
+			st    *lipgloss.Style
+			name  string
+		}
+		conns := []conn{
+			{"●", &s.success, "  local"},
+			{"○", &s.muted, "  staging"},
+			{"✗", &s.danger, "  prod"},
+		}
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			l := &comp.List{
+				Name: "demo.list", Selected: &s.selected, Unfocused: &s.focused,
+				Status: &s.muted, Focused: true, NoStatus: true,
+			}
+			l.DrawFunc(c, r, len(conns), func(i int) comp.Row {
+				row := comp.Row{Lead: conns[i].glyph, Text: conns[i].name}
+				if styled {
+					row.LeadStyle = conns[i].st
+				}
+				return row
+			})
+		}
+	}
 	return Entry{
 		Name:    "List",
 		Summary: "A scrollable, selectable list, flat or grouped. The viewport and the selection are separate.",
@@ -603,6 +631,10 @@ func (m *Model) listEntry(s *styles) Entry {
 				}},
 			{Name: "ranked by a query", Note: "the letters that matched are marked, so the order is something you can check rather than trust",
 				Draw: filtered("env")},
+			{Name: "a state glyph, swallowed", Note: "the default: a selected row is one colour whatever its spans say, so ● ○ ✗ all read the same on the cursor row",
+				Draw: marks(false)},
+			{Name: "a state glyph, kept", Note: "Row.LeadStyle survives the selection — the glyph is the row's state, not its label (issue 44)",
+				Draw: marks(true)},
 			{Name: "a query matching nothing", Note: "an ordinary state, not an error",
 				Draw: filtered("zzz")},
 		},

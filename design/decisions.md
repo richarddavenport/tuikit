@@ -1131,3 +1131,66 @@ the same distinction `guard.Glyphs` already makes by parsing rather than
 matching, so it is probably tractable — but it is a design question with two
 known false-positive classes, and decision 31 says not knowing the shape is a
 reason to refuse rather than to guess.
+
+## 36. A default that was right for the first tool is evidence, not a law
+
+Three reports against `comp.List` landed together (issues 44, 45, 46), from
+pgctl migrating onto the canvas. They look unrelated and are the same thing: a
+choice made when one tool used the component, meeting the second tool.
+
+**The selection swallowed a row's state glyph (44).** A selected row is drawn in
+one colour whatever its spans say, because "a row that kept its own colours
+under it would make the cursor hard to find in exactly the list where finding it
+matters." That is right for a LABEL. pgctl's connection list marks reachability
+with `●` `○` `✗` in the first column, and on the cursor row all three came out
+bold black on white — the one row a reader is looking at was the one row whose
+status they could not read. **A person using it reported this**, not a test:
+*"when highlighting I can't see the color of the dot."*
+
+It is also an accessibility defect and not only a legibility one. A black `●` on
+light grey does not read as "a green one, highlighted"; it reads as a DIFFERENT
+state — off, disabled. pgctl was saved by using four distinct shapes as well as
+four colours. A tool encoding state in colour alone would have lost it outright
+and nothing in the API would have warned it.
+
+`Row.LeadStyle` keeps the lead column's own colour through the selection. Only
+the lead. Letting every styled span survive is more elegant and makes the
+cursor's prominence depend on how colourful a row happens to be — strong on a
+plain list, nearly invisible on a busy one, which is the opposite of what a
+selection is for.
+
+**The status row is charged per list (46).** It is reserved whether or not the
+list overflows, because "a viewport that only looks like one when it is
+scrolling is a viewport you cannot tell from a short list." True for azctl's one
+big tree, where `18/18` earns its row. pgctl stacks FIVE lists in a column: at
+80×24 that is five of about twenty-one body rows, a quarter of the column, on
+counters reading `3/3`, `3/3`, `1/1`, `1/1` and blank — beside panel titles that
+already say the same number. `NoStatus` turns it off, and `Overhead()` reports
+what the list spends on itself so a tool stops encoding `const chrome = 3`.
+
+**`Select` cancelled a pending `Move`, silently (45).** Every one of these tools
+independently arrived at "clamp every cursor when the data changes", from when a
+cursor was a plain int that could point past a list that had shrunk. Against the
+deferred `Move` that clamp reads as `Select(Cursor())`, which zeroed the move the
+arrow key recorded in the same `Update`. The move was applied and immediately
+discarded: **the key did nothing and nothing errored.**
+
+The fix is narrower than the report's options. Selecting the row the cursor is
+already on is not a selection — it is a caller saying the cursor is fine where
+it is — so it keeps the pending move. Out of range it still selects for real,
+which is the case the clamp was written for. Deliberately NOT the wider "apply
+pending on top of any Select": a click means that row, and a queued arrow key
+landing on top of a click would be worse than the bug.
+
+### The rule
+
+**A component's default is evidence from one tool until a second tool has used
+it.** All three defaults were argued for in a doc comment and all three
+arguments were sound — they were just sound about a shape only one tool had.
+None of the three was found by a test, and one was found by a person. The
+migration is doing what decision 14 said it would; this is what "prove it
+against a second tool" looks like when it works.
+
+What this does not license is a flag per preference. Each of these has a default
+that stays, a reason the default is right where it was right, and a second shape
+that the first reasoning demonstrably does not cover.
