@@ -194,16 +194,14 @@ func (p *Palette) Draw(c *Canvas, r Rect) Rect {
 		}.Draw(c, Rect{X: inner.X, Y: y, W: inner.W, H: 1}, id)
 		y++
 	}
-	// Box.Top, not Chrome.Divider: Divider is the SPACE between panes, and
-	// filling a row with it draws a blank that looks like a layout bug.
-	c.Fill(Rect{X: inner.X, Y: y, W: inner.W, H: 1}, c.Chrome().Box.Top, p.Border, id)
+	Rule{Style: p.Border}.Draw(c, Rect{X: inner.X, Y: y, W: inner.W, H: 1}, id)
 	y++
 
 	// The rows, then a rule and the footer.
 	body := Rect{X: inner.X, Y: y, W: inner.W, H: max(0, inner.Bottom()-y-1)}
 	p.rows(c, body)
 
-	c.Fill(Rect{X: inner.X, Y: inner.Bottom() - 1, W: inner.W, H: 1}, c.Chrome().Box.Top, p.Border, id)
+	Rule{Style: p.Border}.Draw(c, Rect{X: inner.X, Y: inner.Bottom() - 1, W: inner.W, H: 1}, id)
 	KeyHints(c, Rect{X: inner.X, Y: inner.Bottom(), W: inner.W, H: 1}, id, p.NoteStyle, p.Hints...)
 	return r
 }

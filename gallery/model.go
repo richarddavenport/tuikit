@@ -161,7 +161,7 @@ func (m *Model) header(c *comp.Canvas) {
 			{Text: itoa(len(m.entries)) + " components", Style: &m.sty.muted},
 		},
 	}.Draw(c, comp.Rect{X: 0, Y: 0, W: m.width, H: 1}, comp.Region(regHeader))
-	c.Fill(comp.Rect{X: 0, Y: 1, W: m.width, H: 1}, "─", &m.sty.border, comp.Region(regRule))
+	comp.Rule{Style: &m.sty.border}.Draw(c, comp.Rect{X: 0, Y: 1, W: m.width, H: 1}, comp.Region(regRule))
 }
 
 func (m *Model) footer(c *comp.Canvas) {

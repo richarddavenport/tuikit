@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               22 components
+tuikit gallery  every component, running                                                                               23 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ List                                                                                           │
@@ -24,7 +24,7 @@ tuikit gallery  every component, running                                        
 │ Scrollbar                     │ │  api_gateway                                                                                   │
 │ Keys                          │ │  api_worker                                                                                    │
 │ Palette                       │ │  api_migrate                                                                                   │
-│                               │ │  web_frontend                                                                                  │
+│ Rule                          │ │  web_frontend                                                                                  │
 │                               │ │  web_assets                                                                                    │
 │                               │ │                                                                                         20/40  │
 │                               │ │ keys     ↑↓ move the selection · j/k the same                                                  │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │
 │                               │ │ glyphs   ↑ ↓ ▸ ▾                                                                               │
 │                               │ │ from     pgctl window(), swarmctl pane scrolling, azctl cursor/top                             │
-│                         22/22 │ │                                                                                                │
+│                         23/23 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

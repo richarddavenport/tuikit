@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               22 components
+tuikit gallery  every component, running                                                                               23 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Palette                                                                                        │
@@ -24,7 +24,7 @@ tuikit gallery  every component, running                                        
 │ Scrollbar                     │ │ │  switch environment          E    latest · qat · prd · local                               │ │
 │ Keys                          │ │ │  edit environments           e    opens ~/.swarmctl/config.yaml                            │ │
 │ Palette                       │ │ │  keys                        ?    every binding, by screen                                 │ │
-│                               │ │ │                                                                                      14/15 │ │
+│ Rule                          │ │ │                                                                                      14/15 │ │
 │                               │ │ │────────────────────────────────────────────────────────────────────────────────────────────│ │
 │                               │ │ │  enter run · tab pin tier · ↑↓ move · esc close                                            │ │
 │                               │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ roles    Accent · Muted · Pending · Danger · SelectionFG · SelectionBG                         │
 │                               │ │ glyphs   ─ · … ↑ ↓                                                                             │
 │                               │ │ from     swarmctl's navigation design, screens 2a and 2b                                       │
-│                         22/22 │ │                                                                                                │
+│                         23/23 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

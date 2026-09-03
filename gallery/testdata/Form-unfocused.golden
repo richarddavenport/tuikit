@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               22 components
+tuikit gallery  every component, running                                                                               23 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Form                                                                                           │
@@ -24,7 +24,7 @@ tuikit gallery  every component, running                                        
 │ Scrollbar                     │ │                                                                                                │
 │ Keys                          │ │                                                                                                │
 │ Palette                       │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Rule                          │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
@@ -32,6 +32,6 @@ tuikit gallery  every component, running                                        
 │                               │ │ keys     ↑↓ field · ‹› choice · space toggle                                                   │
 │                               │ │ roles    Accent · Muted · Danger                                                               │
 │                               │ │ from     pgctl viewForm, swarmctl applyedits.go and confirmPhrase                              │
-│                         22/22 │ │                                                                                                │
+│                         23/23 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

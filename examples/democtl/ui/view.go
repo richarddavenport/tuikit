@@ -57,7 +57,7 @@ func (m *Model) header(c *comp.Canvas) {
 		Right: []comp.Segment{{Text: m.now.Format("15:04:05"), Style: &m.sty.muted}},
 	}.Draw(c, bands[0], comp.Region(regHeader))
 
-	c.Fill(bands[1], "─", &m.sty.border, comp.Region(regRule))
+	comp.Rule{Style: &m.sty.border}.Draw(c, bands[1], comp.Region(regRule))
 }
 
 // footer names the keys that act on WHAT IS FOCUSED, right now.

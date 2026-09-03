@@ -1073,3 +1073,61 @@ frame no group named must still appear — and not a layout detail.
 Verified by rasterising democtl's frames and looking at them: the dashboard, a
 modal drawn over two panes, and a `comp.Meter` — the longest run of box-drawing
 in the suite, and the case that would show a broken grid first.
+
+## 35. Chrome characters come from the chrome, and `comp.Rule` is the missing one
+
+Filed from a tool (issue 43): azctl drew a horizontal rule under two headers
+with `c.Fill(bands[1], "─", …)`, which broke the invariant azctl's own AGENTS.md
+documents about itself — `grep -c 'c.Text(\|c.Fill(\|c.Set(' internal/tui/*.go`
+is supposed to be 0.
+
+The report claimed two tools and three instances, and was careful to say it was
+discounting four of swarmctl's five `─` hits as `comp.Pane`'s job in a tool that
+predates `comp.Pane`. That care is what made it checkable, and checking it found
+more: searching for the SHAPE rather than the character turns up seven
+instances across four codebases, and **three of them were inside tuikit** —
+`gallery/model.go`, `examples/democtl/ui/view.go`, and `comp/palette.go` twice.
+
+Every one is the same three lines: a `Bar` drawn into one band, then a rule
+filled into the next.
+
+**The bug this was hiding.** Five of the seven wrote the literal `"─"`, and two
+asked `c.Chrome().Box.Top`. `theme.ASCIIBox` is `{"+", "-", "+", …}` and exists
+so an interface can be drawn in a font that has nothing. A tool on it got `-`
+from its palette's rules and `─` from its header rule **in the same frame** —
+precisely the failure ASCIIBox exists to prevent, shipping in tuikit's own
+gallery and in democtl. `guard.Glyphs` never had a chance: `─` is a legal glyph.
+It was the wrong SOURCE, not an illegal character, and the only fix for a wrong
+source is to have one source.
+
+So the rule is: **a character that belongs to the chrome is read from the
+chrome, never written as a literal.** `comp.Rule` takes `Chrome.Box.Top` unless
+told otherwise, so a tool that changes its box set changes its rules with it.
+
+### The two shapes that were rejected
+
+`comp.Bar{Fill: '─'}` — a field on the component that was already closest. Bar
+means "one line with content at each end", and a Bar with no content that fills
+its own width is a second meaning wearing the first one's name.
+
+`Bar` underlining itself, which the report preferred and which I wanted to be
+right because it is one component fewer. Six of the seven sites are a Bar with a
+rule beneath it. The seventh, `comp/palette.go`, is a rule **above** a footer.
+Which side of a band the line falls on belongs to the layout, not to whichever
+bar happens to be adjacent — and a component that covers six of seven leaves the
+seventh hand-rolled, which is how a component ends up half-adopted.
+
+### What it cost, and what it did not
+
+Not one frame changed. The goldens moved only where the gallery gained a row and
+a count, which is the evidence that the seven sites were drawing the same thing:
+if any had differed, a golden would have said so.
+
+The guard that would have caught this is NOT built, and issue 44 records why
+rather than leaving it implied. A literal `─` in a tool's source is not always a
+draw: both `gallery.Entry.Glyphs` and a tool's own glyph-set declaration list
+chrome characters in order to ALLOW them. Telling a declaration from a draw is
+the same distinction `guard.Glyphs` already makes by parsing rather than
+matching, so it is probably tractable — but it is a design question with two
+known false-positive classes, and decision 31 says not knowing the shape is a
+reason to refuse rather than to guess.

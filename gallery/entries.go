@@ -47,6 +47,7 @@ func (m *Model) Entries() []Entry {
 		m.scrollbarEntry(s),
 		m.keysEntry(s),
 		m.paletteEntry(s),
+		m.ruleEntry(s),
 	}
 }
 
@@ -1217,6 +1218,44 @@ func (m *Model) paletteEntry(s *styles) Entry {
 				Draw: draw("prune", 0)},
 			{Name: "nothing matches", Note: "an ordinary state, not an error",
 				Draw: draw("zzzz", 0)},
+		},
+	}
+}
+
+func (m *Model) ruleEntry(s *styles) Entry {
+	// A header and a rule under it, which is the shape all seven hand-rolled
+	// sites had. Drawn with the bar so the rule is read as part of something
+	// rather than as a line on its own.
+	draw := func(box theme.BoxSet, over string) func(*comp.Canvas, comp.Rect, bool) {
+		return func(c *comp.Canvas, r comp.Rect, _ bool) {
+			ch := c.Chrome()
+			ch.Box = box
+			c = c.WithChrome(ch)
+
+			bands := comp.Layout{Constraints: []comp.Constraint{
+				comp.Length(1), comp.Length(1), comp.Fill(1),
+			}}.Rows(r)
+			comp.Bar{
+				Left:  []comp.Segment{{Text: "playbooks", Style: &s.title}, {Text: "  ~/estate", Style: &s.muted}},
+				Right: []comp.Segment{{Text: over, Style: &s.muted}},
+			}.Draw(c, bands[0], comp.Region("demo.rulehead"))
+			comp.Rule{Style: &s.border}.Draw(c, bands[1], comp.Region("demo.rule"))
+			c.Text(bands[2].X, bands[2].Y, "what the header is over", &s.muted, comp.Region("demo.ruleover"))
+		}
+	}
+	return Entry{
+		Name:    "Rule",
+		Summary: "The line under a header, or over a footer. Its character comes from the chrome, not from you.",
+		From:    "four codebases drew it by hand and five of the seven wrote a literal ─",
+		Roles:   []string{"Border", "Accent", "Muted"},
+		Glyphs:  []string{"─", "━"},
+		States: []State{
+			{Name: "under a header", Note: "the shape all seven hand-rolled sites had: a Bar, then a line beneath it",
+				Draw: draw(theme.LightBox, "3 playbooks")},
+			{Name: "a heavy box set", Note: "the rule follows the box, because it is the same character the pane's top is",
+				Draw: draw(theme.HeavyBox, "heavy")},
+			{Name: "a font with nothing", Note: "ASCIIBox draws -, and this is the state the hardcoded ─ got wrong: a palette drawing - and a header drawing ─ in one frame",
+				Draw: draw(theme.ASCIIBox, "ascii")},
 		},
 	}
 }
