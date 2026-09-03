@@ -143,9 +143,10 @@ func designsystem(args []string) {
 // frames turns a capture directory into a page.
 func frames(args []string) {
 	fs := flag.NewFlagSet("frames", flag.ExitOnError)
-	out := fs.String("out", "frames.html", "file to write")
+	out := fs.String("out", "", "file to write; defaults to frames.html, or frames.md with -md")
 	title := fs.String("title", "", "the page's title; defaults to the directory's name")
 	lede := fs.String("lede", "", "a sentence under the title")
+	md := fs.Bool("md", false, "write Markdown with an SVG per frame, for a repository")
 
 	// The directory is taken before parsing, so it may come first or last.
 	// stdlib flag stops at the first non-flag argument, which would make
@@ -163,14 +164,26 @@ func frames(args []string) {
 		dir = fs.Arg(0)
 	}
 	if dir == "" || fs.NArg() > 1 {
-		fmt.Fprintln(os.Stderr, "usage: tuikit frames <capture-dir> [-out page.html]")
+		fmt.Fprintln(os.Stderr, "usage: tuikit frames <capture-dir> [-out page.html] [-md]")
 		os.Exit(2)
+	}
+
+	// The default follows the format rather than being one name for both, so
+	// `-md` on its own does the obvious thing instead of writing Markdown into
+	// a file called frames.html.
+	if *out == "" {
+		*out = map[bool]string{false: "frames.html", true: "frames.md"}[*md]
 	}
 
 	// No groups from the command line: grouping carries meaning a flag cannot
 	// express — what the reader is doing — so a tool that wants it calls
 	// docgen.Frames itself. Ungrouped, every frame still appears.
-	if err := (docgen.Frames{Title: *title, Lede: *lede}).Write(dir, *out); err != nil {
+	page := docgen.Frames{Title: *title, Lede: *lede}
+	write := page.Write
+	if *md {
+		write = page.Markdown
+	}
+	if err := write(dir, *out); err != nil {
 		fmt.Fprintln(os.Stderr, "tuikit frames:", err)
 		os.Exit(1)
 	}
@@ -280,8 +293,9 @@ func usage(w *os.File) {
   tuikit designsystem [-out dir] [-tool name]
         write the foundations bundle as HTML
 
-  tuikit frames <capture-dir> [-out page.html] [-title t] [-lede l]
-        turn a captured run of frames into a page you can look at
+  tuikit frames <capture-dir> [-out page.html] [-title t] [-lede l] [-md]
+        turn a captured run of frames into a page you can look at,
+        or with -md into Markdown with an SVG per frame, for a repository
 
   tuikit watch <dir> -capture "<command>" -frames <dir>
         recapture on save, rebuild the page, reload the browser

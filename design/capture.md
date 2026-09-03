@@ -168,3 +168,36 @@ right and that tuikit should encode rather than leave to judgement:
 3. **The chrome is near-silent.** The frames are the loud thing. Group plates by
    what the reader is doing — browsing / inspecting / acting — and give each the
    keystroke that reaches it.
+
+### Two formats, because a page and a repository want different things
+
+`tuikit frames <dir>` writes one self-contained HTML page: everything inline,
+nothing to serve, open it and look. That is the right shape for the inner loop
+and for sending someone a link.
+
+`tuikit frames <dir> -md` writes Markdown with an SVG per frame, into
+`<out>.md` plus a `<out>/` directory beside it. That is the shape for things
+that live IN a repository — a README, an mkdocs site, a pull request — where a
+self-contained page cannot go and a fenced block of raw ANSI renders as noise.
+
+Both read the same capture and share the same section ordering, including the
+rule that a frame no group named still appears. Two copies of that loop is how
+one format grows the bug the other fixed.
+
+**The images are SVG, and that is a decision rather than a default.** A PNG
+needs a rasteriser, which needs a typeface, which is the open question in
+decision 30 — writing documentation is the wrong reason to answer it. SVG names
+the same system monospace stack the page does and lets the reader's machine
+draw, so it needs no typeface of its own, keeps the text greppable, and scales.
+
+Two properties it has to hold that a naive SVG writer does not:
+
+- **Every span states its width** (`textLength`, with `lengthAdjust="spacing"`).
+  A renderer that trusts the font's advance width to reproduce a character grid
+  is one box-drawing character away from a frame that does not meet.
+  `spacingAndGlyphs` would hit the width by distorting the glyphs, which bends
+  the box-drawing characters instead of moving them.
+- **No `<style>` element.** An SVG referenced from Markdown is rendered through
+  a sanitiser, and a stripped stylesheet leaves a frame that is all one colour
+  with no error to explain it. Presentation attributes survive; a stylesheet is
+  a bet.

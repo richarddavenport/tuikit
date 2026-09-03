@@ -74,3 +74,24 @@ different directories.
 tool. That file is **copied, not imported** — config is engine work, and
 `guard.Engine` denies the engine every tuikit import. It is fifteen lines the
 tool owns; change them.
+
+## Showing what a tool looks like
+
+A capture writes `.ansi` frames and a manifest. Two things read them:
+
+```sh
+tuikit frames /tmp/frames -out page.html          # one self-contained page
+tuikit frames /tmp/frames -md -out docs/screens.md  # Markdown + an SVG per frame
+```
+
+The page is for looking and for sending someone a link. The Markdown is for
+what lives in a repository — a README, an mkdocs site, a pull request — and
+writes its images into a directory named after it (`docs/screens.md` →
+`docs/screens/`).
+
+Both are generated from the capture and hold no state of their own: run it
+again and what changed in the tool is what changes in the diff. That is what
+makes the Markdown worth committing. Do not hand-edit it.
+
+Images are SVG, never PNG — decision 34. A PNG needs a typeface and decision 30
+is deliberately still open.

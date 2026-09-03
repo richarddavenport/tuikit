@@ -92,7 +92,35 @@ func (f Frames) Page(dir string) (string, error) {
 	fmt.Fprintf(&b, "<p class=\"facts\">%d frames · %d&#215;%d</p>\n</header>\n",
 		len(manifest.Frames), manifest.Width, manifest.Height)
 
+	for _, sec := range f.sections(manifest, byName) {
+		if err := writeGroup(&b, dir, sec.Title, sec.Lede, sec.Notes, byName); err != nil {
+			return "", err
+		}
+	}
+
+	b.WriteString("</body>\n</html>\n")
+	return b.String(), nil
+}
+
+// section is a group after it has been reconciled with what was captured.
+type section struct {
+	Title string
+	Lede  string
+	Notes []FrameNote
+}
+
+// sections puts the frames in reading order: the groups as given, then
+// everything they did not name.
+//
+// Shared by every output format rather than written once per format, because
+// the trailing group is a RULE and not a layout detail — a frame that exists
+// but is not listed must still appear. A page that silently drops a new screen
+// is worse than one with an untidy section, and a second copy of this loop is
+// how one format grows the bug the other fixed.
+func (f Frames) sections(m manifest, byName map[string]harness.Frame) []section {
+	var out []section
 	shown := map[string]bool{}
+
 	for _, g := range f.Groups {
 		var notes []FrameNote
 		for _, note := range g.Frames {
@@ -101,19 +129,13 @@ func (f Frames) Page(dir string) (string, error) {
 				shown[note.Name] = true
 			}
 		}
-		if len(notes) == 0 {
-			continue
-		}
-		if err := writeGroup(&b, dir, g.Title, g.Lede, notes, byName); err != nil {
-			return "", err
+		if len(notes) > 0 {
+			out = append(out, section{g.Title, g.Lede, notes})
 		}
 	}
 
-	// Anything the groups did not name. A frame that exists but is not listed
-	// must still appear: a page that silently drops a new screen is worse than
-	// one with an untidy section.
 	var rest []FrameNote
-	for _, fr := range manifest.Frames {
+	for _, fr := range m.Frames {
 		if !shown[fr.Name] {
 			rest = append(rest, FrameNote{Name: fr.Name})
 		}
@@ -123,13 +145,9 @@ func (f Frames) Page(dir string) (string, error) {
 		if len(f.Groups) == 0 {
 			title, lede = "Frames", ""
 		}
-		if err := writeGroup(&b, dir, title, lede, rest, byName); err != nil {
-			return "", err
-		}
+		out = append(out, section{title, lede, rest})
 	}
-
-	b.WriteString("</body>\n</html>\n")
-	return b.String(), nil
+	return out
 }
 
 // Write renders the page to a file.

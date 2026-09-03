@@ -1024,3 +1024,52 @@ system moved, and that is not a patch anybody applies silently.
 Existing tools were deliberately **not** changed. Moving pgctl's and swarmctl's
 search order orphans a file that exists right now, and each tool's own repository
 is where that migration gets weighed.
+
+## 34. Frames publish as SVG, and the typeface question stays open
+
+`docgen` produced one thing: a self-contained HTML page. It is the right shape
+for the inner loop and for sending someone a link, and the wrong shape for
+everything that lives in a repository — a README, an mkdocs site, a pull request
+— where a page cannot go and a fenced block of raw ANSI renders as noise. So
+`tuikit frames -md` writes Markdown with an image per frame.
+
+"An image" is where the decision is. A PNG needs a rasteriser, a rasteriser
+needs a typeface, and **decision 30 — embed a typeface or decide never to — is
+still open.** Rasterising for documentation would answer it by accident, in the
+one context where the answer is least considered: the fallback everywhere else
+is that text stays cells, and a document is not a good reason to reverse that.
+
+SVG needs no typeface of its own. It names the same system monospace stack the
+HTML page already names and lets the reader's machine draw, which is the
+existing rule rather than a new one. It also keeps the text as text, so a frame
+in a document stays greppable and readable by a screen reader — a PNG of a
+terminal is opaque to both.
+
+Two properties a naive SVG writer would not have, both found by looking at real
+frames rather than by reasoning:
+
+- **Every span states the width it must occupy** — `textLength`, with
+  `lengthAdjust="spacing"`. A character grid reproduced by trusting the font's
+  advance width is one box-drawing character away from a frame that does not
+  meet, which is the same failure the page avoids by measuring nothing in
+  pixels. `spacingAndGlyphs` reaches the width by distorting the glyphs, so the
+  borders bend rather than move; `spacing` adjusts the gaps and leaves them
+  alone.
+- **No `<style>` element.** An SVG referenced from a Markdown document is
+  rendered through a sanitiser. A stripped stylesheet leaves a frame that is all
+  one colour with no error anybody sees. Presentation attributes survive; a
+  stylesheet is a bet, and the losing case is silent.
+
+**What this forced elsewhere, and the better outcome.** Two renderers need the
+same answer to "what colour is this character", and the SGR reader lived inside
+the HTML writer's line loop. Rather than copy it, it came out as
+`harness.Rows(frame) [][]Span` — the ANSI reader every format shares. Two
+parsers would eventually disagree about a frame neither of them drew, and the
+existing HTML tests (accumulated style, style crossing a line break, a colour
+channel that looks like a code) now cover both formats because both go through
+the one reader. The same went for the section ordering, which is a rule — a
+frame no group named must still appear — and not a layout detail.
+
+Verified by rasterising democtl's frames and looking at them: the dashboard, a
+modal drawn over two panes, and a `comp.Meter` — the longest run of box-drawing
+in the suite, and the case that would show a broken grid first.

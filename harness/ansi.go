@@ -89,67 +89,110 @@ func HTML(frame string) string {
 	var b strings.Builder
 	b.WriteString(`<div class="tuikit-frame">`)
 
-	var st sgr
-	for i, line := range Lines(frame) {
+	for i, row := range Rows(frame) {
 		if i > 0 {
 			b.WriteByte('\n')
 		}
-		st = writeLine(&b, line, st)
+		for _, span := range row {
+			css := span.Style.css()
+			if css == "" {
+				b.WriteString(html.EscapeString(span.Text))
+				continue
+			}
+			fmt.Fprintf(&b, `<span style="%s">%s</span>`, css, html.EscapeString(span.Text))
+		}
 	}
 	b.WriteString(`</div>`)
 	return b.String()
 }
 
-// writeLine converts one line, carrying the style in and handing it back out.
+// Style is how a terminal was drawing when it wrote a run of text: a foreground
+// and background as hex (empty meaning the terminal's own default), and bold.
 //
-// Two rules that are easy to get wrong in opposite directions. A span must not
-// straddle a newline — a colour left switched on across one paints the page's
-// background, which is how a frame ends up with a coloured margin. But the
-// STYLE does cross the line, because it does in a terminal: a background left
-// on at the end of a row paints the start of the next. So the span is closed
-// and reopened, rather than the state being forgotten.
-func writeLine(b *strings.Builder, line string, st sgr) sgr {
-	open := st.open(b)
+// Exported because a frame is written once and read by more than one renderer —
+// HTML for a page, SVG for a document that needs an image. Both need the same
+// answer to "what colour is this character", and two parsers would eventually
+// disagree about a frame neither of them drew.
+type Style struct {
+	FG, BG string
+	Bold   bool
+}
 
-	runes := []rune(line)
-	for i := 0; i < len(runes); i++ {
-		if runes[i] != 0x1b {
-			b.WriteString(html.EscapeString(string(runes[i])))
-			continue
-		}
-		j := i + 1
-		if j >= len(runes) || runes[j] != '[' {
-			if j < len(runes) {
-				i = j
+// Span is a stretch of one line drawn with one style.
+//
+// Named Span rather than Run because harness.Run already drives a key through a
+// model, and one package with two meanings of "run" is a package nobody can
+// skim.
+type Span struct {
+	Text  string
+	Style Style
+}
+
+// Rows reads a frame into styled runs, one slice per line.
+//
+// This is the ANSI reader every renderer shares. The state a terminal carries
+// is threaded through the lines rather than reset at each one, because it
+// carries in a terminal: a background left switched on at the end of a row
+// paints the start of the next. What does NOT carry is the run itself — a run
+// never straddles a newline, since a colour left open across one paints the
+// page's margin rather than the frame's.
+//
+// Cursor movement and every other non-SGR sequence is dropped: a static frame
+// has already been laid out, so a sequence that moves a cursor has nothing left
+// to say.
+func Rows(frame string) [][]Span {
+	lines := Lines(frame)
+	rows := make([][]Span, 0, len(lines))
+
+	var st sgr
+	for _, line := range lines {
+		var row []Span
+		var text strings.Builder
+
+		flush := func(with sgr) {
+			if text.Len() == 0 {
+				return
 			}
-			continue
+			row = append(row, Span{Text: text.String(), Style: Style{FG: with.fg, BG: with.bg, Bold: with.bold}})
+			text.Reset()
 		}
-		j++
-		start := j
-		for j < len(runes) && runes[j] >= 0x20 && runes[j] <= 0x3f {
-			j++
-		}
-		params := string(runes[start:j])
-		final := ' '
-		if j < len(runes) {
-			final = runes[j]
-			j++
-		}
-		i = j - 1
 
-		if final != 'm' {
-			continue // cursor movement and friends have no meaning in a static frame
+		runes := []rune(line)
+		for i := 0; i < len(runes); i++ {
+			if runes[i] != 0x1b {
+				text.WriteRune(runes[i])
+				continue
+			}
+			j := i + 1
+			if j >= len(runes) || runes[j] != '[' {
+				if j < len(runes) {
+					i = j
+				}
+				continue
+			}
+			j++
+			start := j
+			for j < len(runes) && runes[j] >= 0x20 && runes[j] <= 0x3f {
+				j++
+			}
+			params := string(runes[start:j])
+			final := ' '
+			if j < len(runes) {
+				final = runes[j]
+				j++
+			}
+			i = j - 1
+
+			if final != 'm' {
+				continue
+			}
+			flush(st)
+			st = st.apply(params)
 		}
-		if open {
-			b.WriteString("</span>")
-		}
-		st = st.apply(params)
-		open = st.open(b)
+		flush(st)
+		rows = append(rows, row)
 	}
-	if open {
-		b.WriteString("</span>")
-	}
-	return st
+	return rows
 }
 
 // sgr is the drawing state a terminal carries between characters.
@@ -163,25 +206,17 @@ type sgr struct {
 	bold   bool
 }
 
-// open writes the span for the current state, if it needs one.
-func (s sgr) open(b *strings.Builder) bool {
-	css := s.css()
-	if css == "" {
-		return false
-	}
-	fmt.Fprintf(b, `<span style="%s">`, css)
-	return true
-}
-
-func (s sgr) css() string {
+// css is the style as a declaration list, or empty when the terminal was
+// drawing with its own defaults and the markup should say nothing at all.
+func (s Style) css() string {
 	var out []string
-	if s.fg != "" {
-		out = append(out, "color:"+s.fg)
+	if s.FG != "" {
+		out = append(out, "color:"+s.FG)
 	}
-	if s.bg != "" {
-		out = append(out, "background:"+s.bg)
+	if s.BG != "" {
+		out = append(out, "background:"+s.BG)
 	}
-	if s.bold {
+	if s.Bold {
 		out = append(out, "font-weight:600")
 	}
 	return strings.Join(out, ";")
