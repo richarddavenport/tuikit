@@ -1348,3 +1348,59 @@ The second half of azctl's pattern also survives as a general point and is now
 in `design/keys.md`: `ctrl+c` never asks — a confirmation on the universal
 escape hatch is a program arguing with it — and the key that OPENED a question
 must not also answer yes.
+
+## 40. Two guards for the lies an interface tells about itself
+
+Issues 39 and 48, both filed as "probably not tractable, do not guess". Both are
+tractable once narrowed to the part that is actually checkable, and the
+narrowing is the decision.
+
+### `guard.Furniture` — a chrome character typed out by hand
+
+Issue 48. `guard.Glyphs` asks whether a printed character is ALLOWED, and `─` is
+allowed: being in the box set is the point of it. The defect is the SOURCE. A
+tool that writes `c.Fill(band, "─", …)` has hardcoded the light box set, and on
+`theme.ASCIIBox` it draws `─` beside the `-` that everything reading the chrome
+draws — one frame, two box sets.
+
+What made it look intractable was that a chrome character in a source file is
+not always a draw: `gallery.Entry.Glyphs` and a tool's own glyph-set declaration
+both NAME these characters in order to permit them, and a guard that flags those
+is one every tool learns to suppress.
+
+**Narrowing to a literal passed to a canvas draw — `Set`, `Text`, `Fill` —
+excludes both, because neither is a call.** Run against six real packages it
+reported two findings, both known and both real (azctl's, now `comp.Rule`), and
+zero false positives. It also found a **sixth** hardcoded site nobody had
+counted: `scaffold/templates/internal/tui/view.go.tmpl`, the file every new tool
+starts from.
+
+### `harness.Hints` — an advertised key that does nothing
+
+Issue 39, and the answer to its "guard, harness check, or discipline" is: a
+harness check, for less than it hoped.
+
+The AST route dies on the same rock `guard.Keys` documents — a tool's
+screen-level keys are not commands and never will be, so a footer legitimately
+names more than the spec does. The runtime route works: press each advertised
+key, report the ones that change nothing.
+
+**But it does not catch the bug that prompted it.** azctl's runner promised
+`q abort (the running step finishes)` while `q` cancelled the run and quit the
+program. `q` did plenty — it just did not do what the footer said. That is a
+claim about English, and no mechanical check reaches it.
+
+So the guard catches the lesser sibling, the DEAD advertised key, and its doc
+says so rather than implying more. The issue's own worry about false positives
+is handled by the caller passing the hints rather than the frame being scraped:
+a key that is legitimately inert in this state is left out, deliberately, in a
+test that says why.
+
+### The pattern in both
+
+**A check that catches part of a class of bug is worth having if it says which
+part.** The failure mode to avoid is not a narrow guard; it is a guard that
+looks like it covers the class and does not, because then nobody looks for the
+rest. Decision 32 remains the discipline for everything unreachable this way —
+a comment or a label describing behaviour is an untested assertion, and the
+answer to one is a test named after the sentence.

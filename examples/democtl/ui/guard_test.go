@@ -22,4 +22,9 @@ func TestTheInterfaceStaysInItsVocabulary(t *testing.T) {
 	// corners, the chevrons, the scroll markers — which guard.Glyphs cannot
 	// see, because they are literals in comp rather than here.
 	guard.Chrome(t, theme.DefaultChrome, Glyphs)
+	// And the other direction: a chrome character typed out HERE rather than
+	// read from the chrome. guard.Glyphs cannot see it, because the character
+	// is allowed — being in the box set is the point of it. What is wrong is
+	// the source, and a hardcoded one stays put when the box set changes.
+	guard.Furniture(t, ".", theme.DefaultChrome)
 }
