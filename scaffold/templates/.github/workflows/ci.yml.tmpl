@@ -4,14 +4,37 @@ on:
     branches: [main, master]
   pull_request:
 
+# The two checkouts are the price of go.mod's `replace ... => ../tuikit`.
+# tuikit is private and untagged, so it cannot be fetched as a module; it has to
+# be a sibling directory on the runner, which means <<.Name>> cannot be checked
+# out at the workspace root. TUIKIT_TOKEN is a PAT with read access to
+# richarddavenport/tuikit — GITHUB_TOKEN is scoped to this repository and will
+# not reach another one. **Until that secret exists this workflow is red for
+# that reason and not for yours.**
+#
+# All of it goes when tuikit is tagged and the replace comes out: the second
+# checkout, the paths, the working-directory, and the secret.
+defaults:
+  run:
+    working-directory: <<.Name>>
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: <<.Name>>
+      - uses: actions/checkout@v4
+        with:
+          repository: richarddavenport/tuikit
+          path: tuikit
+          token: ${{ secrets.TUIKIT_TOKEN }}
       - uses: actions/setup-go@v5
         with:
-          go-version: '<<.GoVersion>>'
+          # The go directive, not a number repeated here: a version in two
+          # places is a version that drifts.
+          go-version-file: <<.Name>>/go.mod
       - name: gofmt
         run: gofmt -l . | tee /dev/stderr | (! read)
       - name: vet
@@ -19,6 +42,9 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
         with:
+          # The action runs from the workspace root whatever `defaults` says,
+          # so it needs telling separately.
+          working-directory: <<.Name>>
           # Pinned to the v2 line explicitly. The action's "latest" resolves to
           # v1, which is built with an older Go than this module's directive and
           # refuses to run rather than degrading.

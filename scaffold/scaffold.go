@@ -118,6 +118,7 @@ func (t Tool) Write(dir string) ([]string, error) {
 	if t.Decision == 0 {
 		t.Decision = t.latestDecision(root)
 	}
+	t.Tuikit = t.relativeTuikit(root)
 
 	names, err := files()
 	if err != nil {
@@ -192,6 +193,34 @@ func (t Tool) reachable(root string) error {
 	return fmt.Errorf("no tuikit checkout at %s\n\n"+
 		"tuikit is unpublished, so a generated tool resolves it from a directory\n"+
 		"on this machine. Pass -tuikit <path> to say where yours is", abs)
+}
+
+// relativeTuikit rewrites the replace path to be relative to the generated
+// tool, which is what go.mod.tmpl's own comment already promises: "Relative, so
+// it works on any machine with both repos side by side rather than only on the
+// one it was generated on."
+//
+// It did not. `-tuikit /Users/someone/Developer/tuikit` was written verbatim,
+// under that comment, and the generated repository then built on exactly one
+// machine — decision 32's failure mode, in a file whose whole job is to be
+// copied to another machine.
+//
+// An absolute path is kept only when a relative one cannot be expressed: a
+// different volume on Windows, where filepath.Rel fails. Nothing else can fail
+// here, since both paths exist by the time this runs.
+func (t Tool) relativeTuikit(root string) string {
+	if !filepath.IsAbs(t.Tuikit) {
+		return t.Tuikit
+	}
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		return t.Tuikit
+	}
+	rel, err := filepath.Rel(abs, t.Tuikit)
+	if err != nil {
+		return t.Tuikit
+	}
+	return filepath.ToSlash(rel)
 }
 
 // latestDecision is the highest decision number in the checkout the generated

@@ -188,3 +188,76 @@ func tuikitRoot(t *testing.T) string {
 	}
 	return abs
 }
+
+// The replace path is relative, which is what go.mod.tmpl's own comment
+// promises. Issue 47: `-tuikit /abs/path` was written verbatim under that
+// comment, so the generated repository built on exactly one machine.
+func TestTheReplacePathIsRelative(t *testing.T) {
+	base := t.TempDir()
+	// tuikit as a sibling of where the tool will be written, which is the
+	// arrangement the whole scheme assumes.
+	side := filepath.Join(base, "tuikit")
+	if err := os.MkdirAll(side, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	body, err := os.ReadFile(filepath.Join(tuikitRoot(t), "go.mod"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(side, "go.mod"), body, 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := (Tool{Name: "probectl", Tuikit: side}).Write(base); err != nil {
+		t.Fatal(err)
+	}
+
+	gomod, err := os.ReadFile(filepath.Join(base, "probectl", "go.mod"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(gomod), "=> ../tuikit") {
+		t.Errorf("an absolute -tuikit was not made relative:\n%s", gomod)
+	}
+	if strings.Contains(string(gomod), base) {
+		t.Errorf("the generating machine's path is in the generated go.mod:\n%s", gomod)
+	}
+}
+
+// A local-path replace means tuikit is not fetchable as a module, which means
+// CI needs a second checkout to put it where the replace points. Two things
+// that must agree, and nothing checked they did: the generated workflow had one
+// checkout, so the one generated file that cannot work was the one nothing ran.
+//
+// Checkable without a runner, which is the point — the invariant is between two
+// generated files, not between a file and GitHub.
+func TestTheWorkflowChecksOutWhateverTheReplaceNeeds(t *testing.T) {
+	dir := t.TempDir()
+	if _, err := (Tool{Name: "probectl", Tuikit: tuikitRoot(t)}).Write(dir); err != nil {
+		t.Fatal(err)
+	}
+
+	gomod, err := os.ReadFile(filepath.Join(dir, "probectl", "go.mod"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	ci, err := os.ReadFile(filepath.Join(dir, "probectl", ".github", "workflows", "ci.yml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	local := strings.Contains(string(gomod), "=> ..") || strings.Contains(string(gomod), "=> /")
+	checkouts := strings.Count(string(ci), "actions/checkout@")
+
+	switch {
+	case local && checkouts < 2:
+		t.Errorf("go.mod replaces tuikit with a local path but the workflow checks out %d repositories — "+
+			"CI cannot build, and `go build` fails before gofmt, vet or the tests run", checkouts)
+	case !local && checkouts > 1:
+		t.Errorf("the replace is gone but the workflow still checks out %d repositories", checkouts)
+	}
+
+	if local && !strings.Contains(string(ci), "TUIKIT_TOKEN") {
+		t.Error("the second checkout has no token; GITHUB_TOKEN cannot reach another repository")
+	}
+}
