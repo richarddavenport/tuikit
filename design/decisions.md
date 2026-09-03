@@ -1448,3 +1448,49 @@ been. The kitty placement states its footprint in CELLS (`c=`/`r=`), so a wrong
 pixel measurement there makes a blurrier picture rather than a misplaced one —
 which is why both terminals looked right in the screenshots that settled this,
 both having negotiated kitty.
+
+## 42. Four keys are reserved, and it is the only thing tuikit imposes
+
+Issue 40. Everything else here is a part a tool takes or leaves. This is a rule,
+and the reason it can be one is that **all of its value is in being the same
+everywhere**: a reader who has used one of these tools presses `q` expecting to
+leave, and a tool where `q` means "queue" has set a trap using the other tools'
+credibility. One tool is allowed to be idiosyncratic. A family is not.
+
+`ctrl+c` quit now · `q` quit or leave this screen · `esc` back or dismiss ·
+`?` show the keys. `guard.Reserved` fails a build that binds one to anything
+else.
+
+### The line it draws, which is the part worth getting right
+
+**The meaning is reserved. The behaviour is not.** A tool may put a question in
+front of `q`, and decision 39 is the argument for why it must be allowed to:
+azctl asks before abandoning a half-run playbook, pgctl cancels immediately
+because its failure hooks bring the database back up, and a framework that
+standardised THAT would have been wrong about one of them. What a tool may not
+do is make `q` mean something that is not leaving.
+
+That is the distinction which makes this safe to impose when decision 39 was not
+safe to impose. "What does this key mean" is a promise to a reader, and it is
+the same promise in every domain. "What does leaving cost" is a fact about the
+domain, and only the tool knows it.
+
+`ctrl+c` gets no latitude at all, and nothing may even declare it: it is handled
+before a tool sees it, so a command claiming it describes a binding it does not
+have — decision 32's shape, caught by a guard this time.
+
+### What it checks, and what it cannot
+
+It reads DECLARED commands — the spec tree that already feeds the CLI,
+`describe --json` and the context menus. A key bound there is caught before it
+ships.
+
+It cannot see a key handled directly in a model's `Update` switch, and no static
+check can: `case "q":` is the same source whether the branch quits or queues,
+and telling them apart means understanding the branch. Decision 40's rule again
+— a check that catches part of a class is worth having if it says which part.
+
+Four, and the bar for a fifth is that a reader would be SURPRISED to find it
+meaning something else, not that it would be tidy. `/` for filter and `j`/`k`
+for movement are conventions these tools happen to share; they are not promises
+a reader arrives holding, and reserving them would be tidiness spending a rule.

@@ -18,6 +18,9 @@ func TestTheInterfaceStaysInItsVocabulary(t *testing.T) {
 	// Every action reachable by mouse has a keyboard path. An agent cannot
 	// click, and a multiplexer may eat the right-click before democtl sees it.
 	guard.Reachable(t, Commands(1))
+	// And nothing has taken a key that means something else in every other
+	// tuikit tool — the one rule tuikit imposes rather than offers.
+	guard.Reserved(t, Commands(1))
 	// And the furniture the components draw on democtl's behalf — the box
 	// corners, the chevrons, the scroll markers — which guard.Glyphs cannot
 	// see, because they are literals in comp rather than here.

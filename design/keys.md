@@ -42,9 +42,24 @@ back up and a dialog would stand between a reader and the safest action. The
 framework cannot tell these apart — whether the work is recoverable is the
 engine's knowledge.
 
-## What is not settled
 
-Whether tuikit should RESERVE the meaning of a handful of keys across every tool
-— so `q` cannot mean something else, `?` is always help, `esc` always goes back.
-That is issue 40, and it would be the first thing tuikit imposes rather than
-offers.
+## The four that are reserved (decision 42)
+
+These mean one thing each, in every tuikit tool, and `guard.Reserved` fails a
+build that binds them to anything else:
+
+| key | means |
+| --- | --- |
+| `ctrl+c` | stop what is happening and quit, immediately and without asking |
+| `q` | quit, or leave the screen you are on |
+| `esc` | go back, or dismiss what is open |
+| `?` | show the keys |
+
+**What is reserved is the meaning, not the behaviour.** A tool may put a
+question in front of `q` — what leaving costs is the tool's business, and
+decision 39 is the whole argument for that. It may not make `q` mean something
+that is not leaving.
+
+`ctrl+c` has no latitude at all, and nothing may even declare it: it is handled
+before a tool sees it, so a command claiming it describes a binding it does not
+have.
