@@ -1494,3 +1494,64 @@ Four, and the bar for a fifth is that a reader would be SURPRISED to find it
 meaning something else, not that it would be tidy. `/` for filter and `j`/`k`
 for movement are conventions these tools happen to share; they are not promises
 a reader arrives holding, and reserving them would be tidiness spending a rule.
+
+## 43. Text stays cells, and here are the numbers
+
+Issue 30 left the typeface question open when the pixel layer shipped, and asked
+for the binary-size cost to be reported before committing. Measured rather than
+estimated, so the next person inherits numbers instead of re-deriving them.
+
+| | |
+| --- | --- |
+| the Go font's TTF alone | **+140 KB** |
+| with `golang.org/x/image` and the `opentype` rasteriser, actually called | **+616 KB, +4.5%** on a 13.4 MB binary |
+| licence | Go fonts are BSD-3-style, clean, already in the Go ecosystem |
+
+**Size was expected to be the argument against, and it is not.** Neither is the
+licence. The argument is what it buys, and that turned out to depend entirely on
+one thing: how big the text is.
+
+Rendered at real device scale — 16×34 pixel cells, Ghostty's actual numbers on
+the display this was measured on:
+
+- **At one cell, rasterised text is worse than what tuikit already does.** It is
+  legible, and it is the Go font instead of the reader's chosen font, it is
+  proportional so it does not sit on the cell grid, and it loses the property
+  decision 29 is built on — *the characters are still there; select them and you
+  get characters*. That is 616 KB spent to make text worse.
+- **Above one cell it is the only way, and it looks good.** A heading two or
+  three rows tall is something a terminal cannot do at all.
+
+So the question is not "should tuikit rasterise text". It is "should tuikit draw
+text LARGER than a character", and nothing has asked for that. The swarmctl
+handoff that motivated the pixel layer wanted a heading, and a terminal draws a
+heading perfectly well at one cell.
+
+### The conflict that settles it
+
+Decision 29 puts pictures at **z=-1, behind the text**, which is what makes the
+pixel layer a decoration pass: the cells are always the drawing, and a terminal
+that cannot draw images still gets the whole interface.
+
+A heading taller than a cell cannot go behind. It has to be in FRONT, and then
+it covers the cells that are its own fallback — so either the text shows through
+as a double image, or the cells are blanked and selection loses the words.
+Sixel has no z-index at all and simply paints over.
+
+That is not a font decision. It is inverting the one rule that makes the layer
+degrade cleanly, for a feature nobody has asked for.
+
+### What would reopen it
+
+A tool that genuinely needs display-size text — a dashboard on a wall, a status
+screen read from across a room. That is a real use case and none of the four
+tools is it. The measurements above stand; what would have to be worked out is
+the z-order and what the covered cells hold.
+
+Issue 30's decision 3, "where the gradient lives", was answered when the pixel
+layer shipped and is recorded in decision 29: the ramp is read from the
+terminal's own palette via OSC 4, so a picture follows the reader's theme the
+same way the characters do. Its decision 1, a raster library, was answered by
+`paint` — rounded rects, gradients, alpha compositing and bars, hand-rolled,
+because the shape list is short and a library that draws everything costs more
+than it saves.
