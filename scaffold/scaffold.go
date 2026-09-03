@@ -22,6 +22,8 @@ import (
 	"sort"
 	"strings"
 	"text/template"
+
+	"github.com/richarddavenport/tuikit/news"
 )
 
 // all: because embed skips files starting with a dot by default, and half of
@@ -42,6 +44,11 @@ type Tool struct {
 	// manifest an agent reads. One sentence, said once.
 	Short string
 
+	// Decision is the tuikit decision number the generated tool records as
+	// reconciled. Defaults to the highest in the checkout it will build
+	// against, because a tool generated today is by definition up to date and
+	// a tool born stale would report news it has no history with.
+	Decision int
 	// Tuikit is the path a `replace` points at.
 	//
 	// tuikit is private and unpublished, so a generated tool needs one to
@@ -107,6 +114,9 @@ func (t Tool) Write(dir string) ([]string, error) {
 	}
 	if err := t.reachable(root); err != nil {
 		return nil, err
+	}
+	if t.Decision == 0 {
+		t.Decision = t.latestDecision(root)
 	}
 
 	names, err := files()
@@ -182,6 +192,25 @@ func (t Tool) reachable(root string) error {
 	return fmt.Errorf("no tuikit checkout at %s\n\n"+
 		"tuikit is unpublished, so a generated tool resolves it from a directory\n"+
 		"on this machine. Pass -tuikit <path> to say where yours is", abs)
+}
+
+// latestDecision is the highest decision number in the checkout the generated
+// tool will build against, so it is born reconciled rather than reporting news
+// about a framework it has no history with.
+//
+// Zero on any failure, which renders as "decision 0" — a marker that reports
+// everything. A generated tool being told too much is a bad morning; being told
+// nothing is a tool that never learns tuikit moved.
+func (t Tool) latestDecision(root string) int {
+	path := t.Tuikit
+	if !filepath.IsAbs(path) {
+		path = filepath.Join(root, path)
+	}
+	ds, err := news.Read(filepath.Join(path, "design", "decisions.md"))
+	if err != nil {
+		return 0
+	}
+	return news.Latest(ds)
 }
 
 // tuikitModule is what a checkout has to declare to be one.

@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/richarddavenport/tuikit/news"
 )
 
 // The acceptance criterion for the scaffolder, run rather than asserted about:
@@ -147,4 +149,42 @@ func TestAToolIsNotWrittenIfTuikitCannotBeFound(t *testing.T) {
 	if entries, _ := os.ReadDir(filepath.Join(dir, "widgetctl")); len(entries) > 0 {
 		t.Errorf("%d files were written anyway", len(entries))
 	}
+}
+
+// A generated tool is born reconciled. One generated with a marker of zero
+// would, on its first `tuikit news`, be told about every decision tuikit has
+// ever taken — including the ones that produced the code it was just given.
+func TestAGeneratedToolRecordsTheCurrentDecision(t *testing.T) {
+	dir := t.TempDir()
+	if _, err := (Tool{Name: "probectl", Tuikit: tuikitRoot(t)}).Write(dir); err != nil {
+		t.Fatal(err)
+	}
+
+	body, err := os.ReadFile(filepath.Join(dir, "probectl", "AGENTS.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, ok := news.Marker(filepath.Join(dir, "probectl", "AGENTS.md"))
+	if !ok {
+		t.Fatalf("the generated AGENTS.md has no marker:\n%s", body)
+	}
+
+	ds, err := news.Read(filepath.Join(tuikitRoot(t), "design", "decisions.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := news.Latest(ds); got != want {
+		t.Errorf("generated at decision %d, but tuikit is at %d", got, want)
+	}
+}
+
+// tuikitRoot is this checkout, as an absolute path — the scaffolder resolves a
+// relative one against the tool it is writing, not against the test.
+func tuikitRoot(t *testing.T) string {
+	t.Helper()
+	abs, err := filepath.Abs("..")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return abs
 }
