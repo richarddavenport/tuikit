@@ -93,6 +93,32 @@ func pixels(args []string) {
 			fmt.Printf("             if pictures come out half size, try %s=%dx%d\n",
 				term.EnvCellSize, p.CellW*2, p.CellH*2)
 		}
+		// The kernel's opinion, from TIOCGWINSZ, which is a different channel
+		// from CSI 14t: the terminal answers the escape and chooses points or
+		// device pixels without saying which, but ws_xpixel is whatever it
+		// wrote into the tty. When the two disagree, the ratio is the scale
+		// factor and issue 31 stops needing a guess.
+		if tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0); err == nil {
+			if px, py, ok := term.WindowPixels(tty); ok {
+				line := fmt.Sprintf("kernel       window is %dx%d pixels (TIOCGWINSZ)", px, py)
+				if cols, rows, ok := term.WindowCells(tty); ok && cols > 0 && rows > 0 {
+					kw, kh := px/cols, py/rows
+					line += fmt.Sprintf(", so a cell is %dx%d", kw, kh)
+					switch {
+					case kw == p.CellW && kh == p.CellH:
+						line += " — AGREES with the escape"
+					case p.CellW > 0 && kw == p.CellW*2:
+						line += " — DOUBLE the escape's answer, which is the HiDPI disagreement"
+					default:
+						line += fmt.Sprintf(" — DISAGREES with the escape's %dx%d", p.CellW, p.CellH)
+					}
+				}
+				fmt.Println(line)
+			} else {
+				fmt.Println("kernel       TIOCGWINSZ reports no pixel size (common; many terminals never set it)")
+			}
+			_ = tty.Close()
+		}
 		fmt.Printf("background   %s\n", hex(p.Background))
 		fmt.Printf("ramp         %s → %s   (ANSI 5 and 13, read from your theme)\n",
 			hex(p.Ramp.From), hex(p.Ramp.To))
