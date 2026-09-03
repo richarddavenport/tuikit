@@ -60,6 +60,15 @@ type State struct {
 	// because "empty" is obvious and "clamped" is not.
 	Note string
 	Draw func(c *comp.Canvas, r comp.Rect, focused bool)
+
+	// Overlay says this state positions itself against the CANVAS rather than
+	// staying inside the rect it was given — a context menu that nudges itself
+	// back on screen, a help screen drawn over the interface.
+	//
+	// It exempts the state from TestNoComponentDrawsOutsideItsRect, and it is
+	// the only exemption: everything else must stay in its rect, because a
+	// component that overruns paints over its neighbour rather than failing.
+	Overlay bool
 }
 
 // styles is the gallery's own vocabulary, built from the default palette.

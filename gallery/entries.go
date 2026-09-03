@@ -283,15 +283,15 @@ func (m *Model) menuEntry(s *styles) Entry {
 				Draw: func(c *comp.Canvas, r comp.Rect, _ bool) {
 					menu(1).DrawAt(c, r.X+2, r.Y+1)
 				}},
-			{Name: "nudged back on screen", Note: "opened past the edge; half a menu is a list of actions you cannot read",
+			{Name: "nudged back on screen", Overlay: true, Note: "opened past the edge; half a menu is a list of actions you cannot read",
 				Draw: func(c *comp.Canvas, r comp.Rect, _ bool) {
 					menu(0).DrawAt(c, r.Right()-4, r.Bottom()-1)
 				}},
-			{Name: "on a region", Note: "the keyboard path — at the thing the cursor is on, wherever that is in THIS frame",
+			{Name: "on a region", Overlay: true, Note: "the keyboard path — at the thing the cursor is on, wherever that is in THIS frame",
 				Draw: func(c *comp.Canvas, r comp.Rect, _ bool) {
 					// Something to anchor to, drawn first, so the menu can find
 					// it the way it would find a scrolled row.
-					row := comp.Rect{X: r.X + 6, Y: r.Y + 4, W: 24, H: 1}
+					row := comp.Rect{X: r.X + 6, Y: r.Y + 4, W: min(24, max(0, r.W-6)), H: 1}
 					c.Fill(row, " ", &s.selected, comp.Region("demo.row"))
 					c.Text(row.X+1, row.Y, "api_gateway", &s.selected, comp.Region("demo.row"))
 					menu(0).DrawOn(c, comp.Region("demo.row"))
@@ -415,7 +415,7 @@ func (m *Model) spinnerEntry(s *styles) Entry {
 		return func(c *comp.Canvas, r comp.Rect, _ bool) {
 			sp.Style = &s.pending
 			x := sp.Draw(c, r, at.Add(offset), comp.Region("demo.spinner"))
-			c.Text(r.X+x, r.Y, " "+label, &s.muted, comp.Region("demo.spinner"))
+			c.Text(r.X+x, r.Y, comp.Truncate(" "+label, r.W-x), &s.muted, comp.Region("demo.spinner"))
 		}
 	}
 	return Entry{
@@ -647,7 +647,7 @@ func (m *Model) paneEntry(s *styles) Entry {
 			p.Border, p.Focus, p.TitleStyle = &s.border, &s.focused, &s.title
 			inner := p.Draw(c, comp.Rect{X: r.X, Y: r.Y, W: r.W, H: min(r.H, 6)}, comp.Region("demo.pane"))
 			if !inner.Empty() {
-				c.Text(inner.X+1, inner.Y, title, &s.muted, comp.Region("demo.pane"))
+				c.Text(inner.X+1, inner.Y, comp.Truncate(title, inner.W-1), &s.muted, comp.Region("demo.pane"))
 			}
 		}
 	}
@@ -1168,7 +1168,7 @@ func (m *Model) keysEntry(s *styles) Entry {
 		States: []State{
 			{Name: "by screen", Note: "grouped by screen because that is how a reader looks — a flat list of forty is a reference, not an answer",
 				Draw: draw(comp.Keys{Sections: full}, 0)},
-			{Name: "as an overlay", Note: "the interface stays behind it: \"what was I looking at\" is half of what you open help to answer",
+			{Name: "as an overlay", Overlay: true, Note: "the interface stays behind it: \"what was I looking at\" is half of what you open help to answer",
 				Draw: draw(comp.Keys{Sections: full, Overlay: true, Title: "Keys"}, 0)},
 			{Name: "too short", Note: "says it was cut — a help screen that quietly omits half the keys is worse, because a reader believes it",
 				Draw: draw(comp.Keys{Sections: full}, 6)},

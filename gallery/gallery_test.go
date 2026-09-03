@@ -1,6 +1,7 @@
 package gallery
 
 import (
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -10,6 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/termenv"
 
+	"github.com/richarddavenport/tuikit/comp"
 	"github.com/richarddavenport/tuikit/harness"
 	"github.com/richarddavenport/tuikit/theme"
 )
@@ -244,4 +246,61 @@ func TestCaptureFrames(t *testing.T) {
 	s := harness.Capture(t, dir, harness.Size(132, 38))
 	states(t, 132, 38, func(name string, m *Model) { s.Shot(name, run(m)) })
 	s.Done()
+}
+
+// No component draws outside the rect it was given.
+//
+// The canvas guarantees nothing lands outside the CANVAS — Set clips, so a
+// coordinate past the edge is one that does not exist. It guarantees nothing
+// about a component staying inside the RECT it was handed, and a component that
+// overruns paints over its neighbour rather than failing: the frame is still
+// well-formed, the goldens still pass, and the pane beside it is simply wrong.
+//
+// This is issue 6's guard.Width, and it lives here rather than in `guard`
+// because the gallery is already the complete list of components — held closed
+// by TestEveryComponentIsInTheGallery — and already draws each of them into a
+// rect in every state it has. A guard in `guard` would need its own list of
+// components and its own way to build them, and a second list is a list that
+// drifts.
+//
+// It found comp.Toast on its first run: Min is 24 columns and clamp() raised
+// the width UP to it inside a pane 10 wide, so the toast drew 114 cells over
+// whatever was beside it.
+func TestNoComponentDrawsOutsideItsRect(t *testing.T) {
+	// A rect with room around it on all four sides, so an overrun in any
+	// direction has somewhere to land where it can be seen.
+	box := comp.Rect{X: 6, Y: 3, W: 24, H: 8}
+
+	m := New(theme.Default)
+	for _, e := range m.entries {
+		for _, st := range e.States {
+			if st.Overlay {
+				continue // positions itself against the canvas, by contract
+			}
+			t.Run(e.Name+"-"+strings.ReplaceAll(st.Name, " ", "-"), func(t *testing.T) {
+				c := comp.NewCanvas(48, 16)
+				st.Draw(c, box, true)
+
+				var out []string
+				for y := 0; y < 16; y++ {
+					for x := 0; x < 48; x++ {
+						if x >= box.X && x <= box.Right() && y >= box.Y && y <= box.Bottom() {
+							continue
+						}
+						if owner := c.OwnerAt(x, y); owner.Name != "" {
+							out = append(out, fmt.Sprintf("(%d,%d) owned by %v", x, y, owner))
+						}
+					}
+				}
+				if len(out) > 0 {
+					shown := out
+					if len(shown) > 5 {
+						shown = shown[:5]
+					}
+					t.Errorf("drew %d cells outside %v — it is painting over whatever is beside it.\n  %s",
+						len(out), box, strings.Join(shown, "\n  "))
+				}
+			})
+		}
+	}
 }

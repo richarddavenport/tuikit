@@ -53,8 +53,13 @@ const (
 
 // Draw puts the toast in a corner of r and returns the box it took.
 func (t Toast) Draw(c *Canvas, r Rect, id ID) Rect {
+	// Nothing leaves r, whatever the arithmetic below concludes. Min is a
+	// preference and the rect is a fact: a toast asked for 24 columns inside a
+	// pane 10 wide used to draw 24 of them, over whatever was beside it.
+	c = c.Clip(r)
+
 	maxW, minW, margin := or(t.Max, 48), or(t.Min, 24), or(t.Margin, 2)
-	w := clamp(r.W-margin*2, minW, maxW)
+	w := min(clamp(r.W-margin*2, minW, maxW), r.W)
 
 	body := Wrap(t.Body, w-4)
 	lines := len(body)
@@ -63,7 +68,7 @@ func (t Toast) Draw(c *Canvas, r Rect, id ID) Rect {
 	}
 	h := lines + 4 // title, blank, and two of border
 
-	box := Rect{W: w, H: h}
+	box := Rect{W: w, H: min(h, r.H)}
 	switch t.Anchor {
 	case TopLeft:
 		box.X, box.Y = r.X+margin, r.Y+margin/2

@@ -1194,3 +1194,61 @@ against a second tool" looks like when it works.
 What this does not license is a flag per preference. Each of these has a default
 that stays, a reason the default is right where it was right, and a second shape
 that the first reasoning demonstrably does not cover.
+
+## 37. The overrun guard is kept, and it lives in the gallery
+
+Issue 6, open since the first week, blocked on the canvas existing.
+
+`guard.Width` was planned because overflow is the commonest bug in a TUI and the
+one assertions miss — two of pgctl's three capture bugs and both of democtl's
+were something drawn wider than its container. Then the canvas made it look
+unnecessary: `Set` clips, so drawing past the edge is a coordinate that does not
+exist rather than an error to catch.
+
+**The canvas guarantees the wrong thing.** It guarantees nothing lands outside
+the CANVAS. It guarantees nothing about a component staying inside the RECT it
+was handed, and that is the failure that matters: a component which overruns
+paints over its neighbour rather than failing. The frame is still well-formed,
+every golden still passes, and the pane beside it is simply wrong.
+
+`Canvas.Clip` closes it structurally — a clipped canvas cannot draw outside its
+rect — but only for components that call it. Measured: fourteen of twenty-two
+did, and the eight that did not were not all bugs, because several take no rect
+at all. `Confirm.Draw(c, id)` centres itself and returns where it landed;
+`Menu.DrawAt` nudges itself back on screen; `Split.Draw` divides a rect and
+returns two. Those position against the canvas by contract.
+
+So it is kept. Not as `guard.Width`, and not in `guard`.
+
+### Where it lives, and why not in guard
+
+**The gallery.** It is already the complete list of components — held closed
+against `comp` by `TestEveryComponentIsInTheGallery`, which fails if an exported
+type with a `Draw*` method has no entry — and it already draws every one of them
+into a rect, in every state it has. A guard in `guard` would need its own list of
+components and its own way to construct each one, and a second list is a list
+that drifts.
+
+That also answers the issue's other open question. It asked whether the guard
+needs each tool to enumerate its screens, and whether `guard.Screens`'s list
+could serve both. It does not arise: the check is against `comp`, not against a
+tool, because a tool that draws its own rectangle wrong is a tool bug and a
+component that overruns is everybody's.
+
+`State.Overlay` is the single exemption, and it has to be declared per state
+rather than per component — `comp.Keys` is bounded normally and unbounded with
+`Overlay: true`, which is the same distinction the field name already carries.
+
+### What it found
+
+`comp.Toast`, immediately. `Min` defaults to 24 columns and the width was
+`clamp(r.W-margin*2, minW, maxW)`, which raises the width UP to the minimum: a
+toast in a pane 10 columns wide drew 24 of them, 114 cells over whatever was
+beside it. The origin was clamped to the rect and the width never was. It now
+clips and bounds both dimensions — `Min` is a preference, the rect is a fact.
+
+Three more were latent overruns in the gallery's own demo drawing, invisible at
+132 and 80 columns and real at 24. Not one golden moved when they were fixed,
+which is the point: **nothing that existed could have caught any of these**, and
+a frame that is wrong only at a width nobody captured is exactly the bug this
+project keeps finding by looking.
