@@ -1123,7 +1123,7 @@ Not one frame changed. The goldens moved only where the gallery gained a row and
 a count, which is the evidence that the seven sites were drawing the same thing:
 if any had differed, a golden would have said so.
 
-The guard that would have caught this is NOT built, and issue 44 records why
+The guard that would have caught this is NOT built, and issue 48 records why
 rather than leaving it implied. A literal `─` in a tool's source is not always a
 draw: both `gallery.Entry.Glyphs` and a tool's own glyph-set declaration list
 chrome characters in order to ALLOW them. Telling a declaration from a draw is
