@@ -2,16 +2,18 @@
 
 A TUI framework for developers and agents. Go, Bubble Tea, Lip Gloss.
 
-It exists because four tools — [swarmctl], [pgctl], [azctl], [dugo] — arrived at
-the same shape independently, and that shape currently travels by copy. tuikit is
-that shape as a module: the vocabulary an interface is allowed to use, the guards
-that hold it closed, the components, the capture harness, and a scaffolder that
-writes a tool which builds and passes its own checks on the first run.
+It exists because four tools — swarmctl, pgctl, azctl and dugo — arrived at the
+same shape independently, and that shape travelled by copy. tuikit is that shape
+as a module: the vocabulary an interface is allowed to use, the guards that hold
+it closed, the components, the capture harness, and a scaffolder that writes a
+tool which builds and passes its own checks on the first run.
 
-[swarmctl]: https://github.com/richarddavenport/swarmctl
-[pgctl]: https://github.com/richarddavenport/pgctl
-[azctl]: https://github.com/richarddavenport/azctl
-[dugo]: https://github.com/richarddavenport/dugo
+Those four are private, so you cannot read them. They are named throughout this
+repository anyway, because every component here says which tools hand-rolled it
+first and how their versions differed — and a component whose provenance is
+"somebody thought it would be useful" is one nobody can argue with. The design
+notes in `design/` are the honest version of that history, including the things
+that were refused and why.
 
 ## What is here now
 
@@ -182,3 +184,7 @@ and the guards turn "I used a colour that does not exist" into a test failure
 rather than a review comment. An agent can also *see* what it built:
 `harness` renders any screen to a file, and the goldens tell it whether the
 layout moved.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
