@@ -53,6 +53,13 @@ const (
 // Draw renders the pane into r and returns the rect inside it — after the
 // title row, if the title has one.
 //
+// The returned rect is ALREADY inside the border. For padding within it use
+// [Rect.Narrow], which takes columns off the sides; [Rect.Inset] also takes a
+// row off the top and the bottom, and it is the obvious-looking one. pgctl
+// called Inset(1) here, sized a box for ten rows of content, was handed eight,
+// and drew its help row on top of its last field — a silent failure, reported
+// as a trap rather than a gap (issue 49).
+//
 // The inside is blanked, so a pane drawn over something else covers it. That is
 // what makes a modal or a menu a draw rather than a composite.
 //
