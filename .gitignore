@@ -1,3 +1,9 @@
 bin/
 design-system/
 ref-*.png
+
+# Compiled binaries. `make install` writes to ~/.local/bin; a `go build` here
+# leaves one in the working tree, and one was committed for long enough to put
+# 47 MB of Mach-O into the history.
+/tuikit
+/prototype-canvas
