@@ -72,6 +72,86 @@ func (t Table) Rows(w int, rows [][]string) []string {
 	return out
 }
 
+// Spans lays out STYLED cells, keeping each cell's own style.
+//
+// The same layout as [Table.Rows] and the same widths; what changes is that a
+// cell arrives as a [Segment] and leaves as one, so a column whose colour
+// carries meaning still has it.
+//
+// Rows returns joined strings, which is right when a whole line is one colour —
+// and it silently deletes information when it is not. pgctl ported a manifest
+// onto Table and had to make three columns plain: a rule's data mode was amber
+// for "none" and "filtered", a carried count was amber when a table came across
+// filtered rather than whole, and an unknown size was a muted dash. All three
+// became words with a comment explaining the loss (issue 51). Words are a
+// reasonable fallback and they are not the same thing: colour is read without
+// being looked at, which is the entire job of a status column.
+//
+// Padding is emitted as an unstyled segment rather than folded into the cell,
+// so a cell with a background does not paint the gap after it.
+func (t Table) Spans(w int, rows [][]Segment) [][]Segment {
+	widths := t.widths(w, textOf(rows))
+
+	out := make([][]Segment, 0, len(rows))
+	for _, cells := range rows {
+		var line []Segment
+		for i, width := range widths {
+			if i > 0 && t.Gap > 0 {
+				line = append(line, Segment{Text: strings.Repeat(" ", t.Gap)})
+			}
+			var cell Segment
+			if i < len(cells) {
+				cell = cells[i]
+			}
+			line = append(line, pad(cell, width, t.Columns[i].Right)...)
+		}
+		out = append(out, trimTrailing(line))
+	}
+	return out
+}
+
+// pad fits one styled cell to a width, truncating what is too long and
+// surrounding what is too short.
+func pad(cell Segment, width int, right bool) []Segment {
+	text := Truncate(cell.Text, width)
+	gap := width - Width(text)
+	if gap <= 0 {
+		return []Segment{{Text: text, Style: cell.Style}}
+	}
+	blank := Segment{Text: strings.Repeat(" ", gap)}
+	if right {
+		return []Segment{blank, {Text: text, Style: cell.Style}}
+	}
+	return []Segment{{Text: text, Style: cell.Style}, blank}
+}
+
+// textOf drops the styles, so the widths are measured by the one function that
+// already knows how — a second width calculation is a second answer.
+func textOf(rows [][]Segment) [][]string {
+	out := make([][]string, len(rows))
+	for i, cells := range rows {
+		out[i] = make([]string, len(cells))
+		for j, cell := range cells {
+			out[i][j] = cell.Text
+		}
+	}
+	return out
+}
+
+// trimTrailing drops the blank segments off the end, matching Rows's
+// TrimRight: a row that paints its trailing padding claims cells it is not
+// using, and a click on one then lands on the row rather than past it.
+func trimTrailing(line []Segment) []Segment {
+	for len(line) > 0 {
+		last := line[len(line)-1]
+		if strings.TrimRight(last.Text, " ") != "" {
+			break
+		}
+		line = line[:len(line)-1]
+	}
+	return line
+}
+
 // widths resolves each column: fixed as asked, natural to its widest cell, and
 // the filler to whatever is left.
 func (t Table) widths(w int, rows [][]string) []int {

@@ -220,6 +220,33 @@ func (c *Canvas) at(x, y int) *Cell {
 	return &c.cells[y*c.w+x]
 }
 
+// Center is r's middle, w by h, clipped to r.
+//
+// A rect is not a layout, and this is not one either — it is the arithmetic
+// every overlay does, written once. [Confirm] centred itself privately and
+// [Menu] positions itself privately, so a tool building its own overlay on a
+// [List] wrote it again (issue 53). Three copies of `(r.W-w)/2` is two too
+// many, and the one that is wrong is wrong by one column in a way nobody sees
+// until they look at two overlays side by side.
+//
+// The POSITION is clamped and the size is not. A box larger than what it is
+// centred in starts at the edge and is cut by the canvas, which is a box you
+// can read the left of rather than one drawn off the screen — and it is what
+// [Confirm] has always done, deliberately: a modal has a minimum width it keeps
+// even on a terminal too narrow for it, because a question squeezed to twenty
+// columns is a question nobody can read either.
+//
+// So a caller that needs the result to fit inside r must say so itself. Doing
+// it here would have silently changed Confirm's floor into a ceiling, which a
+// test caught.
+func Center(r Rect, w, h int) Rect {
+	return Rect{
+		X: r.X + max(0, (r.W-w)/2),
+		Y: r.Y + max(0, (r.H-h)/2),
+		W: w, H: h,
+	}
+}
+
 // Width measures a cluster the way Lip Gloss does.
 //
 // The same function lipgloss.Width calls, deliberately. If the canvas measured

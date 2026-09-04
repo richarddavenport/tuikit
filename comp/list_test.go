@@ -909,3 +909,69 @@ func clampTo(i, hi int) int {
 	}
 	return max(0, i)
 }
+
+// A row can pin content to its right edge, which is what Bar has always done
+// and what three call sites in boardctl were doing by hand (issue 53).
+func TestARowCanPinContentToItsRightEdge(t *testing.T) {
+	l := &List{Name: "lanes"}
+	c := NewCanvas(30, 3)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 30, H: 3}, []Row{
+		{Text: " ACTIVE", Right: []Segment{{Text: "3/5"}}},
+	})
+
+	line := strings.Split(c.String(), "\n")[0]
+	if !strings.HasSuffix(strings.TrimRight(line, " "), "3/5") {
+		t.Errorf("the right-hand content is not at the edge: %q", line)
+	}
+	if !strings.Contains(line, "ACTIVE") {
+		t.Errorf("the left-hand content was lost: %q", line)
+	}
+}
+
+// The width is measured in columns, which is the bug the reporter hit twice:
+// len() on a string holding a wide glyph puts the content past the edge, where
+// the canvas silently does not draw it.
+func TestTheRightEdgeIsMeasuredInColumns(t *testing.T) {
+	l := &List{Name: "lanes"}
+	c := NewCanvas(20, 2)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 2}, []Row{
+		{Text: "lane", Right: []Segment{{Text: "› 12"}}},
+	})
+
+	line := strings.Split(c.String(), "\n")[0]
+	if !strings.Contains(line, "› 12") {
+		t.Errorf("a row ending in a wide glyph lost it: %q", line)
+	}
+}
+
+// Lead comes out of the same width. The reporter's second bug: forgetting it
+// pushed every count one column past the edge.
+func TestTheRightEdgeAccountsForTheLead(t *testing.T) {
+	l := &List{Name: "lanes"}
+	c := NewCanvas(16, 2)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 16, H: 2}, []Row{
+		{Lead: "▾", Text: " lane", Right: []Segment{{Text: "9"}}},
+	})
+
+	line := strings.Split(c.String(), "\n")[0]
+	if !strings.Contains(line, "9") {
+		t.Errorf("the right-hand content was pushed off the row: %q", line)
+	}
+	if Width(strings.TrimRight(line, " ")) > 16 {
+		t.Errorf("the row is wider than its rect: %q", line)
+	}
+}
+
+// Dropped rather than overlapped when there is no room, because a count written
+// over the end of a name is two pieces of information and neither is readable.
+func TestTheRightEdgeIsDroppedWhenThereIsNoRoom(t *testing.T) {
+	l := &List{Name: "lanes"}
+	c := NewCanvas(4, 2)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 4, H: 2}, []Row{
+		{Text: "lane", Right: []Segment{{Text: "a very long count"}}},
+	})
+
+	if line := strings.Split(c.String(), "\n")[0]; strings.Contains(line, "very") {
+		t.Errorf("it overlapped instead of being dropped: %q", line)
+	}
+}

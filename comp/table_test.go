@@ -3,6 +3,8 @@ package comp
 import (
 	"strings"
 	"testing"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
 // The marker answers "can I reach it" before the name answers "which is it",
@@ -126,4 +128,70 @@ func at(line, cell string) int {
 		return -1
 	}
 	return Width(line[:i])
+}
+
+// A cell keeps its own style. Issue 51: Rows joins to strings, so pgctl had to
+// make three columns plain and write a comment explaining the loss.
+func TestSpansKeepEachCellsStyle(t *testing.T) {
+	amber := lipgloss.NewStyle().Foreground(lipgloss.Color("214"))
+	muted := lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
+
+	tbl := Table{Columns: []Column{{Width: 10}, {Width: 8}}, Gap: 1}
+	out := tbl.Spans(24, [][]Segment{
+		{{Text: "orders"}, {Text: "filtered", Style: &amber}},
+		{{Text: "customers"}, {Text: "all", Style: &muted}},
+	})
+
+	if len(out) != 2 {
+		t.Fatalf("got %d rows", len(out))
+	}
+	var found bool
+	for _, span := range out[0] {
+		if span.Text == "filtered" && span.Style == &amber {
+			found = true
+		}
+	}
+	if !found {
+		t.Errorf("the amber cell lost its style: %+v", out[0])
+	}
+}
+
+// The layout is the same as Rows's, or a tool that switches loses its columns.
+func TestSpansLaysOutTheSameAsRows(t *testing.T) {
+	tbl := Table{Columns: []Column{{Width: 6}, {Fill: true}, {Width: 5, Right: true}}, Gap: 2}
+	cells := [][]string{{"api", "the api service", "2/2"}, {"web", "web", "10/10"}}
+
+	styled := make([][]Segment, len(cells))
+	for i, row := range cells {
+		styled[i] = make([]Segment, len(row))
+		for j, cell := range row {
+			styled[i][j] = Segment{Text: cell}
+		}
+	}
+
+	plain := tbl.Rows(40, cells)
+	for i, line := range tbl.Spans(40, styled) {
+		var b string
+		for _, span := range line {
+			b += span.Text
+		}
+		if b != plain[i] {
+			t.Errorf("row %d:\n  Spans %q\n  Rows  %q", i, b, plain[i])
+		}
+	}
+}
+
+// Padding is its own segment, so a cell with a background does not paint the
+// gap after it.
+func TestPaddingIsNotPartOfTheCell(t *testing.T) {
+	sel := lipgloss.NewStyle().Background(lipgloss.Color("7"))
+	tbl := Table{Columns: []Column{{Width: 10}}}
+
+	for _, line := range tbl.Spans(10, [][]Segment{{{Text: "hi", Style: &sel}}}) {
+		for _, span := range line {
+			if span.Style == &sel && span.Text != "hi" {
+				t.Errorf("the styled segment carries padding: %q", span.Text)
+			}
+		}
+	}
 }

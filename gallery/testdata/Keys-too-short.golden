@@ -3,15 +3,15 @@ tuikit gallery  every component, running                                        
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Keys                                                                                           │
 │ List                          │ │ Every binding, by screen. A footer says what acts on THIS; this says what exists.              │
-│ Pane                          │ │ ‹ by screen · as an overlay · too short · one section ›                                        │
-│ Tabs                          │ │ says it was cut — a help screen that quietly omits half the keys is worse, because a reader b… │
+│ Pane                          │ │ ‹ by screen · as an overlay · too short · scrolled · one section ›                             │
+│ Tabs                          │ │ says it was cut, and HOW MANY — a help screen that quietly omits half the keys is worse, beca… │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ Everywhere                                                                                     │
 │ StepList                      │ │ ?       these keys                                                                             │
 │ LogPane                       │ │ ctrl-k  run a command                                                                          │
 │ Spinner                       │ │ q       quit                                                                                   │
 │ Table                         │ │                                                                                                │
-│ Detail                        │ │ … more                                                                                         │
+│ Detail                        │ │ ↓ 9 more                                                                                       │
 │ Menu                          │ │                                                                                                │
 │ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │

@@ -3,7 +3,7 @@ tuikit gallery  every component, running                                        
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Keys                                                                                           │
 │ List                          │ │ Every binding, by screen. A footer says what acts on THIS; this says what exists.              │
-│ Pane                          │ │ ‹ by screen · as an overlay · too short · one section ›                                        │
+│ Pane                          │ │ ‹ by screen · as an overlay · too short · scrolled · one section ›                             │
 │ Tabs                          │ │ the interface stays behind it: "what was I looking at" is half of what you open help to answer │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ ┌─ Resources ────────────────────────────────────────────────────────────────────────────────┐ │

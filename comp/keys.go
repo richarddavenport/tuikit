@@ -37,6 +37,18 @@ type Keys struct {
 	// KeyWidth aligns the keys into a column. Zero measures them.
 	KeyWidth int
 
+	// Offset is the first line shown, for a list taller than its space.
+	//
+	// Without it this said "… more" and offered no way to see the rest, which
+	// is the least helpful state a help screen has: it tells a reader there is
+	// something they cannot reach. pgctl declined to adopt the component for
+	// exactly this — 35 lines across four sections, on a 24-row terminal, which
+	// is an ordinary terminal rather than a hard case (issue 50).
+	//
+	// [Keys.Rows] is the total, so a caller can clamp this and decide whether
+	// to offer scrolling at all.
+	Offset int
+
 	TitleStyle, SectionStyle, KeyStyle, LabelStyle, Border *lipgloss.Style
 }
 
@@ -66,44 +78,81 @@ func (k Keys) Draw(c *Canvas, r Rect, id ID) int {
 		y += 2
 	}
 
-	// out replaces the last visible row with a marker and stops.
-	//
-	// A help screen that quietly omits half the keys is worse than one that
-	// says it was cut, because a reader believes it — and the keys it dropped
-	// are exactly the ones they came looking for.
-	out := func() bool {
-		if y <= r.Bottom() {
-			return false
-		}
-		// Cleared first: the row it replaces already has something on it, and
-		// a marker that only overwrites its first six columns reads as
-		// "… moretate".
-		c.Fill(Rect{X: r.X, Y: r.Bottom(), W: r.W, H: 1}, " ", nil, id)
-		c.Text(r.X, r.Bottom(), Truncate(c.Chrome().Ellipsis+" more", r.W), k.SectionStyle, id)
-		return true
+	lines := k.lines()
+	off := clamp(k.Offset, 0, max(0, len(lines)-1))
+	room := r.Bottom() - y + 1
+	if room <= 0 {
+		return y
 	}
 
-	for i, section := range k.Sections {
-		if i > 0 {
-			y++
+	// A marker costs a row, at each end that has something beyond it. Counted
+	// before anything is drawn, or the last line is drawn and then covered.
+	above, below := off > 0, false
+	shown := room
+	if above {
+		shown--
+	}
+	if off+shown < len(lines) {
+		below = true
+		shown--
+	}
+	shown = max(0, shown)
+
+	if above {
+		c.Text(r.X, y, Truncate(c.Chrome().ScrollUp+" "+itoa(off)+" above", r.W), k.SectionStyle, id)
+		y++
+	}
+
+	for _, line := range lines[off:min(len(lines), off+shown)] {
+		switch {
+		case line.blank:
+		case line.section != "":
+			c.Text(r.X, y, Truncate(line.section, r.W), k.SectionStyle, id)
+		default:
+			x := r.X + c.Text(r.X, y, Pad(line.hint.Key, width)+"  ", k.KeyStyle, id)
+			c.Text(x, y, Truncate(line.hint.Label, max(0, r.Right()-x+1)), k.LabelStyle, id)
 		}
-		if section.Name != "" {
-			if out() {
-				return r.Bottom() + 1
-			}
-			c.Text(r.X, y, Truncate(section.Name, r.W), k.SectionStyle, id)
-			y++
-		}
-		for _, hint := range section.Keys {
-			if out() {
-				return r.Bottom() + 1
-			}
-			x := r.X + c.Text(r.X, y, Pad(hint.Key, width)+"  ", k.KeyStyle, id)
-			c.Text(x, y, Truncate(hint.Label, max(0, r.Right()-x+1)), k.LabelStyle, id)
-			y++
-		}
+		y++
+	}
+
+	// A help screen that quietly omits half the keys is worse than one that
+	// says it was cut, because a reader believes it — and the keys it dropped
+	// are exactly the ones they came looking for. Now it also says how many,
+	// which is the difference between "there is more" and "there are nine
+	// more", and Offset is how a reader gets to them.
+	if below {
+		rest := len(lines) - (off + shown)
+		c.Fill(Rect{X: r.X, Y: y, W: r.W, H: 1}, " ", nil, id)
+		c.Text(r.X, y, Truncate(c.Chrome().ScrollDown+" "+itoa(rest)+" more", r.W), k.SectionStyle, id)
+		y++
 	}
 	return y
+}
+
+// keyLine is one drawn row: a section heading, a binding, or the blank between
+// sections. Flattened before drawing so the list can be windowed — which is
+// what the caller's own workaround did, and the reason it existed.
+type keyLine struct {
+	section string
+	hint    Hint
+	blank   bool
+}
+
+// lines flattens the sections into the rows they occupy.
+func (k Keys) lines() []keyLine {
+	var out []keyLine
+	for i, section := range k.Sections {
+		if i > 0 {
+			out = append(out, keyLine{blank: true})
+		}
+		if section.Name != "" {
+			out = append(out, keyLine{section: section.Name})
+		}
+		for _, hint := range section.Keys {
+			out = append(out, keyLine{hint: hint})
+		}
+	}
+	return out
 }
 
 // box is the overlay's rect: as tall as the content wants, inside the canvas.
@@ -121,6 +170,10 @@ func (k Keys) box(c *Canvas, r Rect, id ID) Rect {
 	}
 	return Pane{Focused: true, Focus: k.Border, Border: k.Border}.Draw(c, box, id)
 }
+
+// Rows is how many lines the sections need, blank separators included — the
+// number a caller clamps [Keys.Offset] against.
+func (k Keys) Rows() int { return k.rows() }
 
 // rows is how many lines the sections need, blank separators included.
 func (k Keys) rows() int {

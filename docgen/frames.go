@@ -89,8 +89,24 @@ func (f Frames) Page(dir string) (string, error) {
 	if f.Lede != "" {
 		fmt.Fprintf(&b, "<p class=\"lede\">%s</p>\n", html.EscapeString(f.Lede))
 	}
-	fmt.Fprintf(&b, "<p class=\"facts\">%d frames · %d&#215;%d</p>\n</header>\n",
-		len(manifest.Frames), manifest.Width, manifest.Height)
+	fmt.Fprintf(&b, "<p class=\"facts\">%d frames · %d&#215;%d</p>\n", len(manifest.Frames), manifest.Width, manifest.Height)
+
+	// The page cannot ask the reader's terminal what its sixteen colours are, so
+	// it renders them as xterm's defaults — and until it said so, it was
+	// documenting a themeable tool in a palette nobody sees. A reviewer running
+	// Ghostty's Adventure theme said "mine is brown, not like the review", and
+	// they were right: index 13 is #aa7900 there and #ff00ff here. Somebody had
+	// already written "accent is bright magenta" in a design summary, read off a
+	// page like this one (issue 52).
+	//
+	// Said on the page rather than fixed, because there is nothing to fix: the
+	// colours are the reader's and a static page has no way to know them. What
+	// was broken was the page's silence about it.
+	b.WriteString("<p class=\"caveat\">The sixteen ANSI colours are drawn as " +
+		"<strong>xterm's defaults</strong>, because a page cannot ask your terminal what " +
+		"yours are. This tool takes its colours from the terminal (decision 28), so the " +
+		"shapes here are exact and the hues are not yours. Review layout in this page and " +
+		"colour in your own terminal.</p>\n</header>\n")
 
 	for _, sec := range f.sections(manifest, byName) {
 		if err := writeGroup(&b, dir, sec.Title, sec.Lede, sec.Notes, byName); err != nil {

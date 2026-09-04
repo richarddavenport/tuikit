@@ -92,6 +92,13 @@ figcaption > p { margin: 7px 0 0; color: var(--muted); max-width: 74ch; font-siz
    reason the ground is: a token can be redefined, and a webfont with a fallback
    for the glyphs it lacks gives box-drawing and braille different advance
    widths, which takes a frame apart. */
+.caveat {
+  margin: 10px 0 0; padding: 9px 12px;
+  border-left: 2px solid var(--accent);
+  background: var(--surface); color: var(--muted);
+  font-size: 13px; line-height: 1.5; max-width: 62ch;
+}
+.caveat strong { color: var(--ink); font-weight: 600; }
 .tuikit-frame {
   font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "DejaVu Sans Mono", monospace;
   font-size: 12.5px; line-height: 1.25;

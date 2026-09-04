@@ -200,3 +200,25 @@ func between(t *testing.T, s, open, close string) string {
 	}
 	return rest[:j]
 }
+
+// The page says its colours are not the reader's.
+//
+// Issue 52: it renders the sixteen as xterm's defaults, which is the only
+// answer a static page can give — and until it said so, it documented a
+// themeable tool in a palette nobody sees. A reviewer read "accent is bright
+// magenta" off a page like this; their own index 13 was dark mustard.
+func TestThePageSaysItsColoursAreNotYours(t *testing.T) {
+	page, err := Frames{Title: "pgctl"}.Page(capture(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, want := range []string{"xterm", "terminal"} {
+		if !strings.Contains(page, want) {
+			t.Errorf("the page does not mention %q, so a reader reviewing colour is reviewing a tool nobody sees", want)
+		}
+	}
+	if !strings.Contains(page, "caveat") {
+		t.Error("the caveat is not marked up, so it cannot be styled apart from the lede")
+	}
+}

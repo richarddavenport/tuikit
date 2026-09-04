@@ -4,14 +4,14 @@ tuikit gallery  every component, running                                        
 │ Components                    │ │ Keys                                                                                           │
 │ List                          │ │ Every binding, by screen. A footer says what acts on THIS; this says what exists.              │
 │ Pane                          │ │ ‹ by screen · as an overlay · too short · scrolled · one section ›                             │
-│ Tabs                          │ │ a tool with four bindings does not need headings                                               │
+│ Tabs                          │ │ Offset is how a reader reaches them; saying "more" without one is the least helpful state a h… │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │ Everywhere                                                                                     │
-│ StepList                      │ │ ?       these keys                                                                             │
-│ LogPane                       │ │ ctrl-k  run a command                                                                          │
-│ Spinner                       │ │ q       quit                                                                                   │
-│ Table                         │ │                                                                                                │
-│ Detail                        │ │                                                                                                │
+│ Confirm                       │ │ ↑ 6 above                                                                                      │
+│ StepList                      │ │ j/k     move                                                                                   │
+│ LogPane                       │ │ enter   expand a group                                                                         │
+│ Spinner                       │ │ g       pivot: group, type, location, tag                                                      │
+│ Table                         │ │ /       filter                                                                                 │
+│ Detail                        │ │ ↓ 4 more                                                                                       │
 │ Menu                          │ │                                                                                                │
 │ Toast                         │ │                                                                                                │
 │ Form                          │ │                                                                                                │

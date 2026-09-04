@@ -68,12 +68,7 @@ func (cf Confirm) Draw(c *Canvas, id ID) Rect {
 
 	// title, blank, body, blank, keys, and two of border.
 	h := len(body) + 6
-	r := Rect{
-		X: max(0, (bounds.W-w)/2),
-		Y: max(0, (bounds.H-h)/2),
-		W: w,
-		H: h,
-	}
+	r := Center(bounds, w, h)
 
 	title := cf.TitleStyle
 	if cf.Danger && cf.DangerStyle != nil {

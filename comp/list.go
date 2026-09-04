@@ -163,6 +163,24 @@ type Row struct {
 	// its headers a character out of line with its children.
 	Lead string
 
+	// Right is drawn hard against the row's right-hand edge, after Spans.
+	//
+	// [Bar] has done this since it was written and was not reachable from
+	// inside a list, so three call sites in boardctl did the arithmetic by hand
+	// — and it produced two bugs that a golden caught and a reader would not
+	// have: len(s) where Width(s) was meant, on a string holding a `,` and
+	// forgetting that Lead comes out of the same width, which pushed every lane
+	// count one column past the edge where it was silently not drawn (issue
+	// 53).
+	//
+	// Both are the same mistake: the row knows its width and the caller does
+	// not. So the row does it.
+	//
+	// Dropped rather than overlapped when there is not room for both, because a
+	// count written over the end of a name is two pieces of information and
+	// neither is readable.
+	Right []Segment
+
 	// LeadStyle draws Lead in the row's own colour, and keeps it there when the
 	// row is selected.
 	//
@@ -293,12 +311,14 @@ func (l *List) DrawFunc(c *Canvas, r Rect, n int, row func(i int) Row) {
 			}
 			x := body.X + c.Text(body.X, y, lead, leadStyle, id)
 			c.Text(x, y, text, style, id)
+			l.right(c, body, y, this, style, id)
 			continue
 		}
 		x := body.X + c.Text(body.X, y, lead, leadStyle, id)
 		for _, span := range this.Spans {
 			x += c.Text(x, y, span.Text, span.Style, id)
 		}
+		l.right(c, body, y, this, style, id)
 	}
 	l.status(c, r)
 }
@@ -311,6 +331,32 @@ func (l *List) fill(c *Canvas, r Rect, s *lipgloss.Style, id ID) {
 		return
 	}
 	c.Fill(r, " ", s, id)
+}
+
+// right draws Row.Right against the row's right edge.
+//
+// A selected row's Right takes the selection style like everything else: it is
+// part of the row rather than a mark on it, which is the distinction LeadStyle
+// exists to make on the other side.
+func (l *List) right(c *Canvas, body Rect, y int, row Row, style *lipgloss.Style, id ID) {
+	if len(row.Right) == 0 {
+		return
+	}
+	w := 0
+	for _, span := range row.Right {
+		w += Width(span.Text)
+	}
+	if w <= 0 || w > body.W {
+		return
+	}
+	x := body.Right() - w + 1
+	for _, span := range row.Right {
+		st := span.Style
+		if style != nil {
+			st = style
+		}
+		x += c.Text(x, y, span.Text, st, id)
+	}
 }
 
 // Overhead is how many rows of a band the list spends on itself rather than on
