@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                               24 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ Viewer                                                                                         │
+│ List                          │ │ A document you scroll, look through, and act on ranges of. Opens at the top, does not follow,… │
+│ Pane                          │ │ ‹ a diff · a range · syntax under the cursor · wider than the pane · scrolled sideways · no cur│
+│ Tabs                          │ │ k9s's YAML view and termshark's scrollabletext are both this — the arrows still scroll         │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │ 1  apiVersion: apps/v1                                                                         │
+│ StepList                      │ │ 2  kind: Deployment                                                                            │
+│ LogPane                       │ │ 3  metadata:                                                                                   │
+│ Spinner                       │ │ 4    name: api-gateway                                                                         │
+│ Table                         │ │ 5    namespace: estate                                                                         │
+│ Detail                        │ │ 6  spec:                                                                                       │
+│ Menu                          │ │ 7    replicas: 3                                                                               │
+│ Toast                         │ │ 8    template:                                                                                 │
+│ Form                          │ │ 9      spec:                                                                                   │
+│ Split                         │ │ 10       containers:                                                                           │
+│ Layout                        │ │ 11         - name: api-gateway                                                                 │
+│ Meter                         │ │ 12           image: registry.example.com/estate/api-gateway:2026.9.1                           │
+│ Input                         │ │                                                                                                │
+│ Waiting                       │ │                                                                                                │
+│ Breadcrumb                    │ │                                                                                                │
+│ Scrollbar                     │ │                                                                                                │
+│ Keys                          │ │                                                                                                │
+│ Palette                       │ │                                                                                                │
+│ Rule                          │ │                                                                                                │
+│ Viewer                        │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                         12/12  │
+│                               │ │ keys     ↑/↓ move the cursor · shift+↑/↓ extend a range · ←/→ scroll sideways · g go to a line │
+│                               │ │ mouse    wheel scroll without moving the cursor                                                │
+│                               │ │ roles    SelectionBG · Accent · Muted                                                          │
+│                               │ │ from     seven of the fourteen tools surveyed each built this and none could get it from thei… │
+│                         24/24 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

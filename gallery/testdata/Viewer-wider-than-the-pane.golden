@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                               24 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ Viewer                                                                                         │
+│ List                          │ │ A document you scroll, look through, and act on ranges of. Opens at the top, does not follow,… │
+│ Pane                          │ │ ‹ a diff · a range · syntax under the cursor · wider than the pane · scrolled sideways · no cur│
+│ Tabs                          │ │ a document is not as wide as its pane; truncating it means the content cannot be read at all   │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │ {"name":"api-gateway","image":"registry.example.com/estate/api-gateway:2026.9.1","replicas":3} │
+│ StepList                      │ │ {"name":"worker","image":"registry.example.com/estate/worker:2026.9.1","replicas":12}          │
+│ LogPane                       │ │ {"name":"scheduler","image":"registry.example.com/estate/scheduler:2026.8.7","replicas":1}     │
+│ Spinner                       │ │                                                                                                │
+│ Table                         │ │                                                                                                │
+│ Detail                        │ │                                                                                                │
+│ Menu                          │ │                                                                                                │
+│ Toast                         │ │                                                                                                │
+│ Form                          │ │                                                                                                │
+│ Split                         │ │                                                                                                │
+│ Layout                        │ │                                                                                                │
+│ Meter                         │ │                                                                                                │
+│ Input                         │ │                                                                                                │
+│ Waiting                       │ │                                                                                                │
+│ Breadcrumb                    │ │                                                                                                │
+│ Scrollbar                     │ │                                                                                                │
+│ Keys                          │ │                                                                                                │
+│ Palette                       │ │                                                                                                │
+│ Rule                          │ │                                                                                                │
+│ Viewer                        │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                           3/3  │
+│                               │ │ keys     ↑/↓ move the cursor · shift+↑/↓ extend a range · ←/→ scroll sideways · g go to a line │
+│                               │ │ mouse    wheel scroll without moving the cursor                                                │
+│                               │ │ roles    SelectionBG · Accent · Muted                                                          │
+│                               │ │ from     seven of the fourteen tools surveyed each built this and none could get it from thei… │
+│                         24/24 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

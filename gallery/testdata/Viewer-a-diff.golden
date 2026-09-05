@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                               24 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ Viewer                                                                                         │
+│ List                          │ │ A document you scroll, look through, and act on ranges of. Opens at the top, does not follow,… │
+│ Pane                          │ │ ‹ a diff · a range · syntax under the cursor · wider than the pane · scrolled sideways · no cur│
+│ Tabs                          │ │ the cursor is a background and the line keeps its own colour — a List would repaint the whole… │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │ 1 @@ -12,7 +12,9 @@ func (l *List) Extend(by int) {                                            │
+│ StepList                      │ │ 2  func (l *List) Extend(by int) {                                                             │
+│ LogPane                       │ │ 3 -   if !l.anchored {                                                                         │
+│ Spinner                       │ │ 4 -       l.anchor, l.anchored = l.cursor, true                                                │
+│ Table                         │ │ 5 -   }                                                                                        │
+│ Detail                        │ │ 6 +   l.sel.start(l.cursor)                                                                    │
+│ Menu                          │ │ 7     l.pending += by                                                                          │
+│ Toast                         │ │ 8     l.reveal = true                                                                          │
+│ Form                          │ │ 9  }                                                                                           │
+│ Split                         │ │                                                                                                │
+│ Layout                        │ │                                                                                                │
+│ Meter                         │ │                                                                                                │
+│ Input                         │ │                                                                                                │
+│ Waiting                       │ │                                                                                                │
+│ Breadcrumb                    │ │                                                                                                │
+│ Scrollbar                     │ │                                                                                                │
+│ Keys                          │ │                                                                                                │
+│ Palette                       │ │                                                                                                │
+│ Rule                          │ │                                                                                                │
+│ Viewer                        │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                           9/9  │
+│                               │ │ keys     ↑/↓ move the cursor · shift+↑/↓ extend a range · ←/→ scroll sideways · g go to a line │
+│                               │ │ mouse    wheel scroll without moving the cursor                                                │
+│                               │ │ roles    SelectionBG · Accent · Muted                                                          │
+│                               │ │ from     seven of the fourteen tools surveyed each built this and none could get it from thei… │
+│                         24/24 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

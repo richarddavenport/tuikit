@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               23 components
+tuikit gallery  every component, running                                                                               24 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Input                                                                                          │
@@ -25,13 +25,13 @@ tuikit gallery  every component, running                                        
 │ Keys                          │ │                                                                                                │
 │ Palette                       │ │                                                                                                │
 │ Rule                          │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Viewer                        │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │ keys     ←→ move the caret · ^a ^e start, end · ^w delete the word before it · ^u delete back… │
 │                               │ │ roles    Accent · Muted · SelectionFG · SelectionBG                                            │
 │                               │ │ glyphs   …                                                                                     │
 │                               │ │ from     democtl and azctl both fake it with a trailing underscore; the swarmctl palette cann… │
-│                         23/23 │ │                                                                                                │
+│                         24/24 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

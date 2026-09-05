@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               23 components
+tuikit gallery  every component, running                                                                               24 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Detail                                                                                         │
@@ -25,13 +25,13 @@ tuikit gallery  every component, running                                        
 │ Keys                          │ │                                                                                                │
 │ Palette                       │ │                                                                                                │
 │ Rule                          │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Viewer                        │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │ roles    Accent · Muted · Danger                                                               │
 │                               │ │ from     democtl field(), azctl fields() — both carried y from call to call                    │
-│                         23/23 │ │                                                                                                │
+│                         24/24 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

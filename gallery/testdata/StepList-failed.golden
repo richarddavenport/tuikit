@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               23 components
+tuikit gallery  every component, running                                                                               24 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ StepList                                                                                       │
@@ -25,13 +25,13 @@ tuikit gallery  every component, running                                        
 │ Keys                          │ │                                                                                                │
 │ Palette                       │ │                                                                                                │
 │ Rule                          │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Viewer                        │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │ keys     r run again · esc back                                                                │
 │                               │ │ roles    Success · Danger · Pending · Muted                                                    │
 │                               │ │ glyphs   ✓ ✗ ● • →                                                                             │
 │                               │ │ from     swarmctl renderdeploy.go, pgctl actionrun.go, azctl runner.go                         │
-│                         23/23 │ │                                                                                                │
+│                         24/24 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

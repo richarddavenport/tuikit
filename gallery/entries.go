@@ -48,6 +48,7 @@ func (m *Model) Entries() []Entry {
 		m.keysEntry(s),
 		m.paletteEntry(s),
 		m.ruleEntry(s),
+		m.viewerEntry(s),
 	}
 }
 

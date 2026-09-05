@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               23 components
+tuikit gallery  every component, running                                                                               24 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Rule                                                                                           │
@@ -25,13 +25,13 @@ tuikit gallery  every component, running                                        
 │ Keys                          │ │                                                                                                │
 │ Palette                       │ │                                                                                                │
 │ Rule                          │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Viewer                        │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │ roles    Border · Accent · Muted                                                               │
 │                               │ │ glyphs   ─ ━                                                                                   │
 │                               │ │ from     four codebases drew it by hand and five of the seven wrote a literal ─                │
-│                         23/23 │ │                                                                                                │
+│                         24/24 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit
