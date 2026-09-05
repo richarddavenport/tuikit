@@ -8,15 +8,15 @@ import (
 // A small filesystem, the shape lazygit's filetree and yazi both flatten to.
 func nodes() []Node {
 	return []Node{
-		{0, "src"},          // 0
-		{1, "src/app"},      // 1
-		{2, ""},             // 2  src/app/main.go
-		{2, ""},             // 3  src/app/run.go
-		{1, "src/lib"},      // 4
-		{2, ""},             // 5  src/lib/util.go
-		{0, "docs"},         // 6
-		{1, ""},             // 7  docs/readme.md
-		{0, ""},             // 8  go.mod
+		{0, "src"},     // 0
+		{1, "src/app"}, // 1
+		{2, ""},        // 2  src/app/main.go
+		{2, ""},        // 3  src/app/run.go
+		{1, "src/lib"}, // 4
+		{2, ""},        // 5  src/lib/util.go
+		{0, "docs"},    // 6
+		{1, ""},        // 7  docs/readme.md
+		{0, ""},        // 8  go.mod
 	}
 }
 
