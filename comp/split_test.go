@@ -224,3 +224,65 @@ func TestMoveBeforeTheFirstFrameDoesNothing(t *testing.T) {
 		t.Errorf("At = %d after moving with no frame, want 0", s.At)
 	}
 }
+
+// Splits nest, so three panes with two draggable dividers is a composition
+// rather than a component.
+//
+// Each Split carries its own position, so the dividers move independently. The
+// thing to know when nesting: an inner split's rect comes out of the outer
+// one, so after the outer moves the inner must be handed the NEW rect. A rect
+// captured before the outer moved describes where the inner used to be.
+func TestSplitsNest(t *testing.T) {
+	full := Rect{X: 0, Y: 0, W: 60, H: 10}
+	outer := &Split{Name: "outer", Ratio: [2]int{1, 2}, Min: 8}
+	inner := &Split{Name: "inner", Vertical: true, Min: 3}
+
+	c := NewCanvas(60, 10)
+	left, right := outer.Draw(c, full)
+	top, bottom := inner.Draw(c, right)
+
+	for name, r := range map[string]Rect{"left": left, "top": top, "bottom": bottom} {
+		if r.Empty() {
+			t.Errorf("%s pane is empty", name)
+		}
+	}
+	if _, ok := c.Region(Region("outer")); !ok {
+		t.Error("the outer divider is not clickable")
+	}
+	if _, ok := c.Region(Region("inner")); !ok {
+		t.Error("the inner divider is not clickable")
+	}
+	if top.Y+top.H > bottom.Y {
+		t.Errorf("the inner panes overlap: top %v, bottom %v", top, bottom)
+	}
+
+	// Move each, re-deriving the inner rect from the outer as a caller must:
+	// the inner split lives inside the outer's second pane, so a rect captured
+	// before the outer moved describes where the inner used to be.
+	outer.Move(c, 6, full)
+	c2 := NewCanvas(60, 10)
+	left2, right2 := outer.Draw(c2, full)
+	inner.Move(c2, 1, right2)
+
+	c3 := NewCanvas(60, 10)
+	_, right3 := outer.Draw(c3, full)
+	top3, bottom3 := inner.Draw(c3, right3)
+
+	if left2.W != left.W+6 {
+		t.Errorf("the outer divider moved to %d, want %d", left2.W, left.W+6)
+	}
+	if top3.H != top.H+1 {
+		t.Errorf("the inner divider moved to %d, want %d", top3.H, top.H+1)
+	}
+	// And the inner Min still holds inside the nested rect, which is the thing
+	// that would quietly stop being true if a rect were threaded through wrong:
+	// asked to move further than Min allows, it stops rather than obeying.
+	inner.Move(c3, 20, right3)
+	c4 := NewCanvas(60, 10)
+	_, right4 := outer.Draw(c4, full)
+	_, bottom4 := inner.Draw(c4, right4)
+	if bottom4.H < 3 {
+		t.Errorf("the bottom pane was dragged to %d rows, under its Min of 3", bottom4.H)
+	}
+	_ = bottom3
+}
