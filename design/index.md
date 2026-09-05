@@ -18,9 +18,10 @@ one you want: what each package can do, and what it cannot.
 - [research/other-tuis.md](research/other-tuis.md) — everything outside Go and
   Rust, marked by how much of it has been checked. Read it before writing
   "nobody does X"; two claims have already failed there
-- [research/rebuilds/](research/rebuilds/) — could tuikit rebuild the TUIs
-  people actually use? One file per tool, read from the source, listing what is
-  missing. This is where a component earns its way in
+- **[the rebuilds repository](https://github.com/richarddavenport/tuikit-rebuilds)** — could tuikit rebuild the TUIs people
+  actually use? One study per tool, read from the source, plus working code that
+  draws the interface. It lives outside this repo because the studies belong
+  beside the programs they justify. This is where a component earns its way in
 
 The design system bundle is generated rather than written: `make designsystem`
 renders `theme` as HTML. There is no hand-maintained palette page here, and there

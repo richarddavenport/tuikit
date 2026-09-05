@@ -591,7 +591,7 @@ extracted rather than designed. The cell buffer is still a means.
 
 What changes is the SAMPLE. "Two of the four tools" was a rule about not
 generalising from one example, and four private tools were never the only
-examples available. `design/research/rebuilds/` reads the tools people actually
+examples available. The [rebuilds repository](https://github.com/richarddavenport/tuikit-rebuilds) reads the tools people actually
 use and asks what each would need. Six of the fourteen surveyed need a
 collapsible tree. That is the evidence the rule always asked for, and it was
 sitting in public the whole time.
@@ -1613,7 +1613,7 @@ than it saves.
 
 ## 44. The drawing is not scriptable, and yazi is why that is a bet
 
-Found by the yazi rebuild (`design/research/rebuilds/yazi.md`) rather than
+Found by the yazi rebuild (in the [rebuilds repository](https://github.com/richarddavenport/tuikit-rebuilds)) rather than
 reasoned about here, which is why it is worth writing down: the strongest
 evidence in the field points the other way.
 

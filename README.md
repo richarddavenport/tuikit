@@ -14,7 +14,7 @@ component's doc comment names those tools and says what their versions
 disagreed about.
 
 That could still be a story we tell ourselves, so it is checked against other
-people's code. `design/research/rebuilds/` reads the source of ten widely used
+people's code. The [rebuilds repository](https://github.com/richarddavenport/tuikit-rebuilds) reads the source of ten widely used
 TUIs, including lazygit, yazi, k9s, bottom and gitui. For each feature it asks
 one question: do we have it, are we missing it, or does it belong to the tool?
 Every gap is either filled or written down with its evidence. Three claims we
@@ -115,7 +115,7 @@ not planned. `Input` is one line; there is no text area yet.
 discards the result of a read the reader walked away from, which is the whole
 async problem a tool like this has.
 
-**Coverage is honest, not complete.** `design/research/rebuilds/` works out
+**Coverage is honest, not complete.** The [rebuilds repository](https://github.com/richarddavenport/tuikit-rebuilds) works out
 whether tuikit could rebuild the TUIs people actually use, one at a time, from
 their source. lazygit needs three components that do not exist yet. Those files
 are the current list of holes, kept public because a framework claiming to cover

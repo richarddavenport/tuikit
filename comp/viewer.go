@@ -11,7 +11,7 @@ import (
 //
 // # Where this came from
 //
-// Seven of the fourteen tools surveyed in design/research/rebuilds each built
+// Seven of the fourteen tools surveyed in the rebuilds repository each built
 // this, and none of them could get it from their toolkit: lazygit's main panel,
 // gitui's diff.rs and syntax_text.rs, k9s's live_view.go, termshark's
 // scrollabletext and fileviewer, dive's layer detail, gh-dash's PR body — and

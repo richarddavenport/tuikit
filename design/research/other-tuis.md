@@ -149,6 +149,6 @@ not a measurement of any of them. Both rewritten to describe the interface
 without claiming to explain the popularity.
 
 **"gcpeasy's 2,972-line TUI is what a tool pays for not using tuikit."** Written
-in the first draft of `rebuilds/gcpeasy.md`. Measured afterwards: 624 of those
+in the first draft of the gcpeasy study. Measured afterwards: 624 of those
 lines are drawing, and 1,715 are the program itself. `comp` would replace the
 624. The larger number was true and the implication was not.
