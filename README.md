@@ -152,19 +152,22 @@ would reverse it.
 
 ## The parts
 
+Each links to a page on what it can do, what its API is, and what it will not
+do. [`docs/`](docs/) is the index.
+
 | | |
 | --- | --- |
-| `comp` | the cell canvas and the components |
-| `app` | the shell: key routing, mouse, screen stack, async generations |
-| `spec` | one command declaration, and the surfaces it produces |
-| `theme` | nine colour roles, a closed glyph set, the box characters |
-| `guard` | the tests that hold all of the above closed |
-| `harness` | drive a model, capture frames, compare goldens |
-| `term` | what this terminal can do — graphics, cell size, palette |
-| `paint` | gradients, rounded panels and bars, as images |
-| `fuzzy` | ranked matching that reports *where* it matched |
-| `docgen` | frames and the design system, as HTML or Markdown |
-| `scaffold` | `tuikit new` |
+| [`comp`](docs/comp.md) | the cell canvas and the components |
+| [`app`](docs/app.md) | the shell: key routing, mouse, screen stack, async generations |
+| [`spec`](docs/spec.md) | one command declaration, and the surfaces it produces |
+| [`theme`](docs/theme.md) | nine colour roles, a closed glyph set, the box characters |
+| [`guard`](docs/guard.md) | the tests that hold all of the above closed |
+| [`harness`](docs/harness.md) | drive a model, capture frames, compare goldens |
+| [`term`](docs/term.md) | what this terminal can do — graphics, cell size, palette |
+| [`paint`](docs/paint.md) | gradients, rounded panels and bars, as images |
+| [`fuzzy`](docs/fuzzy.md) | ranked matching that reports *where* it matched |
+| [`docgen`](docs/docgen.md) | frames and the design system, as HTML or Markdown |
+| [`scaffold`](docs/scaffold.md) | `tuikit new` |
 
 ## Commands
 
@@ -179,6 +182,9 @@ tuikit news                what changed since a tool last looked
 ```
 
 ## Reading further
+
+[`docs/`](docs/) is the user guide: one page per package, what it can do and
+what it cannot. [`docs/tooling.md`](docs/tooling.md) covers the commands.
 
 `design/decisions.md` is the numbered record of every choice and the reasoning
 behind it, including the things that were refused. `design/architecture.md` is

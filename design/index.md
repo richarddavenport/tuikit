@@ -1,7 +1,8 @@
 # Design notes
 
 Rationale, rejected options and plans — for people changing tuikit, not for
-people using it.
+people using it. If you are building a tool with it, [`docs/`](../docs/) is the
+one you want: what each package can do, and what it cannot.
 
 - [decisions.md](decisions.md) — dated record of choices, including what was
   rejected and why
