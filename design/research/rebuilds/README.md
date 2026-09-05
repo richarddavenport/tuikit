@@ -19,7 +19,22 @@ private tools, and it is available now.
 the tool. It is a coverage test: read the real source, list what it draws, and
 mark each one *have*, *hole*, or *theirs*.
 
-**"Theirs" is the important column.** Most of what a good TUI does is its own
+**"Theirs" was doing three jobs and now does one.** Everything a tool built for
+itself used to land under one heading, which read as *closed* — and only one of
+the three reasons actually is. They are split because they have different
+half-lives:
+
+- **Theirs** — the behaviour only means something in this subject. A commit
+  graph, a port forward, a packet dissector. **These never move.**
+- **Outside the line** — general behaviour we refuse on purpose, named in
+  decision 27 rather than discovered per rebuild. **These move only if
+  decision 27 changes.**
+- **Our floor** — general behaviour we support less of than the tool does, by
+  choice rather than principle. **These move as soon as somebody asks.** A
+  floor is a budget, not a boundary, and filing one under "theirs" hides a
+  shopping list.
+
+**"Theirs" is still the important column.** Most of what a good TUI does is its own
 domain, and a framework that tried to supply it would be wrong. A commit graph
 belongs to a git client. The test is not "could tuikit supply everything" — it
 is "is what tuikit supplies the right set, and is anything missing that several

@@ -130,14 +130,19 @@ tool would have to decide to do.
   the one substrate in the survey that ships a tree, and it is why k9s's is
   2.8 kB where lazygit's is eleven files.
 
-## Theirs, and rightly
+## Theirs — the domain, not the shape
 
 - **`view/pf.go`, `pf_extender.go`, `exec.go`, `scale_extender.go`,
   `image_extender.go`** — port forwards, shelling into a container, scaling a
   deployment. Kubernetes, all of it.
 - **`internal/dao/`, `client/`, `watch/`, `vul/`** — the API layer.
-- **`ui/prompt.go`'s `FishBuff`** — command history with fish-style suggestion.
-  Adjacent to `Palette`, but the history is the tool's.
+## Our floor
+
+- **`ui/prompt.go`'s `FishBuff`** — command history with a fish-style inline
+  suggestion of the rest of the line. The *contents* of the history are the
+  tool's; the mechanism is not, and `Palette` has none. Nobody has asked, so it
+  is a floor rather than a hole — but it is the kind of thing that would be
+  filed as "theirs" and quietly never revisited.
 
 ## The verdict
 

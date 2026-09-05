@@ -71,18 +71,6 @@ range". Most of it is the snapping and the survival across re-render.
 from the top, wraps or does not, highlights syntax, and has a selection over
 it. Five of the fourteen tools need this shape.
 
-## Theirs, and rightly
-
-- **`pkg/gui/presentation/graph/`** (10 kB) — the commit graph, the `│ ├ ─ ╯`
-  lines beside the log. A framework supplying this would be a framework with an
-  opinion about git.
-- **`pkg/gui/presentation/`** — sixteen files turning branches, commits,
-  stashes and submodules into rows. This is exactly the layer tuikit says
-  belongs to the tool, and lazygit agrees by putting it in its own package.
-- **`pkg/gui/mergeconflicts/`** — finding and rendering conflict markers.
-- **`pkg/gui/context/`, `controllers/`** — its own routing, which `app.Keys`
-  and `app.Stack` cover differently rather than better.
-
 ## What the first pass got wrong
 
 Checked against the source on 2026-09-04, after two of the holes were built.
@@ -147,7 +135,7 @@ The boundary is the thing lazygit itself does not cross. It stages hunks; it
 does not edit them. **Showing a buffer and acting on ranges of it is in; being
 the place you type the buffer is out.**
 
-## Theirs, and rightly
+## Theirs — the domain, not the shape
 
 - **`pkg/gui/presentation/graph/`** (10 kB) — the commit graph, the `│ ├ ─ ╯`
   lines beside the log. A framework supplying this would be a framework with an

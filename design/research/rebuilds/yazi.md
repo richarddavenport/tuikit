@@ -107,19 +107,39 @@ popup's position, filtering and key capture itself.
 
 Smaller than it looks, and worth doing only when a second tool asks.
 
-## Theirs, and rightly
+## Theirs — the domain, not the shape
+
+- **`yazi-scheduler/`, `yazi-watcher/`, `yazi-vfs/`, `yazi-dds/`** — the actual
+  file manager: the work queue, the inotify layer, the virtual filesystem, the
+  data-distribution bus. Exactly what a framework must not have an opinion
+  about.
+
+## Outside the line
 
 - **`yazi-widgets/src/input/`** — 30-odd files: vi modes, an undo stack
   (`snaps.rs`, `snap.rs`), motion parsing (`parser/move.rs`, `forward.rs`,
-  `backward.rs`), `kill.rs`, `casefy.rs`. This is a text editor in a one-line
-  box, and it is over the line decision 27 draws.
-- **`yazi-adapter/src/drivers/`** — six image backends: `kgp.rs`, `kgp_old.rs`,
-  `iip.rs`, `sixel.rs`, `chafa.rs`, `ueberzug.rs`. tuikit has two (`term.Sixel`,
-  `term.Kitty`) and no fallback for a terminal with neither. Not a hole; a known
-  and deliberate floor.
-- **`yazi-scheduler/`, `yazi-watcher/`, `yazi-vfs/`, `yazi-dds/`** — the actual
-  file manager. Exactly what a framework must not have an opinion about.
-- **`yazi-plugin/`** — the Lua runtime, per above.
+  `backward.rs`), `kill.rs`, `casefy.rs`.
+
+  Note that **none of this is a file-manager idea.** A text input is pure
+  shape, and every tool in the survey has one. It is excluded because hosting
+  a text buffer is named out in decision 27 — a line drawn on purpose, not a
+  fact about yazi's subject. If that line ever moves, this is what moves with
+  it.
+
+- **`yazi-plugin/`** — the Lua runtime. Not "theirs" at all: a bet considered
+  and declined, with the reasoning and the reopening conditions in decision 44.
+  Listed here only so a reader of this file does not go looking for it under
+  the domain items.
+
+## Our floor
+
+- **`yazi-adapter/src/drivers/`** — six image backends: `kgp.rs` (7.6 kB),
+  `kgp_old.rs`, `iip.rs` (iTerm), `sixel.rs`, `chafa.rs`, `ueberzug.rs`.
+
+  tuikit has two — `term.Sixel` and `term.Kitty` — and **no fallback at all**
+  for a terminal that supports neither, where yazi degrades to chafa's
+  half-blocks. That is a budget, not a boundary: nobody has asked for a third,
+  and the day somebody does the answer is a driver rather than a discussion.
 
 ## What this rebuild changed elsewhere
 
