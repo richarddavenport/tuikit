@@ -9,9 +9,12 @@ paths and sizes quoted so the claims can be checked.
 
 ## The shape
 
-Miller columns — parent, current, preview — with a header, a status line, and a
-stack of overlays: an input, a completion popup, a picker, a confirm, a help
-sheet, a task list, a metadata inspector, and a which-key pane.
+Miller columns: parent, current, preview. A header above them and a status line
+below.
+
+On top of that sits a stack of overlays. An input, a completion popup, a picker,
+a confirm, a help sheet, a task list, a metadata inspector, and a which-key
+pane.
 
 **It is not a tree.** This matters, because the first pass of the lazygit
 rebuild claimed yazi had one. Searching the whole source for `tree` or
@@ -27,11 +30,12 @@ let root = LUA.globals().raw_get::<Table>("Root")?.call_method::<Table>("new", a
 root.call_method("reflow", ())
 ```
 
-The whole main surface — `root.lua`, `current.lua`, `parent.lua`,
-`preview.lua`, `header.lua`, `status.lua`, `linemode.lua`, `marker.lua`,
-`rail.lua`, `tabs.lua` — lives in `yazi-plugin/preset/components/` as Lua a
-user can override. Rust keeps the overlays and the engine; everything you look
-at is a script.
+The whole main surface lives in `yazi-plugin/preset/components/` as Lua a user
+can override. That is `root.lua`, `current.lua`, `parent.lua`, `preview.lua`,
+`header.lua`, `status.lua`, `linemode.lua`, `marker.lua`, `rail.lua` and
+`tabs.lua`.
+
+Rust keeps the overlays and the engine. Everything you look at is a script.
 
 That is a second, serious answer to "get out of the developer's way", and it is
 not tuikit's. tuikit's answer is headless components with injected styles: the
@@ -40,9 +44,11 @@ itself is replaceable at runtime, and the cost is an embedded interpreter, a
 binding layer (`yazi-binding/`), and errors that surface as
 `Failed to redraw the 'Root' component`.
 
-**No change proposed.** Recorded because "we get out of your way" is a claim
-with a competitor, and the honest version of tuikit's is narrower: *out of your
-way on style and data, opinionated about behaviour.*
+**No change proposed.** It is recorded because "we get out of your way" turns
+out to be a claim with a competitor.
+
+The honest version of ours is narrower: *out of your way on style and data,
+opinionated about behaviour.*
 
 ## What tuikit already supplies
 
@@ -68,18 +74,20 @@ way on style and data, opinionated about behaviour.*
 It is an `IndexMap` keyed by URL with a `parents` map beside it, and it
 survives navigating away from a directory and back.
 
-`yazi-core/src/tab/visual.rs` is the other half — the transient range you drag
-out — and it exists only to be committed into `Selected`.
+`yazi-core/src/tab/visual.rs` is the other half. It is the transient range you
+drag out, and it exists only to be committed into `Selected`.
 
 tuikit has the range and not the set. `List.Range` is the gesture; nothing
 holds the answer afterwards, and nothing holds a selection made in one screen
 and read in another. This is pgctl's issue 49 arriving from a second direction,
 which is the extraction rule met.
 
-The shape is already decided by `Tree`: **keyed by the tool's own identity, not
-by index.** yazi keys by URL for exactly the reason `Tree` keys by string — a
-filter or a refresh moves every index, and a selection that moved with them
-would act on the wrong files without erroring.
+`Tree` has already decided the shape: **key it by the tool's own identity, not
+by index.**
+
+yazi keys by URL for the same reason `Tree` keys by a string. A filter or a
+refresh moves every index. A selection that moved with them would act on the
+wrong files, and it would not error while doing it.
 
 ### 2. Key sequences
 
@@ -87,10 +95,9 @@ would act on the wrong files without erroring.
 render the which-key pane: press a prefix, see the candidate continuations, and
 `sorter.rs` orders them.
 
-`app.Keys` routes **one** keystroke through capture → screen → global. There is
-no notion of a pending prefix, so `g` then `g` cannot be expressed at all — and
-a tool that wants it has to become the capture and reimplement the routing
-underneath.
+`app.Keys` routes **one** keystroke through capture → screen → global. There is no notion of a pending prefix, so `g` then `g` cannot be expressed at
+all. A tool that wants it has to install itself as the capture and reimplement
+the routing underneath.
 
 The which-key *pane* is a `Menu` and needs nothing. The pending-prefix state is
 the hole, and it is `app`'s rather than `comp`'s.
@@ -101,9 +108,9 @@ comes from; check one before building it.
 ### 3. Completion over an input
 
 `yazi-fm/src/cmp/cmp.rs` is a popup anchored to the cursor inside the input,
-filtered as you type. tuikit has `Input`, `fuzzy` and `Highlight` — every
-ingredient — and no component that puts them together, so each tool wires the
-popup's position, filtering and key capture itself.
+filtered as you type. tuikit has every ingredient: `Input`, `fuzzy` and `Highlight`. What it does not
+have is a component that puts them together, so each tool wires the popup's
+position, its filtering and its key capture itself.
 
 Smaller than it looks, and worth doing only when a second tool asks.
 

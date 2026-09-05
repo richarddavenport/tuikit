@@ -177,11 +177,21 @@ does X" checkable before they are made. This one needed narrowing.
 
 ## The verdict
 
-**Could tuikit rebuild gcpeasy today? Everything except the PTY pane, and the
-78 kB would not survive it.**
+**Could tuikit rebuild gcpeasy today?** Yes, apart from the interactive PTY
+pane. That pane is a small terminal emulator, and decision 27 says we do not
+host one.
 
-The rest of the survey asks whether `comp` is complete. This one asks the other
-question — what a tool on our own substrate pays for not having it — and answers
-it in a single number: 2,972 lines in one file, 54% of the program, defended by
-four tests for properties a cell grid gives free, with its central interaction
-implemented twice because the engine prints.
+Most of this survey asks one question: is `comp` complete? This rebuild asks the
+opposite question. What does a tool pay for building on our substrate without
+our components?
+
+gcpeasy answers it four times over.
+
+1. **The TUI is 2,972 lines in one file.** That is 54% of the whole program.
+2. **Four of its tests would not exist.** They check that two rendered strings
+   have compatible shapes. On a cell grid those failures cannot happen.
+3. **Its central interaction is implemented twice.** The engine prompts on
+   stdin, so the TUI cannot call it and had to write its own.
+4. **It has no mouse.** Not because the author did not want one. Resolving a
+   click against hand-tracked rectangles is work, and owner IDs are what make
+   it stop being work.

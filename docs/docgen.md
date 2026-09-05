@@ -18,10 +18,11 @@ docgen.Frames{
 }.Markdown(dir, out)
 ```
 
-Reads a capture directory's `.ansi` files and its manifest and produces an HTML
-page, or Markdown with an SVG per frame — which is what you want in a README or
-a pull request, because it renders on GitHub without a screenshot to keep in
-sync.
+Reads a capture directory's `.ansi` files and its manifest. Produces either an
+HTML page or Markdown with one SVG per frame.
+
+Markdown is usually what you want for a README or a pull request. It renders on
+GitHub, and there is no screenshot to keep in sync.
 
 **A frame not named by any group is appended rather than dropped.** That is the
 failure mode of a hand-maintained list: a new screen silently vanishes from the

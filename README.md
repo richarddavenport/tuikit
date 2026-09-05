@@ -9,19 +9,22 @@ API client, a deploy tool.
 Three things here that a widget library does not give you:
 
 **Nothing is invented.** Every one of the 24 components was pulled out of tools
-that had already written it, twice, differently — and each carries the argument
-in its doc comment. To check that against the world rather than against
-ourselves, `design/research/rebuilds/` reads the source of nine of the most used
-TUIs there are — lazygit, yazi, k9s, bottom, gitui, termshark, dive, fx,
-gh-dash — and asks of each feature: *have it, missing it, or theirs?* Every gap
-is either filled or written down with its evidence. Three claims we had made
-turned out to be false and are recorded as such.
+that had already written it. Usually two tools, and usually differently. Each
+component's doc comment names those tools and says what their versions
+disagreed about.
+
+That could still be a story we tell ourselves, so it is checked against other
+people's code. `design/research/rebuilds/` reads the source of ten widely used
+TUIs, including lazygit, yazi, k9s, bottom and gitui. For each feature it asks
+one question: do we have it, are we missing it, or does it belong to the tool?
+Every gap is either filled or written down with its evidence. Three claims we
+had made turned out to be false, and those are recorded too.
 
 **The interface cannot lie about itself.** Nine guards read your own source and
-fail the build: a key advertised in the help that no handler takes, a screen
-nothing can reach, a colour outside the palette, a box-drawing character typed
-by hand instead of taken from the theme. These are ordinary Go tests you call
-from your own package.
+fail the build. They catch a key advertised in the help that no handler takes.
+A screen nothing can reach. A colour outside the palette. A box-drawing
+character typed by hand instead of taken from the theme. These are ordinary Go
+tests, and you call them from your own package.
 
 **One declaration, four surfaces.** Describe a command once and get the CLI, the
 TUI screen, the context menu and a machine-readable manifest from it. `comp` and
@@ -76,11 +79,16 @@ one axis; `comp.Split` gives two of them a divider you can drag, with a `Min` so
 neither can be dragged to nothing. Splits nest, so three panes with two
 independent dividers is a composition rather than a component.
 
-**Guards that fail the build.** A colour outside the palette, a character
-outside the glyph set, chrome the glyph set cannot print, an engine that
-imported a terminal library, a key binding with no help entry, a reserved key
-bound to the wrong meaning, a component drawing outside its rect — each is a
-test failure rather than a review comment.
+**Guards that fail the build.** Each of these is a test failure rather than a
+review comment:
+
+- a colour outside the palette
+- a character outside the glyph set
+- chrome the glyph set cannot print
+- an engine that imported a terminal library
+- a key binding with no help entry
+- a reserved key bound to the wrong meaning
+- a component drawing outside its rect
 
 **Screens you can look at without a terminal.** `harness` renders any screen to
 a file. `tuikit frames` turns a captured run into an HTML page or into Markdown

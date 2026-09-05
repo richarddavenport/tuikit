@@ -7,10 +7,12 @@ Read from a shallow clone on 2026-09-04.
 
 ## Why this one matters more than its star count
 
-It is the closest tool in the survey to tuikit's own substrate — bubbletea and
-lipgloss, same as the four private tools — and it is a dashboard of remote
-state you act on, which is decision 27's sentence almost word for word. If
-anything in this field should need nothing from us, it is this.
+It is the closest tool in the survey to tuikit's own substrate. Bubble Tea and
+lipgloss, the same as the four private tools.
+
+It is also a dashboard of remote state you act on, which is decision 27's
+sentence almost word for word. If anything in this field should need nothing
+from us, it is this.
 
 ## What tuikit already supplies
 

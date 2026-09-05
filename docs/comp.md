@@ -68,17 +68,28 @@ Twenty-four. Run `tuikit gallery` to use every one in every state it has, or
 | `LogPane` | tails a stream. Following is a place, not a mode: scroll up to detach, scroll back to re-attach |
 | `Viewer` | a document. Opens at the **top**, scrolls sideways, and puts the cursor style *under* the line's spans so a diff keeps its syntax colours |
 
-`List` can do: grouped rows (`Row.Skip` for headings the cursor passes over), a
-lead glyph that keeps its own colour under the selection (`Row.LeadStyle`), a
-right-aligned tail (`Row.Right`), multi-styled rows (`Row.Spans`), a range
-selection (`Extend`, `Range`, `ClearRange`), lazy rows (`DrawFunc` asks only for
-what is visible, so a million rows cost a frame the size of the pane), and
-`NoStatus` to give the counter row back.
+`List` can do:
 
-`Viewer` can do: line numbers whose gutter width comes from the whole document,
-tab expansion to the next stop, `NoCursor` for a document with nothing selected,
-`Goto` for a search hit or a `:` line number, `ScrollX` that cuts inside a span
-rather than on its boundary, and the same lazy `DrawFunc`.
+- **grouped rows.** `Row.Skip` marks a heading the cursor passes over.
+- **a lead glyph that survives the selection.** `Row.LeadStyle` keeps a status
+  colour readable on the row you are pointing at.
+- **a right-aligned tail.** `Row.Right`.
+- **rows in more than one colour.** `Row.Spans`.
+- **a range selection.** `Extend`, `Range`, `ClearRange`.
+- **rows produced on demand.** `DrawFunc` asks only for what is visible, so a
+  million rows cost a frame the size of the pane.
+- **giving the counter row back.** `NoStatus`.
+
+`Viewer` can do:
+
+- **line numbers.** The gutter's width comes from the whole document, so it
+  does not change as you scroll.
+- **tab expansion** to the next stop, measured across the whole line.
+- **no cursor at all.** `NoCursor`, for a document with nothing selected.
+- **jumping to a line.** `Goto`, for a search hit or a `:` line number.
+- **sideways scrolling.** `ScrollX` cuts inside a span rather than on its
+  boundary, so the offset does not jump by a syntax token.
+- **the same lazy `DrawFunc`** as `List`.
 
 ### Structure
 

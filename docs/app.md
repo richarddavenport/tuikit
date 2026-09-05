@@ -13,11 +13,13 @@ type Model interface {
 }
 ```
 
-Bubble Tea's third step is `View() string`, and that string is a seam: a tool
-can return a canvas frame, a hand-joined pile of lipgloss, or a canvas frame
-with something concatenated on the end, and nothing can tell the difference —
-the goldens will record whatever comes out. `Draw` hands you a canvas and a rect
-and gives you nowhere else to put anything.
+Bubble Tea's third step is `View() string`. That string is a seam. A tool can
+return a canvas frame, or a hand-joined pile of lipgloss, or a canvas frame with
+something concatenated on the end. Nothing can tell those apart, and the goldens
+will record whatever comes out.
+
+`Draw` closes the seam. It hands you a canvas and a rect, and gives you nowhere
+else to put anything.
 
 `Update` returns `app.Model` rather than `tea.Model` for the same reason: a
 signature accepting `tea.Model` accepts anything with a `View`.
