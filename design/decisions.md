@@ -545,7 +545,15 @@ requires believing they matter.
 
 Ignoring the field. Three things came back worth taking, and are filed: deleting
 `View() string` (#21), a screen stack with history (#22), and constraint layout
-(#23) — the one axis where somebody else is plainly better than us.
+(#23).
+
+**Later note, when #23 was done.** It was filed as "the one axis where somebody
+else is plainly better than us", and that turned out to be a prediction rather
+than a finding. `comp.Layout` resolves bands in a linear pass that pins and
+repeats, and against what these tools actually lay out — a column of bands and a
+pane split in two — it reaches the same answer a solver would, in code a reader
+can follow. A Cassowary solver is the right answer for a library that must lay
+out anything; it is not evidence of a gap in a library that does not.
 
 ## 28. The palette is the terminal's own sixteen
 

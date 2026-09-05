@@ -69,11 +69,16 @@ component marketplace. If you are building a text editor or a game, use
 [tview](https://github.com/rivo/tview), [tcell](https://github.com/gdamore/tcell)
 or [ratatui](https://ratatui.rs).
 
-**Layout is bands and splits, not a constraint solver.** `comp.Layout` divides
-a rect into `Length`, `Percent` and `Fill` bands down one axis, each with an
-optional `.Min()` and `.Max()`. ratatui and
-[bento](https://github.com/metafates/bento) have a Cassowary solver and are
-plainly better at this.
+**Layout is bands, not a constraint solver.** `comp.Layout` divides a rect down
+one axis into `Length`, `Percent` and `Fill` bands, each with an optional
+`.Min()` and `.Max()`, resolved in a single pass. That covers a header, a body
+and a footer, and a pane split in two.
+
+It will not resolve competing rules — "B is twice A", "prefer 20 but accept 12",
+"these three are equal unless the fourth needs room". [ratatui](https://ratatui.rs)
+and [bento](https://github.com/metafates/bento) use a Cassowary solver for
+exactly that, which is the right answer for a library that has to lay out
+anything at all. If your interface needs one, you want theirs.
 
 **Text is always terminal characters.** No embedded typeface, no text larger
 than one cell. Pictures do gradients and curves; type is cells.
