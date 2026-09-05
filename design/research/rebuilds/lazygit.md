@@ -38,12 +38,12 @@ That is most of the chrome, and it is the part tuikit is already right about.
 collapsing, a flat/tree toggle, filtering, and two node types (working-tree
 files and commit files) over one traversal.
 
-**This is the biggest single gap in the field**, not just here: six of the
-fourteen surveyed tools need one. `comp.Tree` was refused once, on the grounds
-that azctl's and swarmctl's versions carried different payloads and a shared
-node type would make both worse. That reasoning was sound against a sample of
-two. It does not survive lazygit, yazi, superfile, dive, fx, termshark and
-ranger each building the same thing.
+**This is the biggest single gap in the field**, though not by as much as
+first claimed — see the correction below. `comp.Tree` was refused once, on the
+grounds that azctl's and swarmctl's versions carried different payloads and a
+shared node type would make both worse. That reasoning was sound against a
+sample of two. It does not survive lazygit, dive, termshark and fx each
+building the same thing.
 
 The refusal also points at the shape: what differs is the **payload**, so the
 component must not own it. `List` already solved this exact problem —
@@ -93,6 +93,17 @@ imports `lipgloss` and nothing else; `Menu.Items` is `[]Hint`, and both callers
 hand. A menu derived from a `spec.Command` is a thing that could exist and does
 not. Filed rather than fixed here, because it is a `spec` question and not a
 lazygit one.
+
+**The tree evidence was overstated.** The first pass named seven tools:
+lazygit, yazi, superfile, dive, fx, termshark, ranger. Checked in their sources,
+four have one — lazygit, dive, termshark, fx. yazi and superfile contain no
+match for "tree" or "collapse" at all, and ranger's only collapse is
+`collapse_preview`, the preview column. All three are Miller columns.
+
+Four is still twice the extraction rule, so `comp.Tree` stands. But the
+corrected list says something the inflated one hid: **every file manager in the
+field chose columns over a tree.** What needs a tree is a hierarchy you cannot
+walk into — image layers, a JSON document, a packet dissection, a git status.
 
 **Panel focus was waved away too quickly.** The first pass said `pkg/gui/context/`
 is covered by "`app.Keys` and `app.Stack` differently rather than better". That

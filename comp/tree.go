@@ -25,10 +25,24 @@ package comp
 // depths — which is all of them — building a graph to hand over and throwing it
 // away again.
 //
-// Read across seven tools that each wrote this: lazygit (`pkg/gui/filetree`,
-// eleven files), yazi, superfile, dive, fx, termshark, ranger. Six of the
-// fourteen surveyed needed a tree; the seventh is lazygit's second one, for
-// commit files.
+// # What actually needs one
+//
+// Four tools in the survey have a tree, checked in their source on 2026-09-04
+// rather than assumed: lazygit (`pkg/gui/filetree`, eleven files, plus a second
+// one for commit files), dive (`dive/filetree/`), termshark (`pkg/pdmltree`
+// and `widgets/copymodetree`) and fx (collapse state over a JSON document).
+//
+// Three that were first claimed to have one do not. yazi and superfile contain
+// no match for "tree" or "collapse" anywhere in their sources, and ranger's
+// only collapse is `collapse_preview` — the preview COLUMN when it has nothing
+// to show. All three are Miller columns: parent, current, preview, side by
+// side, with the hierarchy walked rather than drawn.
+//
+// That is the sharper claim, and it says what this type is for. Every FILE
+// MANAGER in the field chose columns over a tree. What needs a tree is a
+// hierarchy you cannot walk into — a docker image's layers, a JSON document, a
+// packet dissection, a git status — where the whole shape has to be on screen
+// at once because comparing across it is the point.
 type Tree struct {
 	// Collapsed is the keys that are shut, by the tool's own identity for a
 	// row — a path, an ID, a name.

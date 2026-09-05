@@ -9,8 +9,10 @@ Decision 31 refuses those, and the extraction rule asks for two independent
 implementations before generalising — because one is an anecdote.
 
 The rule was never "wait forever". It was "do not generalise from one example",
-and these tools are examples. Six of the fourteen surveyed need a collapsible
-tree; five need a syntax-aware text view. That is a better sample than four
+and these tools are examples. Four of the fourteen surveyed need a collapsible
+tree — checked in their sources, after the first count of six turned out to
+include three Miller-column file managers that have neither a tree nor any
+collapse state. That is a better sample than four
 private tools, and it is available now.
 
 **What a rebuild is not.** Not a plan to build a clone, and not a judgement of
@@ -32,6 +34,8 @@ those are named out in decision 27 rather than discovered per rebuild.
 ## Done
 
 - [lazygit.md](lazygit.md) — 82k stars, the most used TUI in the field
+- [yazi.md](yazi.md) — 42k stars, the most used Rust TUI, and the one that
+  falsified three of the tree claims
 
 ## Method
 
