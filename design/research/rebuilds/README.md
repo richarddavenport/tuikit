@@ -9,10 +9,10 @@ Decision 31 refuses those, and the extraction rule asks for two independent
 implementations before generalising — because one is an anecdote.
 
 The rule was never "wait forever". It was "do not generalise from one example",
-and these tools are examples. Four of the fourteen surveyed need a collapsible
+and these tools are examples. Five of the fourteen surveyed need a collapsible
 tree — checked in their sources, after the first count of six turned out to
 include three Miller-column file managers that have neither a tree nor any
-collapse state. That is a better sample than four
+collapse state. Seven need a syntax-aware text view. That is a better sample than four
 private tools, and it is available now.
 
 **What a rebuild is not.** Not a plan to build a clone, and not a judgement of
@@ -52,6 +52,12 @@ those are named out in decision 27 rather than discovered per rebuild.
 - [yazi.md](yazi.md) — 42k stars, the most used Rust TUI, and the one that
   falsified three of the tree claims
 - [k9s.md](k9s.md) — the closest thing in the field to the four private tools
+- [bottom.md](bottom.md) — charts; and a layout defined in a config file
+- [gitui.md](gitui.md) — the control for lazygit: same subject, other team
+- [termshark.md](termshark.md) — publishes its own list of generic widgets
+- [dive.md](dive.md) — the first rebuild that comes back "yes"
+- [fx.md](fx.md) — the `Viewer` hole with nothing else attached
+- [gh-dash.md](gh-dash.md) — the same substrate as ours, and a 54 kB model
 
 ## Method
 

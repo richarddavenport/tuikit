@@ -101,12 +101,17 @@ screen is active*, which is what lazygit's context stack is for and what its tab
 key moves. `Focused` is a bool on `List`, `Pane` and `Tabs`, so each component
 can be told; nothing keeps the answer.
 
-It is not being extracted, and the count is why: of the four tools, only
+It was not extracted, and the count was why: of the four private tools, only
 swarmctl has it (`internal/tui/disk.go:74`, `focus int` plus a `paneFocus` bool
 for descending into a pane). azctl and docket set `Focused` from a condition
-they already have, and pgctl from a cursor. One tool is not the extraction rule
-— **but a five-panel screen is the shape that would make it two**, so this is a
-watch item rather than a closed question.
+they already have, and pgctl from a cursor.
+
+**That was the wrong pool to count in, and the watch item is now promoted.**
+Counting the surveyed tools instead: lazygit's `pkg/gui/context/`, termshark's
+`framefocus`, `trackfocus`, `renderfocused`, `keepselected` and
+`enableselected` — five widgets for it — and dive's
+`ui/v1/app/controller.go`. With swarmctl that is four, and every one of them is
+a multi-pane screen. See the issue.
 
 **Accordion panels** — lazygit grows the focused panel and shrinks the rest —
 needs nothing new. In immediate mode the constraint handed to `Layout.Rows` can

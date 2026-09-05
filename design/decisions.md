@@ -1678,3 +1678,32 @@ rearrange. A dashboard whose panels an operator drags around and keeps is the
 plausible shape, and none of the four tools is it. If one appears, the question
 is not "embed Lua" but whether the layout alone can be data (`Layout` already
 takes constraints as values) while the components stay Go and stay guarded.
+
+### That condition was met four days later, by three tools
+
+Written on 2026-09-04, after the bottom, gh-dash and dive rebuilds.
+
+bottom's layout is a TOML file, and it deserializes into `comp.Layout`'s shape
+almost exactly (`src/options/config/layout.rs:11`):
+
+```rust
+pub struct Row { pub ratio: Option<u16>, pub child: Option<Vec<RowChildren>> }
+```
+
+`src/app/layout_manager.rs` is 47 kB. gh-dash defines its dashboard in YAML
+down to per-column `Width` and `Hidden` (`internal/config/parser.go:146`), and
+dive computes its own arrangement in `ui/v1/layout/manager.go`.
+
+So the narrow version — **the arrangement is data, the components stay Go** —
+is not hypothetical and costs none of what Lua costs. No interpreter, no
+binding layer, no second language in the failure path.
+
+It is still not free, and the price is the guards. `guard.Reachable` and
+`guard.Screens` answer "can this be got to" by reading the source; an
+arrangement that arrives from a user's TOML at startup cannot be read that way.
+The question that has to be answered before this is built is **what the guards
+check when the arrangement is data** — most likely that they check the
+*declaration* a tool ships as its default, and that loading a user layout is a
+validated transform of it rather than a free-form replacement.
+
+Tracked in the issue, not decided here.

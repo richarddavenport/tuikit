@@ -76,6 +76,19 @@ type Node struct {
 // Returns indices rather than nodes so the caller's own slice stays the source
 // of the data — the same arrangement as [List.DrawFunc], and for the same
 // reason: a tree of two hundred thousand should not be copied to be drawn.
+//
+// # The cost, and where it would bite
+//
+// This walks every node, so it is O(total) per frame rather than O(visible).
+// fx solves the same problem differently and better at scale: its nodes are a
+// doubly-linked list of lines, and a collapsed one hands back a Collapsed
+// pointer to the node AFTER its subtree, so traversal skips what is folded
+// without a separate pass.
+//
+// Returning indices is what buys [List] a draw with no copying, and the linked
+// design gives that up. So this is right for hierarchies of thousands and would
+// need rethinking at millions — the map lookup on Key, once per node per frame,
+// is where it would show first. No tool in the survey has a million-node tree.
 func (t *Tree) Visible(nodes []Node) []int {
 	out := make([]int, 0, len(nodes))
 
