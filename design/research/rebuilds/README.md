@@ -23,6 +23,12 @@ belongs to a git client. The test is not "could tuikit supply everything" — it
 is "is what tuikit supplies the right set, and is anything missing that several
 tools each had to build alone".
 
+**A gap is not excused by the tool's subject.** tuikit is for anything that
+shows state and lets you act on it, which is nearly all of this field — so
+"that is a file-manager idea" is not a reason to skip a hole. The only things
+outside the line are tools that host a text buffer or another terminal, and
+those are named out in decision 27 rather than discovered per rebuild.
+
 ## Done
 
 - [lazygit.md](lazygit.md) — 82k stars, the most used TUI in the field

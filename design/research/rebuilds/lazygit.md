@@ -88,10 +88,16 @@ it. Five of the fourteen tools need this shape.
 **Could tuikit rebuild lazygit today? No — three components short.** Tree, a
 range selection, and a text view with syntax.
 
-**Is that a criticism of tuikit's scope?** Only partly. lazygit is a git client,
-not an operator tool, and a diff view with hunk staging is git-shaped work. But
-the three holes are all general: a tree is not a git idea, a range selection is
-not a git idea, and neither is a scrollable syntax-aware view.
+**Is that a criticism of tuikit's scope?** Yes, and none of it can be waved away
+as out of scope. lazygit shows you state and lets you act on it, which is
+squarely what tuikit is for — decision 27, as widened. All three holes are
+general besides: a tree is not a git idea, a range selection is not a git idea,
+and neither is a scrollable syntax-aware view.
+
+The one thing that would be out of scope is the thing lazygit does not do
+either. It stages hunks; it does not edit them. A diff view with a selection is
+not a text editor, and the distinction is the whole boundary: **showing a buffer
+and acting on ranges of it is in; being the place you type the buffer is out.**
 
 **What it does not need** is the thing worth noticing. lazygit has no charts, no
 forms, no wizard, no tabs. Its 82k stars come from four lists, a split, and a

@@ -567,6 +567,35 @@ pane split in two — it reaches the same answer a solver would, in code a reade
 can follow. A Cassowary solver is the right answer for a library that must lay
 out anything; it is not evidence of a gap in a library that does not.
 
+### Widened, 2026-09-04
+
+The title of this decision is now too narrow, and the scope it set was drawn
+from the wrong evidence: five one-person Bubble Tea projects, which could not
+show what a TUI is for because none of them was one.
+
+**The line is not "operator tools". It is state you look at and act on.** A git
+client, a file manager, a cluster browser, a system monitor, an API client, a
+deploy tool — these differ by domain and not by shape. Each shows structured
+state, lets you move a cursor through it, and runs something against what the
+cursor is on. That is one shape, and it is most of the field.
+
+What stays out is anything that **hosts a text buffer or another terminal**:
+editors and multiplexers. They need modal editing, undo history, syntax over
+large buffers, PTY management and process supervision, and a framework that
+tried to serve them would be a different framework.
+
+Everything else in this decision survives, because none of it was about the
+domain. The CLI is still not a side feature — and `comp` and `app` do not import
+`spec`, so a tool with no command line pays nothing for it. Components are still
+extracted rather than designed. The cell buffer is still a means.
+
+What changes is the SAMPLE. "Two of the four tools" was a rule about not
+generalising from one example, and four private tools were never the only
+examples available. `design/research/rebuilds/` reads the tools people actually
+use and asks what each would need. Six of the fourteen surveyed need a
+collapsible tree. That is the evidence the rule always asked for, and it was
+sitting in public the whole time.
+
 ## 28. The palette is the terminal's own sixteen
 
 Decision 3 chose ANSI indices over truecolour hex and was right about why. It

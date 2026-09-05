@@ -1,15 +1,19 @@
 # tuikit
 
-A Go framework for **operator tools** — the kind with a command line *and* a
-terminal interface over the same domain logic. `kubectl` and `k9s` as one
-binary, for your own infrastructure.
+A Go framework for terminal applications that **show you state and let you act
+on it** — a git client, a file manager, a cluster browser, a system monitor, an
+API client, a deploy tool.
 
-It is not a general TUI framework. It is a narrow shape, and the narrowness is
-the point: declare a command once and get a CLI, a TUI screen, a context-menu
-entry and a machine-readable manifest from the same declaration; draw into a
-cell grid where every cell records what drew it, so clicks resolve without
-maintaining a hit-test map; and hold the whole interface inside a vocabulary
-that a test can enforce.
+Not for hosting a text buffer or another terminal. If you are building an editor
+or a multiplexer, the things you need most — modal editing, undo history, PTY
+management — are not here and are not planned.
+
+Inside that line it aims to be complete. Draw into a cell grid where every cell
+records what drew it, so clicks resolve without a hit-test map. Hold the whole
+interface inside a vocabulary a test can enforce. And, if the tool has a command
+line, declare each command once and get the CLI, the TUI screen, the context
+menu and a machine-readable manifest from the same declaration — `comp` and
+`app` do not depend on `spec`, so a TUI-only tool pays nothing for it.
 
 Built on [Bubble Tea](https://github.com/charmbracelet/bubbletea) and
 [Lip Gloss](https://github.com/charmbracelet/lipgloss). Go 1.25.
@@ -69,10 +73,19 @@ gradient.
 
 ## What it cannot do
 
-**It is not a general TUI framework.** No reactivity, no virtual DOM, no
-component marketplace. If you are building a text editor or a game, use
-[tview](https://github.com/rivo/tview), [tcell](https://github.com/gdamore/tcell)
-or [ratatui](https://ratatui.rs).
+**No text editor, no multiplexer.** Modal editing, undo history, syntax-aware
+buffers over large files, PTY hosting and process management are out of scope and
+not planned. `Input` is one line; there is no text area yet.
+
+**No reactivity, no virtual DOM.** Redraw a snapshot each frame. `app.Gen`
+discards the result of a read the reader walked away from, which is the whole
+async problem a tool like this has.
+
+**Coverage is honest, not complete.** `design/research/rebuilds/` works out
+whether tuikit could rebuild the TUIs people actually use, one at a time, from
+their source. lazygit needs three components that do not exist yet. Those files
+are the current list of holes, kept public because a framework claiming to cover
+a field should show its own gaps.
 
 **Layout is bands, not a constraint solver.** `comp.Layout` divides a rect down
 one axis into `Length`, `Percent` and `Fill` bands, each with an optional
