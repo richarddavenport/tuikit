@@ -17,6 +17,9 @@ people using it.
 - [research/other-tuis.md](research/other-tuis.md) — everything outside Go and
   Rust, marked by how much of it has been checked. Read it before writing
   "nobody does X"; two claims have already failed there
+- [research/rebuilds/](research/rebuilds/) — could tuikit rebuild the TUIs
+  people actually use? One file per tool, read from the source, listing what is
+  missing. This is where a component earns its way in
 
 The design system bundle is generated rather than written: `make designsystem`
 renders `theme` as HTML. There is no hand-maintained palette page here, and there
