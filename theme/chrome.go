@@ -35,6 +35,12 @@ type Chrome struct {
 	// ScrollUp and ScrollDown say which way an off-screen selection went.
 	ScrollUp, ScrollDown string
 
+	// SortAsc and SortDesc mark the column a table is ordered by. They are
+	// drawn on the end of a header label rather than in a column of their own,
+	// so they should be one column wide or the header shifts when the sort
+	// changes.
+	SortAsc, SortDesc string
+
 	// ScrollTrack and ScrollThumb are a scrollbar's two characters.
 	//
 	// The same vocabulary as comp.Meter rotated a quarter turn: a dotted track
@@ -113,6 +119,8 @@ var DefaultChrome = Chrome{
 	ScrollThumb: "│",
 	ScrollUp:    "↑",
 	ScrollDown:  "↓",
+	SortAsc:     "↑",
+	SortDesc:    "↓",
 
 	ChevronLeft:  "‹",
 	ChevronRight: "›",
@@ -143,6 +151,7 @@ func (c Chrome) Glyphs() []rune {
 		c.Box.BottomLeft, c.Box.Bottom, c.Box.BottomRight,
 		c.Divider, c.VDivider,
 		c.Ellipsis, c.Separator, c.ScrollUp, c.ScrollDown,
+		c.SortAsc, c.SortDesc,
 		c.ScrollTrack, c.ScrollThumb,
 		c.ChevronLeft, c.ChevronRight,
 		c.Collapsed, c.Expanded,
