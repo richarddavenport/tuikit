@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               24 components
+tuikit gallery  every component, running                                                                               25 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Menu                                                                                           │
@@ -26,12 +26,12 @@ tuikit gallery  every component, running                                        
 │ Palette                       │ │                                                                               ┌──────────────┐ │
 │ Rule                          │ │                                                                               │ View logs  L │ │
 │ Viewer                        │ │                                                                               │ Deploy     D │ │
-│                               │ │                                                                               │ Restart    R │ │
+│ Sparkline                     │ │                                                                               │ Restart    R │ │
 │                               │ │                                                                               └──────────────┘ │
 │                               │ │ keys     ↑↓ choose · enter do it · esc close                                                   │
 │                               │ │ mouse    rclick open it on what is under the pointer · click choose — and a click on the bord… │
 │                               │ │ roles    Accent · Muted · SelectionFG · SelectionBG                                            │
 │                               │ │ from     democtl's context menu; azctl needs the same one                                      │
-│                         24/24 │ │                                                                                                │
+│                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

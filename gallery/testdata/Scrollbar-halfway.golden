@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               24 components
+tuikit gallery  every component, running                                                                               25 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Scrollbar                                                                                      │
@@ -26,12 +26,12 @@ tuikit gallery  every component, running                                        
 │ Palette                       │ │                                                                                                │
 │ Rule                          │ │                                                                                                │
 │ Viewer                        │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Sparkline                     │ │                                                                                                │
 │                               │ │                                                                                                │
 │                               │ │ mouse    wheel the list's, not the bar's — this reports, it does not act                       │
 │                               │ │ roles    Border · Accent                                                                       │
 │                               │ │ glyphs   · │                                                                                   │
 │                               │ │ from     comp.List, which exposed Offset and Max and drew neither                              │
-│                         24/24 │ │                                                                                                │
+│                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

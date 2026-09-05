@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               24 components
+tuikit gallery  every component, running                                                                               25 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Palette                                                                                        │
@@ -26,12 +26,12 @@ tuikit gallery  every component, running                                        
 │ Palette                       │ │ │                                                                                            │ │
 │ Rule                          │ │ │                                                                                        1/1 │ │
 │ Viewer                        │ │ │────────────────────────────────────────────────────────────────────────────────────────────│ │
-│                               │ │ │  enter run · tab pin tier · ↑↓ move · esc close                                            │ │
+│ Sparkline                     │ │ │  enter run · tab pin tier · ↑↓ move · esc close                                            │ │
 │                               │ │ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
 │                               │ │ keys     type filter across every group, ranked · ↑↓ move — headings are passed over · enter … │
 │                               │ │ roles    Accent · Muted · Pending · Danger · SelectionFG · SelectionBG                         │
 │                               │ │ glyphs   ─ · … ↑ ↓                                                                             │
 │                               │ │ from     swarmctl's navigation design, screens 2a and 2b                                       │
-│                         24/24 │ │                                                                                                │
+│                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

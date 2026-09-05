@@ -188,6 +188,19 @@ var DefaultGlyphs = GlyphSet{
 	'•': "bullet — masked secret",
 	'✓': "check mark — success",
 	'✗': "ballot X — failure",
+
+	// Block elements, for Sparkline. Eight steps of an eighth each.
+	//
+	// SpinnerRange's comment used to say a spinner reaches for Braille rather
+	// than "the block elements that would be a box on someone's terminal". That
+	// has it backwards, and the dates are checkable: ▀ ▄ █ are in CP437, the
+	// original IBM PC set, and the eighths are Unicode 1.0.1 Block Elements.
+	// Braille Patterns arrived in Unicode 3.0, seven years later. Block
+	// elements are the older and better-supported of the two.
+	'▁': "lower one eighth block — sparkline", '▂': "lower one quarter block — sparkline",
+	'▃': "lower three eighths block — sparkline", '▄': "lower half block — sparkline",
+	'▅': "lower five eighths block — sparkline", '▆': "lower three quarters block — sparkline",
+	'▇': "lower seven eighths block — sparkline", '█': "full block — sparkline",
 	'┌': "box drawing", '─': "box drawing", '┐': "box drawing",
 	'│': "box drawing", '└': "box drawing", '┘': "box drawing",
 }

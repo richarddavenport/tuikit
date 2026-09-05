@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               24 components
+tuikit gallery  every component, running                                                                               25 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ LogPane                                                                                        │
@@ -26,12 +26,12 @@ tuikit gallery  every component, running                                        
 │ Palette                       │ │   09:10:00 api_gateway: handled request in 421ms                                               │
 │ Rule                          │ │   09:11:07 api_gateway: upstream timed out after 3s                                            │
 │ Viewer                        │ │   09:12:04 api_gateway: handled request in 621ms 3s                                            │
-│                               │ │   09:13:01 api_gateway: handled request in 721ms                                               │
+│ Sparkline                     │ │   09:13:01 api_gateway: handled request in 721ms                                               │
 │                               │ │                                                                                     fo6 below  │
 │                               │ │ keys     ↑↓ scroll, detaching from the tail                                                    │
 │                               │ │ mouse    wheel the same                                                                        │
 │                               │ │ roles    Muted · Stderr                                                                        │
 │                               │ │ from     swarmctl logspane.go                                                                  │
-│                         24/24 │ │                                                                                                │
+│                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

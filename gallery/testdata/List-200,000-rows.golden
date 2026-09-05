@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               24 components
+tuikit gallery  every component, running                                                                               25 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ List                                                                                           │
@@ -26,12 +26,12 @@ tuikit gallery  every component, running                                        
 │ Palette                       │ │   entry 000017                                                                                 │
 │ Rule                          │ │   entry 000018                                                                                 │
 │ Viewer                        │ │   entry 000019                                                                                 │
-│                               │ │                                                                                     20/200000  │
+│ Sparkline                     │ │                                                                                     20/200000  │
 │                               │ │ keys     ↑↓ move the selection · j/k the same                                                  │
 │                               │ │ mouse    click select the row, anywhere across it · wheel scroll the viewport, never the sele… │
 │                               │ │ roles    SelectionFG · SelectionBG · Accent · Muted                                            │
 │                               │ │ glyphs   ↑ ↓ ▸ ▾                                                                               │
 │                               │ │ from     pgctl window(), swarmctl pane scrolling, azctl cursor/top                             │
-│                         24/24 │ │                                                                                                │
+│                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

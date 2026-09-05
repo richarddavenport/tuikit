@@ -56,9 +56,9 @@ func TestTokensRejectsARoleNothingDrawsWith(t *testing.T) {
 }
 
 func TestGlyphsRejectsACharacterOutsideTheSet(t *testing.T) {
-	dir := pkg(t, "package ui\n\nvar cursor = \"█\"\n")
+	dir := pkg(t, "package ui\n\nvar cursor = \"☃\"\n")
 	got := run(t, func(rec T) { Glyphs(rec, dir, theme.DefaultGlyphs) })
-	want(t, got, "U+2588")
+	want(t, got, "U+2603")
 }
 
 func TestGlyphsAcceptsTheAllowList(t *testing.T) {
@@ -89,7 +89,7 @@ func TestGlyphsFollowsAnExtendedSet(t *testing.T) {
 // failure message. Neither reaches a terminal.
 func TestGuardsIgnoreTestFiles(t *testing.T) {
 	dir := pkg(t, "package ui\n\n"+allRoleUses())
-	write(t, dir, "ui_test.go", "package ui\n\nimport \"github.com/charmbracelet/lipgloss\"\n\nvar c = lipgloss.Color(\"1\")\nvar g = \"█\"\n")
+	write(t, dir, "ui_test.go", "package ui\n\nimport \"github.com/charmbracelet/lipgloss\"\n\nvar c = lipgloss.Color(\"1\")\nvar g = \"☃\"\n")
 
 	silent(t, run(t, func(rec T) { Tokens(rec, dir, theme.Default) }))
 	silent(t, run(t, func(rec T) { Glyphs(rec, dir, theme.DefaultGlyphs) }))

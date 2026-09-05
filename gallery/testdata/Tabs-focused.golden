@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               24 components
+tuikit gallery  every component, running                                                                               25 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Tabs                                                                                           │
@@ -26,12 +26,12 @@ tuikit gallery  every component, running                                        
 │ Palette                       │ │                                                                                                │
 │ Rule                          │ │                                                                                                │
 │ Viewer                        │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Sparkline                     │ │                                                                                                │
 │                               │ │ keys     ‹› cycle                                                                              │
 │                               │ │ mouse    click each tab is its own region                                                      │
 │                               │ │ roles    Accent · Muted                                                                        │
 │                               │ │ glyphs   ‹ › ·                                                                                 │
 │                               │ │ from     swarmctl tabStrip, pgctl tab bar, democtl                                             │
-│                         24/24 │ │                                                                                                │
+│                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

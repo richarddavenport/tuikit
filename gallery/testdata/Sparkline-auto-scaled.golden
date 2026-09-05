@@ -1,0 +1,37 @@
+tuikit gallery  every component, running                                                                               25 components
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Components                    │ │ Sparkline                                                                                      │
+│ List                          │ │ A number over time. The newest sample is always the last column, so the bar under your cursor… │
+│ Pane                          │ │ ‹ a minute of cpu · taller · shorter than the pane · auto-scaled · one scale · flat · all zero │
+│ Tabs                          │ │ no Max: the largest value on screen is the top, which shows the shape and hides the size       │
+│ Bar                           │ │                                                                                                │
+│ Confirm                       │ │   4 rps                                                                                        │
+│ StepList                      │ │                                                        ▁▃▄▅▆▇▇█▇▇▆▅▄▂▁                 ▂▃▅▆▇▇▇ │
+│ LogPane                       │ │                                                       ████████████████▇▅▄▃▁▁     ▁▂▄▅▇████████ │
+│ Spinner                       │ │                                                       ████████████████████████████████████████ │
+│ Table                         │ │   80 rps                                                                                       │
+│ Detail                        │ │                                                       ▂▃▄▅▆▇▇▇█▇▇▆▆▅▄▃▂▁            ▁▂▃▄▅▆▆▇▇▇ │
+│ Menu                          │ │                                                       ███████████████████▇▆▆▅▅▅▅▅▆▇███████████ │
+│ Toast                         │ │                                                       ████████████████████████████████████████ │
+│ Form                          │ │                                                                                                │
+│ Split                         │ │                                                                                                │
+│ Layout                        │ │                                                                                                │
+│ Meter                         │ │                                                                                                │
+│ Input                         │ │                                                                                                │
+│ Waiting                       │ │                                                                                                │
+│ Breadcrumb                    │ │                                                                                                │
+│ Scrollbar                     │ │                                                                                                │
+│ Keys                          │ │                                                                                                │
+│ Palette                       │ │                                                                                                │
+│ Rule                          │ │                                                                                                │
+│ Viewer                        │ │                                                                                                │
+│ Sparkline                     │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │                                                                                                │
+│                               │ │ roles    Accent · Success · Pending · Muted                                                    │
+│                               │ │ glyphs   ▁ ▂ ▃ ▄ ▅ ▆ ▇ █                                                                       │
+│                               │ │ from     k9s wrote internal/tchart; bottom vendored 55 kB of ratatui's own Chart rather than … │
+│                         25/25 │ │                                                                                                │
+└───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
+  ↑↓ component · ‹› state · tab pane · q quit

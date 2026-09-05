@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               24 components
+tuikit gallery  every component, running                                                                               25 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Viewer                                                                                         │
@@ -26,12 +26,12 @@ tuikit gallery  every component, running                                        
 │ Palette                       │ │                                                                                                │
 │ Rule                          │ │                                                                                                │
 │ Viewer                        │ │                                                                                                │
-│                               │ │                                                                                                │
+│ Sparkline                     │ │                                                                                                │
 │                               │ │                                                                                       +46 3/3  │
 │                               │ │ keys     ↑/↓ move the cursor · shift+↑/↓ extend a range · ←/→ scroll sideways · g go to a line │
 │                               │ │ mouse    wheel scroll without moving the cursor                                                │
 │                               │ │ roles    SelectionBG · Accent · Muted                                                          │
 │                               │ │ from     seven of the fourteen tools surveyed each built this and none could get it from thei… │
-│                         24/24 │ │                                                                                                │
+│                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

@@ -1,4 +1,4 @@
-tuikit gallery  every component, running                                                                               24 components
+tuikit gallery  every component, running                                                                               25 components
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Split                                                                                          │
@@ -26,12 +26,12 @@ tuikit gallery  every component, running                                        
 │ Palette                       │ │ │                             │ │                                                            │ │
 │ Rule                          │ │ │                             │ │                                                            │ │
 │ Viewer                        │ │ │                             │ │                                                            │ │
-│                               │ │ │                             │ │                                                            │ │
+│ Sparkline                     │ │ │                             │ │                                                            │ │
 │                               │ │ │                             │ │                                                            │ │
 │                               │ │ └─────────────────────────────┘ └────────────────────────────────────────────────────────────┘ │
 │                               │ │ mouse    drag the gap between the panes IS the handle                                          │
 │                               │ │ roles    Border                                                                                │
 │                               │ │ from     democtl's dashboard, before it was a component                                        │
-│                         24/24 │ │                                                                                                │
+│                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

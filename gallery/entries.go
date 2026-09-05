@@ -49,6 +49,7 @@ func (m *Model) Entries() []Entry {
 		m.paletteEntry(s),
 		m.ruleEntry(s),
 		m.viewerEntry(s),
+		m.sparklineEntry(s),
 	}
 }
 
