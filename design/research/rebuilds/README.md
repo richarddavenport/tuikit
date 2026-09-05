@@ -58,6 +58,8 @@ those are named out in decision 27 rather than discovered per rebuild.
 - [dive.md](dive.md) — the first rebuild that comes back "yes"
 - [fx.md](fx.md) — the `Viewer` hole with nothing else attached
 - [gh-dash.md](gh-dash.md) — the same substrate as ours, and a 54 kB model
+- [gcpeasy.md](gcpeasy.md) — a small tool on exactly our substrate: 78 kB in one
+  file, and the first target partly outside decision 27's line
 
 ## Method
 
