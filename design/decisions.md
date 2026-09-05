@@ -1610,3 +1610,71 @@ same way the characters do. Its decision 1, a raster library, was answered by
 `paint` — rounded rects, gradients, alpha compositing and bars, hand-rolled,
 because the shape list is short and a library that draws everything costs more
 than it saves.
+
+## 44. The drawing is not scriptable, and yazi is why that is a bet
+
+Found by the yazi rebuild (`design/research/rebuilds/yazi.md`) rather than
+reasoned about here, which is why it is worth writing down: the strongest
+evidence in the field points the other way.
+
+yazi does not lay out its own main surface. `yazi-fm/src/root.rs` calls into an
+embedded Lua interpreter:
+
+```rust
+let root = LUA.globals().raw_get::<Table>("Root")?.call_method::<Table>("new", area)?;
+root.call_method("reflow", ())
+```
+
+Everything you look at — `root.lua`, `current.lua`, `parent.lua`,
+`preview.lua`, `header.lua`, `status.lua`, `linemode.lua`, `marker.lua`,
+`rail.lua`, `tabs.lua` — is a file in `yazi-plugin/preset/components/` that a
+user can replace. Rust keeps the engine and the overlays. 42k stars say it
+works.
+
+### Two different answers to the same sentence
+
+Both projects say they get out of the developer's way. They mean different
+things by it.
+
+**tuikit:** the component owns the behaviour and none of the look. Styles are
+injected, glyphs come from `theme.Chrome`, the data stays the tool's, and
+`comp.Tree` does not draw at all. What you cannot change is *how it behaves* —
+that a cursor skips a heading, that a log detaches when you scroll up, that a
+range is dropped by a plain arrow key.
+
+**yazi:** the behaviour is yours too, because the drawing is a script you can
+overwrite at runtime.
+
+### Why not that
+
+Not because it is wrong. Because of what it costs, and each cost is visible in
+yazi's own tree:
+
+- An embedded interpreter and a binding layer. `yazi-binding/` exists solely to
+  hand ratatui's `Rect` and `Buffer` to Lua and back.
+- A second language in the failure path. A broken component surfaces as
+  `Failed to redraw the 'Root' component` at runtime, where a Go compile error
+  would have been.
+- **It dissolves the guards.** `guard.Furniture`, `guard.Reachable`,
+  `guard.Chrome` and `guard.Keys` are AST scans of Go source. A surface drawn
+  by a script the user supplies cannot be checked by reading the program, so
+  the property tuikit enforces — that the interface cannot lie about itself —
+  would become a property it merely hopes for.
+
+That last one is the real argument. Scriptable drawing and a static guarantee
+about what is drawn are not compatible, and the guarantee is the thing four
+tools were built to get.
+
+### What this obliges us to say
+
+The README's claim has to be the narrower true one: **out of your way on style
+and data, opinionated about behaviour.** "Gets out of your way" without that
+qualifier is a claim yazi meets better than we do.
+
+### What would reopen it
+
+A tool that needs a surface its own *users* — not its developers — can
+rearrange. A dashboard whose panels an operator drags around and keeps is the
+plausible shape, and none of the four tools is it. If one appears, the question
+is not "embed Lua" but whether the layout alone can be data (`Layout` already
+takes constraints as values) while the components stay Go and stay guarded.
