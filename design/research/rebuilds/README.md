@@ -36,6 +36,7 @@ those are named out in decision 27 rather than discovered per rebuild.
 - [lazygit.md](lazygit.md) — 82k stars, the most used TUI in the field
 - [yazi.md](yazi.md) — 42k stars, the most used Rust TUI, and the one that
   falsified three of the tree claims
+- [k9s.md](k9s.md) — the closest thing in the field to the four private tools
 
 ## Method
 
