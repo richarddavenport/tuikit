@@ -1,19 +1,38 @@
 # tuikit
 
+### Build the tool, not the terminal.
+
 A Go framework for terminal applications that **show you state and let you act
 on it** — a git client, a file manager, a cluster browser, a system monitor, an
 API client, a deploy tool.
 
+Three things here that a widget library does not give you:
+
+**Nothing is invented.** Every one of the 24 components was pulled out of tools
+that had already written it, twice, differently — and each carries the argument
+in its doc comment. To check that against the world rather than against
+ourselves, `design/research/rebuilds/` reads the source of nine of the most used
+TUIs there are — lazygit, yazi, k9s, bottom, gitui, termshark, dive, fx,
+gh-dash — and asks of each feature: *have it, missing it, or theirs?* Every gap
+is either filled or written down with its evidence. Three claims we had made
+turned out to be false and are recorded as such.
+
+**The interface cannot lie about itself.** Nine guards read your own source and
+fail the build: a key advertised in the help that no handler takes, a screen
+nothing can reach, a colour outside the palette, a box-drawing character typed
+by hand instead of taken from the theme. These are ordinary Go tests you call
+from your own package.
+
+**One declaration, four surfaces.** Describe a command once and get the CLI, the
+TUI screen, the context menu and a machine-readable manifest from it. `comp` and
+`app` do not depend on `spec`, so a TUI-only tool pays nothing for it.
+
 Not for hosting a text buffer or another terminal. If you are building an editor
 or a multiplexer, the things you need most — modal editing, undo history, PTY
-management — are not here and are not planned.
-
-Inside that line it aims to be complete. Draw into a cell grid where every cell
-records what drew it, so clicks resolve without a hit-test map. Hold the whole
-interface inside a vocabulary a test can enforce. And, if the tool has a command
-line, declare each command once and get the CLI, the TUI screen, the context
-menu and a machine-readable manifest from the same declaration — `comp` and
-`app` do not depend on `spec`, so a TUI-only tool pays nothing for it.
+management — are not here and are not planned. Inside that line it aims to be
+complete: components draw into a cell grid where every cell records **what** drew
+it, so a click resolves to the seventh service rather than to row seven, and
+still does after the list scrolls.
 
 Built on [Bubble Tea](https://github.com/charmbracelet/bubbletea) and
 [Lip Gloss](https://github.com/charmbracelet/lipgloss). Go 1.25.
@@ -29,9 +48,9 @@ checkout, which is why the clone comes first. That goes when there is a tag.
 
 ## What you get
 
-**23 components** — `List` `Pane` `Tabs` `Bar` `Confirm` `StepList` `LogPane`
-`Spinner` `Table` `Detail` `Menu` `Toast` `Form` `Split` `Layout` `Meter`
-`Input` `Waiting` `Breadcrumb` `Scrollbar` `Keys` `Palette` `Rule`. Run
+**24 components** — `List` `Viewer` `Pane` `Tabs` `Bar` `Confirm` `StepList`
+`LogPane` `Spinner` `Table` `Detail` `Menu` `Toast` `Form` `Split` `Layout`
+`Meter` `Input` `Waiting` `Breadcrumb` `Scrollbar` `Keys` `Palette` `Rule`. Run
 `tuikit gallery` to use every one of them in every state it has, or
 `tuikit gallery -list` to read the inventory as text.
 
@@ -39,6 +58,13 @@ checkout, which is why the clone comes first. That goes when there is a tag.
 help, key binding and target region. From that, `spec` generates the CLI, the
 completion script, `describe --json`, the context menu for whatever region it
 acts on, and — via `spec.SchemaOf` — a JSON Schema for tool-calling APIs.
+
+**Three viewports, because they are not the same thing.** `List` has a cursor
+and rows. `LogPane` tails a stream and re-attaches when you scroll back to the
+bottom. `Viewer` is a document: it opens at the top, scrolls sideways, and puts
+the cursor style *underneath* the line's own spans — so the line you are reading
+in a diff keeps its syntax colours. Seven of the nine tools in the rebuild
+studies had written that last one themselves.
 
 **Clicks that resolve to identity, not coordinates.** `comp.Canvas` is a grid
 of cells; each records the `ID` of what drew it. `OwnerAt(x, y)` is the entire
