@@ -1,20 +1,27 @@
 # The wider TUI landscape — Go and Rust, read
 
-Read on 2026-09-01. This exists because
-[framework-comparison.md](framework-comparison.md) answered "what are we
+Read on 2026-09-01. This exists because an earlier survey answered "what are we
 offering that these are not?" against **the wrong field**.
 
-That survey drew from [bubbletea-ecosystem.md](bubbletea-ecosystem.md), which
-was one GitHub full-text query: `--language=go bubbletea`. So the five
-"competitors" it found were five one-person Bubble Tea side projects, the
-largest with 18 stars. The conclusion — nobody has built the layer above a cell
-buffer — was drawn from a pool that structurally could not contain
+That one drew from a single GitHub full-text query — `--language=go bubbletea`
+— so the five "competitors" it found were five one-person Bubble Tea side
+projects, the largest with 18 stars. Its conclusion, that nobody had built the
+layer above a cell buffer, came from a pool that structurally could not contain
 `rivo/tview`, `mum4k/termdash`, or anything written in Rust.
+
+That earlier survey is not published here. Its per-project readings are fair and
+carefully evidenced, and they are also a close reading of five hobby repositories
+by name, which is not a thing to publish about projects that size. What it
+concluded is corrected below; what it taught is in `design/decisions.md`.
 
 This survey fixes the pool. Fourteen queries across both languages
 (`tui`, `terminal ui`, `terminal user interface`, `ratatui`, `tview`, `tcell`,
-`gocui`), deduped to **903 repos**, in `tui-landscape.json`; substrate detection
-by reading each top repo's `go.mod`/`Cargo.toml`, in `substrates.tsv`.
+`gocui`), deduped to **903 repos**; substrate detection by reading each top
+repo's `go.mod`/`Cargo.toml`, recorded in `substrates.tsv`.
+
+The raw pull is not kept here — it is a scrape of public metadata that is stale
+within a month, and the finding rather than the fixture is what is worth
+reading. `substrates.tsv` is the evidence for the tables below.
 
 Everything below came from reading source in a clone, not from READMEs.
 

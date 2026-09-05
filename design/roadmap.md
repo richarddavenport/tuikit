@@ -50,8 +50,8 @@ Each is an issue, so it gets closed by a decision rather than forgotten.
 ## From reading the field
 
 Steps 1–9 are done. The five most-starred Bubble Tea app frameworks were then
-read in full ([research/framework-comparison.md](research/framework-comparison.md),
-decision 27), and three things came back worth taking:
+read in full (decision 27; the reading itself is not published, and 27 says
+why), and three things came back worth taking:
 
 11. **Delete `View() string`** ([#21](https://github.com/richarddavenport/tuikit/issues/21))
     — bento's `Model` embeds the thing that renders. Ours returns a string,

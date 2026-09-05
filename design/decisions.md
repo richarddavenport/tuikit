@@ -485,10 +485,16 @@ code in `comp`.
 
 ## 27. tuikit is a shape for one kind of tool, not a TUI framework
 
-Read the five most-starred Bubble Tea app frameworks in full — see
-[research/framework-comparison.md](research/framework-comparison.md) — to answer
-the only question that matters about a project like this: what is it offering
-that the alternatives are not?
+Read the five most-starred Bubble Tea app frameworks in full, to answer the only
+question that matters about a project like this: what is it offering that the
+alternatives are not?
+
+The reading itself is not published. It is fair and carefully evidenced, and it
+is also a close study of five one-person repositories by name, the largest with
+eighteen stars — which is not a thing to publish about projects that size. What
+it concluded is below. `design/research/tui-landscape.md` is the corrected,
+wider survey and does not have that problem, because it reads projects big
+enough to argue back.
 
 The field splits in two, and tuikit is in neither half.
 
