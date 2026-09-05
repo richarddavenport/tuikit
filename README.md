@@ -41,6 +41,11 @@ of cells; each records the `ID` of what drew it. `OwnerAt(x, y)` is the entire
 hit test. An ID names *the item*, not the row it landed on, so a list that
 scrolls does not act on the wrong thing.
 
+**Panes compose.** `comp.Layout` divides a rect into any number of bands down
+one axis; `comp.Split` gives two of them a divider you can drag, with a `Min` so
+neither can be dragged to nothing. Splits nest, so three panes with two
+independent dividers is a composition rather than a component.
+
 **Guards that fail the build.** A colour outside the palette, a character
 outside the glyph set, chrome the glyph set cannot print, an engine that
 imported a terminal library, a key binding with no help entry, a reserved key
