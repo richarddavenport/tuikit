@@ -2,6 +2,29 @@
 
 Drive a model without a terminal, look at what it drew, and hold it to a golden.
 
+## How a frame exists at all
+
+Worth getting straight before anything else, because "no terminal" sounds like
+"no picture" and it is the opposite.
+
+**The program emits the escape sequences; the terminal only interprets them.**
+`comp.Canvas.String()` walks the cell grid and writes the ANSI itself, grouping
+adjacent cells that share a style pointer into one `Render` call. By the time a
+terminal would see it, the frame is already a finished string. A PTY would add
+nowhere for those bytes to go that a file does not.
+
+So a capture is four function calls deep and nothing more:
+
+```
+model.Draw(canvas, rect)   the grid is filled in memory
+canvas.String()            → text + escape sequences, as a string
+Session.Shot(name, m)      → written to <name>.ansi
+docgen.SVG / Frames        → SVG, HTML or Markdown
+```
+
+The `.ansi` file is the frame. `cat` one into your terminal and you see the
+screen, because it is byte-for-byte what the program would have printed.
+
 ## Driving
 
 `Press(m, "j", "j", "enter")` · `Run(m, key)` · `Resize(m, w, h)`
@@ -63,9 +86,20 @@ it, so a capture is byte-identical between runs.
 
 ## What it cannot do
 
-- **No real terminal.** It never opens a PTY. What it tests is what your model
-  drew, not what a terminal did with it.
-- **No pixel comparison.** Graphics are escape sequences in the frame; the
-  goldens hold the characters around them, not the image.
-- **No timing assertions.** The clock is a fixture, which is what makes captures
-  reproducible and what stops you testing that something took 200ms.
+It renders every frame in full. What it never does is open a PTY — so what it
+holds you to is **what your model drew**, not what a terminal did with it. Three
+things therefore go untested here:
+
+- **Font and glyph rendering.** A CJK name is two columns because
+  `ansi.StringWidth` says so. Whether the reader's font draws it that way is
+  somebody else's problem, and `harness.ShapeSurvivesColour` is the nearest
+  thing to a hedge.
+- **Graphics protocol support.** A Sixel or kitty image is bytes inside the
+  frame. Whether a given terminal renders it, ignores it, or prints rubbish is
+  what `tuikit pixels` answers — run by a person, in a real terminal.
+- **Pixel comparison.** Goldens hold the characters *around* a picture, never
+  the image.
+
+Also: **no timing assertions.** The clock is a fixture, which is what makes a
+capture byte-identical between runs and what stops you asserting that something
+took 200ms.

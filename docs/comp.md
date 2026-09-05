@@ -19,7 +19,7 @@ pointer, and **the ID of what drew it**.
 | `OwnerAt(x, y) ID` | **the entire hit test** |
 | `CellAt(x, y) (Cell, bool)` | what is there, style included |
 | `Region(id) (Rect, bool)` | where something ended up, this frame |
-| `String() string` | the frame, with trailing blanks trimmed |
+| `String() string` | **the frame** — text and escape sequences, ready to print, save or render |
 | `Chrome()`, `WithChrome(ch)` | the box characters, gap width and markers in force |
 
 **What an ID means.** `Region("services").At(7)` is *the seventh service*, not

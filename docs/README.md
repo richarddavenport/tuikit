@@ -43,7 +43,7 @@ func (m *model) Draw(c *comp.Canvas, r comp.Rect) {
 func main() { tea.NewProgram(app.New(&model{})).Run() }
 ```
 
-Three methods. `Draw` takes a canvas and a rect and has nowhere else to put
+Three methods, and no `View() string`. `Draw` takes a canvas and a rect and has nowhere else to put
 anything — there is no `View() string` to smuggle a hand-joined string through,
 which is the seam that lets a golden record something a component never drew.
 

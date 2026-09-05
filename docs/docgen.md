@@ -3,6 +3,11 @@
 Turns what the tool actually drew into something you can send to someone. Both
 halves are generated, never hand-maintained.
 
+The input is a directory of `.ansi` files — frames written by
+[`harness`](harness.md), each one the exact string the program would have
+printed. No screenshot is taken and no terminal is involved: `docgen` parses
+those escape sequences back into styled spans and re-emits them as SVG or HTML.
+
 ## Frames — a captured run as a page
 
 ```go
