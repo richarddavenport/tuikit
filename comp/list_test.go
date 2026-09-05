@@ -445,10 +445,19 @@ func TestTheIndentComesFromChrome(t *testing.T) {
 	}
 }
 
-// A row carrying its own state glyph does not also get the cursor's mark. Two
-// glyphs fighting for one column is how a tree's headers end up a character out
-// of line with its children.
-func TestALeadReplacesTheCursorMark(t *testing.T) {
+// A row carrying its own state glyph gets the cursor's mark AS WELL, in its own
+// column to the left of the indent.
+//
+// This used to be one or the other, on the grounds that two glyphs fighting for
+// one column is how a tree's headers end up out of line with its children. That
+// worry is real and it is answered by giving the marker a column of its own
+// rather than by dropping it: the header's text and the child's still line up,
+// and the cursor is now visible on a list whose rows have leads.
+//
+// Which matters because such a list otherwise carried its selection entirely in
+// Selected's background — invisible in a pipe, in a golden, and to a reader who
+// cannot see colour.
+func TestAMarkAndALeadBothGetADrawn(t *testing.T) {
 	c := NewCanvas(30, 4)
 	l := &List{Name: services, Marker: "> ", Blank: "  "}
 	l.Draw(c, c.Bounds(), []Row{
@@ -457,13 +466,21 @@ func TestALeadReplacesTheCursorMark(t *testing.T) {
 	})
 
 	lines := strings.Split(c.String(), "\n")
-	// The cursor is on row 0, which has a Lead: it keeps its own glyph.
-	if got := lines[0]; got != "▾ rg-forge" {
-		t.Errorf("the cursor mark displaced the header's own: %q", got)
+	// The cursor is on row 0: its marker, then no indent, then its own glyph.
+	if got := lines[0]; got != "> ▾ rg-forge" {
+		t.Errorf("the cursor row is %q", got)
 	}
-	// Row 1 has no Lead, so it gets the blank that keeps rows in line.
+	// Row 1 is not the cursor and has no lead: the blank, then the indent.
 	if got := lines[1]; got != "    vm-forge-0" {
-		t.Errorf("child is %q, want indent then the marker's blank", got)
+		t.Errorf("child is %q, want the blank then the indent", got)
+	}
+	// And the thing the old rule was protecting still holds. Measured in
+	// COLUMNS: strings.Index counts bytes, and ▾ is three of them, which is
+	// the miscount Width exists to prevent.
+	head, child := columnOf(t, lines[0], "rg-forge"), columnOf(t, lines[1], "vm-forge-0")
+	if head != child {
+		t.Errorf("the header's text starts at column %d and its child's at %d:\n%q\n%q",
+			head, child, lines[0], lines[1])
 	}
 }
 
@@ -1056,4 +1073,48 @@ func TestMovingWithoutExtendingDropsTheRange(t *testing.T) {
 	if lo, hi, ok := l.Range(); ok {
 		t.Errorf("an arrow key left a range %d..%d", lo, hi)
 	}
+}
+
+// A row with its own lead still gets the cursor's marker. It used to get one or
+// the other, so a list with a status glyph had no cursor at all once the colour
+// was stripped.
+func TestALeadDoesNotSwallowTheMarker(t *testing.T) {
+	c := NewCanvas(30, 4)
+	l := &List{Name: services, Marker: "> ", Blank: "  ", Focused: true, NoStatus: true}
+	rows := []Row{{Lead: "M ", Text: "changed"}, {Lead: "A ", Text: "added"}}
+	l.Draw(c, c.Bounds(), rows)
+
+	lines := strings.Split(c.String(), "\n")
+	if !strings.HasPrefix(lines[0], "> M changed") {
+		t.Errorf("the cursor row is %q", lines[0])
+	}
+	if !strings.HasPrefix(lines[1], "  A added") {
+		t.Errorf("the other row is %q", lines[1])
+	}
+}
+
+// The marker sits OUTSIDE the indent, so the cursor is in the same column on
+// every row. Indented, it moves with the nesting and a tree cannot be scanned.
+func TestTheMarkerIsNotIndentedWithTheRow(t *testing.T) {
+	c := NewCanvas(30, 4)
+	l := &List{Name: services, Marker: "> ", Blank: "  ", Focused: true, NoStatus: true}
+	l.Move(1)
+	l.Draw(c, c.Bounds(), []Row{{Text: "top"}, {Depth: 2, Text: "deep"}})
+
+	lines := strings.Split(c.String(), "\n")
+	if !strings.HasPrefix(lines[1], "> ") {
+		t.Errorf("a nested cursor row starts %q, so the marker moved with the indent", lines[1][:4])
+	}
+}
+
+// columnOf is which COLUMN a substring starts at. strings.Index counts bytes,
+// and a box-drawing glyph is three of them — the miscount comp.Width exists to
+// prevent, and one this test made on its first attempt.
+func columnOf(t *testing.T, line, want string) int {
+	t.Helper()
+	i := strings.Index(line, want)
+	if i < 0 {
+		t.Fatalf("%q is not in %q", want, line)
+	}
+	return Width(line[:i])
 }

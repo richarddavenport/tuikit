@@ -581,14 +581,28 @@ func (l *List) nearest(n int, row func(int) Row, i int) (int, bool) {
 	return l.step(n, row, i, -1)
 }
 
-// lead is everything drawn before a row's text: its indent, then either its own
-// prefix or the cursor's mark.
+// lead is everything drawn before a row's text: the cursor's mark, then the
+// indent, then the row's own prefix.
+//
+// # The marker comes first, and outside the indent
+//
+// It used to be one or the other: a row with a Lead got no marker at all. That
+// is wrong in the ordinary case rather than an edge one, because a status glyph
+// in the lead column is exactly what Row.LeadStyle exists for. Such a list had
+// its selection carried entirely by Selected's background, so it vanished in a
+// pipe, in a golden, and for a reader who cannot see the colour — and
+// harness.ShapeSurvivesColour could not catch it, because the shape was fine
+// and the information was what went missing.
+//
+// Found by building a tool rather than by reading one: three lists in gcpeasy
+// each re-implemented this badly, and lazygit's file rows need it too.
+//
+// Outside the indent because a nested row's marker still belongs in the
+// cursor's column. Indenting it puts the cursor somewhere different on every
+// row and makes a tree impossible to scan.
 func (l *List) lead(c *Canvas, row Row, i int) string {
 	indent := strings.Repeat(" ", max(0, row.Depth)*c.Chrome().Indent)
-	if row.Lead != "" {
-		return indent + row.Lead
-	}
-	return indent + l.mark(i)
+	return l.mark(i) + indent + row.Lead
 }
 
 // mark is the marker for a row, or the blank that keeps the others in line.

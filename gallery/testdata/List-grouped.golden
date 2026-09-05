@@ -6,15 +6,15 @@ tuikit gallery  every component, running                                        
 │ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · grouped · grouped, collapsed · no│
 │ Tabs                          │ │ Depth indents a child; Lead is the header's own glyph, in the marker's column instead of it    │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │ ▾ rg-forge 3                                                                                   │
-│ StepList                      │ │   › vm-forge-0                                                                                 │
+│ Confirm                       │ │   ▾ rg-forge 3                                                                                 │
+│ StepList                      │ │ ›   vm-forge-0                                                                                 │
 │ LogPane                       │ │     nic-forge-0                                                                                │
 │ Spinner                       │ │     sambpforge                                                                                 │
-│ Table                         │ │ ▾ rg-platform 3                                                                                │
+│ Table                         │ │   ▾ rg-platform 3                                                                              │
 │ Detail                        │ │     kv-platform                                                                                │
 │ Menu                          │ │     app-web                                                                                    │
 │ Toast                         │ │     app-api                                                                                    │
-│ Form                          │ │ ▾ rg-data 2                                                                                    │
+│ Form                          │ │   ▾ rg-data 2                                                                                  │
 │ Split                         │ │     sql-reporting                                                                              │
 │ Layout                        │ │     sadatalake                                                                                 │
 │ Meter                         │ │                                                                                                │

@@ -6,9 +6,9 @@ tuikit gallery  every component, running                                        
 │ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · grouped · grouped, collapsed · no│
 │ Tabs                          │ │ the headers say there is something under them you have not seen                                │
 │ Bar                           │ │                                                                                                │
-│ Confirm                       │ │ ▸ rg-forge 3                                                                                   │
-│ StepList                      │ │ ▸ rg-platform 3                                                                                │
-│ LogPane                       │ │ ▸ rg-data 2                                                                                    │
+│ Confirm                       │ │ › ▸ rg-forge 3                                                                                 │
+│ StepList                      │ │   ▸ rg-platform 3                                                                              │
+│ LogPane                       │ │   ▸ rg-data 2                                                                                  │
 │ Spinner                       │ │                                                                                                │
 │ Table                         │ │                                                                                                │
 │ Detail                        │ │                                                                                                │
