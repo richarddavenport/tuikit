@@ -67,6 +67,11 @@ type List struct {
 	// Styles. Selected is the cursor row when focused, Unfocused when not.
 	Selected, Unfocused, Status, EmptyStyle *lipgloss.Style
 
+	// Ranged draws the rows in a range selection that are not the cursor.
+	// Nil falls back to Unfocused, so a list that sets no range style still
+	// shows one rather than nothing.
+	Ranged *lipgloss.Style
+
 	// NoStatus gives the status row back to the rows.
 	//
 	// The default reserves it whether or not the list overflows, because a
@@ -88,6 +93,18 @@ type List struct {
 	// caller that can assign either can reintroduce the bug this exists to
 	// prevent, and it will, because assigning looks harmless.
 	cursor, offset int
+	// anchor is where a range selection started, and anchored says there is
+	// one. Two fields rather than a sentinel index, because the zero value of
+	// this struct has to mean "no selection" — an anchor of -1 cannot be a zero
+	// value, and a fresh list reporting a range from row 0 is the bug that
+	// costs.
+	//
+	// Kept beside the cursor rather than as a pair of bounds, because a range
+	// grows from one end and a pair does not remember which end that was:
+	// extend, turn round, and extend past the start is the case that gets it
+	// wrong.
+	anchor   int
+	anchored bool
 	// pending is moves not yet resolved against the rows. See Move.
 	pending int
 
@@ -280,6 +297,9 @@ func (l *List) DrawFunc(c *Canvas, r Rect, n int, row func(i int) Row) {
 		// is off screen — which is the whole point.
 		this := row(i)
 		style := this.Style
+		if lo, hi, ok := l.Range(); ok && i >= lo && i <= hi && i != l.cursor {
+			style = or2(l.Ranged, l.Unfocused)
+		}
 		if i == l.cursor {
 			style = l.Unfocused
 			if l.Focused {
@@ -428,7 +448,7 @@ func (l *List) Scroll(by int) { l.offset = clamp(l.offset+by, 0, l.Max()) }
 // It means Cursor() between a Move and a Draw is the old value. Every caller in
 // this repo and in the tools moves in Update and reads in Draw, which is the
 // order a Bubble Tea program runs in anyway.
-func (l *List) Move(by int) { l.pending += by; l.reveal = true }
+func (l *List) Move(by int) { l.pending += by; l.reveal = true; l.ClearRange() }
 
 // Select puts the cursor on a row by its index in the LIST.
 //
@@ -461,6 +481,54 @@ func (l *List) Select(i int) {
 		l.cursor, l.pending = at, 0
 	}
 	l.reveal = true
+	l.ClearRange()
+}
+
+// Extend moves the cursor and keeps the other end of the selection where it is.
+//
+// The shift-arrow half of a range. The first Extend from no selection anchors
+// at the cursor, so a reader who presses shift-down once has selected two rows
+// rather than none — which is what every other list in the world does.
+//
+// Deferred like [List.Move], and for the same reason: the rows a move lands on
+// are not known until the frame that draws them.
+func (l *List) Extend(by int) {
+	if !l.anchored {
+		l.anchor, l.anchored = l.cursor, true
+	}
+	l.pending += by
+	l.reveal = true
+}
+
+// Range is the selected span, low to high, and whether there is one.
+//
+// Ordered, so a caller acting on it never has to ask which way the reader
+// dragged. lazygit's patch_exploring carries 13 kB of state for this and most
+// of it is keeping a range sane across a re-render; the cursor and one anchor
+// are enough when both are clamped by the same resolve.
+func (l *List) Range() (lo, hi int, ok bool) {
+	if !l.anchored {
+		return 0, 0, false
+	}
+	if l.anchor <= l.cursor {
+		return l.anchor, l.cursor, true
+	}
+	return l.cursor, l.anchor, true
+}
+
+// ClearRange drops the selection, leaving the cursor.
+//
+// Called by [List.Move] and [List.Select], because moving without extending is
+// how every list says "start again" — a range that survived an ordinary arrow
+// key would be a range a reader cannot get rid of.
+func (l *List) ClearRange() { l.anchor, l.anchored = 0, false }
+
+// or2 picks the first style that is set.
+func or2(a, b *lipgloss.Style) *lipgloss.Style {
+	if a != nil {
+		return a
+	}
+	return b
 }
 
 // Reset puts the list back to the top, for when the rows underneath it have

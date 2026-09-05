@@ -975,3 +975,85 @@ func TestTheRightEdgeIsDroppedWhenThereIsNoRoom(t *testing.T) {
 		t.Errorf("it overlapped instead of being dropped: %q", line)
 	}
 }
+
+// A brand-new list has no range. The zero value has to mean "nothing
+// selected", or every list reports a selection of row 0 before anyone touches
+// it — and a caller acting on Range() would act on it.
+func TestTheZeroListHasNoRange(t *testing.T) {
+	if lo, hi, ok := (&List{Name: "a"}).Range(); ok {
+		t.Errorf("a brand-new list reports a range %d..%d", lo, hi)
+	}
+}
+
+// Shift-down once selects two rows, which is what every other list does.
+func TestExtendAnchorsAtTheCursor(t *testing.T) {
+	l := &List{Name: "a", Focused: true}
+	c := NewCanvas(20, 8)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 8}, rows(10))
+
+	l.Extend(1)
+	l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 8}, rows(10))
+
+	lo, hi, ok := l.Range()
+	if !ok || lo != 0 || hi != 1 {
+		t.Errorf("one extend gave %d..%d ok=%v, want 0..1", lo, hi, ok)
+	}
+}
+
+// The range is ordered whichever way it was dragged, so a caller never asks.
+func TestARangeIsOrderedEitherWay(t *testing.T) {
+	l := &List{Name: "a", Focused: true}
+	c := NewCanvas(20, 8)
+	draw := func() { l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 8}, rows(10)) }
+	draw()
+
+	l.Select(5)
+	draw()
+	l.Extend(-2)
+	draw()
+
+	if lo, hi, ok := l.Range(); !ok || lo != 3 || hi != 5 {
+		t.Errorf("extending upward gave %d..%d ok=%v, want 3..5", lo, hi, ok)
+	}
+}
+
+// Extend, turn round, and extend past the start: the case a pair of bounds
+// gets wrong, because it does not remember which end was the anchor.
+func TestARangeCanBeDraggedBackThroughItsAnchor(t *testing.T) {
+	l := &List{Name: "a", Focused: true}
+	c := NewCanvas(20, 12)
+	draw := func() { l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 12}, rows(20)) }
+	draw()
+
+	l.Select(5)
+	draw()
+	l.Extend(3) // 5..8
+	draw()
+	l.Extend(-6) // through the anchor to 2, so the range is 2..5
+	draw()
+
+	if lo, hi, ok := l.Range(); !ok || lo != 2 || hi != 5 {
+		t.Errorf("got %d..%d ok=%v, want 2..5 — the anchor moved", lo, hi, ok)
+	}
+}
+
+// An ordinary arrow key drops the selection. A range that survived one would be
+// a range a reader cannot get rid of.
+func TestMovingWithoutExtendingDropsTheRange(t *testing.T) {
+	l := &List{Name: "a", Focused: true}
+	c := NewCanvas(20, 8)
+	draw := func() { l.Draw(c, Rect{X: 0, Y: 0, W: 20, H: 8}, rows(10)) }
+	draw()
+
+	l.Extend(2)
+	draw()
+	if _, _, ok := l.Range(); !ok {
+		t.Fatal("no range to drop")
+	}
+
+	l.Move(1)
+	draw()
+	if lo, hi, ok := l.Range(); ok {
+		t.Errorf("an arrow key left a range %d..%d", lo, hi)
+	}
+}
