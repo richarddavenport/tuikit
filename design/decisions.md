@@ -523,9 +523,21 @@ changed" for a graph of UI state. Our shape is a snapshot redrawn — `app.Gen`
 drops the result of a read the reader walked away from, and that is the whole
 async problem an operator tool has.
 
-**The CLI is not a side feature.** It is the axis nobody else is on. Not one of
-the five has anything to say about flags, subcommands or exit codes, because
-none of them is built for a tool that must also work in a pipe.
+**The CLI is not a side feature.** Not one of the five has anything to say about
+flags, subcommands or exit codes, because none of them is built for a tool that
+must also work in a pipe.
+
+This was first written as "the axis nobody else is on", which does not survive
+looking outside Go and Rust. Spectre.Console's `Cli` takes a command
+declaration and produces parsing, help and exit codes beside its rich
+rendering; Ruby's TTY toolkit covers similar ground. Two surfaces from one
+declaration is not novel.
+
+What is not done elsewhere, as far as anyone here has looked, is the whole set:
+a CLI, a full-screen screen, a context menu and a machine-readable manifest from
+one declaration, with a guard failing the build when the engine learns what a
+terminal is. That is a narrower claim and it is the one the evidence supports.
+`design/research/other-tuis.md` is the list to check before making a wider one.
 
 **The cell buffer is a means, not the thesis.** bento has cells and stores no
 owner, with mouse reporting never switched on. bubbleapp wanted ownership badly

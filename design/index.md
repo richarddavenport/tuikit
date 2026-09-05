@@ -12,8 +12,11 @@ people using it.
 - [mouse.md](mouse.md) — first-class mouse support, and the cell-grid substrate
   the prototype settled on
 - [roadmap.md](roadmap.md) — what is built, what is next, what is undecided
-- [research/](research/) — the Bubble Tea ecosystem, bucketed, and the five app
-  frameworks read in full: what they do, and the three ideas worth taking
+- [research/tui-landscape.md](research/tui-landscape.md) — the measured survey:
+  903 Go and Rust repos, what they are built on, and where tuikit is not special
+- [research/other-tuis.md](research/other-tuis.md) — everything outside Go and
+  Rust, marked by how much of it has been checked. Read it before writing
+  "nobody does X"; two claims have already failed there
 
 The design system bundle is generated rather than written: `make designsystem`
 renders `theme` as HTML. There is no hand-maintained palette page here, and there

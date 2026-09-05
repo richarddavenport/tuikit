@@ -1,5 +1,11 @@
 # The wider TUI landscape — Go and Rust, read
 
+> **Go and Rust only.** The pool is fourteen GitHub queries across those two
+> languages, so Textual, Spectre.Console, FTXUI, Terminal.Gui, Ink and brick are
+> all outside it — and htop, tmux and btop, which are among the most-used TUIs
+> there are. `other-tuis.md` is the list that covers them, marked by how much of
+> it has been measured. Check that before making a claim about "the field".
+
 Read on 2026-09-01. This exists because an earlier survey answered "what are we
 offering that these are not?" against **the wrong field**.
 
