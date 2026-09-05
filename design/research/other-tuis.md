@@ -131,6 +131,12 @@ grid were the distinctive half. lipgloss v2 ships `lipgloss.Canvas` with
 other cell buffer carries is the **owner**, so that is the claim, and it is
 narrower than the one being made. Found by the gcpeasy rebuild, 2026-09-05.
 
+**"gcpeasy's interactive pane is a terminal emulator, and therefore outside
+decision 27."** It is not. `runInteractiveSession` uses `tea.Exec` to hand over
+the real terminal, and says so in its own comment. The emulator serves the
+*non-interactive* task pane, which runs commands under a PTY by choice. Read the
+function before classifying it.
+
 **"gh-dash's `ui.go` is 54 kB of exactly the state management `app` was
 extracted to remove."** Measured afterwards: 1,917 lines, of which `View` and
 its helpers are 275 and a single `Update` function is 741. The claim was right

@@ -128,22 +128,29 @@ substrate. Issue 59.
 
 ## Outside the line
 
-**The interactive session pane is a terminal, and we said we do not do those.**
+**Almost nothing, and an earlier draft of this file got that wrong.**
 
-`tuiInteractiveCommand` runs a PTY (`creack/pty`) so `rails console` and
-`kubectl exec` work with real line editing and scrollback. `applyCSI`,
-`writeOutputRune`, `newOutputLine`, `outputRow`/`outputCol` are a small terminal
-emulator, and the file's own comment says why: *"This is what makes copy/paste,
-scrollback, colors, and line editing behave"*.
+The first version said the interactive pane was a terminal emulator and
+therefore outside decision 27. It is not. `runInteractiveSession`
+(`tui.go:935`) uses `tea.Exec` to hand the user's **real terminal** to the
+child process, and its own comment says so:
 
-Decision 27 names hosting another terminal as out of scope, and this is the
-first rebuild where a real chunk of the target lands on the far side of that
-line. The honest verdict is not "tuikit could build gcpeasy" — it is that
-tuikit could build **all of gcpeasy except the interactive pane**, and that pane
-is a deliberate exclusion rather than a gap.
+> hands the user's real terminal to an interactive remote session via tea.Exec,
+> rather than capturing it into the output viewport
 
-Worth noticing that it is genuinely separable: four panels, a footer, modals and
-a boot screen on one side; a PTY in a box on the other.
+That is the right answer and it is one tuikit can give unchanged. `rails
+console` and `kubectl exec` get a real TTY, with real line editing and real
+scrollback, because the TUI suspends rather than emulating.
+
+What actually needs the emulator is the **non-interactive task pane**.
+`startTask` runs background commands under a PTY (`pty.StartWithSize`,
+`tui.go:2725`) so that `gcloud` and `kubectl` emit colour and progress, and then
+`appendOutput` and `applyCSI` have to interpret what comes back — SGR, but also
+`\r` moving the column, `\b`, and tabs.
+
+So the emulator is a consequence of a choice, not a requirement of the domain.
+Run the task without a PTY and you need SGR parsing and nothing more, which is
+issue 63.
 
 ## Theirs — the domain, not the shape
 
@@ -177,9 +184,11 @@ does X" checkable before they are made. This one needed narrowing.
 
 ## The verdict
 
-**Could tuikit rebuild gcpeasy today?** Yes, apart from the interactive PTY
-pane. That pane is a small terminal emulator, and decision 27 says we do not
-host one.
+**Could tuikit rebuild gcpeasy today?** Yes, all of it.
+
+The interactive console is a `tea.Exec` handoff, which tuikit supports as it
+stands. The one piece with no tuikit answer today is turning a subprocess's
+ANSI output into `Segment`s, and that is issue 63 rather than a boundary.
 
 ### The gaps it found
 
