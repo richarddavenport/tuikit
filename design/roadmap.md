@@ -30,7 +30,9 @@ not commitment.
 8. **Migrate azctl** ([#12](https://github.com/richarddavenport/tuikit/issues/12)) (3.2k lines, youngest, least to lose). This is the proof;
    a framework that has never met a real tool is a guess.
 9. **`tuikit new`** ([#13](https://github.com/richarddavenport/tuikit/issues/13)), seeded from what azctl's migration actually needed.
-10. pgctl, dugo, swarmctl migrate later or never ([#14](https://github.com/richarddavenport/tuikit/issues/14)).
+10. pgctl, dugo, swarmctl migrate later or never. Tracked privately, because it
+    is work on those tools rather than on this one — dugo and pgctl are done,
+    swarmctl is two steps in.
 
 ## Open
 
