@@ -21,7 +21,7 @@ a menu, confirmations, a diff view, and a lot of git.
 | the main/secondary split | `Split`, nested for the two-panel diff |
 | its side panel lists | `List`, with `Row.Skip` for headings |
 | `pkg/gui/popup` | `Confirm`, `Toast` |
-| its menu | `Menu`, from the `spec` declaration |
+| its menu | `Menu` — but see the correction below |
 | keybinding help | `Keys` + `guard.Keys` |
 | its status line | `Bar` |
 | search / filter | `Input` + `fuzzy` + `Highlight` |
@@ -83,21 +83,68 @@ it. Five of the fourteen tools need this shape.
 - **`pkg/gui/context/`, `controllers/`** — its own routing, which `app.Keys`
   and `app.Stack` cover differently rather than better.
 
+## What the first pass got wrong
+
+Checked against the source on 2026-09-04, after two of the holes were built.
+
+**"its menu | `Menu`, from the `spec` declaration"** was not true. `comp/menu.go`
+imports `lipgloss` and nothing else; `Menu.Items` is `[]Hint`, and both callers
+— `gallery/entries.go:258` and democtl's `view.go:337` — build that slice by
+hand. A menu derived from a `spec.Command` is a thing that could exist and does
+not. Filed rather than fixed here, because it is a `spec` question and not a
+lazygit one.
+
+**Panel focus was waved away too quickly.** The first pass said `pkg/gui/context/`
+is covered by "`app.Keys` and `app.Stack` differently rather than better". That
+is half right. `app.Keys` orders capture → screen → global, and `app.Stack`
+records how you reached a screen. Neither answers *which of five panels on one
+screen is active*, which is what lazygit's context stack is for and what its tab
+key moves. `Focused` is a bool on `List`, `Pane` and `Tabs`, so each component
+can be told; nothing keeps the answer.
+
+It is not being extracted, and the count is why: of the four tools, only
+swarmctl has it (`internal/tui/disk.go:74`, `focus int` plus a `paneFocus` bool
+for descending into a pane). azctl and docket set `Focused` from a condition
+they already have, and pgctl from a cursor. One tool is not the extraction rule
+— **but a five-panel screen is the shape that would make it two**, so this is a
+watch item rather than a closed question.
+
+**Accordion panels** — lazygit grows the focused panel and shrinks the rest —
+needs nothing new. In immediate mode the constraint handed to `Layout.Rows` can
+differ every frame, so "the focused panel is `Fill`, the others are `Min: 3`" is
+a `switch` in the draw and not a feature.
+
 ## The verdict
 
-**Could tuikit rebuild lazygit today? No — three components short.** Tree, a
-range selection, and a text view with syntax.
+**Two of the three holes are built.** `comp.Tree` is collapse state over a
+flattened hierarchy, keyed by the tool's own identity rather than an index.
+`List.Extend`/`Range`/`ClearRange` is the shift-arrow range, anchored on the
+first extend and dropped by any plain move.
 
-**Is that a criticism of tuikit's scope?** Yes, and none of it can be waved away
-as out of scope. lazygit shows you state and lets you act on it, which is
-squarely what tuikit is for — decision 27, as widened. All three holes are
-general besides: a tree is not a git idea, a range selection is not a git idea,
-and neither is a scrollable syntax-aware view.
+**One is left: a text view that is not a log.** `LogPane` tails and follows and
+has no selection, which its own doc says is deliberate — a log has no cursor. A
+diff scrolls from the top, takes styled spans rather than strings, and has a
+range over it. Until that exists lazygit's main panel cannot be drawn, and five
+of the fourteen surveyed tools want the same component.
 
-The one thing that would be out of scope is the thing lazygit does not do
-either. It stages hunks; it does not edit them. A diff view with a selection is
-not a text editor, and the distinction is the whole boundary: **showing a buffer
-and acting on ranges of it is in; being the place you type the buffer is out.**
+**Is the gap a criticism of tuikit's scope?** No, and it never was. lazygit
+shows you state and lets you act on it, which is decision 27 as widened. A tree
+is not a git idea, a range is not a git idea, and neither is a scrollable
+syntax-aware view.
+
+The boundary is the thing lazygit itself does not cross. It stages hunks; it
+does not edit them. **Showing a buffer and acting on ranges of it is in; being
+the place you type the buffer is out.**
+
+## Theirs, and rightly
+
+- **`pkg/gui/presentation/graph/`** (10 kB) — the commit graph, the `│ ├ ─ ╯`
+  lines beside the log. A framework supplying this would be a framework with an
+  opinion about git.
+- **`pkg/gui/presentation/`** — sixteen files turning branches, commits,
+  stashes and submodules into rows. This is exactly the layer tuikit says
+  belongs to the tool, and lazygit agrees by putting it in its own package.
+- **`pkg/gui/mergeconflicts/`** — finding and rendering conflict markers.
 
 **What it does not need** is the thing worth noticing. lazygit has no charts, no
 forms, no wizard, no tabs. Its 82k stars come from four lists, a split, and a
