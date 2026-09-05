@@ -151,7 +151,9 @@ the place you type the buffer is out.**
 - **`pkg/gui/mergeconflicts/`** — finding and rendering conflict markers.
 
 **What it does not need** is the thing worth noticing. lazygit has no charts, no
-forms, no wizard, no tabs. Its 82k stars come from four lists, a split, and a
-very good diff. The components that matter are few and deep, which is an
-argument for `comp` staying small and each entry being thorough — not for a
-catalogue.
+forms, no wizard and no tabs.
+
+What it does have is four lists, a split, and a diff view with a great deal of
+care in it. The components that matter here are few and deep. That is an
+argument for `comp` staying small and making each entry thorough, rather than
+growing a catalogue.

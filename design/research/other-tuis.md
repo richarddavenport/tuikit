@@ -131,6 +131,17 @@ grid were the distinctive half. lipgloss v2 ships `lipgloss.Canvas` with
 other cell buffer carries is the **owner**, so that is the claim, and it is
 narrower than the one being made. Found by the gcpeasy rebuild, 2026-09-05.
 
+**"gh-dash's `ui.go` is 54 kB of exactly the state management `app` was
+extracted to remove."** Measured afterwards: 1,917 lines, of which `View` and
+its helpers are 275 and a single `Update` function is 741. The claim was right
+about the *kind* of code and wrong to attribute the whole file to it. The
+sharper version is that one function is 39% of the file.
+
+**"Its 82k stars come from four lists, a split, and a very good diff"**, and the
+same move about dive's 54k. A star count has many causes and a UI inventory is
+not a measurement of any of them. Both rewritten to describe the interface
+without claiming to explain the popularity.
+
 **"gcpeasy's 2,972-line TUI is what a tool pays for not using tuikit."** Written
 in the first draft of `rebuilds/gcpeasy.md`. Measured afterwards: 624 of those
 lines are drawing, and 1,715 are the program itself. `comp` would replace the

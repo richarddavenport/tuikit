@@ -61,6 +61,9 @@ tool with this after lazygit and termshark — see the promotion argued in
 needed, `List` and `Detail` cover the rest, and its holes are the focus one
 that every multi-pane tool has.
 
-The first rebuild that comes back "yes", and it is worth noticing why: dive is
-a large, popular tool with a small interface. Its 54k stars come from one tree,
-one list, and a very good idea.
+This is the first rebuild that comes back "yes".
+
+It is worth noticing why, and the reason is about dive rather than about us. Its
+interface is small: one tree, one list, a detail pane and a filter. The tree is
+the part that took 35 kB to write, and `comp.Tree` is the component that
+answers it.

@@ -82,7 +82,25 @@ already has a `Width`.
 **Could tuikit rebuild gh-dash today? Yes, apart from the PR body view** —
 which is `Viewer`, again.
 
-The interesting result is the size. gh-dash's `ui.go` is 54 kB of exactly the
-state management `app` was extracted to remove, written by someone competent on
-the same substrate. That is the argument for `app` that the four private tools
-could not make on their own, because they are the tools it was extracted from.
+The interesting result is *where* the size is. Measured rather than eyeballed,
+because an earlier draft of this file said "54 kB of exactly the state
+management `app` was extracted to remove" without checking.
+
+`internal/tui/ui.go` is 1,917 lines across 37 functions. The distribution is
+lopsided:
+
+| | lines |
+| --- | ---: |
+| `Update` | **741** |
+| `View` and the two `render*` helpers | 275 |
+| the other 34 functions | 825 |
+
+**One function is 39% of the file.** That single `Update` is message dispatch,
+key routing, which section is current, what each has fetched, and which is
+loading. It is exactly what `app.Keys`, `app.Stack`, `app.Screens` and
+`app.Async` were extracted to hold.
+
+Note the contrast with the gcpeasy rebuild. gcpeasy's weight is in drawing;
+gh-dash's is in `Update`, and its drawing is only 275 lines. Two competent tools
+on our substrate, two different halves gone wrong. That is a better argument for
+`app` and `comp` being separate packages than either tool alone.
