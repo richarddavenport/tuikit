@@ -123,3 +123,15 @@ four surfaces plus an enforced engine boundary, is what the evidence supports.
 
 Both survived a while because nobody had looked outside the pool the original
 survey drew from — one GitHub query, in one language.
+
+**"A cell grid where every cell records what drew it"**, stated as though the
+grid were the distinctive half. lipgloss v2 ships `lipgloss.Canvas` with
+`CellAt`, `SetCell` and `Compose`, over an `ultraviolet.Cell` of
+`{Content, Style, Link, Width}`. The cell grid is now table stakes. What no
+other cell buffer carries is the **owner**, so that is the claim, and it is
+narrower than the one being made. Found by the gcpeasy rebuild, 2026-09-05.
+
+**"gcpeasy's 2,972-line TUI is what a tool pays for not using tuikit."** Written
+in the first draft of `rebuilds/gcpeasy.md`. Measured afterwards: 624 of those
+lines are drawing, and 1,715 are the program itself. `comp` would replace the
+624. The larger number was true and the implication was not.

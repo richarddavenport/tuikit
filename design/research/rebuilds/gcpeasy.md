@@ -181,17 +181,55 @@ does X" checkable before they are made. This one needed narrowing.
 pane. That pane is a small terminal emulator, and decision 27 says we do not
 host one.
 
-Most of this survey asks one question: is `comp` complete? This rebuild asks the
-opposite question. What does a tool pay for building on our substrate without
-our components?
+### The gaps it found
 
-gcpeasy answers it four times over.
+This is what a rebuild is for, so it goes first.
 
-1. **The TUI is 2,972 lines in one file.** That is 54% of the whole program.
-2. **Four of its tests would not exist.** They check that two rendered strings
-   have compatible shapes. On a cell grid those failures cannot happen.
-3. **Its central interaction is implemented twice.** The engine prompts on
-   stdin, so the TUI cannot call it and had to write its own.
-4. **It has no mouse.** Not because the author did not want one. Resolving a
-   click against hand-tracked rectangles is work, and owner IDs are what make
-   it stop being work.
+1. **ANSI from a subprocess.** `appendOutput` parses SGR out of `gcloud` and
+   `kubectl` output. Nothing in tuikit turns that into `Segment`s. Filed as
+   issue 63.
+2. **Panel focus, for the fifth time.** `m.focus` plus `m.cursors[panel]`.
+   Issue 59, now with a tool on our own substrate behind it.
+3. **A claim of ours that needed narrowing.** lipgloss v2 ships a cell buffer,
+   so "a cell grid" is no longer what makes tuikit different. Owner IDs still
+   are. See above.
+
+### The number I first put here, and why it was wrong
+
+The first version of this verdict said the TUI is 2,972 lines in one file and
+54% of the program, and left the reader to conclude that tuikit would remove
+most of it.
+
+That is a true number used to suggest something false. Counting the lines inside
+each function:
+
+| | lines | share |
+| --- | ---: | ---: |
+| drawing — the 31 `render*` and helper funcs | 624 | 22% |
+| key handling — `handleKey` and its four modal siblings | 264 | 9% |
+| terminal emulator — `appendOutput`, `applyCSI` and friends | 198 | 7% |
+| everything else — tasks, state cache, preferences, auth, GCP calls | 1,715 | 61% |
+
+**`comp` would replace about 624 lines, not 2,972.** `app.Keys` would take a
+share of the 264. The emulator is outside our line by choice. The 61% is the
+program — orchestrating tasks, caching state, remembering hidden items,
+authenticating — and tuikit has no opinion about most of it.
+
+624 lines of hand-rolled drawing is still a real finding, and so is the fact
+that four of its tests defend properties a cell grid gives free. Neither needed
+to be inflated.
+
+### What the exercise is for
+
+The stated purpose in this directory's README is a coverage test: for each
+feature, do we have it, are we missing it, or does it belong to the tool?
+
+The first draft of this file asked a different question instead — what does a
+tool pay for not using tuikit? That is a marketing question wearing a research
+question's clothes, and it cannot be answered by reading somebody else's
+repository. Answering it properly would mean rebuilding gcpeasy and counting
+the result.
+
+Kept as a note rather than deleted, because `other-tuis.md` exists for exactly
+this: a record of the claims that did not survive being checked is more useful
+than a record of the ones that did.
