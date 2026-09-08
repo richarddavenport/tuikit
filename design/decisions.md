@@ -1760,3 +1760,229 @@ check when the arrangement is data** — most likely that they check the
 validated transform of it rather than a free-form replacement.
 
 Tracked in the issue, not decided here.
+
+## 45. The cursor can be keyed by identity, and everything else already was
+
+`comp.Canvas` records an owner per cell as `{Name, Index}` into the DATA, and
+its package doc explains at length why a screen position would act on the wrong
+row after a scroll. `comp.Marks` is keyed by the tool's own string. `Tree`'s
+collapse set says outright: "A KEY rather than an index, because indices move."
+
+`List.cursor` was an `int`. So a filter applied, a filter cleared or a view
+toggled left the cursor on the same LINE and a different thing, silently.
+
+dive reports this twice, five years apart — issues 468 and 543 — and our own
+htop rebuild reproduced it: filter to three processes, move onto one, clear the
+filter, and the cursor is on an unrelated process.
+
+**`Row.Key`, and it is opt-in.** Set it and the cursor follows the row. Leave it
+empty and the cursor is an index, which is correct and free for a list whose
+rows never move — most of them. A tool that would have to invent a key per row
+per frame to get behaviour it already had should not have to.
+
+Three rules inside it. A key that is no longer in the list falls back to the
+index, clamped: the row the reader was on has been deleted and its neighbour is
+the nearest thing to what they were looking at. `Select` forgets the remembered
+key, because a click means THAT row and a stale key would pull the cursor back
+on the next frame. And the key is read from the row `resolve` already fetched,
+so a list of two hundred thousand still pays only for the rows it draws.
+
+## 46. The lead column is three things, not one
+
+`Row.Lead` was doing two jobs that want opposite treatment, and `Row.Depth`
+indented both.
+
+A **status glyph** — a git status letter, a change mark, a reachability dot —
+means the same thing on every row and has to form a column down the screen. A
+**tree marker** belongs to its row and has to travel with it as it indents. One
+field could not be both: a list with depth put its status letters somewhere
+different on every line.
+
+So there are three, in drawing order: the cursor marker, then `Row.Status`
+(before the indent, padded to `List.StatusWidth`), then the indent, then
+`Row.Lead` (after it). `Row.Indent` replaces the indent's spaces for a tree that
+draws branches.
+
+`List.StatusWidth` is declared on the list rather than measured from the rows,
+because `DrawFunc` is handed one row at a time and never sees the widest — a
+measured width would change on the frame where the two-column glyph scrolls off.
+
+**`Overhead()` is now `StatusRows()`.** The old name did not say ROWS, and a
+caller aligning a table header read it as columns, used it, and got a header
+indented by one — which compiled and drew. `LeadWidth()` is the columns answer.
+The old name remains as a deprecated one-liner.
+
+## 47. A tree draws branches, and depth cannot say which
+
+`comp.Tree` decides which rows are visible and `Row.Depth` indents them. Neither
+draws a tree, and the missing part is not cosmetic.
+
+Which connector a row gets depends on facts about the rows BETWEEN it and its
+parent. Two rows at the same depth get different prefixes: one needs a `│` in
+its first column because an ancestor still has siblings coming, and the other
+does not. Depth cannot carry that.
+
+htop keeps a bitmask per row for it (`Table_buildTreeBranch`); dive keeps three
+string constants. Two tools, so `comp.Branches(nodes, chrome) []string` exists.
+
+**It returns strings rather than drawing.** That is what lets the result go into
+`Row.Indent` for a list, or inside one cell of a `comp.Table` — which is where
+htop puts its tree, because a prefix in front of the PID makes every numeric
+column ragged.
+
+The connectors live in `theme.Chrome.Tree`, with `ASCIITree` beside the default.
+htop carries two sets and picks from the locale, because a terminal under
+`LANG=C` draws a tree as a column of replacement boxes. `Chrome.WithTree` is
+separate from `Chrome.With`: a box set and a tree set are independent choices.
+
+`├` was not in `DefaultGlyphs` until this. A box has four corners and no
+junctions, so nothing had ever needed the tee — the chrome guard said so.
+
+## 48. A range is a gesture, not a component's field
+
+`rangeSel` is now `comp.Range`, exported.
+
+The type holds an ANCHOR and the caller supplies the cursor. That is what lets
+it work over a list, a document, a table row number or a tree node index without
+learning what any of them are — and it is why gowid ships `copymodetable` and
+`copymodetree` as two widgets while this is one.
+
+Two properties worth stating now that it is exported. The zero value means no
+selection, so a fresh component cannot report a range from row 0. And the span
+is derived from the cursor passed in, never stored, which is what makes it
+correct under a deferred `Move` — a far end accumulated in a key handler is
+always a frame behind what the reader sees.
+
+It composes with `Marks` rather than competing: `Marks.Span` takes the keys a
+`Range` covers.
+
+## 49. A subprocess's colour is data, and the tool keeps it
+
+`comp.ANSI` and `comp.ANSILines` turn SGR into `[]Segment`.
+
+Decision 28 puts a tool's own colour on ANSI 0-15 so the reader's theme wins.
+That rule is about DESIGN, and a subprocess's output is not the tool's design —
+it is data, the same way its words are. A tool does not rewrite `kubectl`'s
+nouns and should not rewrite its colours. So 0-15 become `lipgloss.ANSIColor`
+and still follow the terminal's theme; 256-colour and truecolor pass through as
+they arrived, because dropping them loses the distinction the program was
+drawing.
+
+A line is assembled in CELLS, not a string builder, because `\r` and `\b` move
+and a builder can only append. A progress bar that redraws itself ten times
+comes out as its final state, and a shorter redraw leaves the tail of the longer
+one visible — which is what a terminal does.
+
+Cursor addressing, scroll regions and the alternate screen are skipped whole
+rather than printed. That is a terminal emulator, and decision 27 refuses to
+host one.
+
+## 50. A guard can be wrong, and saying so costs a reason
+
+`guard.Tokens` refuses a colour built from a literal. lazygit's
+`presentation/icons/file_icons.go` holds 743 hex literals that are file-type
+BRAND colours — the Go gopher's blue, the Rust orange — and the whole point of
+them is that they are the same everywhere. The guard would reject all 743 and it
+would be wrong.
+
+`guard.Except(file, reason)` exists, and **the reason is required**; an empty one
+panics. Without it this is a suppression flag wearing a better name, and the
+value of the guard is that a colour outside the palette is a decision somebody
+made. The same bargain `theme.GlyphSet.With` strikes for characters.
+
+It cannot rot, which is the part that makes it worth having. An exemption naming
+a file that is not in the directory fails — the file was renamed and the next
+one to take that name would be silently unguarded. An exemption on a file that
+builds no colours from literals fails too, because nothing is being excused. A
+stale exemption is worse than none: it reads as though somebody checked.
+
+## 51. A fixture typed by hand is a world that does not exist
+
+Decision 1 says the fixture the screens are rendered from is a value the engine
+returns. Nothing enforced it, and in one tool it quietly stopped being one: the
+fixture set a field by hand while the engine composed the same field as a
+sentence, and the renderer composed it again. A golden showed a row disagreeing
+with itself on every run and looked right, because it was checking the renderer
+against a world invented three hundred lines away in the same file.
+
+Four bugs shipped past 72 goldens, a colour check and a narrow-terminal run.
+Three for this reason. The compounding part is the worst of it: a hand-made
+fixture makes a wrong screen look correct AND hands you an easy way to keep it
+that way, by editing the fixture to match the renderer.
+
+`guard.Derived(t, dir, pkg, types...)` reads the TEST files, which no other
+guard does and this one has to. You name the types that are the engine's
+ANSWERS, not its inputs — a request or a filter must not be listed, because this
+is not "tests may not build structs", it is "these particular structs are
+conclusions". An empty literal is allowed: a zero value is "nothing yet", not an
+invented world.
+
+## 52. A capture never runs a command, and now says so
+
+`harness.Press` and `harness.Snapshot` discard the `tea.Cmd` an `Update`
+returns, and never call `Init`. That is deliberate and it is what makes a
+capture deterministic.
+
+The consequence was silent: **a model that loads its data in `Init` captures an
+empty screen.** No error, no warning, and the tests pass because they call the
+model's own `Load` directly.
+
+`harness.LoadsBeforeCapture(m)` reports a model whose `Init` still returns a
+command, with the reason. The scaffold's `browse` calls it, so a generated tool
+fails loudly rather than writing frames that say "nothing yet".
+
+Running the commands instead stays refused: real asynchrony in a capture costs
+the determinism the discarding buys.
+
+## 53. Config is searched in five places, and the first match wins
+
+Decision 33 said WHERE a config lives. It did not say how many places are looked
+in, and two was too few.
+
+The order, taken from dive and read from `anchore/fangs` rather than from its
+README:
+
+```
+./<tool>.yaml · ./.<tool>.yaml · ~/.<tool>.yaml
+$XDG_CONFIG_HOME/<tool>/config.yaml   else ~/.config/<tool>/
+$XDG_CONFIG_DIRS/<tool>/config.yaml   each entry, system-wide, last
+```
+
+`.yml` at every location. `$<TOOL>_CONFIG` and an explicit `--config`
+short-circuit the list, because nothing system-wide may override what a person
+typed.
+
+**The gap this closes is `$XDG_CONFIG_DIRS`** — the system-wide half of the
+spec, which a team shipping `/etc/xdg/<tool>/` could not use. It is searched
+LAST: an administrator's default must never outrank a file the person wrote.
+
+**First match wins, and dive merges.** That is the deliberate divergence. `fangs`
+sets `MultiFile: true` and layers every file it finds, which is right for a
+scanner under a fleet-wide policy and wrong here: once files merge, "which
+config am I using" stops having an answer and becomes "which key came from
+where". `FindConfig` returns the winner and every path it tried, which answers
+the first question in one line.
+
+Two extensions, not viper's seven. A tool that reads YAML should not have to
+answer questions about HCL.
+
+## 54. The tools it was extracted from are named by role
+
+Every component here came out of tools that had already written it, and the
+provenance is why "nothing is invented" is a claim rather than a slogan. Those
+tools are private, so the doc comments name them by role: the deploy tool, the
+database tool, the cloud tool, the disk tool, the board. `CONTEXT.md` has the
+table.
+
+**The names are withheld and the count is not**, because the count is what the
+argument rests on. "Two tools wrote this and differed about X" is a claim a
+reader can weigh without knowing which two. `comp.Tree` does not exist because
+two of them differed in a way that mattered; `app.Toggles` does exist because
+two turned out identical. Neither sentence needs a repository name.
+
+What went with the names: file-and-line citations into private repositories,
+which a reader could not open anyway. What stayed: the disagreement, which one
+was right, and the shapes of the types where they differed.
+
+`democtl` keeps its name — it is this repository's own example and you can read
+it. So does `herdr`, which is somebody else's public project.
