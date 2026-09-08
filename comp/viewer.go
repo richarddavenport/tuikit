@@ -93,7 +93,7 @@ type Viewer struct {
 	// is the component.
 	cursor, offset, col int
 
-	sel rangeSel
+	sel Range
 
 	// span is a range set by the TOOL rather than dragged by the reader, and
 	// spanned says whether there is one. Separate from sel because the two
@@ -152,7 +152,7 @@ func (v *Viewer) Move(by int) {
 	}
 	v.cursor = max(0, v.cursor+by)
 	v.reveal = true
-	v.sel.clear()
+	v.sel.Clear()
 }
 
 // Goto puts the cursor on a line and brings it into view.
@@ -163,7 +163,7 @@ func (v *Viewer) Move(by int) {
 func (v *Viewer) Goto(i int) {
 	v.cursor = max(0, i)
 	v.reveal = true
-	v.sel.clear()
+	v.sel.Clear()
 }
 
 // Scroll moves the view without moving the cursor.
@@ -194,7 +194,7 @@ func (v *Viewer) Extend(by int) {
 	if v.NoCursor {
 		return
 	}
-	v.sel.start(v.cursor)
+	v.sel.Start(v.cursor)
 	v.cursor = max(0, v.cursor+by)
 	v.reveal = true
 }
@@ -233,12 +233,12 @@ func (v *Viewer) Range() (lo, hi int, ok bool) {
 	if v.NoCursor {
 		return 0, 0, false
 	}
-	return v.sel.span(v.cursor)
+	return v.sel.Span(v.cursor)
 }
 
 // ClearRange drops the selection, dragged or set, leaving the cursor.
 func (v *Viewer) ClearRange() {
-	v.sel.clear()
+	v.sel.Clear()
 	v.spanned = false
 }
 
