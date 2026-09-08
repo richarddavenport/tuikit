@@ -233,12 +233,21 @@ tuikit news                what changed since a tool last looked
 
 ## Start
 
+**The library:**
+
 ```sh
 go get github.com/richarddavenport/tuikit
 ```
 
-`tuikit gallery` shows every component in every state. `tuikit new` scaffolds a
-tool. Go 1.25. MIT.
+**The command**, which is a separate install — `go get` adds a dependency, it
+does not put anything on your PATH:
+
+```sh
+go install github.com/richarddavenport/tuikit/cmd/tuikit@latest
+```
+
+`tuikit gallery` then shows every component in every state, and `tuikit new`
+scaffolds a tool that builds, runs and passes its own checks. Go 1.25. MIT.
 
 ## Reading further
 
