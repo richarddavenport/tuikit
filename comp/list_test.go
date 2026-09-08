@@ -1195,3 +1195,95 @@ func TestRowIndentReplacesTheDepthSpaces(t *testing.T) {
 		t.Errorf("no closing branch before the last child:\n%s", frame)
 	}
 }
+
+// Issue 80: the cursor follows the row, not the line.
+//
+// dive reported this twice, five years apart: filter to something, move onto a
+// row, clear the filter, and the cursor is on a different file.
+func TestTheCursorFollowsItsKeyThroughAFilter(t *testing.T) {
+	all := []Row{
+		{Key: "a", Text: "alpha"},
+		{Key: "b", Text: "bravo"},
+		{Key: "c", Text: "charlie"},
+		{Key: "d", Text: "delta"},
+	}
+	filtered := []Row{all[2], all[3]} // charlie, delta
+
+	l := &List{Name: "rows", Focused: true, NoStatus: true}
+	c := NewCanvas(20, 4)
+
+	// Filtered, cursor onto delta.
+	l.Draw(c, c.Bounds(), filtered)
+	l.Move(1)
+	l.Draw(c, c.Bounds(), filtered)
+	if got := filtered[l.Cursor()].Key; got != "d" {
+		t.Fatalf("cursor on %q, want d", got)
+	}
+
+	// Filter cleared. Index 1 is now bravo; the key says delta.
+	l.Draw(c, c.Bounds(), all)
+	if got := all[l.Cursor()].Key; got != "d" {
+		t.Errorf("cursor landed on %q after the filter cleared, want d", got)
+	}
+}
+
+// Without a key the cursor is an index, which is correct and free for a list
+// whose rows never move. Opting out has to keep working exactly as before.
+func TestWithoutAKeyTheCursorIsStillAnIndex(t *testing.T) {
+	l := &List{Name: "rows", Focused: true, NoStatus: true}
+	c := NewCanvas(20, 4)
+
+	l.Draw(c, c.Bounds(), rows(4))
+	l.Move(2)
+	l.Draw(c, c.Bounds(), rows(4))
+	if got := l.Cursor(); got != 2 {
+		t.Fatalf("cursor at %d, want 2", got)
+	}
+	// A shorter list clamps, the way it always did.
+	l.Draw(c, c.Bounds(), rows(2))
+	if got := l.Cursor(); got != 1 {
+		t.Errorf("cursor at %d after the list shrank to 2, want 1", got)
+	}
+}
+
+// The row the reader was on is deleted. Falling back to the index is the only
+// sane answer, and it must still be clamped.
+func TestADeletedKeyFallsBackToTheIndex(t *testing.T) {
+	before := []Row{{Key: "a"}, {Key: "b"}, {Key: "c"}}
+	after := []Row{{Key: "a"}, {Key: "c"}}
+
+	l := &List{Name: "rows", Focused: true, NoStatus: true}
+	c := NewCanvas(20, 4)
+	l.Draw(c, c.Bounds(), before)
+	l.Move(1)
+	l.Draw(c, c.Bounds(), before)
+	if got := before[l.Cursor()].Key; got != "b" {
+		t.Fatalf("cursor on %q, want b", got)
+	}
+
+	l.Draw(c, c.Bounds(), after)
+	if l.Cursor() >= len(after) {
+		t.Errorf("cursor at %d with %d rows", l.Cursor(), len(after))
+	}
+	if got := after[l.Cursor()].Key; got != "c" {
+		t.Errorf("cursor on %q after b was deleted, want c — its neighbour", got)
+	}
+}
+
+// A click means that row, so it drops the remembered key. Otherwise the key
+// from the old row pulls the cursor straight back on the next frame.
+func TestSelectForgetsTheRememberedKey(t *testing.T) {
+	all := []Row{{Key: "a"}, {Key: "b"}, {Key: "c"}}
+	l := &List{Name: "rows", Focused: true, NoStatus: true}
+	c := NewCanvas(20, 4)
+
+	l.Draw(c, c.Bounds(), all)
+	l.Move(2)
+	l.Draw(c, c.Bounds(), all)
+
+	l.Select(0)
+	l.Draw(c, c.Bounds(), all)
+	if got := all[l.Cursor()].Key; got != "a" {
+		t.Errorf("after clicking row 0 the cursor is on %q, want a", got)
+	}
+}

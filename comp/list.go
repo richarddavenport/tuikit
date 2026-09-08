@@ -102,6 +102,11 @@ type List struct {
 	// caller that can assign either can reintroduce the bug this exists to
 	// prevent, and it will, because assigning looks harmless.
 	cursor, offset int
+
+	// key is the identity of the row the cursor was on at the last draw, when
+	// the rows carry one. Matched against the incoming rows to find where the
+	// cursor belongs now.
+	key string
 	// sel is the range selection's anchor. Shared with [Viewer], because the
 	// invariant is easy to get wrong the same way twice.
 	sel rangeSel
@@ -169,6 +174,28 @@ type Row struct {
 	// they have in common is that a child sits two columns right of its
 	// header, and that is this field.
 	Depth int
+
+	// Key is this row's identity, for a list whose rows come and go.
+	//
+	// Set it and the cursor follows the ROW rather than the line. A filter
+	// applied, a filter cleared, a view toggled, a refresh that reorders — the
+	// cursor lands back on the thing the reader was looking at, because it
+	// remembers what that was rather than where it sat.
+	//
+	// Empty, and the cursor is an index, which is correct and free for a list
+	// whose rows never move. Opt-in for that reason: a tool that would have to
+	// invent a key per row per frame to get behaviour it already had should
+	// not have to.
+	//
+	// Everything else in comp is keyed by identity — owner IDs, [Marks],
+	// [Tree.Collapsed] — and their docs all say why: indices move. The cursor
+	// was the last thing that did not, and dive reported the consequence twice
+	// five years apart (issue 80).
+	//
+	// When the key is gone from the list, the cursor stays at its index and is
+	// clamped, which is the old behaviour and the only sane fallback: the row
+	// a reader was on has been deleted, and its neighbour is the best guess.
+	Key string
 
 	// Status is a fixed column between the cursor marker and the indent.
 	//
@@ -515,7 +542,10 @@ func (l *List) Move(by int) { l.pending += by; l.reveal = true; l.ClearRange() }
 // than the bug.
 func (l *List) Select(i int) {
 	if at := max(0, i); at != l.cursor {
-		l.cursor, l.pending = at, 0
+		// The remembered key goes with it: a click means THAT row, and a key
+		// from the row the cursor used to be on would pull it straight back on
+		// the next frame.
+		l.cursor, l.pending, l.key = at, 0, ""
 	}
 	l.reveal = true
 	l.ClearRange()
@@ -560,7 +590,10 @@ func or2(a, b *lipgloss.Style) *lipgloss.Style {
 
 // Reset puts the list back to the top, for when the rows underneath it have
 // changed out from under the cursor — a filter, usually.
-func (l *List) Reset() { l.cursor, l.offset, l.pending, l.reveal = 0, 0, 0, false }
+func (l *List) Reset() {
+	l.cursor, l.offset, l.pending, l.reveal = 0, 0, 0, false
+	l.key = ""
+}
 
 // resolve settles the cursor against the rows that actually exist.
 //
@@ -576,7 +609,7 @@ func (l *List) resolve(n int, row func(int) Row) {
 		l.cursor, l.pending = 0, 0
 		return
 	}
-	cur := clamp(l.cursor, 0, n-1)
+	cur := l.locate(n, row)
 	step, dir := l.pending, 1
 	l.pending = 0
 	if step < 0 {
@@ -596,12 +629,45 @@ func (l *List) resolve(n int, row func(int) Row) {
 
 	// A click, a restored cursor, or rows that changed underneath can all leave
 	// it on a row it may not hold.
-	if row(cur).Skip {
+	settled := row(cur)
+	if settled.Skip {
 		if i, ok := l.nearest(n, row, cur); ok {
 			cur = i
+			settled = row(cur)
 		}
 	}
 	l.cursor = cur
+	// Remembered from the row already fetched, not a second call: a list of two
+	// hundred thousand pays for the rows it draws and nothing else, which is
+	// what DrawFunc is for.
+	l.key = settled.Key
+}
+
+// locate is where the cursor belongs in the rows that just arrived.
+//
+// By KEY when the rows carry one and the remembered key is still present,
+// otherwise by index, clamped. Those are the two halves of issue 80: the index
+// keeps the cursor in range and the key keeps it on the same thing, and a list
+// needs both because a row can be filtered out entirely.
+//
+// A linear scan, once per frame, over rows already being asked for. A map would
+// cost a build of every key per frame to save a walk of the same length, and
+// DrawFunc exists so that a list of two hundred thousand is not walked at all —
+// so this stays O(n) and the tools that care about that do not set Key.
+func (l *List) locate(n int, row func(int) Row) int {
+	at := clamp(l.cursor, 0, n-1)
+	if l.key == "" {
+		return at
+	}
+	for i := 0; i < n; i++ {
+		if row(i).Key == l.key {
+			return i
+		}
+	}
+	// Gone. Stay at the index and let the clamp above stand — the row the
+	// reader was on has been removed, and its neighbour is the nearest thing
+	// to what they were looking at.
+	return at
 }
 
 // step is the next selectable row in one direction, or false at the end.
