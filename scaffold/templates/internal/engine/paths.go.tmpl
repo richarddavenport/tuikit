@@ -17,7 +17,7 @@ import (
 //
 // This file is COPIED into every tool rather than imported from tuikit: config
 // is engine work, and guard.Engine denies the engine every tuikit import
-// (decision 22). Fifteen owned lines beat a layering rule with an exception in
+// (decision 22). Owning these lines beats a layering rule with an exception in
 // it. Change them freely — they are yours.
 
 // EnvConfig and EnvState name explicit locations, checked before the defaults.
@@ -43,27 +43,90 @@ func StateDir() (string, error) {
 	return under("XDG_STATE_HOME", ".local", "state")
 }
 
-// ConfigPaths is the search order for the configuration, most specific first:
-// an explicit path, $<<.Env>>_CONFIG, ./<<.Name>>.yaml, then the user's config
-// directory.
+// Exts are the extensions tried at each location, in order.
+//
+// Two, not seven. dive reaches this list through viper and accepts yaml, json,
+// toml, hcl, ini and properties; a tool that reads one format should not answer
+// questions about the other five. `.yml` is here because leaving it out is a
+// support question forever.
+var Exts = []string{"yaml", "yml"}
+
+// ConfigPaths is every location searched, most specific first.
+//
+// tuikit decision 33, and the order is dive's, read from `anchore/fangs` on
+// 2026-09-08 rather than from its README:
+//
+//	./<<.Name>>.yaml            a config that belongs to this checkout
+//	./.<<.Name>>.yaml           the same thing, hidden
+//	~/.<<.Name>>.yaml           the classic single-file dotfile
+//	$XDG_CONFIG_HOME/<<.Name>>/config.yaml   or ~/.config/<<.Name>>/ when unset
+//	$XDG_CONFIG_DIRS/<<.Name>>/config.yaml   each entry, system-wide, last
+//
+// FIRST MATCH WINS. dive merges every file it finds, which is right for a
+// scanner run under a fleet-wide policy and wrong here: once files merge, "which
+// config am I using" stops having an answer and becomes "which key came from
+// where". A tool a person runs on their own machine should be able to answer the
+// first question in one line.
+//
+// $XDG_CONFIG_DIRS is last because it is the system-wide half of the spec — an
+// administrator's default, which anything the person wrote themselves outranks.
 //
 // The whole list is returned rather than just the winner, because the only
 // useful thing to say when nothing is found is WHERE it looked. "no config
-// found" sends a reader off to guess; four paths sends them to create one.
+// found" sends a reader off to guess; the list sends them to create one.
 func ConfigPaths(explicit string) []string {
 	if explicit == "" {
 		explicit = os.Getenv(EnvConfig)
 	}
 	if explicit != "" {
 		// An explicitly named config is the answer, present or not. Falling
-		// back would hide the fact that the path was wrong.
+		// back would hide the fact that the path was wrong — and nothing
+		// system-wide may override what a person typed on the command line.
 		return []string{explicit}
 	}
-	paths := []string{"<<.Name>>.yaml"}
+
+	var paths []string
+	add := func(dir, base string) {
+		for _, ext := range Exts {
+			paths = append(paths, filepath.Join(dir, base+"."+ext))
+		}
+	}
+
+	add(".", "<<.Name>>")
+	add(".", ".<<.Name>>")
+	if home, err := os.UserHomeDir(); err == nil {
+		add(home, ".<<.Name>>")
+	}
 	if dir, err := ConfigDir(); err == nil {
-		paths = append(paths, filepath.Join(dir, "config.yaml"))
+		add(dir, "config")
+	}
+	for _, dir := range systemConfigDirs() {
+		add(dir, "config")
 	}
 	return paths
+}
+
+// systemConfigDirs is $XDG_CONFIG_DIRS split, each with <<.Name>> appended.
+//
+// Colon-separated and ordered, like $PATH. The spec's default is /etc/xdg, and
+// it is used when the variable is unset OR empty — an empty value means "the
+// default", not "nowhere", which is the opposite of how $<<.Env>>_CONFIG is
+// treated above and is worth the two lines to get right.
+//
+// Relative entries are dropped for the same reason ConfigDir drops them: a
+// relative config directory resolves against wherever <<.Name>> was started.
+func systemConfigDirs() []string {
+	raw := os.Getenv("XDG_CONFIG_DIRS")
+	if raw == "" {
+		raw = "/etc/xdg"
+	}
+	var out []string
+	for _, dir := range filepath.SplitList(raw) {
+		if filepath.IsAbs(dir) {
+			out = append(out, filepath.Join(dir, "<<.Name>>"))
+		}
+	}
+	return out
 }
 
 // FindConfig returns the first path that exists, and every path it tried. The

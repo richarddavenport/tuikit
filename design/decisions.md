@@ -1047,6 +1047,49 @@ installed *on this laptop*. State goes in `$XDG_STATE_HOME`, else
 `~/.local/state/<tool>/`. One tool has state today, which is exactly when the
 pattern is cheap to set.
 
+### Amended 2026-09-08: the full search order, and first match wins
+
+The decision above says *where* a config lives. It did not say how many places
+are looked in, and two turned out to be too few.
+
+dive's search order was the prompt. Read from
+[`anchore/fangs`](https://github.com/anchore/fangs) rather than from dive's
+README, which simplifies it:
+
+```
+./<tool>.yaml                            a config belonging to this checkout
+./.<tool>.yaml                           the same thing, hidden
+~/.<tool>.yaml                           the classic single-file dotfile
+$XDG_CONFIG_HOME/<tool>/config.yaml      else ~/.config/<tool>/
+$XDG_CONFIG_DIRS/<tool>/config.yaml      each entry, system-wide, last
+```
+
+`.yml` is tried at every location too. `$<TOOL>_CONFIG` and an explicit
+`--config` still short-circuit the whole list, because nothing system-wide may
+override what a person typed.
+
+**The gap this closes is `$XDG_CONFIG_DIRS`.** It is the system-wide half of the
+XDG spec, colon-separated like `$PATH`, defaulting to `/etc/xdg`. A team
+shipping a machine-wide default could not do so before. It is searched **last**:
+an administrator's default must never outrank a file the person wrote.
+
+**First match wins, and dive merges.** That is the one place this deliberately
+diverges. `fangs` sets `MultiFile: true` and layers every file it finds, which
+is right for a scanner run under a fleet-wide policy. It is wrong here, and the
+reason is a question rather than a principle: once files merge, *"which config
+am I using"* stops having an answer and becomes *"which key came from where"*.
+A tool a person runs on their own laptop should answer the first question in one
+line, and `FindConfig` returning both the winner and every path it tried is how
+it does.
+
+Two extensions, not viper's seven. A tool that reads YAML should not have to
+answer questions about HCL.
+
+Eleven tests in `scaffold/templates/internal/engine/paths_test.go.tmpl` hold it,
+including the order as an exact list — the order *is* the decision, so a location
+in the wrong place is a different config being loaded rather than a cosmetic
+difference.
+
 ### Why this is not a `tuikit/conf` package
 
 Two tools have hand-rolled the same fifteen lines, which is the trigger in
