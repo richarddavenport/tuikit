@@ -57,7 +57,7 @@ outer moves the inner must be handed the **new** rect.
 
 ## The components
 
-Twenty-four. Run `tuikit gallery` to use every one in every state it has, or
+Twenty-five. Run `tuikit gallery` to use every one in every state it has, or
 `tuikit gallery -list` for the inventory as text.
 
 ### Lists and documents — three viewports, because they are not one thing
@@ -75,7 +75,19 @@ Twenty-four. Run `tuikit gallery` to use every one in every state it has, or
   color readable on the row you are pointing at.
 - **a right-aligned tail.** `Row.Right`.
 - **rows in more than one color.** `Row.Spans`.
-- **a range selection.** `Extend`, `Range`, `ClearRange`.
+- **a range selection.** `Extend`, `Range`, `ClearRange`. The anchor is
+  [`comp.Range`](#a-range-over-anything), which anything with a cursor can hold.
+- **a status column that survives an indent.** `Row.Status` is drawn before the
+  indent and `Row.Lead` after it, so a git status letter forms a column down the
+  screen while a fold marker travels with its row. `List.StatusWidth` reserves
+  the column and `LeadWidth()` is how wide the whole prefix is, for a header
+  that has to start in the same place.
+- **branches instead of an indent.** `Row.Indent` replaces the spaces
+  `Row.Depth` would have drawn — see [trees](#trees).
+- **a cursor that follows the row.** `Row.Key`, opt-in. Set it and a filter
+  applied or cleared leaves the cursor on the same *thing* rather than the same
+  *line*. Leave it empty and the cursor is an index, which is right and free for
+  a list whose rows never move.
 - **rows produced on demand.** `DrawFunc` asks only for what is visible, so a
   million rows cost a frame the size of the pane.
 - **giving the counter row back.** `NoStatus`.
@@ -89,7 +101,55 @@ Twenty-four. Run `tuikit gallery` to use every one in every state it has, or
 - **jumping to a line.** `Goto`, for a search hit or a `:` line number.
 - **sideways scrolling.** `ScrollX` cuts inside a span rather than on its
   boundary, so the offset does not jump by a syntax token.
+- **a highlight nobody dragged.** `SetRange(lo, hi)` works with `NoCursor` set,
+  for a span a *tool* chose — the bytes belonging to the field selected in
+  another pane. `Extend` still refuses, because dragging needs somewhere to drag
+  from.
 - **the same lazy `DrawFunc`** as `List`.
+
+### Trees
+
+`Tree` holds collapse state over a flattened hierarchy, keyed by the tool's own
+identity for a row rather than by index. `Visible(nodes)` returns the indices to
+draw.
+
+`Branches(nodes, chrome)` returns the connector prefix for each row — `│`, `├─`,
+`└─`. Which one a row gets cannot be derived from its depth: it depends on
+whether ancestors still have siblings coming, which is a fact about the rows in
+between. It returns **strings**, so they can go in `Row.Indent` for a list or
+inside one cell of a `Table` — which is where a process tree belongs, because a
+prefix in front of the PID makes every numeric column ragged.
+
+The connectors live in `theme.Chrome.Tree`, with `theme.ASCIITree` beside the
+default for a terminal that draws box characters as replacement boxes.
+
+### A range over anything
+
+`comp.Range` holds an **anchor**; the caller supplies the cursor. That is what
+lets one type serve a list, a document, a table row number and a tree node index
+without learning what any of them are.
+
+The zero value means no selection, so a fresh component cannot report a range
+from row 0. The span is derived from the cursor passed in and never stored,
+which is what keeps it correct under a deferred `Move`.
+
+It composes with `Marks` rather than competing: `Marks.Span` takes the keys a
+`Range` covers.
+
+### Subprocess output
+
+`ANSI(s)` and `ANSILines(s)` turn SGR escape sequences into `[]Segment`, for a
+pane showing what `kubectl` or `gcloud` just said.
+
+Colors pass through rather than being remapped. A tool's own color comes from
+the palette so the reader's theme wins; a subprocess's output is **data**, the
+same way its words are, and a tool that does not rewrite the nouns should not
+rewrite the colors either.
+
+`\r`, `\b` and tabs are handled, because they are how a progress line is drawn
+— a line is assembled in cells rather than appended to, so ten redraws come out
+as the final state. Cursor addressing and scroll regions are skipped whole:
+that is a terminal emulator, and hosting one is out of scope.
 
 ### Structure
 
