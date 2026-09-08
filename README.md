@@ -8,13 +8,13 @@ API client, a deploy tool.
 
 Three things here that a widget library does not give you:
 
-**Nothing is invented.** Every one of the 24 components was pulled out of tools
+**Nothing is invented.** Every one of the 25 components was pulled out of tools
 that had already written it. Usually two tools, and usually differently. Each
 component's doc comment names those tools and says what their versions
 disagreed about.
 
 That could still be a story we tell ourselves, so it is checked against other
-people's code. The [rebuilds repository](https://github.com/richarddavenport/tuikit-rebuilds) reads the source of ten widely used
+people's code. The [rebuilds repository](https://github.com/richarddavenport/tuikit-rebuilds) reads the source of eleven widely used
 TUIs, including lazygit, yazi, k9s, bottom and gitui. For each feature it asks
 one question: do we have it, are we missing it, or does it belong to the tool?
 Every gap is either filled or written down with its evidence. Three claims we
@@ -51,10 +51,10 @@ checkout, which is why the clone comes first. That goes when there is a tag.
 
 ## What you get
 
-**24 components** — `List` `Viewer` `Pane` `Tabs` `Bar` `Confirm` `StepList`
+**25 components** — `List` `Viewer` `Pane` `Tabs` `Bar` `Confirm` `StepList`
 `LogPane` `Spinner` `Table` `Detail` `Menu` `Toast` `Form` `Split` `Layout`
-`Meter` `Input` `Waiting` `Breadcrumb` `Scrollbar` `Keys` `Palette` `Rule`. Run
-`tuikit gallery` to use every one of them in every state it has, or
+`Meter` `Input` `Waiting` `Breadcrumb` `Scrollbar` `Keys` `Palette` `Rule`
+`Sparkline`. Run `tuikit gallery` to use every one of them in every state it has, or
 `tuikit gallery -list` to read the inventory as text.
 
 **One declaration, four surfaces.** A `spec.Command` carries its flags, args,

@@ -1,6 +1,6 @@
 # `comp` — the canvas and the components
 
-Everything you look at. A grid of cells, 24 components that draw into it, and
+Everything you look at. A grid of cells, 25 components that draw into it, and
 the text measurement they all share.
 
 ## The canvas

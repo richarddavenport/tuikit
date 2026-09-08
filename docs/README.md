@@ -6,7 +6,7 @@ do. Written for people building a tool. For why any of it is shaped this way,
 
 | | | |
 | --- | --- | --- |
-| [`comp`](comp.md) | the cell canvas and 24 components | drawing |
+| [`comp`](comp.md) | the cell canvas and 25 components | drawing |
 | [`app`](app.md) | key routing, mouse, screen stack, async | the shell |
 | [`spec`](spec.md) | one command declaration, four surfaces | the command line |
 | [`theme`](theme.md) | colour roles, a closed glyph set, box characters | the vocabulary |
