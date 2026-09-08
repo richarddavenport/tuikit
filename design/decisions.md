@@ -5,8 +5,9 @@ otherwise reach for.
 
 ## 1. The framework is a library and a scaffolder, split on mechanism vs policy
 
-Four tools — swarmctl, pgctl, azctl, dugo — already share a shape, and it travels
-by copy. A fix to a pane lands in one repo.
+Four tools — the deploy tool, the database tool, the cloud tool, the disk tool —
+already share a shape, and it travels by copy. A fix to a pane lands in one
+repo.
 
 **Mechanism goes in the library.** `guard.Tokens`, `guard.Glyphs`, `theme`,
 `docgen` are functions. They know Go source, terminal columns and ANSI, and they
@@ -19,8 +20,8 @@ delivered as generated code the tool owns and can edit on day one.
 
 **Backend-shaped things belong to the tool** — its fixtures, whether it captures
 live frames at all, what has to be standing up for that. No answer tuikit could
-give would be right for pgctl (needs a database), swarmctl (needs a swarm) and a
-backendless tool at once.
+give would be right for the database tool (needs a database), the deploy tool
+(needs a swarm) and a backendless tool at once.
 
 The corollary: tuikit's CI tests tuikit. A consuming tool's CI is that tool's
 business.
@@ -47,12 +48,12 @@ recolouring the palette. That is the whole reason roles are named.
 > got wrong is that it treated all 256 as equivalent. They are not — only the
 > first sixteen follow the reader's theme.
 
-Inherited from swarmctl. A truecolour hex looks right on the machine it was
-picked on and wrong over ssh from another; the 256 palette is what every terminal
-has agreed on. `theme.Hex` converts for anything drawing outside a terminal, and
-is computed from the palette formula rather than tabled — a table of nine
-hand-copied values is nine chances to copy one wrong, and wrong here means a
-design system quietly describing a different tool.
+Inherited from the deploy tool. A truecolour hex looks right on the machine it
+was picked on and wrong over ssh from another; the 256 palette is what every
+terminal has agreed on. `theme.Hex` converts for anything drawing outside a
+terminal, and is computed from the palette formula rather than tabled — a table
+of nine hand-copied values is nine chances to copy one wrong, and wrong here
+means a design system quietly describing a different tool.
 
 Capture will force lipgloss's *TrueColor profile* so those values are not
 stripped when there is no TTY. That is not a contradiction: the values stay 256.
@@ -104,10 +105,11 @@ a role cannot satisfy the guard with a swatch alone.
 
 ## 8. The name is tuikit, not ctlkit
 
-`ctlkit` echoed the family it came from — swarmctl, pgctl, azctl — but the `-ctl`
-suffix is a claim about what a tool *does*: it controls something. The framework
-controls nothing. What it is about is the terminal interface, which is what the
-four have in common and the only thing this module knows how to help with.
+`ctlkit` echoed the family it came from: every one of the four tools it was
+extracted from is named `something-ctl`. But that suffix is a claim about what a
+tool *does* — it controls something — and the framework controls nothing. What
+it is about is the terminal interface, which is what the four have in common and
+the only thing this module knows how to help with.
 
 Renamed before anything imported it, which is the only cheap time to do it.
 
@@ -130,25 +132,25 @@ an agent from `describe --json`, but only reaches what a keystroke reaches.
 Neither replaces the other, and pretending one does means either losing the
 states that matter most or making an agent read the test suite to take a picture.
 
-## 11. Extract from swarmctl, prove on azctl
+## 11. Extract from the deploy tool, prove on the cloud tool
 
-swarmctl is 65k lines and mid-flight, so it is the source rather than the first
-migration. azctl is 3.2k lines and the youngest, so it has the least to lose and
-is the honest test of whether the framework fits a real tool. A framework that
-has never met one is a guess.
+The deploy tool is 65k lines and mid-flight, so it is the source rather than the
+first migration. The cloud tool is 3.2k lines and the youngest, so it has the
+least to lose and is the honest test of whether the framework fits a real tool.
+A framework that has never met one is a guess.
 
 ## 12. No cobra
 
 Once `spec` is the source of truth for a command, cobra is a second description
-of the same tree and the work becomes adapting one into the other. That costs two
-things worth keeping: swarmctl's exit-code contract — `0`, `1`, `2` meaning "a
-dry run found drift", and a script's own status passed through — and the
-dual-mode entry where `main` decides whether an argument is a subcommand or the
-start of the TUI's flags. Cobra wants to own `os.Exit` and returns 1 for
+of the same tree and the work becomes adapting one into the other. That costs
+two things worth keeping: the deploy tool's exit-code contract — `0`, `1`, `2`
+meaning "a dry run found drift", and a script's own status passed through — and
+the dual-mode entry where `main` decides whether an argument is a subcommand or
+the start of the TUI's flags. Cobra wants to own `os.Exit` and returns 1 for
 everything.
 
 What cobra would have given free — completions, generated help — generates from
-`spec` directly. dugo drops it when it migrates.
+`spec` directly. The disk tool drops it when it migrates.
 
 ## 13. ANSI files and HTML, not SVG
 
@@ -168,13 +170,13 @@ lies.
 so the version is the same whether or not anything is installed, and there is no
 path where the step is skipped.
 
-The pin itself is inherited from swarmctl, which hit the same wall and left the
-comment: golangci-lint-action's `version: latest` resolves to the v1 line, built
-with go1.24, which refuses to run against a `go 1.25.0` directive rather than
-degrading. The action must be `@v8` and the version an explicit v2.
+The pin itself is inherited from the deploy tool, which hit the same wall and
+left the comment: golangci-lint-action's `version: latest` resolves to the v1
+line, built with go1.24, which refuses to run against a `go 1.25.0` directive
+rather than degrading. The action must be `@v8` and the version an explicit v2.
 
-This is the copy-by-hand problem the scaffolder exists to end: swarmctl knew the
-answer, and tuikit rediscovered it by breaking.
+This is the copy-by-hand problem the scaffolder exists to end: the deploy tool
+knew the answer, and tuikit rediscovered it by breaking.
 
 ## 15. democtl is seeded and clock-frozen, not merely backendless
 
@@ -194,8 +196,8 @@ comparing two independently generated fleets.
 ## 16. The example is a tool, not a widget showcase
 
 democtl manages a fictional fleet with a dashboard, logs, a modal and a step run
-— the four shapes swarmctl, pgctl, azctl and dugo all have. It is deliberately
-not a gallery of components in a grid.
+— the four shapes the deploy tool, the database tool, the cloud tool and the
+disk tool all have. It is deliberately not a gallery of components in a grid.
 
 A showcase demonstrates that a widget renders. A tool demonstrates the things
 that actually go wrong: a modal that has to bound itself to the terminal, an
@@ -205,7 +207,8 @@ agent — needs the reference for, and none of them appear in a widget grid.
 
 `tuikit gallery` is still worth building, and it will be seeded from democtl's
 components. But the components come from a working tool first, the same way
-`theme` came from swarmctl rather than from a palette designed in the abstract.
+`theme` came from the deploy tool rather than from a palette designed in the
+abstract.
 
 ## 17. Writing the example before the components is the right order
 
@@ -237,8 +240,8 @@ Gloss keeps styling; its layout helpers go.
 Two consequences beyond the mouse. Style lives on the cell, so nothing parses
 ANSI — the trim-versus-clip distinction the grid page documents stops existing.
 And `Set` clips to the canvas, so drawing past the edge is not an error to catch
-but a coordinate that does not exist: overflow, which caused two of pgctl's three
-capture bugs and both of democtl's, stops being a class of bug.
+but a coordinate that does not exist: overflow, which caused two of the database
+tool's three capture bugs and both of democtl's, stops being a class of bug.
 
 ## 19. Every mouse action needs a keyboard path, and a guard enforces it
 
@@ -299,9 +302,9 @@ engine. The open question was whether tuikit should offer the engine anything.
 
 It should not, and the bar is higher than "no Bubble Tea imports". Measured on
 the tools that exist: democtl's `fleet` imports `fmt`, `math/rand` and `time` —
-stdlib only. swarmctl's `internal/engine` imports nothing from charmbracelet at
-all. What an engine imports is stdlib plus its own domain SDK: pgx, the Azure
-SDK, the Docker SDK.
+stdlib only. The deploy tool's `internal/engine` imports nothing from
+charmbracelet at all. What an engine imports is stdlib plus its own domain SDK:
+pgx, the Azure SDK, the Docker SDK.
 
 So the rule is **no terminal concepts**, not merely no terminal library. No
 colour, no width, no keys, no framework. An engine that has never heard of a
@@ -322,9 +325,9 @@ the boundary stops being checkable.
 
 Checkable is the point, and `guard.Engine` does it — a deny-list by *category*
 rather than by library, because an engine that measures display width has
-learned about columns whichever package it used. swarmctl's, pgctl's and azctl's
-engines all pass it; swarmctl's TUI reports 37 imports, so it is not passing
-vacuously.
+learned about columns whichever package it used. The deploy tool's, the database
+tool's and the cloud tool's engines all pass it; the deploy tool's TUI reports
+37 imports, so it is not passing vacuously.
 
 ## 23. `tuikit watch` polls, rather than depending on fsnotify
 
@@ -352,13 +355,13 @@ for.
 
 ## 24. A palette role holds a `TerminalColor`, not a `Color`
 
-Found by migrating azctl, which is what that migration is for.
+Found by migrating the cloud tool, which is what that migration is for.
 
-azctl's palette is `lipgloss.AdaptiveColor` pairs — a light value and a dark
-one, so the tool reads on a pale terminal as well as a dark one. `theme.Palette`
-held `lipgloss.Color`, which cannot express that at all, so azctl's choice was
-between tuikit's vocabulary and working in daylight. That is not a choice a
-design system should be imposing.
+The cloud tool's palette is `lipgloss.AdaptiveColor` pairs — a light value and a
+dark one, so the tool reads on a pale terminal as well as a dark one.
+`theme.Palette` held `lipgloss.Color`, which cannot express that at all, so the
+cloud tool's choice was between tuikit's vocabulary and working in daylight.
+That is not a choice a design system should be imposing.
 
 **Depth and adaptation are different questions.** Decision 13 chose ANSI 256
 over truecolour because ssh decides the profile — that is about how many colours
@@ -384,17 +387,18 @@ them it will not. Hex answers what it looks like; Value answers what it is.
 
 ## 25. The nine roles are the framework's vocabulary, not the tool's promise
 
-Two guard bugs, both found in the first ten minutes of azctl's migration.
+Two guard bugs, both found in the first ten minutes of the cloud tool's
+migration.
 
-**`guard.Tokens` demanded that every role be drawn with.** azctl failed on four
-at once — `Stderr`, `SelectionFG`, `SelectionBG` and its own `Text` — for the
-crime of being a resource browser rather than a table. "Either use it or drop
-it" is advice a tool cannot take: the nine are fields on a struct it inherited
-from `theme.Default`, and there is no dropping them.
+**`guard.Tokens` demanded that every role be drawn with.** the cloud tool failed
+on four at once — `Stderr`, `SelectionFG`, `SelectionBG` and its own `Text` —
+for the crime of being a resource browser rather than a table. "Either use it or
+drop it" is advice a tool cannot take: the nine are fields on a struct it
+inherited from `theme.Default`, and there is no dropping them.
 
-The check came from swarmctl, where the palette was the tool's own file and an
-unused role really was dead code. Inheriting a palette is what made that stop
-being true, and nothing noticed until a second tool inherited one.
+The check came from the deploy tool, where the palette was the tool's own file
+and an unused role really was dead code. Inheriting a palette is what made that
+stop being true, and nothing noticed until a second tool inherited one.
 
 So the check now applies to `Extra` only. An unused Extra is still dead and
 still fails: a tool that invented a tenth meaning and then did not use it has
@@ -402,8 +406,8 @@ left a name for the next person to wonder about.
 
 **`guard.Glyphs` did not honour `GlyphSet.Printable`.** It looked the rune up in
 the map directly, so `SpinnerRange` — documented in `theme` as the one thing the
-allow-list does not cover — did nothing, and azctl's `⠿` was rejected. Two
-functions answering "may this be printed" differently is worse than either
+allow-list does not cover — did nothing, and the cloud tool's `⠿` was rejected.
+Two functions answering "may this be printed" differently is worse than either
 answer on its own; the guard now asks `Printable`, which is the exported one.
 
 Worth noting what the second bug was hiding behind: `SpinnerRange`'s comment
@@ -414,49 +418,49 @@ writing its own frame was never covered at all.
 
 ## 26. A depth and a toggle set, not a `comp.Tree`
 
-azctl has a tree, and the question was whether `comp` needs one. The five tools
-were surveyed rather than guessed at:
+The cloud tool has a tree, and the question was whether `comp` needs one. The
+five tools were surveyed rather than guessed at:
 
 | | Hierarchy in the UI? |
 |---|---|
-| azctl | **Yes** — real expand/collapse, `expanded map[string]bool`, ▸/▾, two levels |
-| swarmctl | The flattened shape in **four** places — diff rows, apply rows, pane rows, disk detail — and always fully expanded |
-| dugo | Recursive *data*, presented as a **drill-down** with a nav stack |
-| pgctl | No. Five flat parallel panels; hierarchy is panel-to-panel scoping |
+| the cloud tool | **Yes** — real expand/collapse, `expanded map[string]bool`, ▸/▾, two levels |
+| the deploy tool | The flattened shape in **four** places — diff rows, apply rows, pane rows, disk detail — and always fully expanded |
+| the disk tool | Recursive *data*, presented as a **drill-down** with a nav stack |
+| the database tool | No. Five flat parallel panels; hierarchy is panel-to-panel scoping |
 | democtl | No. `stack` is a detail field, never a grouping |
 
 A tree widget has one consumer. That is not the bar.
 
-**dugo is why the answer is not "one consumer for now".** It has the deepest
-hierarchy of the five and answers it with `navStack []NavigationState` — push on
-descend, pop on ascend, the cursor remembered per level. Shipping `comp.Tree`
-would commit the framework to the two-level flattened model, and the tool with
-the most hierarchy in it would not use the component. A drill-down is not a
-worse tree; it is the right answer when the depth is unbounded and the fan-out
-is large, which is what a filesystem is.
+**the disk tool is why the answer is not "one consumer for now".** It has the
+deepest hierarchy of the five and answers it with `navStack []NavigationState` —
+push on descend, pop on ascend, the cursor remembered per level. Shipping
+`comp.Tree` would commit the framework to the two-level flattened model, and the
+tool with the most hierarchy in it would not use the component. A drill-down is
+not a worse tree; it is the right answer when the depth is unbounded and the
+fan-out is large, which is what a filesystem is.
 
 ### What did have two consumers
 
-**A row that knows its depth.** azctl left the clearest possible statement of a
-missing field, as a comment explaining a workaround:
+**A row that knows its depth.** the cloud tool left the clearest possible
+statement of a missing field, as a comment explaining a workaround:
 
-> The marker is built into the row rather than set on the list, because azctl
+> The marker is built into the row rather than set on the list, because the cloud tool
 > marks a RESOURCE row and not a bucket header — comp.List's Marker is one
 > character for the whole list, which is right for a flat list and not for a
 > tree.
 
 So it built the indent into the row text and recomputed `i == cursor` itself, to
-place its own cursor glyph — doing the list's job, inside the list's input.
-swarmctl does the same by hand in four places, as a literal `"  " + line`.
+place its own cursor glyph — doing the list's job, inside the list's input. The
+deploy tool does the same by hand in four places, as a literal `" " + line`.
 `Row.Depth` and `Row.Lead` are that comment, as two fields.
 
-**A keyed toggle set.** azctl's `expanded map[string]bool` and swarmctl's
-`revealState{all bool; rows map[string]bool}` are the same type under two names,
-for two unrelated purposes — expansion, and unmasking secrets. A shape arrived
-at twice independently, for different reasons, is the strongest form of this
-project's signal. `app.Toggles` took swarmctl's semantics, which were the better
-of the two: turning the global override off also clears the per-key set, so the
-key twice is a reliable way back to nothing.
+**A keyed toggle set.** the cloud tool's `expanded map[string]bool` and the
+deploy tool's `revealState{all bool; rows map[string]bool}` are the same type
+under two names, for two unrelated purposes — expansion, and unmasking secrets.
+A shape arrived at twice independently, for different reasons, is the strongest
+form of this project's signal. `app.Toggles` took the deploy tool's semantics,
+which were the better of the two: turning the global override off also clears
+the per-key set, so the key twice is a reliable way back to nothing.
 
 ### What must not be generalised
 
@@ -469,8 +473,8 @@ interface that is still honest.
 
 ### Two rules the survey turned up, worth keeping
 
-azctl's `rebuild()` does two things nobody else does and everybody eventually
-wants:
+The cloud tool's `rebuild()` does two things nobody else does and everybody
+eventually wants:
 
 - **The selection is preserved by identity, not by row index.** After a
   re-pivot, a filter or a refresh, it re-selects the row whose resource ID
@@ -643,9 +647,10 @@ SelectionFG is the background and SelectionBG the foreground, so it inverts
 correctly on a light theme **by construction** rather than by detecting one. No
 `AdaptiveColor`, no `COLORFGBG` sniffing, no light profile to maintain.
 
-swarmctl's design notes reached the same place independently, exploring a light
-terminal profile: reverse video is *"the one treatment that reads identically in
-both profiles"*. Two routes to one answer is the signal this project runs on.
+The deploy tool's design notes reached the same place independently, exploring a
+light terminal profile: reverse video is *"the one treatment that reads
+identically in both profiles"*. Two routes to one answer is the signal this
+project runs on.
 
 ### What it costs
 
@@ -679,10 +684,10 @@ sixteen are now every swatch on the design system page.
 
 ## 29. Pixels are a decoration pass, and the cells are always the drawing
 
-swarmctl's design notes asked for a pixel layer — a panel drawn as a real image
-composited over the terminal, with a soft shadow and a smooth gradient. The
-obvious reading is that this needs a second renderer and a second view, and that
-a tool would have to be written twice.
+The deploy tool's design notes asked for a pixel layer — a panel drawn as a real
+image composited over the terminal, with a soft shadow and a smooth gradient.
+The obvious reading is that this needs a second renderer and a second view, and
+that a tool would have to be written twice.
 
 It does not, and the reason is decision 20. **An owner ID already says which
 cells a component drew.** So the pixel layer needs no layout of its own; it
@@ -855,9 +860,9 @@ and without a picture, because no test in CI can tell you whether foot draws it.
 
 TEA's third step is `View() string`, and that string is a seam.
 
-A tuikit model is supposed to compute no coordinates: components take rects,
-the canvas owns the grid, and the tool declares what goes where. azctl was got
-to the point where `grep -c 'c.Text(|c.Fill(|c.Set(' internal/tui/*.go` is
+A tuikit model is supposed to compute no coordinates: components take rects, the
+canvas owns the grid, and the tool declares what goes where. The cloud tool was
+got to the point where `grep -c 'c.Text(|c.Fill(|c.Set(' internal/tui/*.go` is
 **zero** — a real result, and one nothing enforced. A model returning a string
 can hand back a hand-joined pile of lipgloss, or a canvas frame with something
 concatenated onto it, and the goldens will record whatever comes out. It was a
@@ -895,14 +900,14 @@ Four things every tool set up the same way and could get subtly different:
 The runner sizes the canvas at `terminal height - 1`, justified above as a
 convention because both tools here did it independently. That justification is
 weaker than it reads: democtl's own comment says the row came from "where the
-old bodyHeight arithmetic already put it", so it was inherited from swarmctl
-rather than chosen, and two tools agreeing is not two decisions when one was
-copied from the other.
+old bodyHeight arithmetic already put it", so it was inherited from the deploy
+tool rather than chosen, and two tools agreeing is not two decisions when one
+was copied from the other.
 
 The plausible reasons are real — pending wrap on the bottom-right cell, and
 where the cursor parks — and neither has been measured. The counter-evidence is
-also real: azctl ran at full height until it migrated here, with no scrolling
-and no lost top line.
+also real: the cloud tool ran at full height until it migrated here, with no
+scrolling and no lost top line.
 
 So this is recorded as an open question rather than a settled rule. It costs
 every tool a row on faith, and issue 37 says how to find out.
@@ -943,10 +948,10 @@ says BUILD, so this case should never persist — if it does, the rule is being
 misquoted rather than applied.
 
 **A component whose shape we do not know.** Here the rule earns its keep, and
-decision 26 is the proof: azctl's `row{bucket, res}` and swarmctl's
-`diffRow{service, action, change}` look alike and are not, because each carries
-a domain payload. A shared `[]Node` would have forced both to box their data or
-keep it twice. `comp.Tree` would have been WRONG, not merely early.
+decision 26 is the proof: the cloud tool's `row{bucket, res}` and the deploy
+tool's `diffRow{service, action, change}` look alike and are not, because each
+carries a domain payload. A shared `[]Node` would have forced both to box their
+data or keep it twice. `comp.Tree` would have been WRONG, not merely early.
 
 **So: no use case is a reason to wait. Not knowing the shape is a reason to
 refuse.** Only the second is a principle.
@@ -980,12 +985,12 @@ visible from a migration.
 Three bugs in one evening had the same shape: **prose describing behaviour the
 code never had.**
 
-- azctl's mouse handler: *"a bucket header expands with enter or a click on
+- the cloud tool's mouse handler: *"a bucket header expands with enter or a click on
   it"*, above a handler that only moved the cursor. Clicking a header did
   nothing visible, so the mouse looked broken.
-- azctl's runner footer: `q abort (the running step finishes)`. `q` cancelled
+- the cloud tool's runner footer: `q abort (the running step finishes)`. `q` cancelled
   the run and quit the whole program, with no question asked.
-- `comp.Spinner`'s own doc: *"azctl's single ⠿ is a spinner that has stopped,
+- `comp.Spinner`'s own doc: *"the cloud tool's single ⠿ is a spinner that has stopped,
   which reads as hung rather than as working. Not carried."* It was carried, by
   omission — the runner never ticked, so the spinner froze on whichever glyph
   the last event left it on.
@@ -1017,21 +1022,23 @@ the disagreement on disk.
 
 | tool | how it resolves | where that lands on macOS |
 | --- | --- | --- |
-| pgctl | `os.UserConfigDir()` | `~/Library/Application Support/pgctl/config.yaml` |
-| swarmctl | `os.UserConfigDir()` | `~/Library/Application Support/swarmctl/config.yaml` |
-| azctl | `os.UserHomeDir()` + a hardcoded `.config` | `~/.config/azctl/playbooks` |
+| the database tool | `os.UserConfigDir()` | `~/Library/Application Support/the database tool/config.yaml` |
+| the deploy tool | `os.UserConfigDir()` | `~/Library/Application Support/the deploy tool/config.yaml` |
+| the cloud tool | `os.UserHomeDir()` + a hardcoded `.config` | `~/.config/the cloud tool/playbooks` |
 
 `os.UserConfigDir()` honours `$XDG_CONFIG_HOME` on Linux and ignores it on
-darwin, where it returns `~/Library/Application Support`. So pgctl and swarmctl
-have byte-for-byte identical search code that can never land where azctl's does.
+darwin, where it returns `~/Library/Application Support`. So the database tool
+and the deploy tool have byte-for-byte identical search code that can never land
+where the cloud tool's does.
 
 The tell that the stdlib answer is the wrong one is what was actually found
-there: swarmctl's own `state.yaml` sitting among `com.apple.ContextStoreAgent`
-and `com.apple.avfoundation`, while the configs a person had written by hand —
-`orb.yaml`, `orb-monorepo.yaml` — were in `~/.config/swarmctl/`, where the
-search order does not look. The user put them where the convention says they go.
-That convention is not a preference: the same `~/.config` held `gh`, `git`,
-`nvim`, `fish`, `tmux`, `btop`, `sops` and `gcloud`.
+there: the deploy tool's own `state.yaml` sitting among
+`com.apple.ContextStoreAgent` and `com.apple.avfoundation`, while the configs a
+person had written by hand — `orb.yaml`, `orb-monorepo.yaml` — were in
+`~/.config/the deploy tool/`, where the search order does not look. The user put
+them where the convention says they go. That convention is not a preference: the
+same `~/.config` held `gh`, `git`, `nvim`, `fish`, `tmux`, `btop`, `sops` and
+`gcloud`.
 
 **So: `$XDG_CONFIG_HOME` if set, else `~/.config/<tool>/`, on every platform
 including macOS.** `os.UserConfigDir()` is right for an application with a
@@ -1042,8 +1049,8 @@ a config you will write twice.
 
 **State is not config.** Config is written by a person and belongs in that
 dotfiles repository; state is written by the tool and must not follow you to
-another machine — swarmctl's `state.yaml` maps an environment to the SSH key
-installed *on this laptop*. State goes in `$XDG_STATE_HOME`, else
+another machine — the deploy tool's `state.yaml` maps an environment to the SSH
+key installed *on this laptop*. State goes in `$XDG_STATE_HOME`, else
 `~/.local/state/<tool>/`. One tool has state today, which is exactly when the
 pattern is cheap to set.
 
@@ -1096,9 +1103,9 @@ Two tools have hand-rolled the same fifteen lines, which is the trigger in
 decision 31 for extracting a component. It is still refused, and the reason is
 decision 22: `guard.TerminalPackages` denies
 `github.com/richarddavenport/tuikit` outright — *the engine gets nothing from
-the framework*. Config loading is engine work in both tools that do it
-(`pgctl/internal/config`, `swarmctl/internal/engine`), so a shared package would
-force one of two things, and both are worse than the duplication:
+the framework*. Config loading is engine work in both tools that do it (`the
+database tool/internal/config`, `the deploy tool/internal/engine`), so a shared
+package would force one of two things, and both are worse than the duplication:
 
 - weaken the deny-list to "tuikit, except the parts we decided are not really
   the framework", which is the "minimal UI-free surface" already rejected in
@@ -1119,9 +1126,9 @@ rule that no longer means anything, and because the thing being copied is a
 policy that should almost never change — if it does, it is because an operating
 system moved, and that is not a patch anybody applies silently.
 
-Existing tools were deliberately **not** changed. Moving pgctl's and swarmctl's
-search order orphans a file that exists right now, and each tool's own repository
-is where that migration gets weighed.
+Existing tools were deliberately **not** changed. Moving the database tool's and
+the deploy tool's search order orphans a file that exists right now, and each
+tool's own repository is where that migration gets weighed.
 
 ## 34. Frames publish as SVG, and the typeface question stays open
 
@@ -1174,17 +1181,18 @@ in the suite, and the case that would show a broken grid first.
 
 ## 35. Chrome characters come from the chrome, and `comp.Rule` is the missing one
 
-Filed from a tool (issue 43): azctl drew a horizontal rule under two headers
-with `c.Fill(bands[1], "─", …)`, which broke the invariant azctl's own AGENTS.md
-documents about itself — `grep -c 'c.Text(\|c.Fill(\|c.Set(' internal/tui/*.go`
-is supposed to be 0.
+Filed from a tool (issue 43): the cloud tool drew a horizontal rule under two
+headers with `c.Fill(bands[1], "─", …)`, which broke the invariant the cloud
+tool's own AGENTS.md documents about itself — `grep -c
+'c.Text(\|c.Fill(\|c.Set(' internal/tui/*.go` is supposed to be 0.
 
 The report claimed two tools and three instances, and was careful to say it was
-discounting four of swarmctl's five `─` hits as `comp.Pane`'s job in a tool that
-predates `comp.Pane`. That care is what made it checkable, and checking it found
-more: searching for the SHAPE rather than the character turns up seven
-instances across four codebases, and **three of them were inside tuikit** —
-`gallery/model.go`, `examples/democtl/ui/view.go`, and `comp/palette.go` twice.
+discounting four of the deploy tool's five `─` hits as `comp.Pane`'s job in a
+tool that predates `comp.Pane`. That care is what made it checkable, and
+checking it found more: searching for the SHAPE rather than the character turns
+up seven instances across four codebases, and **three of them were inside
+tuikit** — `gallery/model.go`, `examples/democtl/ui/view.go`, and
+`comp/palette.go` twice.
 
 Every one is the same three lines: a `Bar` drawn into one band, then a rule
 filled into the next.
@@ -1232,24 +1240,24 @@ reason to refuse rather than to guess.
 
 ## 36. A default that was right for the first tool is evidence, not a law
 
-Three reports against `comp.List` landed together (issues 44, 45, 46), from
-pgctl migrating onto the canvas. They look unrelated and are the same thing: a
-choice made when one tool used the component, meeting the second tool.
+Three reports against `comp.List` landed together (issues 44, 45, 46), from The
+database tool migrating onto the canvas. They look unrelated and are the same
+thing: a choice made when one tool used the component, meeting the second tool.
 
 **The selection swallowed a row's state glyph (44).** A selected row is drawn in
 one colour whatever its spans say, because "a row that kept its own colours
 under it would make the cursor hard to find in exactly the list where finding it
-matters." That is right for a LABEL. pgctl's connection list marks reachability
-with `●` `○` `✗` in the first column, and on the cursor row all three came out
-bold black on white — the one row a reader is looking at was the one row whose
-status they could not read. **A person using it reported this**, not a test:
-*"when highlighting I can't see the color of the dot."*
+matters." That is right for a LABEL. The database tool's connection list marks
+reachability with `●` `○` `✗` in the first column, and on the cursor row all
+three came out bold black on white — the one row a reader is looking at was the
+one row whose status they could not read. **A person using it reported this**,
+not a test: *"when highlighting I can't see the color of the dot."*
 
 It is also an accessibility defect and not only a legibility one. A black `●` on
 light grey does not read as "a green one, highlighted"; it reads as a DIFFERENT
-state — off, disabled. pgctl was saved by using four distinct shapes as well as
-four colours. A tool encoding state in colour alone would have lost it outright
-and nothing in the API would have warned it.
+state — off, disabled. The database tool was saved by using four distinct shapes
+as well as four colours. A tool encoding state in colour alone would have lost
+it outright and nothing in the API would have warned it.
 
 `Row.LeadStyle` keeps the lead column's own colour through the selection. Only
 the lead. Letting every styled span survive is more elegant and makes the
@@ -1259,12 +1267,13 @@ selection is for.
 
 **The status row is charged per list (46).** It is reserved whether or not the
 list overflows, because "a viewport that only looks like one when it is
-scrolling is a viewport you cannot tell from a short list." True for azctl's one
-big tree, where `18/18` earns its row. pgctl stacks FIVE lists in a column: at
-80×24 that is five of about twenty-one body rows, a quarter of the column, on
-counters reading `3/3`, `3/3`, `1/1`, `1/1` and blank — beside panel titles that
-already say the same number. `NoStatus` turns it off, and `Overhead()` reports
-what the list spends on itself so a tool stops encoding `const chrome = 3`.
+scrolling is a viewport you cannot tell from a short list." True for the cloud
+tool's one big tree, where `18/18` earns its row. The database tool stacks FIVE
+lists in a column: at 80×24 that is five of about twenty-one body rows, a
+quarter of the column, on counters reading `3/3`, `3/3`, `1/1`, `1/1` and blank
+— beside panel titles that already say the same number. `NoStatus` turns it off,
+and `Overhead()` reports what the list spends on itself so a tool stops encoding
+`const chrome = 3`.
 
 **`Select` cancelled a pending `Move`, silently (45).** Every one of these tools
 independently arrived at "clamp every cursor when the data changes", from when a
@@ -1298,10 +1307,10 @@ that the first reasoning demonstrably does not cover.
 Issue 6, open since the first week, blocked on the canvas existing.
 
 `guard.Width` was planned because overflow is the commonest bug in a TUI and the
-one assertions miss — two of pgctl's three capture bugs and both of democtl's
-were something drawn wider than its container. Then the canvas made it look
-unnecessary: `Set` clips, so drawing past the edge is a coordinate that does not
-exist rather than an error to catch.
+one assertions miss — two of the database tool's three capture bugs and both of
+democtl's were something drawn wider than its container. Then the canvas made it
+look unnecessary: `Set` clips, so drawing past the edge is a coordinate that
+does not exist rather than an error to catch.
 
 **The canvas guarantees the wrong thing.** It guarantees nothing lands outside
 the CANVAS. It guarantees nothing about a component staying inside the RECT it
@@ -1356,9 +1365,9 @@ project keeps finding by looking.
 Issue 37: `app.Runner` sized the canvas at `terminal height - 1` and nothing in
 the repo said why. Every mention was a description — *"the bottom line is left
 for the terminal"*, *"which is where the old bodyHeight arithmetic already put
-it"*. The second is the tell: democtl inherited it from swarmctl. It was then
-promoted to a framework rule in decision 30 on the grounds that two tools did it
-independently, **which is not two decisions if one was copied**.
+it"*. The second is the tell: democtl inherited it from the deploy tool. It was
+then promoted to a framework rule in decision 30 on the grounds that two tools
+did it independently, **which is not two decisions if one was copied**.
 
 **Measured.** tmux 3.5a, 24×10, `tea.WithAltScreen`, a frame of exactly the
 terminal height with a bordered pane so the bottom-right cell is genuinely
@@ -1376,9 +1385,9 @@ No scroll, no lost top line. The reserved version simply leaves row 10 blank.
 The pending-wrap hazard is real in general and does not fire here, because
 nothing is written *after* the last cell — the flag is set and the frame ends.
 The issue's own hypothesis looks right: this is an INLINE-renderer workaround
-carried into alt-screen code, where it does not apply. azctl is corroborating
-evidence, having run at full height for months before it migrated with no report
-of a lost line.
+carried into alt-screen code, where it does not apply. The cloud tool is
+corroborating evidence, having run at full height for months before it migrated
+with no report of a lost line.
 
 ### So why is it still the default
 
@@ -1399,17 +1408,17 @@ fixed whichever way the measurement eventually goes.
 
 ## 39. No leave-confirm in the framework: the second tool wanted the opposite
 
-Issue 41 recorded azctl's "leaving would lose something" pattern and parked it
-for a second consumer, per decision 31. The second consumer arrived, and it
-settles the question the other way.
+Issue 41 recorded the cloud tool's "leaving would lose something" pattern and
+parked it for a second consumer, per decision 31. The second consumer arrived,
+and it settles the question the other way.
 
-**azctl**, mid-playbook, `q` or `esc` opens a confirm:
+**the cloud tool**, mid-playbook, `q` or `esc` opens a confirm:
 
 > The run is still going. Leaving stops it where it is — **the steps that have
 > already run are not undone.**
 
-**pgctl**, mid-operation, `q` cancels immediately with no question at all
-(`internal/tui/app.go:330`):
+**the database tool**, mid-operation, `q` cancels immediately with no question
+at all (`internal/tui/app.go:330`):
 
 ```go
 case "q":
@@ -1419,19 +1428,20 @@ case "q":
         m.active.cancel()
 ```
 
-Both are right. The difference is not taste and not maturity: **azctl's work
-cannot be undone and pgctl's can.** A half-run playbook leaves an environment
-neither finished nor untouched, so the reader has to be told before it happens.
-A cancelled pgctl operation runs its failure hooks and brings the database back
-up, so a confirmation would be a dialog standing between a reader and the safest
-available action — and one that makes cancelling *slower* in exactly the moment
-someone is trying to stop something.
+Both are right. The difference is not taste and not maturity: **the cloud tool's
+work cannot be undone and the database tool's can.** A half-run playbook leaves
+an environment neither finished nor untouched, so the reader has to be told
+before it happens. A cancelled the database tool operation runs its failure
+hooks and brings the database back up, so a confirmation would be a dialog
+standing between a reader and the safest available action — and one that makes
+cancelling *slower* in exactly the moment someone is trying to stop something.
 
 An `app.Keys{Leaving: …}` field, or a stack that refuses to be popped, would
-have imposed azctl's answer on pgctl. The framework cannot tell these apart,
-because the question is whether the domain's work is recoverable, and that is
-the engine's knowledge — decision 22 says the engine tells the UI nothing about
-terminals, and this is the same boundary from the other side.
+have imposed the cloud tool's answer on the database tool. The framework cannot
+tell these apart, because the question is whether the domain's work is
+recoverable, and that is the engine's knowledge — decision 22 says the engine
+tells the UI nothing about terminals, and this is the same boundary from the
+other side.
 
 So: **refused**, and this is the `comp.Tree` outcome rather than the
 `app.Toggles` one. Two tools wrote something similar-looking, and the parts that
@@ -1442,10 +1452,10 @@ which is about writing rather than about mechanism: **"are you sure" is a
 question about nothing.** A confirm names what is lost, or it is theatre. That
 belongs in the design notes and not in a component.
 
-The second half of azctl's pattern also survives as a general point and is now
-in `design/keys.md`: `ctrl+c` never asks — a confirmation on the universal
-escape hatch is a program arguing with it — and the key that OPENED a question
-must not also answer yes.
+The second half of the cloud tool's pattern also survives as a general point and
+is now in `design/keys.md`: `ctrl+c` never asks — a confirmation on the
+universal escape hatch is a program arguing with it — and the key that OPENED a
+question must not also answer yes.
 
 ## 40. Two guards for the lies an interface tells about itself
 
@@ -1468,10 +1478,10 @@ is one every tool learns to suppress.
 
 **Narrowing to a literal passed to a canvas draw — `Set`, `Text`, `Fill` —
 excludes both, because neither is a call.** Run against six real packages it
-reported two findings, both known and both real (azctl's, now `comp.Rule`), and
-zero false positives. It also found a **sixth** hardcoded site nobody had
-counted: `scaffold/templates/internal/tui/view.go.tmpl`, the file every new tool
-starts from.
+reported two findings, both known and both real (the cloud tool's, now
+`comp.Rule`), and zero false positives. It also found a **sixth** hardcoded site
+nobody had counted: `scaffold/templates/internal/tui/view.go.tmpl`, the file
+every new tool starts from.
 
 ### `harness.Hints` — an advertised key that does nothing
 
@@ -1483,10 +1493,10 @@ screen-level keys are not commands and never will be, so a footer legitimately
 names more than the spec does. The runtime route works: press each advertised
 key, report the ones that change nothing.
 
-**But it does not catch the bug that prompted it.** azctl's runner promised
-`q abort (the running step finishes)` while `q` cancelled the run and quit the
-program. `q` did plenty — it just did not do what the footer said. That is a
-claim about English, and no mechanical check reaches it.
+**But it does not catch the bug that prompted it.** the cloud tool's runner
+promised `q abort (the running step finishes)` while `q` cancelled the run and
+quit the program. `q` did plenty — it just did not do what the footer said. That
+is a claim about English, and no mechanical check reaches it.
 
 So the guard catches the lesser sibling, the DEAD advertised key, and its doc
 says so rather than implying more. The issue's own worry about false positives
@@ -1562,11 +1572,11 @@ else.
 ### The line it draws, which is the part worth getting right
 
 **The meaning is reserved. The behaviour is not.** A tool may put a question in
-front of `q`, and decision 39 is the argument for why it must be allowed to:
-azctl asks before abandoning a half-run playbook, pgctl cancels immediately
-because its failure hooks bring the database back up, and a framework that
-standardised THAT would have been wrong about one of them. What a tool may not
-do is make `q` mean something that is not leaving.
+front of `q`, and decision 39 is the argument for why it must be allowed to: The
+cloud tool asks before abandoning a half-run playbook, the database tool cancels
+immediately because its failure hooks bring the database back up, and a
+framework that standardised THAT would have been wrong about one of them. What a
+tool may not do is make `q` mean something that is not leaving.
 
 That is the distinction which makes this safe to impose when decision 39 was not
 safe to impose. "What does this key mean" is a promise to a reader, and it is
@@ -1621,9 +1631,9 @@ the display this was measured on:
   three rows tall is something a terminal cannot do at all.
 
 So the question is not "should tuikit rasterise text". It is "should tuikit draw
-text LARGER than a character", and nothing has asked for that. The swarmctl
-handoff that motivated the pixel layer wanted a heading, and a terminal draws a
-heading perfectly well at one cell.
+text LARGER than a character", and nothing has asked for that. The the deploy
+tool handoff that motivated the pixel layer wanted a heading, and a terminal
+draws a heading perfectly well at one cell.
 
 ### The conflict that settles it
 
@@ -1734,7 +1744,7 @@ pub struct Row { pub ratio: Option<u16>, pub child: Option<Vec<RowChildren>> }
 ```
 
 `src/app/layout_manager.rs` is 47 kB. gh-dash defines its dashboard in YAML
-down to per-column `Width` and `Hidden` (`internal/config/parser.go:146`), and
+down to per-column `Width` and `Hidden`, and
 dive computes its own arrangement in `ui/v1/layout/manager.go`.
 
 So the narrow version — **the arrangement is data, the components stay Go** —

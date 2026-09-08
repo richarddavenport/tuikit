@@ -12,11 +12,11 @@ enables (documentation, goldens, catching overflow) is downstream of that.
 
 ### The constraint that shapes it
 
-pgctl's capture lives in a `_test.go` for a real reason: the model's fields are
-unexported, so `go test` is the only thing that can reach into the package and
-put the UI in a chosen state. Any "just run a command" design has to answer that,
-and the honest answer is that two mechanisms are needed because there are two
-questions.
+The database tool's capture lives in a `_test.go` for a real reason: the model's
+fields are unexported, so `go test` is the only thing that can reach into the
+package and put the UI in a chosen state. Any "just run a command" design has to
+answer that, and the honest answer is that two mechanisms are needed because
+there are two questions.
 
 | Question | Mechanism | Reaches |
 |---|---|---|
@@ -62,13 +62,13 @@ and the demo tool are close relatives.
 
 ## The agent layer
 
-**This is no longer speculative.** pgctl commit `57a13ad` ("Capture the UI's
-frames, and fix the three bugs that found", 2026-08-31) is a working prototype —
-`internal/tui/screenshot_probe_test.go`, 308 lines, 17 frames. tuikit's `harness`
-is a generalisation of that, not an invention.
+**This is no longer speculative.** the database tool commit `57a13ad` ("Capture
+the UI's frames, and fix the three bugs that found", 2026-08-31) is a working
+prototype — `internal/tui/screenshot_probe_test.go`, 308 lines, 17 frames.
+tuikit's `harness` is a generalisation of that, not an invention.
 
-Note what it is *not*: `swarmctl/internal/tui/capture.go` is **log** capture.
-Screen capture existed nowhere until pgctl.
+Note what it is *not*: `the deploy tool/internal/tui/capture.go` is **log**
+capture. Screen capture existed nowhere until the database tool.
 
 ### What the prototype established
 
@@ -100,9 +100,10 @@ answer for a page rendered where there is no terminal to ask.
 | Live | Real backend, probed moments before | Documentation, and finding what fixtures hide. Run deliberately, by a person or an agent. Not a CI thing. |
 
 The second is not a luxury. The header-overflow bug **was masked in the first
-capture** because the fixture shortened the config path to `pgctl.yaml`; only a
-real temp-dir path was long enough to overflow. Fixtures encode the author's
-assumptions, which is exactly what a capture is supposed to catch.
+capture** because the fixture shortened the config path to `the database
+tool.yaml`; only a real temp-dir path was long enough to overflow. Fixtures
+encode the author's assumptions, which is exactly what a capture is supposed to
+catch.
 
 **Frames go out as ANSI files**, one per screen, gated on an env var so an
 ordinary `go test ./...` skips them:
@@ -134,7 +135,7 @@ compared against index 0 instead of the running maximum, so it picked vpic
 
 ### What tuikit adds on top
 
-- **`guard.Width`** — the invariant pgctl now tests by hand
+- **`guard.Width`** — the invariant the database tool now tests by hand
   (`lipgloss.Width(line) > m.width`) generalised: every screen and every modal,
   rendered at 80 / 100 / 132 columns, failing on any line wider than the
   terminal. Overflow is a whole *class* of bug and two of the three found were
@@ -150,9 +151,9 @@ compared against index 0 instead of the running maximum, so it picked vpic
 - **A frame log** — one entry per keystroke, so a whole flow is reviewable rather
   than a screen at a time.
 - **Labelled provenance.** Every frame declares whether it is live or composed.
-  pgctl marked the snapshot-manifest and plan/run frames composed because no
-  production snapshot exists on that machine. A page of frames that quietly mixes
-  the two is a page that misreports the tool.
+the database tool marked the snapshot-manifest and plan/run frames composed
+because no production snapshot exists on that machine. A page of frames that
+quietly mixes the two is a page that misreports the tool.
 
 ### Publishing frames
 

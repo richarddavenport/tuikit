@@ -6,17 +6,18 @@ not commitment.
 ## Plan
 
 1. ~~**Extract** `theme` + `guard` + `docgen`'s design-system bundle out of
-   swarmctl into the module.~~ **Done** — commit `0d0e560`. Verified by running
-   the extracted guards against swarmctl's own `internal/tui`: both clean, and a
-   role nothing draws with still reported, so they are not passing vacuously.
+the deploy tool into the module.~~ **Done** — commit `0d0e560`. Verified by
+running the extracted guards against the deploy tool's own `internal/tui`: both
+clean, and a role nothing draws with still reported, so they are not passing
+vacuously.
 2. ~~**`examples/democtl`**~~ **Done** — commit `609ee55`. A fictional fleet with
    a dashboard, logs, a confirm modal and a step run; seeded and clock-frozen so
    the harness can use it as a fixture. First real consumer of the guards. Its
    own frames found two bugs before the harness that will automate looking at
    them exists.
-3. **`harness`** ([#3](https://github.com/richarddavenport/tuikit/issues/3)) — generalise pgctl's `screenshot_probe_test.go`: fixture and
+3. **`harness`** ([#3](https://github.com/richarddavenport/tuikit/issues/3)) — generalise the database tool's `screenshot_probe_test.go`: fixture and
    live modes, ANSI capture, ANSI→HTML, `guard.Width`, goldens. Prove it against
-   democtl, then against swarmctl's existing screens.
+   democtl, then against the deploy tool's existing screens.
 4. **`comp.Canvas`** ([#5](https://github.com/richarddavenport/tuikit/issues/5), needs [#4](https://github.com/richarddavenport/tuikit/issues/4) wide runes) — the cell-grid substrate, settled by the prototype on
    `prototype/canvas-mouse`. Wide runes, `Rect` layout, typed owner IDs, and
    democtl ported onto it. Before `comp`, because a component that returns a
@@ -27,12 +28,12 @@ not commitment.
    four already differ meaningfully. **`tuikit gallery`** grows alongside: a
    component that is not in the gallery is not finished.
 7. **`spec`** ([#11](https://github.com/richarddavenport/tuikit/issues/11)) — declarations, CLI generation, manifest, completions.
-8. **Migrate azctl** ([#12](https://github.com/richarddavenport/tuikit/issues/12)) (3.2k lines, youngest, least to lose). This is the proof;
+8. **Migrate the cloud tool** ([#12](https://github.com/richarddavenport/tuikit/issues/12)) (3.2k lines, youngest, least to lose). This is the proof;
    a framework that has never met a real tool is a guess.
-9. **`tuikit new`** ([#13](https://github.com/richarddavenport/tuikit/issues/13)), seeded from what azctl's migration actually needed.
-10. pgctl, dugo, swarmctl migrate later or never. Tracked privately, because it
-    is work on those tools rather than on this one — dugo and pgctl are done,
-    swarmctl is two steps in.
+9. **`tuikit new`** ([#13](https://github.com/richarddavenport/tuikit/issues/13)), seeded from what the cloud tool's migration actually needed.
+10. The database tool, the disk tool, the deploy tool migrate later or never. Tracked privately, because it
+    is work on those tools rather than on this one — the disk tool and the database tool are done,
+    the deploy tool is two steps in.
 
 ## Open
 
@@ -59,7 +60,7 @@ why), and three things came back worth taking:
     would notice. Cheapest of the three, and it hardens what `comp` already is.
 12. **A screen stack with history** ([#22](https://github.com/richarddavenport/tuikit/issues/22))
     — `app.Screens` calls itself the router and is a flat map. democtl's `esc`
-    is a hardcoded constant; azctl's runner is a second program you cannot
+    is a hardcoded constant; the cloud tool's runner is a second program you cannot
     return from. Take soda's mechanism, add a `spec.Call` label per entry so an
     agent can read where it is, and stop at about a hundred lines.
 13. **Constraint layout** ([#23](https://github.com/richarddavenport/tuikit/issues/23))
@@ -75,6 +76,6 @@ tuikit new mytool -short "what it does" -module github.com/you/mytool
 cd mytool && make check
 ```
 
-It came last on purpose, seeded from what azctl's migration actually needed
-rather than from a guess — scaffolding written before a real tool had been
-migrated would have been a template full of them.
+It came last on purpose, seeded from what the cloud tool's migration actually
+needed rather than from a guess — scaffolding written before a real tool had
+been migrated would have been a template full of them.

@@ -18,7 +18,8 @@ been wrong.
 
 ## The tool, and what it was doing
 
-<!-- azctl, drawing the resource tree; pgctl, mid-apply; and so on. -->
+<!-- the cloud tool, drawing the resource tree; the database tool, mid-apply;
+and so on. -->
 
 ## What you wrote by hand
 

@@ -44,7 +44,7 @@ bounds-checked into a no-op. `OwnerAt(x, y)` is the hit test.
 
 | | Lines |
 |---|---|
-| The whole substrate (`canvas.go`) | **153** |
+| The whole substrate | **153** |
 | democtl's dashboard redrawn on it, with all four mouse behaviours | 369 |
 | Tests driving it by synthetic mouse events | 201 |
 
@@ -115,13 +115,13 @@ and the next key press acts on something the reader cannot see. This was the
 third thing scrolling found, and the only one that is a design decision rather
 than a missing implementation.
 
-**An unexpected result: overflow stops being a class of bug.** `Set` clips to the
-canvas, so drawing outside the terminal is not an error to catch — it is a
+**An unexpected result: overflow stops being a class of bug.** `Set` clips to
+the canvas, so drawing outside the terminal is not an error to catch — it is a
 coordinate that does not exist. A menu deliberately placed at column 88 of 96
-renders clipped at the edge with every line still exactly 96 columns. `guard.Width`
-becomes a belt-and-braces check on `comp` itself rather than something every tool
-has to run. Two of the three bugs pgctl's capture found, and both of democtl's,
-were overflow.
+renders clipped at the edge with every line still exactly 96 columns.
+`guard.Width` becomes a belt-and-braces check on `comp` itself rather than
+something every tool has to run. Two of the three bugs the database tool's
+capture found, and both of democtl's, were overflow.
 
 ## Decisions this settles
 

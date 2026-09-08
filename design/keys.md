@@ -36,11 +36,11 @@ are guessing at it.
 
 ## Whether leaving should ask at all is the TOOL's decision
 
-Decision 39. azctl asks mid-playbook because its steps cannot be undone; pgctl
-cancels immediately without asking because its failure hooks bring the database
-back up and a dialog would stand between a reader and the safest action. The
-framework cannot tell these apart — whether the work is recoverable is the
-engine's knowledge.
+Decision 39. The cloud tool asks mid-playbook because its steps cannot be
+undone; the database tool cancels immediately without asking because its failure
+hooks bring the database back up and a dialog would stand between a reader and
+the safest action. The framework cannot tell these apart — whether the work is
+recoverable is the engine's knowledge.
 
 
 ## The four that are reserved (decision 42)

@@ -5,16 +5,17 @@ record of choices — including what was rejected — see [decisions.md](decisio
 
 ## Why this exists
 
-Four tools now share a shape: `swarmctl` (65k lines), `pgctl` (11k), `dugo`
-(3.8k), `azctl` (3.2k). Each has `cmd/` + `internal/engine` + `internal/tui` +
-`internal/cli`, bubbletea and lipgloss, a `design/` directory, a Makefile with
-`## target:` self-help and ldflags version stamping. azctl's own notes say it is
-"modelled on swarmctl's engine/tui/cli split"; dugo's say its project
-infrastructure was "ported from swarmctl".
+Four tools now share a shape: the deploy tool (65k lines), the database tool
+(11k), the disk tool (3.8k), the cloud tool (3.2k). Each has `cmd/` +
+`internal/engine` + `internal/tui` + `internal/cli`, bubbletea and lipgloss, a
+`design/` directory, a Makefile with `## target:` self-help and ldflags version
+stamping. The cloud tool's own notes say it is "modelled on the deploy tool's
+engine/tui/cli split"; the disk tool's say its project infrastructure was
+"ported from the deploy tool".
 
 That travel happens by copy and by re-explanation. A fix to a pane lands in one
-repo. The theme was extracted once, in swarmctl, and the other three did not get
-it. This is the argument for a module.
+repo. The theme was extracted once, in the deploy tool, and the other three did
+not get it. This is the argument for a module.
 
 ## The two ideas
 
@@ -46,8 +47,8 @@ gate" actually means in practice.
 
 ### 2. Nothing in the interface is unnamed
 
-Lifted wholesale from swarmctl's `internal/tui/theme`, which already solved
-this and wrote down why:
+Lifted wholesale from the deploy tool's `internal/tui/theme`, which already
+solved this and wrote down why:
 
 - **Nine colour roles** — `Accent`, `Muted`, `Border`, `Danger`, `Pending`,
   `Success`, `Stderr`, `SelectionBG`, `SelectionFG`. The terminal's own sixteen
@@ -85,10 +86,11 @@ generated code the tool owns and can edit on day one. If it is a default rather
 than a law, it is policy.
 
 **Everything backend-shaped belongs to the tool.** Its fixtures, whether it
-captures live frames at all, and what it needs standing up to do so. pgctl needs
-a database; swarmctl would need a swarm; a tool with no backend needs neither.
-No answer tuikit could give would be right for all three. Its only obligation is
-not to make it hard — which the skip-unless-env-var pattern already discharges.
+captures live frames at all, and what it needs standing up to do so. The
+database tool needs a database; the deploy tool would need a swarm; a tool with
+no backend needs neither. No answer tuikit could give would be right for all
+three. Its only obligation is not to make it hard — which the
+skip-unless-env-var pattern already discharges.
 
 This is also the answer to a question an earlier draft asked and should not
 have: *how does live-mode capture get a backend in CI?* It does not,
@@ -114,24 +116,24 @@ All mechanism. Nothing here decides when it runs.
 
 | Package | What it holds |
 |---|---|
-| `theme` | Roles, glyphs, `Hex`, light/dark handling. Extracted from swarmctl. |
+| `theme` | Roles, glyphs, `Hex`, light/dark handling. Extracted from the deploy tool. |
 | `comp` | Components written 2–4 times already: pane, tabs, table, list with filter, logs pane (search/filter/timestamps/scroll), step list, form, confirm, toast, spinner, key hint bar. |
 | `app` | The bubbletea shell: screen router, focus model, the async conventions as *types* rather than prose — generation counters, single-flight polling, bounded poll failure, the `capturesKeys()` mode split. |
 | `spec` | Command declarations → CLI + TUI screen + manifest. stdlib `flag`, no cobra. |
 | `guard` | `Tokens`, `Glyphs`, and a `Screens` check that every screen constant has a `View()` case. |
-| `harness` | Headless drive, deterministic frames, golden tests, ANSI capture, ANSI→HTML. Generalised from pgctl `57a13ad`. |
+| `harness` | Headless drive, deterministic frames, golden tests, ANSI capture, ANSI→HTML. Generalised from the database tool `57a13ad`. |
 | `docgen` | Manifest → mkdocs-material site, and a capture directory → a frames page. Docs cannot drift from the code. |
 | `cmd/tuikit` | `new` (scaffold), `watch` (recapture on save, serve, reload), `gallery` (the running component browser). |
-| `safety` | `secret: true` scrubbing; the `assert` primitive that runs under `--dry-run`; protected-environment refusal. Both learned the hard way in azctl. |
+| `safety` | `secret: true` scrubbing; the `assert` primitive that runs under `--dry-run`; protected-environment refusal. Both learned the hard way in the cloud tool. |
 
 ## Self-documenting
 
 `docgen` reads the same manifest and writes the mkdocs site: CLI reference, key
-reference, component sheet, and the generated design-system bundle swarmctl's
-`cmd/designsystem` already produces as HTML. swarmctl's own reasoning for
-generating rather than maintaining it applies to all of it: *"a palette written
-by hand is a palette that drifts, and a drifted design system describes a tool
-that does not exist."*
+reference, component sheet, and the generated design-system bundle the deploy
+tool's `cmd/designsystem` already produces as HTML. The deploy tool's own
+reasoning for generating rather than maintaining it applies to all of it: *"a
+palette written by hand is a palette that drifts, and a drifted design system
+describes a tool that does not exist."*
 
 ## Scaffolder
 

@@ -9,6 +9,28 @@ synonym. If a concept you need is missing, that is a signal: either you are
 introducing language the project does not use, or there is a real gap worth
 adding.
 
+## The four tools
+
+Every component here was extracted from tools that had already written it. Those
+tools are private, so they are named by role throughout:
+
+| | |
+| --- | --- |
+| **the deploy tool** | services, panes, a run dialog, 65k lines |
+| **the database tool** | connections, forms, five stacked lists |
+| **the cloud tool** | a resource inventory, a tree, the first migration onto tuikit |
+| **the disk tool** | where the space went |
+| **the board** | open loops, live or dormant |
+
+The names are withheld; the *count* and the *disagreement* are not, because they
+are what the argument rests on. "Two tools wrote this and differed about X" is a
+claim you can weigh without knowing which two. `comp.Tree` does not exist
+because two of them differed in a way that mattered; `app.Toggles` does exist
+because two turned out identical.
+
+`democtl` is different — it is this repository's own example, in
+`examples/democtl`, and is named because you can read it.
+
 ## The vocabulary
 
 **Role** — a named colour in the palette. Named by *role*, never by hue:

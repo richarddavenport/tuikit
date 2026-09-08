@@ -22,8 +22,8 @@ spec.Command{
 
 `Commands` nests subcommands. A nil `Run` makes a grouping command that prints
 its children. `Hidden` keeps something working but unadvertised. `PassThrough`
-collects flags the command did not declare — from azctl, whose `play` takes
-`--<param>` for whatever a runtime-chosen YAML playbook declares.
+collects flags the command did not declare — from the cloud tool, whose `play`
+takes `--<param>` for whatever a runtime-chosen YAML playbook declares.
 
 ## What it produces
 
@@ -57,8 +57,8 @@ are exactly what a guard will fail it for afterwards.
 2  a dry run found DRIFT — not an error, a finding
 ```
 
-`OK` · `Fail` · `Drift`. The two is the point: `swarmctl diff && deploy` must not
-deploy when there is drift.
+`OK` · `Fail` · `Drift`. The two is the point: `the deploy tool diff && deploy`
+must not deploy when there is drift.
 
 ## Argument and flag kinds
 
