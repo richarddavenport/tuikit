@@ -10,8 +10,8 @@ import (
 //
 // This is the file to change first when the engine becomes real. A tool whose
 // screens can only be rendered against a live backend is a tool whose screens
-// nobody has ever compared — which is exactly the state azctl was in before it
-// moved to tuikit.
+// nobody has ever compared — which is exactly the state the first tool to
+// migrate was in before it moved to tuikit.
 func fixture() engine.Snapshot {
 	at := time.Date(2026, 1, 1, 9, 0, 0, 0, time.UTC)
 	return engine.Snapshot{

@@ -18,8 +18,8 @@ wrapper around it.
 **Why.** It is what makes the interface testable. The fixture the screens are
 rendered from is a value the engine returns, so a screen can be looked at
 without whatever the real backend needs — a subscription, a cluster, a
-password. azctl went years without a single screenshot of its own interface
-because that split was not there.
+password. One of the tools tuikit was extracted from went years without a
+single screenshot of its own interface, because that split was not there.
 
 `guard.Engine` holds it closed, from the first commit, before there is anything
 to be tempted by.

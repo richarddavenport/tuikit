@@ -17,8 +17,8 @@ import (
 // tuikit's components own state — where a cursor is, what a viewport shows,
 // where a divider sits — and state inside a component cannot survive being
 // copied on every message. A value model compiles, runs, and silently forgets
-// every scroll. It is the one change azctl's migration had to make in every
-// file, so it is what a new tool starts with.
+// every scroll. It is the one change the first migration onto tuikit had to
+// make in every file, so it is what a new tool starts with.
 type Model struct {
 	snap engine.Snapshot
 	sty  styles
