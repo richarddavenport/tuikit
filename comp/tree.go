@@ -1,5 +1,11 @@
 package comp
 
+import (
+	"strings"
+
+	"github.com/richarddavenport/tuikit/theme"
+)
+
 // Tree is collapse state over a flattened hierarchy.
 //
 // # What it is not
@@ -158,4 +164,94 @@ func (t *Tree) Collapse(nodes []Node) {
 			t.Collapsed[node.Key] = true
 		}
 	}
+}
+
+// Branches is the connector prefix for each node, for a tree that draws its
+// shape rather than indenting.
+//
+// # Why a function and not [Row.Depth]
+//
+// Depth cannot answer it. Which connector a row gets depends on facts about the
+// rows BETWEEN it and its parent:
+//
+//	init
+//	├─ systemd-journald
+//	├─ sshd
+//	│  └─ sshd: richard
+//	└─ firefox
+//
+// `sshd: richard` needs a │ in its first column because `sshd` still has a
+// sibling coming. A row at the same depth under `firefox` would get a space.
+// Two rows, one depth, different prefixes.
+//
+// htop keeps a bitmask per row for this — `Row.indent` in `Row.h`, built by
+// `Table_buildTreeBranch`. dive keeps three string constants in
+// `dive/filetree/file_tree.go`. Two tools, which is the bar for extracting.
+//
+// # Where the result goes
+//
+// [Row.Indent], for a list. Or anywhere: htop draws its tree INSIDE the command
+// column, because a prefix in front of the PID makes every numeric column
+// ragged, and a plain string can go there. Returning strings rather than
+// drawing is what makes both possible.
+//
+// Takes the same []Node as [Tree.Visible] and returns one prefix per node, so a
+// caller that filtered with Visible indexes this with the same indices.
+func Branches(nodes []Node, ch theme.Chrome) []string {
+	out := make([]string, len(nodes))
+	// open[d] is whether the ancestor at depth d still has siblings below, and
+	// therefore whether a vertical line passes through this row's column d.
+	var open []bool
+
+	for i, node := range nodes {
+		d := max(0, node.Depth)
+		if d > len(open) {
+			d = len(open)
+		}
+		open = open[:d]
+
+		var b strings.Builder
+		// open[0] is the root level, which has no column: a depth-1 row starts
+		// at the left edge with its own connector. The columns drawn are for
+		// ancestors at depths 1..d-1.
+		ancestors := open
+		if len(ancestors) > 0 {
+			ancestors = ancestors[1:]
+		}
+		for _, passing := range ancestors {
+			if passing {
+				b.WriteString(ch.Tree.Vertical)
+			} else {
+				b.WriteString(ch.Tree.Gap)
+			}
+		}
+		if d > 0 {
+			if lastChild(nodes, i, d) {
+				b.WriteString(ch.Tree.Last)
+			} else {
+				b.WriteString(ch.Tree.Branch)
+			}
+		}
+		out[i] = b.String()
+		open = append(open, !lastChild(nodes, i, d))
+	}
+	return out
+}
+
+// lastChild reports whether i is the final node at its depth under its parent.
+//
+// Read off the depths rather than stored, the same way [HasChildren] is: a
+// stored flag can disagree with the shape it describes, and a derived one
+// cannot. The scan stops at the first node shallower than i, which is where the
+// parent's run of children ends.
+func lastChild(nodes []Node, i, depth int) bool {
+	for j := i + 1; j < len(nodes); j++ {
+		switch d := max(0, nodes[j].Depth); {
+		case d < depth:
+			return true
+		case d == depth:
+			return false
+		}
+	}
+	return true
 }

@@ -203,6 +203,10 @@ var DefaultGlyphs = GlyphSet{
 	'▇': "lower seven eighths block — sparkline", '█': "full block — sparkline",
 	'┌': "box drawing", '─': "box drawing", '┐': "box drawing",
 	'│': "box drawing", '└': "box drawing", '┘': "box drawing",
+	// The tee, which a box never needs and a tree always does. A rectangle has
+	// four corners and no junctions, so this was missing until comp.Branches
+	// was written and the chrome guard said so.
+	'├': "tree branch with more siblings below",
 }
 
 // With returns a copy of the set with additions.

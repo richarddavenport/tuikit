@@ -381,3 +381,65 @@ func TestAShorterLineDoesNotLeaveAGhost(t *testing.T) {
 		t.Errorf("after scrolling 20 columns into a 30-column line, the row is %q", got)
 	}
 }
+
+// Issue 75: a derived highlight in a pane with no cursor.
+//
+// termshark's hex pane. The bytes belonging to the selected field light up;
+// nobody navigates that pane, so it has no cursor and should not pretend to.
+func TestASetRangeDrawsWithoutACursor(t *testing.T) {
+	style := lipgloss.NewStyle().Bold(true)
+	v := &Viewer{Name: "hex", NoCursor: true, Ranged: &style}
+	v.SetRange(1, 2)
+
+	lo, hi, ok := v.Range()
+	if !ok {
+		t.Fatal("a set range is not reported with NoCursor — this is the bug")
+	}
+	if lo != 1 || hi != 2 {
+		t.Errorf("range is %d..%d, want 1..2", lo, hi)
+	}
+
+	c := NewCanvas(20, 4)
+	v.Draw(c, c.Bounds(), []Line{{Text: "aa"}, {Text: "bb"}, {Text: "cc"}, {Text: "dd"}})
+
+	// The highlighted rows carry a style and the others do not.
+	for _, row := range []struct {
+		y     int
+		wants bool
+	}{{0, false}, {1, true}, {2, true}, {3, false}} {
+		cell, _ := c.CellAt(0, row.y)
+		if got := cell.Style != nil; got != row.wants {
+			t.Errorf("row %d styled = %v, want %v", row.y, got, row.wants)
+		}
+	}
+}
+
+// Extend still refuses under NoCursor: dragging needs somewhere to drag from.
+// The two are different gestures and only one of them survives.
+func TestExtendStillNeedsACursor(t *testing.T) {
+	v := &Viewer{Name: "hex", NoCursor: true}
+	v.Extend(3)
+	if _, _, ok := v.Range(); ok {
+		t.Error("Extend produced a range in a pane with no cursor to anchor it")
+	}
+}
+
+// Out of order is accepted, because a caller computing both ends from a byte
+// offset should not have to know which came first.
+func TestASetRangeSortsItself(t *testing.T) {
+	v := &Viewer{Name: "hex"}
+	v.SetRange(9, 4)
+	if lo, hi, _ := v.Range(); lo != 4 || hi != 9 {
+		t.Errorf("SetRange(9, 4) gave %d..%d, want 4..9", lo, hi)
+	}
+}
+
+// ClearRange drops a set range as well as a dragged one.
+func TestClearRangeDropsASetRange(t *testing.T) {
+	v := &Viewer{Name: "hex", NoCursor: true}
+	v.SetRange(1, 2)
+	v.ClearRange()
+	if _, _, ok := v.Range(); ok {
+		t.Error("ClearRange left the set range behind")
+	}
+}

@@ -41,6 +41,9 @@ type Chrome struct {
 	// changes.
 	SortAsc, SortDesc string
 
+	// Tree is the connectors a tree draws its shape with.
+	Tree TreeSet
+
 	// ScrollTrack and ScrollThumb are a scrollbar's two characters.
 	//
 	// The same vocabulary as comp.Meter rotated a quarter turn: a dotted track
@@ -131,6 +134,8 @@ var DefaultChrome = Chrome{
 	Collapsed: "▸ ",
 	Expanded:  "▾ ",
 
+	Tree: UnicodeTree,
+
 	Gap:    1,
 	Inset:  1,
 	Indent: 2,
@@ -155,6 +160,7 @@ func (c Chrome) Glyphs() []rune {
 		c.ScrollTrack, c.ScrollThumb,
 		c.ChevronLeft, c.ChevronRight,
 		c.Collapsed, c.Expanded,
+		c.Tree.Vertical, c.Tree.Branch, c.Tree.Last, c.Tree.Gap,
 	} {
 		for _, r := range s {
 			if !seen[r] {
@@ -168,3 +174,45 @@ func (c Chrome) Glyphs() []rune {
 
 // With returns a copy with a different box set, for the common change.
 func (c Chrome) With(box BoxSet) Chrome { c.Box = box; return c }
+
+// TreeSet is what [comp.Branches] draws a hierarchy's shape with.
+//
+// Four strings, and all four must be the same width or the rows below a branch
+// stop lining up with the rows beside it. Two columns is the usual choice and
+// is what DefaultChrome uses.
+//
+// # Why this is themeable rather than fixed
+//
+// htop carries two of these — `CRT_treeStrUtf8` and `CRT_treeStrAscii` — and
+// picks between them from the locale, because a terminal running under `LANG=C`
+// draws box-drawing characters as replacement boxes and a tree becomes a column
+// of them. That is the same failure the whole GlyphSet exists to prevent, found
+// in a tool that has been shipping since 2004.
+//
+// So [ASCIITree] is here beside the default, and a tool that has to run on
+// somebody else's server can choose it.
+type TreeSet struct {
+	// Vertical passes through the column of an ancestor that has more children
+	// coming: the │ in "│  └─".
+	Vertical string
+	// Branch is a child with siblings after it.
+	Branch string
+	// Last is the final child, which closes the line rather than continuing it.
+	Last string
+	// Gap is the blank under an ancestor with nothing left below, and it is a
+	// character rather than an absence so that all four widths match.
+	Gap string
+}
+
+// UnicodeTree is the default: box-drawing connectors, two columns each.
+var UnicodeTree = TreeSet{Vertical: "│ ", Branch: "├─", Last: "└─", Gap: "  "}
+
+// ASCIITree is htop's fallback set, for a terminal that cannot draw the others.
+var ASCIITree = TreeSet{Vertical: "| ", Branch: "|-", Last: "`-", Gap: "  "}
+
+// WithTree returns a copy drawing its tree with the given connectors.
+//
+// Separate from [Chrome.With] because a box set and a tree set are independent
+// choices: a tool can want rounded corners and ASCII branches, or the reverse.
+// Choosing the ASCII fallback for a terminal that has nothing means both.
+func (c Chrome) WithTree(t TreeSet) Chrome { c.Tree = t; return c }

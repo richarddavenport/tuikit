@@ -34,8 +34,13 @@ func TestTheOtherBoxSetsNeedTheirCharactersAdded(t *testing.T) {
 
 // ASCII needs nothing added, because it is the fallback for a font that has
 // nothing.
+//
+// Both dimensions of it. A tool falling back for a terminal under LANG=C wants
+// the box set AND the tree connectors, and taking one without the other leaves
+// a column of replacement boxes down the left of every tree — which is htop's
+// reason for carrying CRT_treeStrAscii beside CRT_treeStrUtf8.
 func TestTheASCIIBoxNeedsNothing(t *testing.T) {
-	for _, r := range DefaultChrome.With(ASCIIBox).Glyphs() {
+	for _, r := range DefaultChrome.With(ASCIIBox).WithTree(ASCIITree).Glyphs() {
 		if r < 128 {
 			continue
 		}

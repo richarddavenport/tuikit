@@ -95,6 +95,13 @@ type Viewer struct {
 
 	sel rangeSel
 
+	// span is a range set by the TOOL rather than dragged by the reader, and
+	// spanned says whether there is one. Separate from sel because the two
+	// answer different questions: sel is anchored to the cursor and this is
+	// not, which is the whole reason it can exist with NoCursor.
+	span    [2]int
+	spanned bool
+
 	// reveal says the cursor moved and should be brought into view. A flag
 	// rather than doing it every frame, so the wheel does not snap back the
 	// instant it scrolls past the cursor.
@@ -192,16 +199,48 @@ func (v *Viewer) Extend(by int) {
 	v.reveal = true
 }
 
+// SetRange highlights a span the reader did not drag.
+//
+// A DERIVED highlight: termshark selects a field in its structure pane and the
+// bytes belonging to it light up in the hex pane. There is no cursor in the hex
+// pane and there should not be one — nobody is navigating it — but the
+// highlight is a range and has to exist.
+//
+// So this works with [Viewer.NoCursor] set, and [Viewer.Extend] does not. The
+// two are different gestures: Extend is a reader dragging from where they are,
+// this is a tool saying which lines mean something. Before it existed, the only
+// way to draw one was to leave the cursor on and style it away — which lies to
+// [Canvas.OwnerAt] and moves an invisible thing when a key is pressed (issue
+// 75).
+//
+// Out of order is accepted and sorted, because a caller computing both ends
+// from a byte offset should not have to know which came first.
+func (v *Viewer) SetRange(lo, hi int) {
+	if lo > hi {
+		lo, hi = hi, lo
+	}
+	v.span, v.spanned = [2]int{max(0, lo), max(0, hi)}, true
+}
+
 // Range is the selected span, low to high, and whether there is one.
+//
+// An explicit [Viewer.SetRange] wins over a dragged one, because a tool that
+// set a range meant it and a stale anchor should not outvote it.
 func (v *Viewer) Range() (lo, hi int, ok bool) {
+	if v.spanned {
+		return v.span[0], v.span[1], true
+	}
 	if v.NoCursor {
 		return 0, 0, false
 	}
 	return v.sel.span(v.cursor)
 }
 
-// ClearRange drops the selection, leaving the cursor.
-func (v *Viewer) ClearRange() { v.sel.clear() }
+// ClearRange drops the selection, dragged or set, leaving the cursor.
+func (v *Viewer) ClearRange() {
+	v.sel.clear()
+	v.spanned = false
+}
 
 // Draw renders a document held as a slice.
 func (v *Viewer) Draw(c *Canvas, r Rect, lines []Line) {
@@ -275,11 +314,16 @@ func (v *Viewer) DrawFunc(c *Canvas, r Rect, n int, line func(i int) Line) {
 		// cursor with a background keeps the syntax colours it sits on.
 		var beneath *lipgloss.Style
 		switch {
+		// A set range draws whether or not there is a cursor: it is the tool
+		// pointing at something, not the reader standing on it.
+		case ranged && i >= lo && i <= hi && (v.spanned || !v.NoCursor):
+			beneath = or2(v.Ranged, v.Selected)
+			if !v.spanned && i == v.cursor && v.Focused {
+				beneath = v.Selected
+			}
 		case v.NoCursor:
 		case i == v.cursor && v.Focused:
 			beneath = v.Selected
-		case ranged && i >= lo && i <= hi:
-			beneath = or2(v.Ranged, v.Selected)
 		}
 
 		if v.Numbers {

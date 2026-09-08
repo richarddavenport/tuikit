@@ -54,6 +54,15 @@ type List struct {
 	// nothing is an ordinary state, not an error.
 	Empty string
 
+	// StatusWidth is the columns reserved for [Row.Status], and zero means no
+	// status column at all.
+	//
+	// Declared on the list rather than measured from the rows, because
+	// DrawFunc is handed one row at a time and never sees the widest. A number
+	// the caller states is a column the same width on every frame, including
+	// the frame where the only row with a two-column glyph has scrolled off.
+	StatusWidth int
+
 	// Marker is drawn against the cursor row and Blank against the rest, for a
 	// list whose selection is a CHARACTER rather than only a colour. They
 	// should be the same width, or the rows jump as you move.
@@ -161,14 +170,39 @@ type Row struct {
 	// header, and that is this field.
 	Depth int
 
-	// Lead is the row's own prefix, drawn in the cursor marker's column and
-	// INSTEAD of it.
+	// Status is a fixed column between the cursor marker and the indent.
 	//
-	// For a group header that says something there already — ▸ collapsed, ▾
-	// expanded. A row carrying its own state glyph does not also want the
-	// cursor's mark on top of it: the highlight is what says where the cursor
-	// is, and two glyphs fighting for one column is how a tree ends up with
-	// its headers a character out of line with its children.
+	// For a glyph that means the same thing on every row whatever its depth: a
+	// git status letter, a change mark, a reachability dot. It is padded to
+	// [List.StatusWidth], so the glyphs line up down the screen and a header
+	// can be positioned with [List.LeadWidth].
+	//
+	// The distinction from Lead is where the INDENT falls. Status is drawn
+	// before it and Lead after it, so a status column stays a column while a
+	// tree marker travels with its row. Both at once is what lazygit's file
+	// list and dive's layer tree each need and neither could have: a row with
+	// one Lead had to choose, and Depth pushed the chosen one out of line
+	// (issue 66).
+	Status string
+
+	// StatusStyle colours Status and keeps that colour under the selection,
+	// the same way LeadStyle does and for the same reason.
+	StatusStyle *lipgloss.Style
+
+	// Indent replaces the spaces Depth would have drawn.
+	//
+	// For a tree that draws BRANCHES rather than whitespace. [Branches] builds
+	// these from the same []Node [Tree] already takes; anything else a tool
+	// wants in that space works too.
+	//
+	// Empty falls back to Depth, so nothing that does not set it changes.
+	Indent string
+
+	// Lead is the row's own prefix, drawn after the indent and before the text.
+	//
+	// For a marker that belongs to the row rather than to the column — ▸
+	// collapsed, ▾ expanded. It travels with the row as it indents, which is
+	// what a tree wants and what a status column does not.
 	Lead string
 
 	// Right is drawn hard against the row's right-hand edge, after Spans.
@@ -306,8 +340,6 @@ func (l *List) DrawFunc(c *Canvas, r Rect, n int, row func(i int) Row) {
 		// the reader's own mark on the list, and a row that kept its own
 		// colours under it would make the cursor hard to find in exactly the
 		// list where finding it matters.
-		lead := l.lead(c, this, i)
-
 		// The lead keeps its own colour through the selection when it has one,
 		// because it is the row's state and not the row's label.
 		leadStyle := style
@@ -320,12 +352,12 @@ func (l *List) DrawFunc(c *Canvas, r Rect, n int, row func(i int) Row) {
 			if text == "" {
 				text = spansText(this.Spans)
 			}
-			x := body.X + c.Text(body.X, y, lead, leadStyle, id)
+			x := body.X + l.drawLead(c, body.X, y, this, i, leadStyle, id)
 			c.Text(x, y, text, style, id)
 			l.right(c, body, y, this, style, id)
 			continue
 		}
-		x := body.X + c.Text(body.X, y, lead, leadStyle, id)
+		x := body.X + l.drawLead(c, body.X, y, this, i, leadStyle, id)
 		for _, span := range this.Spans {
 			x += c.Text(x, y, span.Text, span.Style, id)
 		}
@@ -370,20 +402,34 @@ func (l *List) right(c *Canvas, body Rect, y int, row Row, style *lipgloss.Style
 	}
 }
 
-// Overhead is how many rows of a band the list spends on itself rather than on
-// rows — 1 for the status row, 0 with NoStatus.
+// StatusRows is how many rows of a band the list spends on itself rather than
+// on rows — 1 for the status row, 0 with NoStatus.
+//
+// ROWS. [List.LeadWidth] is the columns question, and the two were confusable
+// enough under the old name that a rebuild used this one to indent a table
+// header (issue 76).
 //
 // It exists so a tool laying out several lists does not encode this
 // component's internals as a constant. pgctl had `const chrome = 3` (two
 // borders and "the row comp.List keeps for its position counter"), which is a
 // number that goes silently wrong the moment the answer changes — the class
 // decision 32 is about.
-func (l *List) Overhead() int {
+func (l *List) StatusRows() int {
 	if l.NoStatus {
 		return 0
 	}
 	return 1
 }
+
+// Overhead is [List.StatusRows] under its old name.
+//
+// Renamed because "overhead" does not say ROWS, and a caller aligning a table
+// header read it as columns, used it, and got a header indented by one — which
+// compiled, drew, and was wrong (issue 76). [List.LeadWidth] is the columns
+// answer.
+//
+// Deprecated: use [List.StatusRows] for rows or [List.LeadWidth] for columns.
+func (l *List) Overhead() int { return l.StatusRows() }
 
 // status draws the count, and which way an off-screen selection went.
 func (l *List) status(c *Canvas, r Rect) {
@@ -600,9 +646,62 @@ func (l *List) nearest(n int, row func(int) Row, i int) (int, bool) {
 // Outside the indent because a nested row's marker still belongs in the
 // cursor's column. Indenting it puts the cursor somewhere different on every
 // row and makes a tree impossible to scan.
-func (l *List) lead(c *Canvas, row Row, i int) string {
-	indent := strings.Repeat(" ", max(0, row.Depth)*c.Chrome().Indent)
-	return l.mark(i) + indent + row.Lead
+// drawLead paints the marker, the status column, the indent and the row's own
+// prefix, and returns the columns they took.
+//
+// Four pieces rather than one string, because Status carries its own colour.
+// Concatenating them would mean a git status letter and a fold marker sharing
+// one style, which is the thing LeadStyle exists to prevent one level up.
+func (l *List) drawLead(c *Canvas, x, y int, row Row, i int, leadStyle *lipgloss.Style, id ID) int {
+	w := c.Text(x, y, l.mark(i), leadStyle, id)
+	if status := l.statusOf(row); status != "" {
+		style := leadStyle
+		if row.StatusStyle != nil {
+			style = row.StatusStyle
+		}
+		w += c.Text(x+w, y, status, style, id)
+	}
+	w += c.Text(x+w, y, l.indentOf(c, row), leadStyle, id)
+	return w + c.Text(x+w, y, row.Lead, leadStyle, id)
+}
+
+// statusOf pads Status to StatusWidth, so the column is the same width on every
+// row including the rows with nothing to put in it.
+func (l *List) statusOf(row Row) string {
+	if l.StatusWidth <= 0 {
+		return ""
+	}
+	return Pad(Truncate(row.Status, l.StatusWidth), l.StatusWidth)
+}
+
+// indentOf is the row's own indent string, or the spaces its Depth asks for.
+func (l *List) indentOf(c *Canvas, row Row) string {
+	if row.Indent != "" {
+		return row.Indent
+	}
+	return strings.Repeat(" ", max(0, row.Depth)*c.Chrome().Indent)
+}
+
+// LeadWidth is the columns drawn before a row's own text, for a header that has
+// to start in the same place.
+//
+// The FIXED part only: the cursor marker and the status column. An indent
+// varies per row by definition, so a caller aligning a table header wants this
+// number and not that one.
+//
+// It exists because there was no way to ask. Two rebuilds computed
+// `comp.Width(list.Marker) + comp.Width(glyph)` by hand, and one of them first
+// reached for [List.StatusRows] — which answers a different question in a
+// different unit and compiles perfectly (issue 76).
+func (l *List) LeadWidth() int {
+	w := 0
+	if l.Marker != "" {
+		w = Width(l.Marker)
+		if l.Blank != "" {
+			w = max(w, Width(l.Blank))
+		}
+	}
+	return w + max(0, l.StatusWidth)
 }
 
 // mark is the marker for a row, or the blank that keeps the others in line.

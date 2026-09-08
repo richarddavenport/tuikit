@@ -2,7 +2,10 @@ package comp
 
 import (
 	"reflect"
+	"strings"
 	"testing"
+
+	"github.com/richarddavenport/tuikit/theme"
 )
 
 // A small filesystem, the shape lazygit's filetree and yazi both flatten to.
@@ -137,5 +140,86 @@ func TestTheZeroTreeIsUsable(t *testing.T) {
 	tr.Toggle("src")
 	if len(tr.Visible(nodes())) != 4 {
 		t.Error("the zero tree could not be toggled")
+	}
+}
+
+// The case Depth cannot express: two rows at the same depth, different
+// connectors, because of what sits between them and their parents.
+//
+// This is issue 78, and the shape is htop's process tree.
+func TestBranchesDependOnSiblingsNotOnDepth(t *testing.T) {
+	nodes := []Node{
+		{Depth: 0, Key: "init"},
+		{Depth: 1, Key: "journald"},
+		{Depth: 1, Key: "sshd"},
+		{Depth: 2, Key: "session"}, // under sshd, which has firefox after it
+		{Depth: 1, Key: "firefox"},
+		{Depth: 2, Key: "tab"}, // under firefox, which is last
+	}
+	got := Branches(nodes, theme.DefaultChrome)
+
+	// session is sshd's only child, so it closes its own branch — but the
+	// column to its LEFT continues, because sshd still has firefox coming.
+	// tab is firefox's only child and firefox is last, so that column is blank.
+	// Same depth, same connector, different first column. That is the fact
+	// Depth cannot carry.
+	want := []string{
+		"",
+		"├─",
+		"├─",
+		"│ └─",
+		"└─",
+		"  └─",
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("node %d prefix %q, want %q", i, got[i], want[i])
+		}
+	}
+
+	// The two depth-2 rows are the point: same depth, different first column.
+	if got[3] == got[5] {
+		t.Errorf("both depth-2 rows got %q — depth decided it, which is the bug", got[3])
+	}
+	if !strings.HasPrefix(got[3], theme.UnicodeTree.Vertical) {
+		t.Errorf("row 3 is %q, want a continuing line in its first column", got[3])
+	}
+	if !strings.HasPrefix(got[5], theme.UnicodeTree.Gap) {
+		t.Errorf("row 5 is %q, want a blank first column", got[5])
+	}
+}
+
+// The last child closes its line and everything before it continues.
+func TestTheLastChildClosesTheBranch(t *testing.T) {
+	nodes := []Node{{Depth: 0}, {Depth: 1}, {Depth: 1}}
+	got := Branches(nodes, theme.DefaultChrome)
+	if got[1] != "├─" {
+		t.Errorf("a middle child got %q, want ├─", got[1])
+	}
+	if got[2] != "└─" {
+		t.Errorf("the last child got %q, want └─", got[2])
+	}
+}
+
+// Every connector is the same width, or rows below a branch stop lining up
+// with the rows beside it.
+func TestTheConnectorsAreAllOneWidth(t *testing.T) {
+	for name, set := range map[string]theme.TreeSet{"unicode": theme.UnicodeTree, "ascii": theme.ASCIITree} {
+		w := Width(set.Vertical)
+		for label, s := range map[string]string{"branch": set.Branch, "last": set.Last, "gap": set.Gap} {
+			if got := Width(s); got != w {
+				t.Errorf("%s %s is %d columns, want %d like the vertical", name, label, got, w)
+			}
+		}
+	}
+}
+
+// A tool can take the ASCII connectors without taking anything else, which is
+// what a terminal under LANG=C needs.
+func TestBranchesFollowTheChrome(t *testing.T) {
+	nodes := []Node{{Depth: 0}, {Depth: 1}, {Depth: 1}}
+	got := Branches(nodes, theme.DefaultChrome.WithTree(theme.ASCIITree))
+	if got[2] != "`-" {
+		t.Errorf("with the ASCII set the last child is %q, want `-", got[2])
 	}
 }

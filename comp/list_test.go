@@ -1118,3 +1118,80 @@ func columnOf(t *testing.T, line, want string) int {
 	}
 	return Width(line[:i])
 }
+
+// Issue 66: a status column and a tree indent at the same time.
+//
+// lazygit's file rows lead with git status letters, which have to form a column
+// down the screen. dive's layer tree indents. Before this, one Lead field had
+// to serve both, and Depth pushed the status letters out of line.
+func TestAStatusColumnSurvivesTheIndent(t *testing.T) {
+	l := &List{Name: "files", StatusWidth: 2, NoStatus: true}
+	rows := []Row{
+		{Status: "M", Text: "main.go"},
+		{Status: "A", Depth: 1, Text: "nested.go"},
+		{Status: "D", Depth: 2, Text: "deep.go"},
+	}
+	c := NewCanvas(40, 4)
+	l.Draw(c, c.Bounds(), rows)
+	lines := strings.Split(uncoloured.ReplaceAllString(c.String(), ""), "\n")
+
+	// Every status letter in the same column, whatever the depth.
+	col := -1
+	for i, want := range []string{"M", "A", "D"} {
+		at := strings.Index(lines[i], want)
+		if at < 0 {
+			t.Fatalf("row %d has no %q: %q", i, want, lines[i])
+		}
+		if col == -1 {
+			col = at
+		} else if at != col {
+			t.Errorf("row %d has its status at column %d, want %d — the indent moved it", i, at, col)
+		}
+	}
+
+	// And the text still indents.
+	if strings.Index(lines[1], "nested.go") <= strings.Index(lines[0], "main.go") {
+		t.Error("the depth-1 row did not indent")
+	}
+}
+
+// Issue 76: the columns before a row's text, in columns.
+func TestLeadWidthIsColumnsAndStatusRowsIsRows(t *testing.T) {
+	l := &List{Marker: "> ", StatusWidth: 2}
+	if got, want := l.LeadWidth(), 4; got != want {
+		t.Errorf("LeadWidth = %d, want %d (a 2-column marker plus a 2-column status)", got, want)
+	}
+	if got, want := l.StatusRows(), 1; got != want {
+		t.Errorf("StatusRows = %d, want %d", got, want)
+	}
+	// The old name still answers, so the private tools keep building.
+	if l.Overhead() != l.StatusRows() {
+		t.Error("Overhead stopped agreeing with StatusRows")
+	}
+	// A list with neither is zero, not one.
+	if got := (&List{}).LeadWidth(); got != 0 {
+		t.Errorf("a list with no marker and no status has LeadWidth %d, want 0", got)
+	}
+}
+
+// Issue 78 through the list: branches go in Row.Indent and replace the spaces.
+func TestRowIndentReplacesTheDepthSpaces(t *testing.T) {
+	l := &List{Name: "tree", NoStatus: true}
+	nodes := []Node{{Depth: 0, Key: "a"}, {Depth: 1, Key: "b"}, {Depth: 1, Key: "c"}}
+	prefixes := Branches(nodes, theme.DefaultChrome)
+
+	rows := make([]Row, len(nodes))
+	for i, n := range nodes {
+		rows[i] = Row{Indent: prefixes[i], Text: n.Key}
+	}
+	c := NewCanvas(40, 4)
+	l.Draw(c, c.Bounds(), rows)
+	frame := uncoloured.ReplaceAllString(c.String(), "")
+
+	if !strings.Contains(frame, "├─b") {
+		t.Errorf("no branch before the middle child:\n%s", frame)
+	}
+	if !strings.Contains(frame, "└─c") {
+		t.Errorf("no closing branch before the last child:\n%s", frame)
+	}
+}
