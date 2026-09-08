@@ -431,7 +431,7 @@ func (m *Model) spinnerEntry(s *styles) Entry {
 				Draw: draw(comp.Spinner{}, 0, "reading the target's foreign keys…")},
 			{Name: "a moment later", Note: "the same spinner, 300ms on — every spinner on screen agrees",
 				Draw: draw(comp.Spinner{}, 300*time.Millisecond, "reading the target's foreign keys…")},
-			{Name: "the caller's frames", Note: "braille is the default, not a requirement",
+			{Name: "frames from the caller", Note: "braille is the default, not a requirement",
 				Draw: draw(comp.Spinner{Frames: []string{"-", "\\", "|", "/"}}, 0, "for a font without braille")},
 		},
 	}

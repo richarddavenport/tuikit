@@ -206,6 +206,38 @@ func TestGalleryGoldens(t *testing.T) {
 	})
 }
 
+// A state's name becomes a golden's FILENAME, and a Go module zip refuses some
+// characters outright.
+//
+// `gallery/testdata/Spinner-the-caller's-frames.golden` made `go get
+// github.com/richarddavenport/tuikit@v0.1.0` fail for everyone with
+//
+//	create zip: malformed file path: invalid char '\''
+//
+// The tests passed, `make check` passed, and CI passed — the file is perfectly
+// legal on disk. It only broke for people who were not us, which is the class
+// of bug a repository finds on the day it goes public and not before.
+//
+// So the names are checked here, where they are written, rather than the files
+// being checked where they land.
+func TestAStateNameCanBeAFilename(t *testing.T) {
+	// What golang.org/x/mod/zip rejects. Spaces are absent because states()
+	// turns them into hyphens, so they never reach a filename; everything
+	// listed here does.
+	const illegal = `'"\!*[]:<>|?` + "`"
+	m := New(theme.Default)
+	for _, e := range m.Entries() {
+		for _, s := range e.States {
+			for _, r := range e.Name + s.Name {
+				if strings.ContainsRune(illegal, r) {
+					t.Errorf("%s/%s contains %q, which cannot be in a filename inside a Go module",
+						e.Name, s.Name, r)
+				}
+			}
+		}
+	}
+}
+
 // The gallery has to survive 80 columns like everything else it shows.
 func TestGalleryAtEightyColumns(t *testing.T) {
 	states(t, 80, 24, func(name string, m *Model) {

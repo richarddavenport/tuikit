@@ -3,7 +3,7 @@ tuikit gallery  every component, running                                        
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Spinner                                                                                        │
 │ List                          │ │ Work in flight. Its frame comes from the clock, so every spinner turns together.               │
-│ Pane                          │ │ ‹ turning · a moment later · the caller's frames ›                                             │
+│ Pane                          │ │ ‹ turning · a moment later · frames from the caller ›                                          │
 │ Tabs                          │ │ braille is the default, not a requirement                                                      │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ | for a font without braille                                                                   │
