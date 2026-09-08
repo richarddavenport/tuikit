@@ -1,6 +1,7 @@
 package guard
 
 import (
+	"go/ast"
 	"strconv"
 	"strings"
 )
@@ -81,4 +82,82 @@ func Engine(t T, dir string, denied ...Denied) {
 // "github.com/muesli/ansiblе-something".
 func underPrefix(path, prefix string) bool {
 	return path == prefix || strings.HasPrefix(path, prefix+"/")
+}
+
+// Derived fails when a test builds one of the engine's own answers by hand.
+//
+// # The failure it catches
+//
+// Decision 1 says the fixture the screens are rendered from is a value the
+// engine returns. Nothing enforced it, and in docket it quietly stopped being
+// one: `fixture()` set a field by hand while the engine composed the same field
+// as a sentence, and the renderer composed it again. The golden showed the row
+// disagreeing with itself on every run and looked right, because it was
+// checking the renderer against a world invented three hundred lines away in
+// the same file.
+//
+// Four bugs shipped past 72 goldens, a colour check and a narrow-terminal run.
+// Three of them for this reason.
+//
+// The compounding part is the worst of it: a hand-made fixture makes a wrong
+// screen look correct AND hands you an easy way to keep it that way. Editing
+// the fixture to match the renderer "fixes" the test and hides the bug.
+//
+// # What to pass
+//
+// The types that are the engine's ANSWERS rather than its inputs — what a
+// gather-and-reconcile produced, not the arguments it was called with. In
+// docket those are `Truth` and `Live`: neither is ever written by a person, so
+// neither should ever be typed by one in a test.
+//
+//	guard.Derived(t, ".", "engine", "Truth", "Live")
+//
+// A type that a test SHOULD construct — a request, an option, a filter — must
+// not be listed. This is not "tests may not build structs"; it is "these
+// particular structs are conclusions, and a conclusion typed by hand is a
+// conclusion nobody checked".
+//
+// # The seam that makes obeying it possible
+//
+// An engine that only exposes "run the commands and judge the result" as one
+// step leaves a test no way to get a real value without real commands. Split
+// gathering from reconciling and the fixture becomes the reconciler applied to
+// canned input, which is a value the engine returned and a world that exists.
+func Derived(t T, dir, pkg string, types ...string) {
+	t.Helper()
+	if len(types) == 0 {
+		t.Fatalf("guard: Derived with no types — a guard that checks nothing passes silently")
+	}
+
+	derived := map[string]bool{}
+	for _, name := range types {
+		derived[name] = true
+	}
+
+	for _, f := range testSources(t, dir) {
+		ast.Inspect(f.ast, func(n ast.Node) bool {
+			lit, ok := n.(*ast.CompositeLit)
+			if !ok {
+				return true
+			}
+			sel, ok := lit.Type.(*ast.SelectorExpr)
+			if !ok || !derived[sel.Sel.Name] {
+				return true
+			}
+			if id, ok := sel.X.(*ast.Ident); !ok || id.Name != pkg {
+				return true
+			}
+			// An empty literal is a zero value, not an invented world: it is
+			// what a caller writes to say "nothing yet", and refusing it would
+			// push tests into a worse shape to satisfy a guard.
+			if len(lit.Elts) == 0 {
+				return true
+			}
+			t.Errorf("%s:%d builds %s.%s by hand — it is something the engine "+
+				"RETURNS, and a fixture typed here is a world that does not exist. "+
+				"Call the engine's own reconcile on canned input instead",
+				f.name, f.fset.Position(lit.Pos()).Line, pkg, sel.Sel.Name)
+			return true
+		})
+	}
 }

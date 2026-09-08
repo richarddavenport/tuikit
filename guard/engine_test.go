@@ -105,3 +105,69 @@ func TestEveryDeniedPrefixSaysWhy(t *testing.T) {
 		}
 	}
 }
+
+// Issue 62: decision 1 says the fixture is a value the engine returns, and
+// nothing enforced it, so in docket it quietly stopped being one.
+func TestDerivedRejectsAHandBuiltAnswer(t *testing.T) {
+	dir := t.TempDir()
+	write(t, dir, "board_test.go", `package tui
+
+import "example.com/tool/internal/engine"
+
+func fixture() engine.Truth {
+	return engine.Truth{Stale: true, PR: "merged 11d ago by you"}
+}
+`)
+	got := run(t, func(rec T) { Derived(rec, dir, "engine", "Truth", "Live") })
+	want(t, got, "builds engine.Truth by hand")
+}
+
+// The other direction: a fixture that asks the engine is what the rule wants,
+// and must not fire.
+func TestDerivedAcceptsAnAnswerFromTheEngine(t *testing.T) {
+	dir := t.TempDir()
+	write(t, dir, "board_test.go", `package tui
+
+import "example.com/tool/internal/engine"
+
+func fixture() engine.Truth {
+	return engine.Reconcile(cannedInput())
+}
+`)
+	silent(t, run(t, func(rec T) { Derived(rec, dir, "engine", "Truth", "Live") }))
+}
+
+// A type the test SHOULD construct is not listed and must not fire. This is not
+// "tests may not build structs".
+func TestDerivedIgnoresTypesItWasNotGiven(t *testing.T) {
+	dir := t.TempDir()
+	write(t, dir, "board_test.go", `package tui
+
+import "example.com/tool/internal/engine"
+
+var req = engine.Request{Branch: "main"}
+`)
+	silent(t, run(t, func(rec T) { Derived(rec, dir, "engine", "Truth") }))
+}
+
+// An empty literal is a zero value, not an invented world. Refusing it would
+// push tests into a worse shape to satisfy a guard.
+func TestDerivedAllowsTheZeroValue(t *testing.T) {
+	dir := t.TempDir()
+	write(t, dir, "board_test.go", `package tui
+
+import "example.com/tool/internal/engine"
+
+var nothingYet = engine.Truth{}
+`)
+	silent(t, run(t, func(rec T) { Derived(rec, dir, "engine", "Truth") }))
+}
+
+// A guard given nothing to check passes vacuously, which is the failure every
+// guard here is written to avoid.
+func TestDerivedWithNoTypesFails(t *testing.T) {
+	dir := t.TempDir()
+	write(t, dir, "board_test.go", "package tui\n")
+	got := run(t, func(rec T) { Derived(rec, dir, "engine") })
+	want(t, got, "checks nothing")
+}

@@ -289,3 +289,35 @@ func checkExemptions(t T, except []Exemption, sources []source, used map[string]
 		}
 	}
 }
+
+// testSources is the _test.go files, which [sources] deliberately skips.
+//
+// The only guard that reads tests is [Derived], and it has to: the world a
+// fixture invents is invented in a test file, which is exactly where nothing
+// else looks.
+func testSources(t T, dir string) []source {
+	t.Helper()
+
+	names, err := filepath.Glob(filepath.Join(dir, "*_test.go"))
+	if err != nil {
+		t.Fatalf("guard: %v", err)
+	}
+	if len(names) == 0 {
+		t.Fatalf("guard: no test files in %s — a guard that scans nothing passes silently", dir)
+	}
+
+	out := make([]source, 0, len(names))
+	for _, name := range names {
+		src, err := os.ReadFile(name)
+		if err != nil {
+			t.Fatalf("guard: %v", err)
+		}
+		fset := token.NewFileSet()
+		file, err := parser.ParseFile(fset, name, src, 0)
+		if err != nil {
+			t.Fatalf("guard: %v", err)
+		}
+		out = append(out, source{name: name, src: src, fset: fset, ast: file})
+	}
+	return out
+}

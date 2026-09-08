@@ -38,6 +38,36 @@ it: `harness.Hints` presses every advertised key and fails on one that does
 nothing, and `harness.ShapeSurvivesColour` checks a frame still reads with every
 escape sequence stripped.
 
+## `guard.Derived` — the fixture has to be the engine's answer
+
+Decision 1 says the fixture the screens are rendered from is a value the engine
+returns. Nothing enforced it, and in docket it quietly stopped being one.
+
+```go
+guard.Derived(t, ".", "engine", "Truth", "Live")
+```
+
+Pass the types that are the engine's **answers** rather than its inputs — what a
+gather-and-reconcile produced, not the arguments it was called with. A type a
+test *should* construct must not be listed: this is not "tests may not build
+structs", it is "these particular structs are conclusions, and a conclusion
+typed by hand is a conclusion nobody checked".
+
+**What it catches.** docket's `fixture()` set a field by hand while the engine
+composed the same field as a sentence, and the renderer composed it again. The
+golden showed a row disagreeing with itself on every run and looked right,
+because it was checking the renderer against a world invented three hundred
+lines away in the same file. Four bugs shipped past 72 goldens; three for this
+reason.
+
+The compounding part is the worst of it: a hand-made fixture makes a wrong
+screen look correct **and** hands you an easy way to keep it that way — editing
+the fixture to match the renderer.
+
+An empty literal is allowed. A zero value is "nothing yet", not an invented
+world.
+
+
 ## When the guard is wrong: `guard.Except`
 
 `guard.Tokens` refuses a colour built from a literal, because a colour that did
