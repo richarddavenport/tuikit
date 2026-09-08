@@ -27,8 +27,7 @@ What was missing is *where the click lands*.
 
 ## The prototype
 
-Branch `prototype/canvas-mouse`, commits `1cdd3f8` and `cd75346` — throwaway,
-not for merge.
+Branch `prototype/canvas-mouse` — throwaway, not for merge.
 It renders democtl's dashboard through a cell grid and wires up all four
 behaviours.
 

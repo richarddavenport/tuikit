@@ -62,12 +62,12 @@ and the demo tool are close relatives.
 
 ## The agent layer
 
-**This is no longer speculative.** the database tool commit `57a13ad` ("Capture
-the UI's frames, and fix the three bugs that found", 2026-08-31) is a working
-prototype — `internal/tui/screenshot_probe_test.go`, 308 lines, 17 frames.
+**This is no longer speculative.** The database tool shipped a working
+prototype on 2026-08-31 — a 308-line capture test producing 17 frames, whose
+commit message is "Capture the UI's frames, and fix the three bugs that found".
 tuikit's `harness` is a generalisation of that, not an invention.
 
-Note what it is *not*: `the deploy tool/internal/tui/capture.go` is **log**
+Note what it is *not*: the deploy tool's own `capture.go` is **log**
 capture. Screen capture existed nowhere until the database tool.
 
 ### What the prototype established

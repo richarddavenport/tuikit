@@ -121,7 +121,7 @@ All mechanism. Nothing here decides when it runs.
 | `app` | The bubbletea shell: screen router, focus model, the async conventions as *types* rather than prose — generation counters, single-flight polling, bounded poll failure, the `capturesKeys()` mode split. |
 | `spec` | Command declarations → CLI + TUI screen + manifest. stdlib `flag`, no cobra. |
 | `guard` | `Tokens`, `Glyphs`, and a `Screens` check that every screen constant has a `View()` case. |
-| `harness` | Headless drive, deterministic frames, golden tests, ANSI capture, ANSI→HTML. Generalised from the database tool `57a13ad`. |
+| `harness` | Headless drive, deterministic frames, golden tests, ANSI capture, ANSI→HTML. Generalised from the database tool's capture test. |
 | `docgen` | Manifest → mkdocs-material site, and a capture directory → a frames page. Docs cannot drift from the code. |
 | `cmd/tuikit` | `new` (scaffold), `watch` (recapture on save, serve, reload), `gallery` (the running component browser). |
 | `safety` | `secret: true` scrubbing; the `assert` primitive that runs under `--dry-run`; protected-environment refusal. Both learned the hard way in the cloud tool. |

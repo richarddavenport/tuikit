@@ -224,8 +224,8 @@ right-aligned column measured against the box rather than the terminal.
 
 ## 18. Components draw cells, not strings
 
-Settled by the prototype on `prototype/canvas-mouse` (`1cdd3f8`), and written up
-in [mouse.md](mouse.md).
+Settled by the prototype on `prototype/canvas-mouse`, and written up in
+[mouse.md](mouse.md).
 
 A component that returns a string cannot be clicked: hit-testing needs geometry,
 and `lipgloss.JoinHorizontal` throws it away. So `comp` sits on a cell grid where

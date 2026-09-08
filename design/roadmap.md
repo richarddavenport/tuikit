@@ -6,11 +6,13 @@ not commitment.
 ## Plan
 
 1. ~~**Extract** `theme` + `guard` + `docgen`'s design-system bundle out of
-the deploy tool into the module.~~ **Done** — commit `0d0e560`. Verified by
+the deploy tool into the module.~~ **Done** — commit *The vocabulary, and the
+guards that hold it closed*. Verified by
 running the extracted guards against the deploy tool's own `internal/tui`: both
 clean, and a role nothing draws with still reported, so they are not passing
 vacuously.
-2. ~~**`examples/democtl`**~~ **Done** — commit `609ee55`. A fictional fleet with
+2. ~~**`examples/democtl`**~~ **Done** — commit *democtl: the example, the
+   reference, and the fixture*. A fictional fleet with
    a dashboard, logs, a confirm modal and a step run; seeded and clock-frozen so
    the harness can use it as a fixture. First real consumer of the guards. Its
    own frames found two bugs before the harness that will automate looking at
