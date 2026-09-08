@@ -1,61 +1,103 @@
 # tuikit
 
-### Build the tool, not the terminal.
+**Terminal tools that look like someone designed them.** A Go framework for the
+interfaces that show you state and let you act on it — a git client, a cluster
+browser, a deploy tool. Built on
+[Bubble Tea](https://github.com/charmbracelet/bubbletea) and
+[Lip Gloss](https://github.com/charmbracelet/lipgloss).
 
-A Go framework for terminal applications that **show you state and let you act
-on it** — a git client, a file manager, a cluster browser, a system monitor, an
-API client, a deploy tool.
+```
+democtl                                                           estate: prod
 
-Three things here that a widget library does not give you:
+┌─ services ───────────────────┐ ┌─ api-gateway ─────────────────────────────┐
+│ ● api-gateway    running     │ │ image      ghcr.io/acme/api:1.9.3         │
+│ ● auth           running     │ │ replicas   4/4                            │
+│ ● billing      → queued      │ │ updated    2m ago                         │
+│ ● search         running     │ │                                           │
+│ ✗ mailer         failed      │ │ ▾ health                                  │
+│ ● cdn            running     │ │   ✓ readiness        passing              │
+│ ● queue          running     │ │   ✓ liveness         passing              │
+│                              │ │   • migrations       running…             │
+│ 7 services · 1 failing       │ │                                           │
+└──────────────────────────────┘ └───────────────────────────────────────────┘
 
-**Nothing is invented.** Every one of the 25 components was pulled out of tools
-that had already written it. Usually two tools, and usually differently. Each
-component's doc comment names those tools and says what their versions
-disagreed about.
-
-That could still be a story we tell ourselves, so it is checked against other
-people's code. The [rebuilds repository](https://github.com/richarddavenport/tuikit-rebuilds) reads the source of eleven widely used
-TUIs, including lazygit, yazi, k9s, bottom and gitui. For each feature it asks
-one question: do we have it, are we missing it, or does it belong to the tool?
-Every gap is either filled or written down with its evidence. Three claims we
-had made turned out to be false, and those are recorded too.
-
-**The interface cannot lie about itself.** Nine guards read your own source and
-fail the build. They catch a key advertised in the help that no handler takes.
-A screen nothing can reach. A colour outside the palette. A box-drawing
-character typed by hand instead of taken from the theme. These are ordinary Go
-tests, and you call them from your own package.
-
-**One declaration, four surfaces.** Describe a command once and get the CLI, the
-TUI screen, the context menu and a machine-readable manifest from it. `comp` and
-`app` do not depend on `spec`, so a TUI-only tool pays nothing for it.
-
-Not for hosting a text buffer or another terminal. If you are building an editor
-or a multiplexer, the things you need most — modal editing, undo history, PTY
-management — are not here and are not planned. Inside that line it aims to be
-complete: components draw into a cell grid where every cell records **what** drew
-it, so a click resolves to the seventh service rather than to row seven, and
-still does after the list scrolls.
-
-Built on [Bubble Tea](https://github.com/charmbracelet/bubbletea) and
-[Lip Gloss](https://github.com/charmbracelet/lipgloss). Go 1.25.
-
-```sh
-git clone https://github.com/richarddavenport/tuikit
-cd tuikit && go run ./cmd/tuikit new mytool -dir ..
-cd ../mytool && make check   # it builds, runs, and passes its own guards
+j/k move · enter open · d deploy · / filter · q quit
 ```
 
-The generated tool resolves tuikit through a `replace` pointing at a sibling
-checkout, which is why the clone comes first. That goes when there is a tag.
+That is one `Draw` function. Every box, every glyph, every colour role in it is
+a component you did not write.
 
-## What you get
+```go
+func (m *Model) Draw(c *comp.Canvas, r comp.Rect) {
+	band := comp.Layout{Constraints: []comp.Constraint{
+		comp.Length(1), // title
+		comp.Fill(1),   // body
+		comp.Length(1), // hints
+	}}.Rows(r)
 
-**25 components** — `List` `Viewer` `Pane` `Tabs` `Bar` `Confirm` `StepList`
-`LogPane` `Spinner` `Table` `Detail` `Menu` `Toast` `Form` `Split` `Layout`
-`Meter` `Input` `Waiting` `Breadcrumb` `Scrollbar` `Keys` `Palette` `Rule`
-`Sparkline`. Run `tuikit gallery` to use every one of them in every state it has, or
-`tuikit gallery -list` to read the inventory as text.
+	comp.Bar{
+		Left:  []comp.Segment{{Text: "democtl"}},
+		Right: []comp.Segment{{Text: "estate: " + m.estate}},
+	}.Draw(c, band[0], comp.Region("title"))
+
+	left, right := m.split.Draw(c, band[1])
+
+	inside := comp.Pane{Title: "services", Focused: true}.Draw(c, left, comp.Region("services"))
+	m.list.Draw(c, inside, m.rows())
+
+	inside = comp.Pane{Title: m.selected().Name}.Draw(c, right, comp.Region("detail"))
+	comp.Detail{Blocks: m.blocks()}.Draw(c, inside, comp.Region("detail.body"))
+
+	comp.KeyHints(c, band[2], comp.Region("hints"), nil, m.hints()...)
+}
+```
+
+No state of its own, no reactivity, no virtual DOM: pass the state, get the
+frame. A component is handed a rectangle, it paints into it, it returns. There
+is no tree, so there is nothing to keep in step with the drawing.
+
+## It is themed by whatever themed your terminal
+
+No config file. No loader. Nothing to ask the user for. A tuikit interface sends
+the first sixteen ANSI colour **indices** — the only colours a terminal lets its
+user redefine — so the tool your reader opens is already in their palette, on
+the first frame. Nine roles, named by role and never by hue: `Accent` survives
+someone deciding the interface should be blue.
+
+## 25 components, and that's the whole set
+
+```
+frame    Pane · Rule · Layout · Split · Bar
+data     List · Table · Detail · LogPane · Viewer · Sparkline
+nav      Tabs · Breadcrumb · Menu · Scrollbar · Keys · Palette
+status   StepList · Spinner · Waiting · Meter · Toast · Confirm
+entry    Input · Form
+```
+
+Held closed by a test: a component `comp` has and the gallery does not is a test
+failure, and so is the reverse. `tuikit gallery` runs every one of them in every
+state it has.
+
+A component exists when two tools hand-rolled the same thing and their versions
+did not meaningfully differ. `Pane` is the clearest case: one tool had **two**
+box-drawing functions that disagreed with each other, written months apart for
+the same job. A tool duplicating a function inside itself is the strongest
+argument for extraction there is, because there is no second tool's
+requirements to blame it on.
+
+## What it cannot do
+
+- **Not a text editor, not a multiplexer.** No modal editing, no undo history,
+  no PTYs. If your interface needs one, you want theirs.
+- **No shadows, no blur, no easing.** A terminal has no z-axis: a menu is on top
+  because it was drawn last, and that is the entire implementation — no
+  compositing step.
+- **29 glyphs, and the list is closed**, enforced by a test. No icon font, no
+  emoji. A terminal font without a glyph draws a replacement box, which reads as
+  a bug rather than as decoration. Adding one is a line naming the character and
+  the reason.
+
+## What else is in it
 
 **One declaration, four surfaces.** A `spec.Command` carries its flags, args,
 help, key binding and target region. From that, `spec` generates the CLI, the
@@ -105,7 +147,7 @@ components can offer a picture — a gradient meter, a rounded panel — drawn
 decoration pass, so a terminal that cannot show one loses nothing but the
 gradient.
 
-## What it cannot do
+## What it cannot do, at length
 
 **No text editor, no multiplexer.** Modal editing, undo history, syntax-aware
 buffers over large files, PTY hosting and process management are out of scope and
@@ -188,6 +230,15 @@ tuikit watch <dir>         recapture on save, rebuild, reload
 tuikit designsystem        the colours and glyphs as HTML
 tuikit news                what changed since a tool last looked
 ```
+
+## Start
+
+```sh
+go get github.com/richarddavenport/tuikit
+```
+
+`tuikit gallery` shows every component in every state. `tuikit new` scaffolds a
+tool. Go 1.25. MIT.
 
 ## Reading further
 
