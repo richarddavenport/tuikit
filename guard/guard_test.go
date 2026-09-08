@@ -218,3 +218,64 @@ func TestGlyphsHonoursTheSpinnerRange(t *testing.T) {
 		t.Errorf("a braille spinner frame was rejected: %v", got)
 	}
 }
+
+// Issue 70: the guard is wrong about brand colours, and there was no way to
+// say so.
+func TestAnExemptionLetsOneFileThrough(t *testing.T) {
+	dir := t.TempDir()
+	write(t, dir, "ui.go", `package ui
+
+import "github.com/charmbracelet/lipgloss"
+
+var border = lipgloss.Color("240")
+`+allRoleUses())
+	write(t, dir, "icons.go", `package ui
+
+import "github.com/charmbracelet/lipgloss"
+
+var brand = lipgloss.Color("#00ADD8")
+`)
+
+	// Without it, both files are reported.
+	both := run(t, func(rec T) { Tokens(rec, dir, allRolesUsed()) })
+	if len(both) < 2 {
+		t.Fatalf("expected both files reported, got %d: %v", len(both), both)
+	}
+
+	// With it, only the one that was not excused.
+	one := run(t, func(rec T) {
+		Tokens(rec, dir, allRolesUsed(), Except("icons.go", "file-type brand colours, not theme"))
+	})
+	if len(one) != 1 {
+		t.Errorf("with icons.go exempted the guard reported %d, want 1: %v", len(one), one)
+	}
+	want(t, one, "ui.go")
+}
+
+// A stale exemption is worse than none: it reads as though somebody checked.
+func TestAnExemptionForAMissingFileFails(t *testing.T) {
+	dir := pkg(t, "package ui\n"+allRoleUses())
+	got := run(t, func(rec T) {
+		Tokens(rec, dir, allRolesUsed(), Except("gone.go", "renamed away"))
+	})
+	want(t, got, "is not in the scanned directory")
+}
+
+// An exemption that excuses nothing is a hole nobody is using.
+func TestAnExemptionThatExcusesNothingFails(t *testing.T) {
+	dir := pkg(t, "package ui\n\nvar x = 1\n"+allRoleUses())
+	got := run(t, func(rec T) {
+		Tokens(rec, dir, allRolesUsed(), Except("ui.go", "no longer needed"))
+	})
+	want(t, got, "builds no colours from literals")
+}
+
+// A reason is not optional.
+func TestAnExemptionWithoutAReasonPanics(t *testing.T) {
+	defer func() {
+		if recover() == nil {
+			t.Error("Except accepted an empty reason")
+		}
+	}()
+	Except("icons.go", "")
+}

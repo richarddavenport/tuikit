@@ -46,14 +46,20 @@ type T interface {
 //
 // The second is the other direction. A role nothing draws with is a decision
 // nobody made.
-func Tokens(t T, dir string, p theme.Palette) {
+func Tokens(t T, dir string, p theme.Palette, except ...Exemption) {
 	t.Helper()
 
 	sources := sources(t, dir)
+	used := map[string]int{}
 	for _, f := range sources {
+		_, exempt := reasonFor(except, f.name)
 		ast.Inspect(f.ast, func(n ast.Node) bool {
 			call, ok := n.(*ast.CallExpr)
 			if !ok || !isLipglossColor(call.Fun) {
+				return true
+			}
+			if exempt {
+				used[filepath.Base(f.name)]++
 				return true
 			}
 			t.Errorf("%s:%d builds a colour from a literal — "+
@@ -62,6 +68,7 @@ func Tokens(t T, dir string, p theme.Palette) {
 			return true
 		})
 	}
+	checkExemptions(t, except, sources, used)
 
 	var all strings.Builder
 	for _, f := range sources {
@@ -199,4 +206,86 @@ func unique(in []string) []string {
 		}
 	}
 	return out
+}
+
+// Exemption names a file [Tokens] may not check, and why.
+//
+// # When the guard is wrong
+//
+// lazygit's `presentation/icons/file_icons.go` is 794 lines holding 743 hex
+// colour literals. They are file-type BRAND colours — the Go gopher's blue, the
+// Rust orange — and the whole point of them is that they are the same
+// everywhere. Decision 28 puts colour on ANSI 0-15 so the reader's theme wins,
+// and that reasoning does not reach a brand mark.
+//
+// Before this there were three options and all were bad: drop the guard and
+// lose it everywhere, move the colours somewhere unscanned, or give up the
+// icons.
+//
+// # Why a reason is required
+//
+// Because the value of the guard is that a colour outside the palette is a
+// DECISION, and an exemption that records nothing has thrown that away — it is
+// a suppression flag wearing a better name. This is the same bargain
+// [theme.GlyphSet.With] strikes for characters, and for the same reason.
+//
+// # Why it cannot rot
+//
+// Two checks, both failures:
+//
+//   - An exemption naming a file that is not there. The file was renamed or
+//     deleted and the exemption outlived it, which means the next file to take
+//     that name is silently unguarded.
+//   - An exemption on a file with no literals in it. Nothing is being excused,
+//     so it should be deleted — and until it is, it is a hole nobody is using
+//     and nobody will notice opening.
+//
+// A stale exemption is worse than no exemption, because it reads as though
+// somebody checked.
+type Exemption struct {
+	File   string
+	Reason string
+}
+
+// Except exempts one file, by base name, for a stated reason.
+//
+// The reason is not optional: an empty one panics, the way
+// [theme.GlyphSet.With] does on a malformed pair, because both are a typo at
+// the call site rather than a condition to handle at runtime.
+func Except(file, reason string) Exemption {
+	if file == "" || reason == "" {
+		panic("guard: Except wants a file and a reason — an exemption with no reason is a suppression flag")
+	}
+	return Exemption{File: filepath.Base(file), Reason: reason}
+}
+
+func reasonFor(except []Exemption, name string) (string, bool) {
+	for _, e := range except {
+		if e.File == filepath.Base(name) {
+			return e.Reason, true
+		}
+	}
+	return "", false
+}
+
+// checkExemptions fails on an exemption that has stopped meaning anything.
+func checkExemptions(t T, except []Exemption, sources []source, used map[string]int) {
+	t.Helper()
+
+	present := map[string]bool{}
+	for _, f := range sources {
+		present[filepath.Base(f.name)] = true
+	}
+	for _, e := range except {
+		switch {
+		case !present[e.File]:
+			t.Errorf("guard: %s is exempted (%q) but is not in the scanned directory — "+
+				"delete the exemption, or the next file to take that name is unguarded",
+				e.File, e.Reason)
+		case used[e.File] == 0:
+			t.Errorf("guard: %s is exempted (%q) but builds no colours from literals — "+
+				"delete the exemption rather than leaving a hole nobody is using",
+				e.File, e.Reason)
+		}
+	}
 }
