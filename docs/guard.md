@@ -23,7 +23,7 @@ func TestGuards(t *testing.T) {
 
 | | |
 | --- | --- |
-| `Tokens` | a colour literal instead of a palette role — and a role nothing draws with |
+| `Tokens` | a color literal instead of a palette role — and a role nothing draws with |
 | `Glyphs` | a character outside the glyph set. Comments don't count; only what reaches the screen |
 | `Chrome` | chrome configured with characters the glyph set cannot print |
 | `Furniture` | a `─` or `▸` typed by hand into `Set`/`Text`/`Fill` instead of taken from the chrome |
@@ -35,7 +35,7 @@ func TestGuards(t *testing.T) {
 
 Two more live in `harness` because they need to run the program rather than read
 it: `harness.Hints` presses every advertised key and fails on one that does
-nothing, and `harness.ShapeSurvivesColour` checks a frame still reads with every
+nothing, and `harness.ShapeSurvivesColor` checks a frame still reads with every
 escape sequence stripped.
 
 ## `guard.Derived` — the fixture has to be the engine's answer
@@ -70,30 +70,30 @@ world.
 
 ## When the guard is wrong: `guard.Except`
 
-`guard.Tokens` refuses a colour built from a literal, because a colour that did
+`guard.Tokens` refuses a color built from a literal, because a color that did
 not come from the palette is a decision nobody made. That is right almost
 always and there is a real exception.
 
 lazygit's `presentation/icons/file_icons.go` holds **743 hex literals**. They
-are file-type brand colours — the Go gopher's blue, the Rust orange — and the
+are file-type brand colors — the Go gopher's blue, the Rust orange — and the
 whole point of them is that they are the same everywhere. Decision 28 puts
-colour on ANSI 0–15 so the reader's theme wins, and that reasoning does not
+color on ANSI 0–15 so the reader's theme wins, and that reasoning does not
 reach a brand mark.
 
 ```go
 guard.Tokens(t, ".", Palette,
-	guard.Except("file_icons.go", "file-type brand colours, not theme"))
+	guard.Except("file_icons.go", "file-type brand colors, not theme"))
 ```
 
 **The reason is required**, and an empty one panics. Without it this is a
 suppression flag wearing a better name, and the value of the guard is that a
-colour outside the palette is a *decision*.
+color outside the palette is a *decision*.
 
 **And it cannot rot.** Two things fail:
 
 - an exemption naming a file that is not in the directory — it was renamed or
   deleted, and the next file to take that name would be silently unguarded
-- an exemption on a file that builds no colours from literals — nothing is being
+- an exemption on a file that builds no colors from literals — nothing is being
   excused, so it is a hole nobody is using and nobody will notice opening
 
 A stale exemption is worse than no exemption, because it reads as though
@@ -102,7 +102,7 @@ somebody checked.
 
 ## The properties they buy
 
-**Colours are the reader's.** ANSI 0–15 come from their terminal theme. A hex
+**Colors are the reader's.** ANSI 0–15 come from their terminal theme. A hex
 literal overrides a choice they made on purpose, and `Tokens` is why that cannot
 happen by accident.
 

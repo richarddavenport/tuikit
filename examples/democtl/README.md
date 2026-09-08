@@ -23,12 +23,12 @@ frame reading "47s ago" has to read that tomorrow too.
 | Convention | Where |
 |---|---|
 | Engine and UI split, engine with no UI imports | `fleet/` and `ui/` |
-| Every colour from a `theme.Palette`, every glyph from a `theme.GlyphSet` | `ui/style.go` |
+| Every color from a `theme.Palette`, every glyph from a `theme.GlyphSet` | `ui/style.go` |
 | The guards, as a tool actually writes them | `ui/guard_test.go` — six lines |
 | The mode split: while something captures keys, `j` is the letter j | `ui/model.go`, `capturesKeys` |
 | A generation counter, so an abandoned run cannot draw into its successor | `ui/update.go`, `stepDoneMsg.gen` |
 | Every screen constant needs a `View()` case | `ui/view.go`, and the test for it |
-| Truncating plain text and clipping coloured text are different operations | `ui/text.go` |
+| Truncating plain text and clipping colored text are different operations | `ui/text.go` |
 | A modal bounded to the terminal | `ui/view.go`, `overlay` |
 
 ## What the glyph set costs, on purpose

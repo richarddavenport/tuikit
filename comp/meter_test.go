@@ -102,10 +102,10 @@ func TestMeterWithARampIsUnchangedWithoutGraphics(t *testing.T) {
 	}
 }
 
-// TestMeterRasteriserIsNotCalledWithoutGraphics. The draw function is a
+// TestMeterRasterizerIsNotCalledWithoutGraphics. The draw function is a
 // function precisely so a terminal that cannot show a picture never pays to
 // make one.
-func TestMeterRasteriserIsNotCalledWithoutGraphics(t *testing.T) {
+func TestMeterRasterizerIsNotCalledWithoutGraphics(t *testing.T) {
 	c := comp.NewCanvas(20, 1)
 	called := false
 	m := comp.Meter{Value: 0.5, Track: trackID, Pixels: true}

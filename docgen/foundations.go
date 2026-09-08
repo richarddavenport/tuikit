@@ -22,26 +22,26 @@ func (r renderer) colorsPage() string {
 	}
 	b.WriteString(`</div>`)
 
-	// Every role drawn in a line of interface, not only as a swatch. A colour
+	// Every role drawn in a line of interface, not only as a swatch. A color
 	// is a decision about what something MEANS, and a swatch cannot show that.
 	b.WriteString(`<h2>In place</h2>`)
 	b.WriteString(r.rolesInUse())
 
 	b.WriteString(`<h2>Why indices, not hex</h2>
 <p>The values are the first sixteen ANSI <em>indices</em>, because those are the only
-colours a terminal lets its user redefine — so a tuikit tool is themed by whatever
+colors a terminal lets its user redefine — so a tuikit tool is themed by whatever
 themed the terminal. The swatches below are what a default xterm draws; on your
 own terminal they are your own theme. Everything from index 16 up is a fixed
 formula no theme touches, which is why the palette does not use it.</p>
-<p>A truecolour hex would look right on the machine it was picked on, wrong over
+<p>A truecolor hex would look right on the machine it was picked on, wrong over
 ssh from another, and identical under every theme the reader has ever chosen.
 The hex shown here is for drawing the interface <em>outside</em> a terminal, and
 is never what the code sends.</p>
 <p>Names are roles, never hues. <code>Accent</code> survives someone deciding the
 interface should be blue; <code>pink</code> does not.</p>`)
 
-	return r.page("Foundations", "Colour roles",
-		"Each role is one of the terminal's own sixteen. The interface has no other colours — guard.Tokens holds that closed.",
+	return r.page("Foundations", "Color roles",
+		"Each role is one of the terminal's own sixteen. The interface has no other colors — guard.Tokens holds that closed.",
 		b.String())
 }
 
@@ -117,13 +117,13 @@ happened. Both were invisible until someone looked at a captured frame.</p>
 
 <h2>Two ways to shorten a line, and they are not interchangeable</h2>
 <p>Truncating counts runes and is right for plain text. A line that already
-carries colour has to be <em>clipped</em> instead: truncation counts the escape
-sequences as width, so a coloured row gets cut short of the pane and, worse, cut
+carries color has to be <em>clipped</em> instead: truncation counts the escape
+sequences as width, so a colored row gets cut short of the pane and, worse, cut
 mid-escape.</p>
 
 <h2>The interface paints no background</h2>
-<p>Except one: the selected row of a table, where a foreground colour alone cannot
-be seen against its neighbours. Everything else sits on whatever the reader's
+<p>Except one: the selected row of a table, where a foreground color alone cannot
+be seen against its neighbors. Everything else sits on whatever the reader's
 terminal is, which is why the same design has to hold up both ways.</p>` +
 		`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">` +
 		`<div class="term">` + r.span("accent", "> api_api") + plain("   2/2  ") + r.span("success", "ok") + "\n" +

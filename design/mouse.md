@@ -29,7 +29,7 @@ What was missing is *where the click lands*.
 
 Branch `prototype/canvas-mouse` — throwaway, not for merge.
 It renders democtl's dashboard through a cell grid and wires up all four
-behaviours.
+behaviors.
 
 ```sh
 git checkout prototype/canvas-mouse
@@ -44,7 +44,7 @@ bounds-checked into a no-op. `OwnerAt(x, y)` is the hit test.
 | | Lines |
 |---|---|
 | The whole substrate | **153** |
-| democtl's dashboard redrawn on it, with all four mouse behaviours | 369 |
+| democtl's dashboard redrawn on it, with all four mouse behaviors | 369 |
 | Tests driving it by synthetic mouse events | 201 |
 
 Against that, from the string-based version it deletes `clip`, `pad`,
@@ -63,7 +63,7 @@ is no region list that can drift from the drawing, because the drawing *is* the
 region list. A component that moved but forgot to update its rect is not a
 failure mode that exists.
 
-**All four behaviours?** All four, and two details that only showed up by
+**All four behaviors?** All four, and two details that only showed up by
 building it:
 
 - Clicking the blank space after a short name has to select the row. It does,

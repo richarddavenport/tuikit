@@ -97,7 +97,7 @@ type Field struct {
 	// tool's type-the-name-to-confirm. Empty means no such requirement.
 	Must string
 
-	// Disabled greys a field out. It still shows its value: a choice you
+	// Disabled grays a field out. It still shows its value: a choice you
 	// cannot change is one you may still need to read.
 	Disabled bool
 

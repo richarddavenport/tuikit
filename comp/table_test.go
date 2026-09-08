@@ -59,7 +59,7 @@ func TestTheFillerTakesWhatIsLeft(t *testing.T) {
 }
 
 // A cell too long for its column is truncated with an ellipsis, so the columns
-// after it stay where they are. A cell that pushed its neighbours along would
+// after it stay where they are. A cell that pushed its neighbors along would
 // make every row a different shape.
 func TestALongCellIsTruncatedRatherThanPushing(t *testing.T) {
 	tbl := Table{Gap: 1, Columns: []Column{{Width: 8}, {Width: 6}}}

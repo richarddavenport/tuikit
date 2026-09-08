@@ -28,7 +28,7 @@ import "github.com/charmbracelet/lipgloss"
 type Keys struct {
 	Sections []KeySection
 
-	// Overlay draws it as a centred box over the interface, like Confirm.
+	// Overlay draws it as a centered box over the interface, like Confirm.
 	// Otherwise it fills the rect it is given. An overlay is usually right:
 	// "what was I looking at" is half of what a reader opens help to answer.
 	Overlay bool

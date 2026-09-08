@@ -45,7 +45,7 @@ func (s *Sort) By() (col int, desc, ok bool) { return s.Col, s.Desc, s.sorted }
 
 // Toggle sorts by a column, reversing it if it was already the one.
 //
-// The behaviour every spreadsheet has and every tool re-implements: click once
+// The behavior every spreadsheet has and every tool re-implements: click once
 // for ascending, again for descending. A third click does NOT clear it, because
 // a table that intermittently forgets its order is worse than one that keeps a
 // direction you did not want.

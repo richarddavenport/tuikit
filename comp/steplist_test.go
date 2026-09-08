@@ -113,7 +113,7 @@ func TestEachStepOwnsItsRow(t *testing.T) {
 }
 
 func TestTheStatusLineFollowsTheSteps(t *testing.T) {
-	forceColour()
+	forceColor()
 	danger := lipgloss.NewStyle().Foreground(lipgloss.Color("196"))
 
 	c := NewCanvas(60, 6)

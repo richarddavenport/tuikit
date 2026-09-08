@@ -82,9 +82,9 @@ func TestHelpBecomesTheDescription(t *testing.T) {
 	}
 }
 
-// It serialises to the shape a tool-calling API expects, and stably: an agent's
-// cache key is usually the serialised schema.
-func TestTheSchemaSerialisesStably(t *testing.T) {
+// It serializes to the shape a tool-calling API expects, and stably: an agent's
+// cache key is usually the serialized schema.
+func TestTheSchemaSerializesStably(t *testing.T) {
 	first, err := json.Marshal(spec.SchemaOf(cmd()))
 	if err != nil {
 		t.Fatal(err)
@@ -113,6 +113,6 @@ func TestACommandWithNoParametersIsStillAnObject(t *testing.T) {
 		t.Fatal(err)
 	}
 	if string(body) != `{"type":"object","properties":{}}` {
-		t.Errorf("empty schema serialises as %s", body)
+		t.Errorf("empty schema serializes as %s", body)
 	}
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/richarddavenport/tuikit/guard"
 )
 
-// The engine knows the domain and nothing about terminals — no colour, no
+// The engine knows the domain and nothing about terminals — no color, no
 // width, no keys, no framework, and no tuikit (decision 22).
 //
 // The rule is worth as much as it is enforced, and it is mechanically

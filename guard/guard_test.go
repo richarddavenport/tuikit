@@ -16,7 +16,7 @@ import (
 // case here is checked in both directions: the offending source must fail, and
 // the innocent source that looks like it must not.
 
-func TestTokensRejectsAColourLiteral(t *testing.T) {
+func TestTokensRejectsAColorLiteral(t *testing.T) {
 	dir := pkg(t, `package ui
 
 import "github.com/charmbracelet/lipgloss"
@@ -24,10 +24,10 @@ import "github.com/charmbracelet/lipgloss"
 var border = lipgloss.Color("240")
 `)
 	got := run(t, func(rec T) { Tokens(rec, dir, allRolesUsed()) })
-	want(t, got, "builds a colour from a literal")
+	want(t, got, "builds a color from a literal")
 }
 
-func TestTokensAcceptsAColourFromThePalette(t *testing.T) {
+func TestTokensAcceptsAColorFromThePalette(t *testing.T) {
 	dir := pkg(t, `package ui
 
 import "github.com/charmbracelet/lipgloss"
@@ -85,7 +85,7 @@ func TestGlyphsFollowsAnExtendedSet(t *testing.T) {
 	}))
 }
 
-// A test file may name a colour it is checking for, or print a glyph in a
+// A test file may name a color it is checking for, or print a glyph in a
 // failure message. Neither reaches a terminal.
 func TestGuardsIgnoreTestFiles(t *testing.T) {
 	dir := pkg(t, "package ui\n\n"+allRoleUses())
@@ -209,9 +209,9 @@ var _ = p.Accent
 }
 
 // The spinner range is the documented escape hatch, and the guard has to
-// honour the same answer GlyphSet.Printable gives. Two functions answering
+// honor the same answer GlyphSet.Printable gives. Two functions answering
 // "may this be printed" differently is worse than either answer.
-func TestGlyphsHonoursTheSpinnerRange(t *testing.T) {
+func TestGlyphsHonorsTheSpinnerRange(t *testing.T) {
 	dir := t.TempDir()
 	write(t, dir, "ui.go", "package ui\n\nvar frame = \"⠿\"\n")
 
@@ -220,7 +220,7 @@ func TestGlyphsHonoursTheSpinnerRange(t *testing.T) {
 	}
 }
 
-// Issue 70: the guard is wrong about brand colours, and there was no way to
+// Issue 70: the guard is wrong about brand colors, and there was no way to
 // say so.
 func TestAnExemptionLetsOneFileThrough(t *testing.T) {
 	dir := t.TempDir()
@@ -245,7 +245,7 @@ var brand = lipgloss.Color("#00ADD8")
 
 	// With it, only the one that was not excused.
 	one := run(t, func(rec T) {
-		Tokens(rec, dir, allRolesUsed(), Except("icons.go", "file-type brand colours, not theme"))
+		Tokens(rec, dir, allRolesUsed(), Except("icons.go", "file-type brand colors, not theme"))
 	})
 	if len(one) != 1 {
 		t.Errorf("with icons.go exempted the guard reported %d, want 1: %v", len(one), one)
@@ -268,7 +268,7 @@ func TestAnExemptionThatExcusesNothingFails(t *testing.T) {
 	got := run(t, func(rec T) {
 		Tokens(rec, dir, allRolesUsed(), Except("ui.go", "no longer needed"))
 	})
-	want(t, got, "builds no colours from literals")
+	want(t, got, "builds no colors from literals")
 }
 
 // A reason is not optional.

@@ -71,9 +71,9 @@ func TestLabelsLineUpPerBlock(t *testing.T) {
 	}
 }
 
-// A fact can colour its VALUE without colouring its label. A state that is red
-// in the list and grey here is the same fact told twice, differently.
-func TestAFactCanColourItsValueAlone(t *testing.T) {
+// A fact can color its VALUE without coloring its label. A state that is red
+// in the list and gray here is the same fact told twice, differently.
+func TestAFactCanColorItsValueAlone(t *testing.T) {
 	label := lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
 	value := lipgloss.NewStyle().Foreground(lipgloss.Color("196"))
 
@@ -113,7 +113,7 @@ func TestThereIsNoBlankRowBeforeTheFirstThing(t *testing.T) {
 
 // Prose wraps; a fact truncates. A note is a sentence and losing the end of it
 // loses the point, where a resource ID that runs off the edge is still
-// recognisable from its start.
+// recognizable from its start.
 func TestProseWrapsAndAFactTruncates(t *testing.T) {
 	lines := drawDetail(Detail{Blocks: []Block{
 		{Text: "the tasks are replaced one at a time"},

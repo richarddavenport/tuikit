@@ -34,21 +34,21 @@ whether the key exists.
 
 `Extra` exists because the alternative is worse. A tool that needs a tenth
 meaning and cannot name it reaches for `lipgloss.Color("39")` instead — and
-`guard.Tokens`, the thing that keeps colours honest, is the first casualty. It
+`guard.Tokens`, the thing that keeps colors honest, is the first casualty. It
 should still feel like a decision: a shade of an existing role is not one.
 
 `Roles()` returns the nine in a fixed reading order with `Extra` appended, and
 the `Why` text describes the role rather than the hue, so it survives a tool
-recolouring the palette. That is the whole reason roles are named.
+recoloring the palette. That is the whole reason roles are named.
 
-## 3. ANSI indices, never truecolour hex
+## 3. ANSI indices, never truecolor hex
 
 > **Narrowed by decision 28 (2026-09-01): the first SIXTEEN indices, not 256.**
 > The reasoning below is unchanged and still the reason not to use hex; what it
 > got wrong is that it treated all 256 as equivalent. They are not — only the
 > first sixteen follow the reader's theme.
 
-Inherited from the deploy tool. A truecolour hex looks right on the machine it
+Inherited from the deploy tool. A truecolor hex looks right on the machine it
 was picked on and wrong over ssh from another; the 256 palette is what every
 terminal has agreed on. `theme.Hex` converts for anything drawing outside a
 terminal, and is computed from the palette formula rather than tabled — a table
@@ -91,11 +91,11 @@ what is constant is that a role is reached through a dot.
 ## 7. The design system is generated, never maintained beside the code
 
 A design tool draws pixels; a TUI draws a character grid. A mockup made without
-the column budget, the 256 colours and the glyph allow-list is a picture of a
+the column budget, the 256 colors and the glyph allow-list is a picture of a
 tool that cannot be built. So `docgen` renders from `theme`, and a test fails if
 any terminal block in the bundle draws a character outside the set.
 
-Only the foundations exist so far — colours, glyphs, the grid. Component and
+Only the foundations exist so far — colors, glyphs, the grid. Component and
 screen cards arrive with the components. A card depicting a component that does
 not exist is exactly the drift this package prevents.
 
@@ -154,7 +154,7 @@ What cobra would have given free — completions, generated help — generates f
 
 ## 13. ANSI files and HTML, not SVG
 
-The ANSI file is both the archive and the golden: stripped of colour it diffs in
+The ANSI file is both the archive and the golden: stripped of color it diffs in
 a pull request, and kept whole it is exactly what the terminal emitted. HTML with
 real text keeps a published frame selectable and searchable. SVG would be a third
 representation of the same frame, earning nothing and drifting from the other two.
@@ -307,7 +307,7 @@ charmbracelet at all. What an engine imports is stdlib plus its own domain SDK:
 pgx, the Azure SDK, the Docker SDK.
 
 So the rule is **no terminal concepts**, not merely no terminal library. No
-colour, no width, no keys, no framework. An engine that has never heard of a
+color, no width, no keys, no framework. An engine that has never heard of a
 column is one that can be tested, reused from a CLI, driven from a cron job, and
 read by someone who does not know what tuikit is.
 
@@ -364,7 +364,7 @@ cloud tool's choice was between tuikit's vocabulary and working in daylight.
 That is not a choice a design system should be imposing.
 
 **Depth and adaptation are different questions.** Decision 13 chose ANSI 256
-over truecolour because ssh decides the profile — that is about how many colours
+over truecolor because ssh decides the profile — that is about how many colors
 there are. Which of them to use against a pale background is a separate
 decision, and the tool's.
 
@@ -374,13 +374,13 @@ now have them.
 
 Two things follow:
 
-**`theme.Hex` answers with the DARK value of an adaptive colour**, and passes a
+**`theme.Hex` answers with the DARK value of an adaptive color**, and passes a
 hex value straight through. Everything that renders a palette outside a terminal
 — a design system page, a captured frame turned into HTML — draws on a dark
 ground, because that is what the frame was captured for. A palette page for a
 light interface is a real thing to want, and is not this.
 
-**`theme.Value` is new**: the colour as the tool *declared* it, for the design
+**`theme.Value` is new**: the color as the tool *declared* it, for the design
 system page to show beside what it resolves to. "205" tells a reader the palette
 is ANSI indices and will follow their terminal's own scheme; "#d2a8ff" tells
 them it will not. Hex answers what it looks like; Value answers what it is.
@@ -404,7 +404,7 @@ So the check now applies to `Extra` only. An unused Extra is still dead and
 still fails: a tool that invented a tenth meaning and then did not use it has
 left a name for the next person to wonder about.
 
-**`guard.Glyphs` did not honour `GlyphSet.Printable`.** It looked the rune up in
+**`guard.Glyphs` did not honor `GlyphSet.Printable`.** It looked the rune up in
 the map directly, so `SpinnerRange` — documented in `theme` as the one thing the
 allow-list does not cover — did nothing, and the cloud tool's `⠿` was rejected.
 Two functions answering "may this be printed" differently is worse than either
@@ -462,7 +462,7 @@ form of this project's signal. `app.Toggles` took the deploy tool's semantics,
 which were the better of the two: turning the global override off also clears
 the per-key set, so the key twice is a reliable way back to nothing.
 
-### What must not be generalised
+### What must not be generalized
 
 The flattening. `row{bucket, res}`, `diffRow{service, action, change}` and
 `applyRow{service, stack, edits, edit}` look alike and are not: each carries a
@@ -594,7 +594,7 @@ domain. The CLI is still not a side feature — and `comp` and `app` do not impo
 extracted rather than designed. The cell buffer is still a means.
 
 What changes is the SAMPLE. "Two of the four tools" was a rule about not
-generalising from one example, and four private tools were never the only
+generalizing from one example, and four private tools were never the only
 examples available. The [rebuilds repository](https://github.com/richarddavenport/tuikit-rebuilds) reads the tools people actually
 use and asks what each would need. Six of the fourteen surveyed need a
 collapsible tree. That is the evidence the rule always asked for, and it was
@@ -602,12 +602,12 @@ sitting in public the whole time.
 
 ## 28. The palette is the terminal's own sixteen
 
-Decision 3 chose ANSI indices over truecolour hex and was right about why. It
+Decision 3 chose ANSI indices over truecolor hex and was right about why. It
 was wrong about the scope, and the wrongness was invisible for as long as nobody
 asked the next question.
 
 **Only indices 0–15 follow the reader's theme.** Everything from 16 up is a
-formula — a 6×6×6 cube and a 24-step grey ramp — identical in every terminal,
+formula — a 6×6×6 cube and a 24-step gray ramp — identical in every terminal,
 which no theme touches and no theme can. `theme/hex.go` has said so in a comment
 since it was written: *"the first sixteen are the terminal's own, and predate any
 formula."* Nobody joined it to the palette, which was 205/241/240 — three numbers
@@ -625,15 +625,15 @@ not. **The line is not index versus hex. It is fifteen.**
 
 The sixteen are already semantic, which is what makes this a mapping rather than
 a guess. Terminal themes agree that 0 is the background, 7 the foreground, 8 the
-dimmed grey that comments are drawn in, and 15 the brightest text. Omarchy's
+dimmed gray that comments are drawn in, and 15 the brightest text. Omarchy's
 templates say it literally — `palette = 0={{ background }}`, `palette = 8={{
 muted }}` — and every other theme system does the same under other names.
 
 | Role | Was | Now | |
 |---|---|---|---|
 | Accent | 205 | **13** | bright magenta |
-| Muted | 241 | **8** | the dimmed grey |
-| Border | 240 | **8** | the same grey |
+| Muted | 241 | **8** | the dimmed gray |
+| Border | 240 | **8** | the same gray |
 | Success | 34 | **2** | green |
 | Pending | 214 | **3** | yellow |
 | Danger | 196 | **1** | red |
@@ -654,26 +654,26 @@ project runs on.
 
 ### What it costs
 
-**One grey.** Muted and Border are the same index. They were 241 and 240 — one
+**One gray.** Muted and Border are the same index. They were 241 and 240 — one
 step apart on the ramp, `#626262` and `#585858`, which nobody could tell apart.
 
-**The accent is the terminal's magenta, not the theme's own accent colour.**
+**The accent is the terminal's magenta, not the theme's own accent color.**
 ANSI has no accent slot. A tool that wants the real one reads it from wherever
 its desktop keeps it and assigns the role; that is what a plain assignment is
-for, and `guard.Tokens` still holds every *other* colour closed.
+for, and `guard.Tokens` still holds every *other* color closed.
 
 ### What it does not cost
 
-Nothing else. The guards are untouched, because they check that a colour came
+Nothing else. The guards are untouched, because they check that a color came
 from the palette and not what the palette contains. **Not one golden moved**,
-because goldens are colour-stripped. And there is no reload to write: an index
+because goldens are color-stripped. And there is no reload to write: an index
 is resolved by the terminal at paint time, so changing the theme retints the
 next frame — where a tool that baked hex into a config file needs a signal
 handler and a re-read.
 
 ### Two things fixed on the way
 
-`Hex` answered `#000000` both for index 0 and for a colour it could not read. It
+`Hex` answered `#000000` both for index 0 and for a color it could not read. It
 answers `""` for the failure now: index 0 is a real role, and a sentinel that
 collides with a legitimate answer is a check that has stopped checking — the
 test that every role converts would have passed over a broken one.
@@ -714,7 +714,7 @@ There are two terminal graphics protocols and no terminal speaks both.
 
 **Sixel** is DEC's, from the 1980s: the image is encoded as text in stripes six
 pixels tall and pasted at the cursor. It is opaque — it covers the cells under
-it and nothing shows through — colour-register based rather than truecolour, and
+it and nothing shows through — color-register based rather than truecolor, and
 it has no z-index. Disturb the screen and it is gone.
 
 **The kitty graphics protocol** carries 32-bit RGBA and a z-index, stores the
@@ -760,7 +760,7 @@ users get softer edges and nobody is shown a hole.
 
 ### Three emitters, one design
 
-The expensive part is shared. The panel is rasterised once into an
+The expensive part is shared. The panel is rasterized once into an
 `image.RGBA`; only the final encode differs — Sixel bytes, kitty bytes, or
 nothing. Ordering follows the audience, not the polish: cells, then Sixel for
 the default, then kitty.
@@ -798,7 +798,7 @@ ANSI 0–15 so the reader's terminal theme wins. A picture carrying a literal
 Omarchy themes while the text beside it changed, which is a worse result than
 having no picture at all.
 
-**So a component asks for a picture and never for a colour.** `Meter` has a
+**So a component asks for a picture and never for a color.** `Meter` has a
 `Pixels bool`, not a ramp; the gradient lives on the canvas, and the canvas read
 it from the terminal with OSC 4 — indices 5 and 13, Accent's own family. Change
 theme and the picture changes with the text. This is the same arrangement the
@@ -807,7 +807,7 @@ a component that could pass its own gradient is a component that can escape the
 theme.
 
 Two more things are read back the same way: the background, with OSC 11, because
-Sixel has no alpha and a soft edge must be composited against a colour that is
+Sixel has no alpha and a soft edge must be composited against a color that is
 KNOWN rather than guessed; and the cell size, with `CSI 16 t`, because a picture
 is asked for in cells and drawn in pixels and nothing else knows the ratio.
 
@@ -815,7 +815,7 @@ is asked for in cells and drawn in pixels and nothing else knows the ratio.
 
 The obvious next thing is a heading rendered in a real font, and it is
 deliberately absent. Sixel is opaque, so any text inside a picture's rectangle
-must be IN the picture — which means an embedded face, a licence decision, a
+must be IN the picture — which means an embedded face, a license decision, a
 real number on the binary, and the same words rendering differently depending on
 which terminal the reader has.
 
@@ -933,7 +933,7 @@ captured frames, which is the worst place to find it.
 
 ## 31. "No use case" and "we don't know the shape" are different reasons
 
-The extraction rule — generalise only where two of the four tools differ
+The extraction rule — generalize only where two of the four tools differ
 meaningfully — has been doing more work than it should, because it was being
 used to explain three different situations that want three different answers.
 
@@ -982,13 +982,13 @@ visible from a migration.
 
 ## 32. The comments are load-bearing, and that cuts both ways
 
-Three bugs in one evening had the same shape: **prose describing behaviour the
+Three bugs in one evening had the same shape: **prose describing behavior the
 code never had.**
 
 - the cloud tool's mouse handler: *"a bucket header expands with enter or a click on
   it"*, above a handler that only moved the cursor. Clicking a header did
   nothing visible, so the mouse looked broken.
-- the cloud tool's runner footer: `q abort (the running step finishes)`. `q` cancelled
+- the cloud tool's runner footer: `q abort (the running step finishes)`. `q` canceled
   the run and quit the whole program, with no question asked.
 - `comp.Spinner`'s own doc: *"the cloud tool's single ⠿ is a spinner that has stopped,
   which reads as hung rather than as working. Not carried."* It was carried, by
@@ -998,7 +998,7 @@ code never had.**
 This project writes down WHY more than most, and that is worth keeping: every
 decision here exists because a comment recorded a reason somebody would
 otherwise have had to rediscover. But a comment is a claim nothing checks, and
-three of them were claims about behaviour rather than about reasons.
+three of them were claims about behavior rather than about reasons.
 
 **A comment explaining why is documentation. A comment describing what the code
 does is an untested assertion.** The first kind ages into insight; the second
@@ -1026,7 +1026,7 @@ the disagreement on disk.
 | the deploy tool | `os.UserConfigDir()` | `~/Library/Application Support/the deploy tool/config.yaml` |
 | the cloud tool | `os.UserHomeDir()` + a hardcoded `.config` | `~/.config/the cloud tool/playbooks` |
 
-`os.UserConfigDir()` honours `$XDG_CONFIG_HOME` on Linux and ignores it on
+`os.UserConfigDir()` honors `$XDG_CONFIG_HOME` on Linux and ignores it on
 darwin, where it returns `~/Library/Application Support`. So the database tool
 and the deploy tool have byte-for-byte identical search code that can never land
 where the cloud tool's does.
@@ -1138,9 +1138,9 @@ everything that lives in a repository — a README, an mkdocs site, a pull reque
 — where a page cannot go and a fenced block of raw ANSI renders as noise. So
 `tuikit frames -md` writes Markdown with an image per frame.
 
-"An image" is where the decision is. A PNG needs a rasteriser, a rasteriser
+"An image" is where the decision is. A PNG needs a rasterizer, a rasterizer
 needs a typeface, and **decision 30 — embed a typeface or decide never to — is
-still open.** Rasterising for documentation would answer it by accident, in the
+still open.** Rasterizing for documentation would answer it by accident, in the
 one context where the answer is least considered: the fallback everywhere else
 is that text stays cells, and a document is not a good reason to reverse that.
 
@@ -1162,20 +1162,20 @@ frames rather than by reasoning:
   alone.
 - **No `<style>` element.** An SVG referenced from a Markdown document is
   rendered through a sanitiser. A stripped stylesheet leaves a frame that is all
-  one colour with no error anybody sees. Presentation attributes survive; a
+  one color with no error anybody sees. Presentation attributes survive; a
   stylesheet is a bet, and the losing case is silent.
 
 **What this forced elsewhere, and the better outcome.** Two renderers need the
-same answer to "what colour is this character", and the SGR reader lived inside
+same answer to "what color is this character", and the SGR reader lived inside
 the HTML writer's line loop. Rather than copy it, it came out as
 `harness.Rows(frame) [][]Span` — the ANSI reader every format shares. Two
 parsers would eventually disagree about a frame neither of them drew, and the
-existing HTML tests (accumulated style, style crossing a line break, a colour
+existing HTML tests (accumulated style, style crossing a line break, a color
 channel that looks like a code) now cover both formats because both go through
 the one reader. The same went for the section ordering, which is a rule — a
 frame no group named must still appear — and not a layout detail.
 
-Verified by rasterising democtl's frames and looking at them: the dashboard, a
+Verified by rasterizing democtl's frames and looking at them: the dashboard, a
 modal drawn over two panes, and a `comp.Meter` — the longest run of box-drawing
 in the suite, and the case that would show a broken grid first.
 
@@ -1245,7 +1245,7 @@ database tool migrating onto the canvas. They look unrelated and are the same
 thing: a choice made when one tool used the component, meeting the second tool.
 
 **The selection swallowed a row's state glyph (44).** A selected row is drawn in
-one colour whatever its spans say, because "a row that kept its own colours
+one color whatever its spans say, because "a row that kept its own colors
 under it would make the cursor hard to find in exactly the list where finding it
 matters." That is right for a LABEL. The database tool's connection list marks
 reachability with `●` `○` `✗` in the first column, and on the cursor row all
@@ -1254,14 +1254,14 @@ one row whose status they could not read. **A person using it reported this**,
 not a test: *"when highlighting I can't see the color of the dot."*
 
 It is also an accessibility defect and not only a legibility one. A black `●` on
-light grey does not read as "a green one, highlighted"; it reads as a DIFFERENT
+light gray does not read as "a green one, highlighted"; it reads as a DIFFERENT
 state — off, disabled. The database tool was saved by using four distinct shapes
-as well as four colours. A tool encoding state in colour alone would have lost
+as well as four colors. A tool encoding state in color alone would have lost
 it outright and nothing in the API would have warned it.
 
-`Row.LeadStyle` keeps the lead column's own colour through the selection. Only
+`Row.LeadStyle` keeps the lead column's own color through the selection. Only
 the lead. Letting every styled span survive is more elegant and makes the
-cursor's prominence depend on how colourful a row happens to be — strong on a
+cursor's prominence depend on how colorful a row happens to be — strong on a
 plain list, nearly invisible on a busy one, which is the opposite of what a
 selection is for.
 
@@ -1275,7 +1275,7 @@ quarter of the column, on counters reading `3/3`, `3/3`, `1/1`, `1/1` and blank
 and `Overhead()` reports what the list spends on itself so a tool stops encoding
 `const chrome = 3`.
 
-**`Select` cancelled a pending `Move`, silently (45).** Every one of these tools
+**`Select` canceled a pending `Move`, silently (45).** Every one of these tools
 independently arrived at "clamp every cursor when the data changes", from when a
 cursor was a plain int that could point past a list that had shrunk. Against the
 deferred `Move` that clamp reads as `Select(Cursor())`, which zeroed the move the
@@ -1315,13 +1315,13 @@ does not exist rather than an error to catch.
 **The canvas guarantees the wrong thing.** It guarantees nothing lands outside
 the CANVAS. It guarantees nothing about a component staying inside the RECT it
 was handed, and that is the failure that matters: a component which overruns
-paints over its neighbour rather than failing. The frame is still well-formed,
+paints over its neighbor rather than failing. The frame is still well-formed,
 every golden still passes, and the pane beside it is simply wrong.
 
 `Canvas.Clip` closes it structurally — a clipped canvas cannot draw outside its
 rect — but only for components that call it. Measured: fourteen of twenty-two
 did, and the eight that did not were not all bugs, because several take no rect
-at all. `Confirm.Draw(c, id)` centres itself and returns where it landed;
+at all. `Confirm.Draw(c, id)` centers itself and returns where it landed;
 `Menu.DrawAt` nudges itself back on screen; `Split.Draw` divides a rect and
 returns two. Those position against the canvas by contract.
 
@@ -1423,7 +1423,7 @@ at all (`internal/tui/app.go:330`):
 ```go
 case "q":
     if m.active != nil && m.active.running {
-        // A running operation is cancelled rather than abandoned, so the
+        // A running operation is canceled rather than abandoned, so the
         // engine's failure hooks get to bring an environment back up.
         m.active.cancel()
 ```
@@ -1431,10 +1431,10 @@ case "q":
 Both are right. The difference is not taste and not maturity: **the cloud tool's
 work cannot be undone and the database tool's can.** A half-run playbook leaves
 an environment neither finished nor untouched, so the reader has to be told
-before it happens. A cancelled the database tool operation runs its failure
+before it happens. A canceled the database tool operation runs its failure
 hooks and brings the database back up, so a confirmation would be a dialog
 standing between a reader and the safest available action — and one that makes
-cancelling *slower* in exactly the moment someone is trying to stop something.
+canceling *slower* in exactly the moment someone is trying to stop something.
 
 An `app.Keys{Leaving: …}` field, or a stack that refuses to be popped, would
 have imposed the cloud tool's answer on the database tool. The framework cannot
@@ -1494,7 +1494,7 @@ names more than the spec does. The runtime route works: press each advertised
 key, report the ones that change nothing.
 
 **But it does not catch the bug that prompted it.** the cloud tool's runner
-promised `q abort (the running step finishes)` while `q` cancelled the run and
+promised `q abort (the running step finishes)` while `q` canceled the run and
 quit the program. `q` did plenty — it just did not do what the footer said. That
 is a claim about English, and no mechanical check reaches it.
 
@@ -1510,7 +1510,7 @@ test that says why.
 part.** The failure mode to avoid is not a narrow guard; it is a guard that
 looks like it covers the class and does not, because then nobody looks for the
 rest. Decision 32 remains the discipline for everything unreachable this way —
-a comment or a label describing behaviour is an untested assertion, and the
+a comment or a label describing behavior is an untested assertion, and the
 answer to one is a test named after the sentence.
 
 ## 41. The kernel knows what a pixel is
@@ -1571,11 +1571,11 @@ else.
 
 ### The line it draws, which is the part worth getting right
 
-**The meaning is reserved. The behaviour is not.** A tool may put a question in
+**The meaning is reserved. The behavior is not.** A tool may put a question in
 front of `q`, and decision 39 is the argument for why it must be allowed to: The
 cloud tool asks before abandoning a half-run playbook, the database tool cancels
 immediately because its failure hooks bring the database back up, and a
-framework that standardised THAT would have been wrong about one of them. What a
+framework that standardized THAT would have been wrong about one of them. What a
 tool may not do is make `q` mean something that is not leaving.
 
 That is the distinction which makes this safe to impose when decision 39 was not
@@ -1612,17 +1612,17 @@ estimated, so the next person inherits numbers instead of re-deriving them.
 | | |
 | --- | --- |
 | the Go font's TTF alone | **+140 KB** |
-| with `golang.org/x/image` and the `opentype` rasteriser, actually called | **+616 KB, +4.5%** on a 13.4 MB binary |
-| licence | Go fonts are BSD-3-style, clean, already in the Go ecosystem |
+| with `golang.org/x/image` and the `opentype` rasterizer, actually called | **+616 KB, +4.5%** on a 13.4 MB binary |
+| license | Go fonts are BSD-3-style, clean, already in the Go ecosystem |
 
 **Size was expected to be the argument against, and it is not.** Neither is the
-licence. The argument is what it buys, and that turned out to depend entirely on
+license. The argument is what it buys, and that turned out to depend entirely on
 one thing: how big the text is.
 
 Rendered at real device scale — 16×34 pixel cells, Ghostty's actual numbers on
 the display this was measured on:
 
-- **At one cell, rasterised text is worse than what tuikit already does.** It is
+- **At one cell, rasterized text is worse than what tuikit already does.** It is
   legible, and it is the Go font instead of the reader's chosen font, it is
   proportional so it does not sit on the cell grid, and it loses the property
   decision 29 is built on — *the characters are still there; select them and you
@@ -1630,7 +1630,7 @@ the display this was measured on:
 - **Above one cell it is the only way, and it looks good.** A heading two or
   three rows tall is something a terminal cannot do at all.
 
-So the question is not "should tuikit rasterise text". It is "should tuikit draw
+So the question is not "should tuikit rasterize text". It is "should tuikit draw
 text LARGER than a character", and nothing has asked for that. The the deploy
 tool handoff that motivated the pixel layer wanted a heading, and a terminal
 draws a heading perfectly well at one cell.
@@ -1689,13 +1689,13 @@ works.
 Both projects say they get out of the developer's way. They mean different
 things by it.
 
-**tuikit:** the component owns the behaviour and none of the look. Styles are
+**tuikit:** the component owns the behavior and none of the look. Styles are
 injected, glyphs come from `theme.Chrome`, the data stays the tool's, and
 `comp.Tree` does not draw at all. What you cannot change is *how it behaves* —
 that a cursor skips a heading, that a log detaches when you scroll up, that a
 range is dropped by a plain arrow key.
 
-**yazi:** the behaviour is yours too, because the drawing is a script you can
+**yazi:** the behavior is yours too, because the drawing is a script you can
 overwrite at runtime.
 
 ### Why not that
@@ -1721,7 +1721,7 @@ tools were built to get.
 ### What this obliges us to say
 
 The README's claim has to be the narrower true one: **out of your way on style
-and data, opinionated about behaviour.** "Gets out of your way" without that
+and data, opinionated about behavior.** "Gets out of your way" without that
 qualifier is a claim yazi meets better than we do.
 
 ### What would reopen it
@@ -1778,10 +1778,10 @@ filter, and the cursor is on an unrelated process.
 **`Row.Key`, and it is opt-in.** Set it and the cursor follows the row. Leave it
 empty and the cursor is an index, which is correct and free for a list whose
 rows never move — most of them. A tool that would have to invent a key per row
-per frame to get behaviour it already had should not have to.
+per frame to get behavior it already had should not have to.
 
 Three rules inside it. A key that is no longer in the list falls back to the
-index, clamped: the row the reader was on has been deleted and its neighbour is
+index, clamped: the row the reader was on has been deleted and its neighbor is
 the nearest thing to what they were looking at. `Select` forgets the remembered
 key, because a click means THAT row and a stale key would pull the cursor back
 on the next frame. And the key is read from the row `resolve` already fetched,
@@ -1856,15 +1856,15 @@ always a frame behind what the reader sees.
 It composes with `Marks` rather than competing: `Marks.Span` takes the keys a
 `Range` covers.
 
-## 49. A subprocess's colour is data, and the tool keeps it
+## 49. A subprocess's color is data, and the tool keeps it
 
 `comp.ANSI` and `comp.ANSILines` turn SGR into `[]Segment`.
 
-Decision 28 puts a tool's own colour on ANSI 0-15 so the reader's theme wins.
+Decision 28 puts a tool's own color on ANSI 0-15 so the reader's theme wins.
 That rule is about DESIGN, and a subprocess's output is not the tool's design —
 it is data, the same way its words are. A tool does not rewrite `kubectl`'s
-nouns and should not rewrite its colours. So 0-15 become `lipgloss.ANSIColor`
-and still follow the terminal's theme; 256-colour and truecolor pass through as
+nouns and should not rewrite its colors. So 0-15 become `lipgloss.ANSIColor`
+and still follow the terminal's theme; 256-color and truecolor pass through as
 they arrived, because dropping them loses the distinction the program was
 drawing.
 
@@ -1879,21 +1879,21 @@ host one.
 
 ## 50. A guard can be wrong, and saying so costs a reason
 
-`guard.Tokens` refuses a colour built from a literal. lazygit's
+`guard.Tokens` refuses a color built from a literal. lazygit's
 `presentation/icons/file_icons.go` holds 743 hex literals that are file-type
-BRAND colours — the Go gopher's blue, the Rust orange — and the whole point of
+BRAND colors — the Go gopher's blue, the Rust orange — and the whole point of
 them is that they are the same everywhere. The guard would reject all 743 and it
 would be wrong.
 
 `guard.Except(file, reason)` exists, and **the reason is required**; an empty one
 panics. Without it this is a suppression flag wearing a better name, and the
-value of the guard is that a colour outside the palette is a decision somebody
+value of the guard is that a color outside the palette is a decision somebody
 made. The same bargain `theme.GlyphSet.With` strikes for characters.
 
 It cannot rot, which is the part that makes it worth having. An exemption naming
 a file that is not in the directory fails — the file was renamed and the next
 one to take that name would be silently unguarded. An exemption on a file that
-builds no colours from literals fails too, because nothing is being excused. A
+builds no colors from literals fails too, because nothing is being excused. A
 stale exemption is worse than none: it reads as though somebody checked.
 
 ## 51. A fixture typed by hand is a world that does not exist
@@ -1905,7 +1905,7 @@ sentence, and the renderer composed it again. A golden showed a row disagreeing
 with itself on every run and looked right, because it was checking the renderer
 against a world invented three hundred lines away in the same file.
 
-Four bugs shipped past 72 goldens, a colour check and a narrow-terminal run.
+Four bugs shipped past 72 goldens, a color check and a narrow-terminal run.
 Three for this reason. The compounding part is the worst of it: a hand-made
 fixture makes a wrong screen look correct AND hands you an easy way to keep it
 that way, by editing the fixture to match the renderer.

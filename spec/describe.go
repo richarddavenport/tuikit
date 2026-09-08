@@ -16,7 +16,7 @@ import (
 // runs and the TUI draws, so it cannot be stale without them being stale too.
 //
 // The palette and glyph set are in it because an agent asked to add a screen
-// needs to know which colour roles exist and which characters it may print
+// needs to know which color roles exist and which characters it may print
 // before it writes anything — and because those are the two things a guard will
 // fail it for afterwards.
 type Manifest struct {
@@ -73,7 +73,7 @@ type RegionInfo struct {
 	Commands []string `json:"commands,omitempty"`
 }
 
-// RoleInfo is one colour role, by name and reason. Never by hue.
+// RoleInfo is one color role, by name and reason. Never by hue.
 type RoleInfo struct {
 	Name string `json:"name"`
 	Hex  string `json:"hex"`

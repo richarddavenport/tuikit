@@ -38,10 +38,10 @@ save.
 
 ## DesignSystem — the palette and glyphs as pages
 
-`DesignSystem` renders `theme` into `Page` cards — colours, glyphs, box sets.
+`DesignSystem` renders `theme` into `Page` cards — colors, glyphs, box sets.
 
 There is deliberately **no hand-written palette page** anywhere in this repo,
-and there should never be one: a page describing colours is a second source of
+and there should never be one: a page describing colors is a second source of
 truth that goes stale the first time a role changes. `tuikit designsystem`
 generates it from `theme` itself.
 

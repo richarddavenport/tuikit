@@ -111,7 +111,7 @@ func step(m Pointer, line string) error {
 		return nil
 	}
 
-	x, y, err := centre(m, rest[0])
+	x, y, err := center(m, rest[0])
 	if err != nil {
 		return err
 	}
@@ -186,9 +186,9 @@ func wider(m Pointer, name string) (bool, error) {
 	return r.W > r.H, nil
 }
 
-// centre is the middle of a region, which is the safest cell to aim at: an
+// center is the middle of a region, which is the safest cell to aim at: an
 // edge is where a rounding error lands.
-func centre(m Pointer, name string) (int, int, error) {
+func center(m Pointer, name string) (int, int, error) {
 	id, err := comp.ParseID(name)
 	if err != nil {
 		return 0, 0, err

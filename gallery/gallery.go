@@ -21,8 +21,8 @@ import (
 
 // Entry is one component.
 //
-// The metadata is not decoration. A component's keys, its mouse behaviours, the
-// colour ROLES it draws with and the glyphs it needs are the things you have to
+// The metadata is not decoration. A component's keys, its mouse behaviors, the
+// color ROLES it draws with and the glyphs it needs are the things you have to
 // know before choosing it, and they are exactly what a static sheet leaves out.
 // The roles and glyphs are also what a tool has to be able to supply: a
 // component needing a role a tool's palette does not name is a component that
@@ -67,7 +67,7 @@ type State struct {
 	//
 	// It exempts the state from TestNoComponentDrawsOutsideItsRect, and it is
 	// the only exemption: everything else must stay in its rect, because a
-	// component that overruns paints over its neighbour rather than failing.
+	// component that overruns paints over its neighbor rather than failing.
 	Overlay bool
 }
 

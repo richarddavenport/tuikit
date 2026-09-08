@@ -4,7 +4,7 @@ tuikit gallery  every component, running                                        
 │ Components                    │ │ Breadcrumb                                                                                     │
 │ List                          │ │ How you got here, and how to go back. app.Stack has kept a Path since it was written.          │
 │ Pane                          │ │ ‹ the root · two deep · four deep · too narrow · very narrow ›                                 │
-│ Tabs                          │ │ the last is the screen you are on, and is the only one coloured                                │
+│ Tabs                          │ │ the last is the screen you are on, and is the only one colored                                 │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ democtl · Logs                                                                                 │
 │ StepList                      │ │                                                                                                │

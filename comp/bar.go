@@ -35,7 +35,7 @@ type Bar struct {
 }
 
 // Segment is a run of text with a style. A bar's ends are lists of them
-// because a header is rarely one colour: a tool's name, its description and
+// because a header is rarely one color: a tool's name, its description and
 // its health are three things, and each says something different.
 type Segment struct {
 	Text  string

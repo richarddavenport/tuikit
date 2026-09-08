@@ -100,7 +100,7 @@ func TestTheVocabularyIsInTheManifest(t *testing.T) {
 			t.Errorf("role %+v is missing something", r)
 		}
 		if r.Name == "Accent" && !strings.HasPrefix(r.Hex, "#") {
-			t.Errorf("Accent's colour is %q", r.Hex)
+			t.Errorf("Accent's color is %q", r.Hex)
 		}
 	}
 	if len(m.Glyphs) == 0 {

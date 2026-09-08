@@ -27,13 +27,13 @@ import (
 // # Why not List
 //
 // Closer, and the difference is one rule. [List] paints the cursor row in a
-// single style, deliberately: "a selected row is one colour whatever its spans
+// single style, deliberately: "a selected row is one color whatever its spans
 // say", because the selection is the reader's own mark and a row keeping its
-// colours under it makes the cursor hard to find.
+// colors under it makes the cursor hard to find.
 //
 // That rule is right for a list of services and wrong for a document. The line
 // under the cursor in a diff is the line you are READING, and dropping its
-// syntax colours to show where the cursor is trades the content for the
+// syntax colors to show where the cursor is trades the content for the
 // pointer. So the cursor style here goes UNDER the spans instead — see [under].
 //
 // The other difference is sideways. A list is as wide as its pane and a
@@ -84,7 +84,7 @@ type Viewer struct {
 	Tab int
 
 	// Styles. Selected is the cursor line, and it is applied UNDERNEATH the
-	// line's own spans: set a background on it and the syntax colours survive.
+	// line's own spans: set a background on it and the syntax colors survive.
 	// Ranged is the rest of a range selection, falling back to Selected.
 	Selected, Ranged, Number, Status, EmptyStyle *lipgloss.Style
 
@@ -311,7 +311,7 @@ func (v *Viewer) DrawFunc(c *Canvas, r Rect, n int, line func(i int) Line) {
 		}
 
 		// The line style goes under the spans rather than over them, so a
-		// cursor with a background keeps the syntax colours it sits on.
+		// cursor with a background keeps the syntax colors it sits on.
 		var beneath *lipgloss.Style
 		switch {
 		// A set range draws whether or not there is a cursor: it is the tool

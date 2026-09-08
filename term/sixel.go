@@ -7,24 +7,24 @@ import (
 	"strings"
 )
 
-// sixelColors is the palette every image is quantised to: the 6×6×6 cube.
+// sixelColors is the palette every image is quantized to: the 6×6×6 cube.
 //
-// Sixel is colour-register based rather than truecolour, so a gradient is
+// Sixel is color-register based rather than truecolor, so a gradient is
 // stepped no matter what — the only question is how coarsely. 216 registers is
 // inside what every Sixel terminal supports (the usual floor is 256) and needs
 // no per-image analysis, which matters because this runs on a redraw.
 //
 // A median-cut palette per image would look better and would also mean the
-// panel's colours shifting slightly whenever its data changed. Stepping that
+// panel's colors shifting slightly whenever its data changed. Stepping that
 // stays put reads as a design; stepping that moves reads as a bug.
 const sixelLevels = 6
 
 // EncodeSixel encodes an image as a Sixel escape sequence.
 //
 // The image must be opaque: Sixel has no alpha, and a transparent pixel here
-// would be written as whatever colour it happens to carry rather than showing
+// would be written as whatever color it happens to carry rather than showing
 // what is behind it. Use [paint.Flatten] against the terminal's background
-// first — the caller knows that colour and this package does not.
+// first — the caller knows that color and this package does not.
 func EncodeSixel(img *image.RGBA) string {
 	b := img.Bounds()
 	w, h := b.Dx(), b.Dy()
@@ -38,30 +38,30 @@ func EncodeSixel(img *image.RGBA) string {
 	out.WriteString("\x1bP0;1;0q")
 	fmt.Fprintf(&out, "\"1;1;%d;%d", w, h)
 
-	// Quantise once. Doing it per band would read every pixel six times.
+	// Quantize once. Doing it per band would read every pixel six times.
 	idx := make([]int, w*h)
 	used := map[int]bool{}
 	for y := 0; y < h; y++ {
 		for x := 0; x < w; x++ {
-			i := quantise(img.RGBAAt(b.Min.X+x, b.Min.Y+y))
+			i := quantize(img.RGBAAt(b.Min.X+x, b.Min.Y+y))
 			idx[y*w+x] = i
 			used[i] = true
 		}
 	}
 	for i := range used {
-		r, g, bl := unquantise(i)
-		// Sixel colour components are percentages, not bytes.
+		r, g, bl := unquantize(i)
+		// Sixel color components are percentages, not bytes.
 		fmt.Fprintf(&out, "#%d;2;%d;%d;%d", i, pct(r), pct(g), pct(bl))
 	}
 
 	// A sixel is six vertical pixels in one character, so the image is walked
-	// in bands of six rows and each band is written once per colour in it.
+	// in bands of six rows and each band is written once per color in it.
 	for top := 0; top < h; top += 6 {
 		first := true
 		for i := range used {
 			row := bandRow(idx, w, h, top, i)
 			if row == "" {
-				continue // this colour is not in this band
+				continue // this color is not in this band
 			}
 			if !first {
 				out.WriteByte('$') // back to the start of the same band
@@ -77,10 +77,10 @@ func EncodeSixel(img *image.RGBA) string {
 	return out.String()
 }
 
-// bandRow is one colour's contribution to one six-row band, run-length encoded.
+// bandRow is one color's contribution to one six-row band, run-length encoded.
 //
-// Returns "" when the colour does not appear, so the caller can skip it
-// entirely — on a panel with a handful of colours per band that is the
+// Returns "" when the color does not appear, so the caller can skip it
+// entirely — on a panel with a handful of colors per band that is the
 // difference between an image and a wall of empty runs.
 func bandRow(idx []int, w, h, top, want int) string {
 	var b strings.Builder
@@ -123,14 +123,14 @@ func bandRow(idx []int, w, h, top, want int) string {
 	return b.String()
 }
 
-// quantise maps a colour to the 6×6×6 cube.
-func quantise(c color.RGBA) int {
+// quantize maps a color to the 6×6×6 cube.
+func quantize(c color.RGBA) int {
 	q := func(v uint8) int { return int(v) * (sixelLevels - 1) / 255 }
 	return q(c.R)*sixelLevels*sixelLevels + q(c.G)*sixelLevels + q(c.B)
 }
 
-// unquantise is quantise's inverse, back to the centre of the cube cell.
-func unquantise(i int) (r, g, b uint8) {
+// unquantize is quantize's inverse, back to the center of the cube cell.
+func unquantize(i int) (r, g, b uint8) {
 	v := func(n int) uint8 { return uint8(n * 255 / (sixelLevels - 1)) }
 	return v(i / (sixelLevels * sixelLevels) % sixelLevels), v(i / sixelLevels % sixelLevels), v(i % sixelLevels)
 }

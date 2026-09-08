@@ -31,7 +31,7 @@ type Pixels struct {
 	// palette rather than chosen here.
 	//
 	// This is the whole reason a component asks for "a picture" instead of
-	// passing colours. Decision 28 put the characters on ANSI 0–15 so the
+	// passing colors. Decision 28 put the characters on ANSI 0–15 so the
 	// reader's theme wins; a picture carrying a literal gradient would look
 	// identical under all 22 Omarchy themes while the text beside it changed,
 	// which is a worse result than having no picture at all.
@@ -98,7 +98,7 @@ type picture struct {
 // WithGraphics returns a view that may carry pictures.
 //
 // A tool calls this once, at the top, with what [term.Detect] answered. Leave
-// it unset and every Picture call is a no-op — which is the behaviour under
+// it unset and every Picture call is a no-op — which is the behavior under
 // test, and the reason goldens cannot move.
 func (c *Canvas) WithGraphics(p Pixels) *Canvas {
 	p.CellW, p.CellH = max(1, p.CellW), max(1, p.CellH)
@@ -139,7 +139,7 @@ func (c *Canvas) Graphics() term.Graphics {
 // what was there anyway, and no code was written twice to make that true.
 //
 // draw is a function rather than an image so that a terminal which cannot show
-// it never pays to rasterise it. It is handed the region's size in PIXELS,
+// it never pays to rasterize it. It is handed the region's size in PIXELS,
 // which it cannot compute itself: only the canvas knows the cell size the
 // terminal reported.
 //
@@ -180,7 +180,7 @@ func (c *Canvas) Picture(id ID, draw func(w, h int) *image.RGBA) bool {
 	return true
 }
 
-// pixels serialises the pictures, to be appended AFTER the frame's text.
+// pixels serializes the pictures, to be appended AFTER the frame's text.
 //
 // After, not before, because Sixel is opaque: a space printed over it erases
 // it. The kitty protocol does not care — at z=-1 the image is under the text
@@ -215,7 +215,7 @@ func (c *Canvas) pixels() string {
 		switch c.gfx.Mode {
 		case term.Sixel:
 			// Sixel has no alpha, so the soft edges are composited here
-			// against the colour the terminal reported. This is the handoff's
+			// against the color the terminal reported. This is the handoff's
 			// second concession — the shadow is baked, and it can only be
 			// baked against a background that is KNOWN rather than guessed.
 			b.WriteString(term.EncodeSixel(paint.Flatten(p.img, c.gfx.Background)))

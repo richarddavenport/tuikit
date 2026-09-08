@@ -29,7 +29,7 @@ package app
 // the framework knows about.
 //
 // A screen is not a URL. It is a value the tool already has, so parameters are
-// typed and free and there is nothing to serialise.
+// typed and free and there is nothing to serialize.
 //
 // # The label
 //

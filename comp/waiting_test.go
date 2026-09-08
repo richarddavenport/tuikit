@@ -14,7 +14,7 @@ func drawWaiting(w Waiting, cw, ch int, at time.Time) string {
 	return c.String()
 }
 
-func TestWaitingIsCentred(t *testing.T) {
+func TestWaitingIsCentered(t *testing.T) {
 	got := drawWaiting(Waiting{Label: "reading the estate"}, 40, 5, when)
 	lines := strings.Split(got, "\n")
 	if len(lines) != 5 {
@@ -26,7 +26,7 @@ func TestWaitingIsCentred(t *testing.T) {
 	}
 	lead := len(lines[2]) - len(strings.TrimLeft(lines[2], " "))
 	if lead < 8 {
-		t.Errorf("the message starts at column %d; it is not centred:\n%s", lead, got)
+		t.Errorf("the message starts at column %d; it is not centered:\n%s", lead, got)
 	}
 }
 

@@ -19,7 +19,7 @@ func tabsOf(names ...string) []Tab {
 
 // The chevrons go around the STRIP, because they say the strip cycles and which
 // keys do it — a fact about the keymap that no styling can carry. Around the
-// active tab they would only repeat what its colour already says.
+// active tab they would only repeat what its color already says.
 func TestTheChevronsWrapTheStripNotTheCurrentTab(t *testing.T) {
 	c := NewCanvas(40, 1)
 	Tabs{Tabs: tabsOf("Overview", "Config", "Events"), Active: 0}.
@@ -64,7 +64,7 @@ func TestEachTabIsClickableSeparately(t *testing.T) {
 
 // A strip you cannot operate should not look like one you can.
 func TestTheCurrentTabLooksDifferentWhenFocused(t *testing.T) {
-	forceColour()
+	forceColor()
 	quiet := lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
 	on := lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 	lit := lipgloss.NewStyle().Foreground(lipgloss.Color("229"))

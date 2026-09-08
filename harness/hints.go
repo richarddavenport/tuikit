@@ -20,10 +20,10 @@ import (
 //
 // A key that does something OTHER than what its label says. That was the bug
 // which prompted this (the cloud tool's runner promised `q abort (the running
-// step finishes)` while `q` cancelled the run and quit the program): `q` did
+// step finishes)` while `q` canceled the run and quit the program): `q` did
 // plenty, it just did not do what the footer said. No mechanical check reaches
 // that, because it is a claim about English. Decision 32 is the discipline
-// that covers it — a comment or a label describing behaviour is an untested
+// that covers it — a comment or a label describing behavior is an untested
 // assertion, and the answer is a test named after the sentence.
 //
 // So this catches the lesser sibling: the DEAD advertised key. Worth having,

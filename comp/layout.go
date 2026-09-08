@@ -26,7 +26,7 @@ package comp
 // enough. Fill, Min and Max cover every case in the deploy tool, the database
 // tool, the cloud tool and democtl.
 //
-// Generalise past that when two of the four need it, which is the rule every
+// Generalize past that when two of the four need it, which is the rule every
 // component here was extracted under. Flex alignment and negative spacing
 // exist in ratatui because ratatui is a general library; we are not one.
 type Layout struct {

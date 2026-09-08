@@ -82,7 +82,7 @@ func TestAToolsOwnPaletteIsWhatGetsDrawn(t *testing.T) {
 	html := DesignSystem{Tool: "democtl", Palette: pal}.Pages()[0].HTML
 
 	if !strings.Contains(html, "#0087ff") {
-		t.Error("the overridden accent is not in the colours page")
+		t.Error("the overridden accent is not in the colors page")
 	}
 	if strings.Contains(html, "#ff5faf") {
 		t.Error("tuikit's default accent is still being drawn")

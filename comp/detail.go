@@ -37,7 +37,7 @@ type Detail struct {
 
 	Blocks []Block
 
-	// Styles. Value falls back to nothing, which is the tool's text colour.
+	// Styles. Value falls back to nothing, which is the tool's text color.
 	TitleStyle, SubtitleStyle, HeadingStyle, LabelStyle, ValueStyle *lipgloss.Style
 }
 
@@ -157,9 +157,9 @@ func (d Detail) facts(c *Canvas, r Rect, y *int, b Block, level int, id ID) {
 	}
 	lines := Table{Gap: 1, Columns: []Column{{}, {Fill: true}}}.Rows(width, cells)
 
-	// Drawn in two pieces rather than one, so a fact can colour its value
-	// without colouring its label — which is what makes a failed state read as
-	// failed rather than as another grey row.
+	// Drawn in two pieces rather than one, so a fact can color its value
+	// without coloring its label — which is what makes a failed state read as
+	// failed rather than as another gray row.
 	labelWidth := 0
 	for _, f := range b.Facts {
 		labelWidth = max(labelWidth, Width(f.Label))

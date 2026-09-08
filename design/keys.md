@@ -1,6 +1,6 @@
 # Keys
 
-What tuikit has settled about keyboard behaviour, and what it has not.
+What tuikit has settled about keyboard behavior, and what it has not.
 
 `app.Keys` routes in one order — Capture, then Screen, then Global — and that
 order is the mechanism. This file is about the handful of MEANINGS that turned
@@ -55,7 +55,7 @@ build that binds them to anything else:
 | `esc` | go back, or dismiss what is open |
 | `?` | show the keys |
 
-**What is reserved is the meaning, not the behaviour.** A tool may put a
+**What is reserved is the meaning, not the behavior.** A tool may put a
 question in front of `q` — what leaving costs is the tool's business, and
 decision 39 is the whole argument for that. It may not make `q` mean something
 that is not leaving.

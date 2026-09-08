@@ -8,18 +8,18 @@ import (
 
 // Palette, Glyphs and Chrome are <<.Name>>'s vocabulary.
 //
-// tuikit's defaults unchanged, which is the right place to start: nine colour
+// tuikit's defaults unchanged, which is the right place to start: nine color
 // roles named by what they are FOR, an allow-list of the non-ASCII characters
 // the interface may print, and the box it draws with.
 //
-// The roles are the terminal's own sixteen ANSI indices — the only colours a
+// The roles are the terminal's own sixteen ANSI indices — the only colors a
 // theme can redefine — so <<.Title>> is themed by whatever themed the terminal,
 // with nothing to configure and nothing to reload. Override a role and you are
 // overriding the reader's choice, so do it deliberately. Override what you
 // disagree with; do not build one from scratch, because the point of a closed
 // set is that nine decisions is the whole vocabulary.
 //
-// guard_test.go holds all three closed. A raw colour or an unlisted glyph is a
+// guard_test.go holds all three closed. A raw color or an unlisted glyph is a
 // test failure, not something to notice in review.
 var (
 	Palette = theme.Default

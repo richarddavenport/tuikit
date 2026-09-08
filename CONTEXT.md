@@ -33,9 +33,9 @@ because two turned out identical.
 
 ## The vocabulary
 
-**Role** — a named colour in the palette. Named by *role*, never by hue:
+**Role** — a named color in the palette. Named by *role*, never by hue:
 `Accent` survives someone deciding the interface should be blue; `pink` does not.
-A raw ANSI index says what a colour IS instead of what it is FOR.
+A raw ANSI index says what a color IS instead of what it is FOR.
 
 **Palette** — the closed set of nine roles, valued as the terminal's own sixteen
 ANSI indices so a tool is themed by whatever themed the terminal (`Accent`, `Muted`, `Border`,
@@ -88,7 +88,7 @@ CLI command, the TUI screen, the `describe --json` entry an agent reads, and the
 right-click menu. One declaration, so none of them can drift from the others.
 
 **Engine / UI split** — the engine knows the domain and has **no terminal
-concepts at all**: no colour, no width, no keys, no framework, and no tuikit
+concepts at all**: no color, no width, no keys, no framework, and no tuikit
 import. In practice an engine imports stdlib plus its own domain SDK. The UI
 never calls the domain directly; the CLI is a peer of the TUI over the same
 engine. Every tool in the family keeps it (decision 22).

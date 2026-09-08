@@ -2,14 +2,14 @@ package docgen
 
 // pageCSS is the chrome around the frames, and it is deliberately quiet.
 //
-// Every colour is defined on bare :root and only overridden in the theme
-// blocks. A colour whose one definition sits inside a media query never applies
+// Every color is defined on bare :root and only overridden in the theme
+// blocks. A color whose one definition sits inside a media query never applies
 // when the viewer's theme is unset, which is the default — and the page then
 // renders one theme's text on the other theme's ground.
 //
 // The .tuikit-frame rule is the exception that proves the rest: it takes no
 // tokens and does not change between themes, because the ANSI inside it was
-// captured for a dark terminal and recolouring it would report colours the tool
+// captured for a dark terminal and recoloring it would report colors the tool
 // does not have.
 const pageCSS = `
 :root {

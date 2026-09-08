@@ -63,11 +63,11 @@ code { font-family: var(--mono); font-size: 0.92em; color: #c8c8c8; }
 }
 .term.light { background: #fbfbfa; color: #303030; border-color: #e2e2e0; }
 
-/* Roles. The only colours in this document — see foundations/colors. */
+/* Roles. The only colors in this document — see foundations/colors. */
 `
 
 // paletteCSS turns the roles into the classes every page draws with, so a page
-// literally cannot use a colour the interface does not have.
+// literally cannot use a color the interface does not have.
 func (r renderer) paletteCSS() string {
 	var b strings.Builder
 	for _, role := range r.pal.Roles() {
@@ -82,10 +82,10 @@ func (r renderer) paletteCSS() string {
 
 func cssClass(role string) string { return strings.ToLower(role) }
 
-// hexOf is theme.Hex, named short because the colour pages call it constantly.
+// hexOf is theme.Hex, named short because the color pages call it constantly.
 func hexOf(c lipgloss.TerminalColor) string { return theme.Hex(c) }
 
-// valueOf is the colour as the tool declared it, which is what a design system
+// valueOf is the color as the tool declared it, which is what a design system
 // page should say alongside what it resolves to.
 func valueOf(c lipgloss.TerminalColor) string { return theme.Value(c) }
 
@@ -116,12 +116,12 @@ func (r renderer) page(group, title, lede, body string) string {
 }
 
 // term wraps terminal content. Lines are given as already-marked-up strings —
-// see span, which is the only way to colour one.
+// see span, which is the only way to color one.
 func term(lines ...string) string {
 	return `<div class="term">` + strings.Join(lines, "\n") + `</div>`
 }
 
-// span colours a run of text with a role.
+// span colors a run of text with a role.
 //
 // It PANICS on a role that does not exist. A design system whose swatch says
 // one thing and whose components quietly say another is worse than no design
@@ -134,7 +134,7 @@ func (r renderer) span(role, text string) string {
 	return fmt.Sprintf(`<span class="%s">%s</span>`, cssClass(role), html.EscapeString(text))
 }
 
-// plain is text at the terminal's default colour — which a tuikit interface
+// plain is text at the terminal's default color — which a tuikit interface
 // never sets, so it is whatever the reader's terminal is.
 func plain(text string) string { return html.EscapeString(text) }
 

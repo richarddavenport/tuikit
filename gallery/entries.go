@@ -333,7 +333,7 @@ func (m *Model) detailEntry(s *styles) Entry {
 		States: []State{
 			{Name: "a thing", Note: "labels line up per BLOCK, so a long tag key does not drag the facts above it wide",
 				Draw: draw(full)},
-			{Name: "a value with its own colour", Note: "a state that is red in the list and grey here is one fact told twice",
+			{Name: "a value with its own color", Note: "a state that is red in the list and gray here is one fact told twice",
 				Draw: draw(comp.Detail{Title: "api_migrate", Blocks: []comp.Block{{Facts: []comp.Fact{
 					{Label: "state", Value: "failed", Style: &s.danger},
 					{Label: "replicas", Value: "0/1"},
@@ -534,7 +534,7 @@ func (m *Model) listEntry(s *styles) Entry {
 			})
 		}
 	}
-	// A state glyph in the lead column, which keeps its colour under the
+	// A state glyph in the lead column, which keeps its color under the
 	// selection. Issue 44: the row a reader is looking at was the one row whose
 	// status they could not read.
 	marks := func(styled bool) func(*comp.Canvas, comp.Rect, bool) {
@@ -614,7 +614,7 @@ func (m *Model) listEntry(s *styles) Entry {
 				Draw: huge(200000, 0)},
 			{Name: "200,000 rows, deep in", Note: "the window moved; nothing else did",
 				Draw: huge(200000, 13742)},
-			{Name: "grouped with headings", Note: "↑↓ passes over the headings, so j/k never appear to do nothing — and a click on one is ignored rather than selecting its neighbour",
+			{Name: "grouped with headings", Note: "↑↓ passes over the headings, so j/k never appear to do nothing — and a click on one is ignored rather than selecting its neighbor",
 				Draw: func(c *comp.Canvas, r comp.Rect, _ bool) {
 					l := &comp.List{
 						Name: "demo.list", Selected: &s.selected, Unfocused: &s.focused,
@@ -633,7 +633,7 @@ func (m *Model) listEntry(s *styles) Entry {
 				}},
 			{Name: "ranked by a query", Note: "the letters that matched are marked, so the order is something you can check rather than trust",
 				Draw: filtered("env")},
-			{Name: "a state glyph, swallowed", Note: "the default: a selected row is one colour whatever its spans say, so ● ○ ✗ all read the same on the cursor row",
+			{Name: "a state glyph, swallowed", Note: "the default: a selected row is one color whatever its spans say, so ● ○ ✗ all read the same on the cursor row",
 				Draw: marks(false)},
 			{Name: "a state glyph, kept", Note: "Row.LeadStyle survives the selection — the glyph is the row's state, not its label (issue 44)",
 				Draw: marks(true)},
@@ -764,7 +764,7 @@ func (m *Model) confirmEntry(s *styles) Entry {
 			cf.Border, cf.TitleStyle = &s.focused, &s.title
 			cf.DangerStyle, cf.BodyStyle, cf.HintStyle = &s.danger, &s.muted, &s.muted
 			cf.Hints = []comp.Hint{{Key: "y", Label: "confirm"}, {Key: "n", Label: "cancel"}}
-			// Drawn into a canvas of its own so it centres on the preview
+			// Drawn into a canvas of its own so it centers on the preview
 			// rather than on the whole window.
 			sub := comp.NewCanvas(r.W, r.H)
 			cf.Draw(sub, comp.Region("demo.confirm"))
@@ -894,7 +894,7 @@ func (m *Model) logPaneEntry(s *styles) Entry {
 }
 
 // blit copies one canvas into a rect of another, which is how a component that
-// centres itself is previewed inside a pane rather than on the whole window.
+// centers itself is previewed inside a pane rather than on the whole window.
 func blit(dst *comp.Canvas, r comp.Rect, src *comp.Canvas) {
 	for y := 0; y < src.Bounds().H && y < r.H; y++ {
 		for x := 0; x < src.Bounds().W && x < r.W; x++ {
@@ -1071,7 +1071,7 @@ func (m *Model) breadcrumbEntry(s *styles) Entry {
 		States: []State{
 			{Name: "the root", Note: "one crumb is still a trail — it says you are as far out as you go",
 				Draw: draw([]string{"democtl"}, 0)},
-			{Name: "two deep", Note: "the last is the screen you are on, and is the only one coloured",
+			{Name: "two deep", Note: "the last is the screen you are on, and is the only one colored",
 				Draw: draw([]string{"democtl", "Logs"}, 0)},
 			{Name: "four deep", Note: "root first, current last",
 				Draw: draw(deep, 0)},

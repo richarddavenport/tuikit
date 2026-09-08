@@ -2,7 +2,7 @@
 // writing to it.
 //
 // Everything else in this library is a one-way conversation: a canvas is
-// serialised and printed, and what the terminal does with it is the terminal's
+// serialized and printed, and what the terminal does with it is the terminal's
 // business. Graphics detection cannot work that way. There is no environment
 // variable that answers "can you draw a picture", because the answer is a
 // property of the emulator rather than of the shell that launched it, so the
@@ -32,7 +32,7 @@ type Graphics int
 
 const (
 	// None is a terminal that draws characters and nothing else — Alacritty,
-	// anything unrecognised, anything too slow to answer, and every test.
+	// anything unrecognized, anything too slow to answer, and every test.
 	//
 	// It is first so that the zero value is the safe one. A Graphics nobody
 	// set means "draw cells", which is the mode that always works.
@@ -56,7 +56,7 @@ func (g Graphics) String() string {
 // EnvOverride is the variable that skips detection: none, sixel or kitty.
 //
 // It exists for three different people. Someone whose terminal answers a query
-// it does not honour needs a way out; someone reproducing a bug needs to pin
+// it does not honor needs a way out; someone reproducing a bug needs to pin
 // the mode; and someone capturing a frame for documentation needs the cells
 // even on a terminal that could do better.
 const EnvOverride = "TUIKIT_GRAPHICS"

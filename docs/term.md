@@ -33,11 +33,11 @@ back to `CSI 14t` when the kernel does not fill in the pixel fields, and
 Why it matters: an image is sized in pixels and placed in cells, and getting the
 ratio wrong stretches every picture.
 
-## Colours
+## Colors
 
 `Background()` and `QueryBackground` read the terminal's actual background via
 OSC 11, so a Sixel image — which has no alpha — can be flattened against the
-right colour instead of against a guess.
+right color instead of against a guess.
 
 `Colors(indices...)` reads ANSI palette entries via OSC 4. That is how a
 generated gradient follows the reader's own theme rather than imposing one.

@@ -34,7 +34,7 @@ func TestATitleInTheEdgeCostsNoRow(t *testing.T) {
 }
 
 func TestATitleOnARowIsPaintedFullWidth(t *testing.T) {
-	forceColour()
+	forceColor()
 	title := lipgloss.NewStyle().Background(lipgloss.Color("57"))
 
 	c := NewCanvas(16, 5)
@@ -99,7 +99,7 @@ func TestAPaneWithNoRoomDrawsNothing(t *testing.T) {
 }
 
 func TestFocusChangesTheBorderAndTheTitle(t *testing.T) {
-	forceColour()
+	forceColor()
 	border := lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
 	focus := lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 

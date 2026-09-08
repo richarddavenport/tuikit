@@ -13,7 +13,7 @@ import (
 //
 // # Why SVG and not PNG
 //
-// A PNG needs a rasteriser, which needs a typeface, which is the open question
+// A PNG needs a rasterizer, which needs a typeface, which is the open question
 // in decision 30 — and answering it in order to write documentation would be
 // deciding it for the wrong reason. SVG needs no typeface of its own: it names
 // the same system monospace stack the HTML page does and lets the reader's
@@ -36,7 +36,7 @@ import (
 //
 // Presentation attributes, not CSS. An SVG referenced from a Markdown document
 // is rendered in a sanitiser's idea of SVG, and a stripped <style> block leaves
-// a frame that is all one colour with no error to explain it. Attributes
+// a frame that is all one color with no error to explain it. Attributes
 // survive; a stylesheet is a bet.
 func SVG(frame string) string { return svgFrame(frame, defaultMetrics) }
 
@@ -60,8 +60,8 @@ type metrics struct {
 var defaultMetrics = metrics{fontSize: 13, cellW: 7.8, lineH: 16.25, padX: 14, padY: 12, radius: 7}
 
 // The frame's own ground and default ink, matching the HTML page's rule: the
-// ANSI was captured for a dark terminal, and recolouring it would report
-// colours the tool does not have.
+// ANSI was captured for a dark terminal, and recoloring it would report
+// colors the tool does not have.
 const (
 	svgGround = "#0c0c0e"
 	svgInk    = "#d0d0d0"

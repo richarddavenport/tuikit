@@ -6,7 +6,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// The palette is a closed set with a fixed reading order. A tool that recolours
+// The palette is a closed set with a fixed reading order. A tool that recolors
 // it still gets the same nine roles in the same order, because the order is
 // what a palette page reads and a reshuffle would silently redraw it.
 func TestRolesAreTheNineInOrder(t *testing.T) {
@@ -23,10 +23,10 @@ func TestRolesAreTheNineInOrder(t *testing.T) {
 	}
 }
 
-// Overriding a colour keeps the role's reason, because the reason describes
-// what the colour is FOR. A tool that decides its accent is blue has not
+// Overriding a color keeps the role's reason, because the reason describes
+// what the color is FOR. A tool that decides its accent is blue has not
 // changed what an accent means.
-func TestOverridingAColourKeepsTheReason(t *testing.T) {
+func TestOverridingAColorKeepsTheReason(t *testing.T) {
 	blue := Default
 	blue.Accent = lipgloss.Color("4")
 

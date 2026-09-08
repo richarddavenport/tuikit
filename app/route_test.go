@@ -35,7 +35,7 @@ func TestWhateverIsCapturingGetsTheKeyFirst(t *testing.T) {
 }
 
 // A capture takes the key whether or not it does anything with it. An
-// unrecognised key inside a filter box is a character, not a chance for the
+// unrecognized key inside a filter box is a character, not a chance for the
 // screen underneath to act on it.
 func TestACaptureSwallowsKeysItDoesNotUse(t *testing.T) {
 	var log []string

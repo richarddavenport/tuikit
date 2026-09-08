@@ -79,7 +79,7 @@ func TestGapsAreAccountedFor(t *testing.T) {
 
 // A terminal too short for the layout gives zero-height bands rather than
 // negative ones. A negative rect is a rect that draws nothing anywhere, which
-// is much harder to recognise than a band that is simply not there.
+// is much harder to recognize than a band that is simply not there.
 func TestNothingGoesNegative(t *testing.T) {
 	l := Layout{Constraints: []Constraint{Length(1), Length(1), Fill(1), Length(1)}, Gap: 1}
 	for total := range 8 {

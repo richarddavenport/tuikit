@@ -11,7 +11,7 @@
 // The obvious next thing is a heading in a real typeface, and it is deliberately
 // absent. Sixel is opaque: it replaces the cells it covers, so any text inside
 // the picture's rectangle must be IN the picture, which means an embedded font,
-// which means a licence decision and a real number on the binary — and it means
+// which means a license decision and a real number on the binary — and it means
 // the same words render differently depending on which terminal the reader has.
 //
 // Keeping text as cells avoids all of it. The picture is a band; the words live
@@ -25,14 +25,14 @@ import (
 	"math"
 )
 
-// Ramp is a linear gradient between two colours.
+// Ramp is a linear gradient between two colors.
 //
 // Two stops rather than an arbitrary list, because the handoff's design uses
 // two and a list would be a general answer to a question nobody has asked yet.
 type Ramp struct{ From, To color.RGBA }
 
 // At samples the ramp. t outside 0..1 clamps rather than wrapping — a caller
-// that is off by a pixel at the edge should get the edge colour, not the
+// that is off by a pixel at the edge should get the edge color, not the
 // opposite one.
 func (r Ramp) At(t float64) color.RGBA {
 	t = math.Max(0, math.Min(1, t))
@@ -43,7 +43,7 @@ func (r Ramp) At(t float64) color.RGBA {
 // Panel is a rounded rectangle filled with a horizontal ramp.
 //
 // The alpha channel is real: corners and edges fade to transparent rather than
-// to a background colour. A terminal that composites (kitty) gets that
+// to a background color. A terminal that composites (kitty) gets that
 // directly; one that does not (Sixel) bakes it against a known background with
 // [Flatten], which is why the background is the caller's business and not this
 // package's.
@@ -56,9 +56,9 @@ type Panel struct {
 	// 0..1 of the usable height. The panel answers a question rather than
 	// merely decorating, which is the only reason a picture earns its cells.
 	Bars []float64
-	// BarColor is the bars' colour. The zero value is a translucent shadow,
+	// BarColor is the bars' color. The zero value is a translucent shadow,
 	// which is the only default that reads against EVERY ramp — the first
-	// version used the ramp's own end colour and produced bars very nearly
+	// version used the ramp's own end color and produced bars very nearly
 	// invisible against the gradient they sat on.
 	BarColor color.RGBA
 }
@@ -90,7 +90,7 @@ func (p Panel) coverage(x, y float64) float64 {
 	if r <= 0 {
 		return 1
 	}
-	// cx, cy is the nearest corner arc's centre, if this pixel is in a corner.
+	// cx, cy is the nearest corner arc's center, if this pixel is in a corner.
 	cx, cy := x, y
 	switch {
 	case x < r:
@@ -189,7 +189,7 @@ type Bar struct {
 	Value float64
 	Ramp  Ramp
 	// Track is the unfilled remainder. Alpha is respected, so a track can be
-	// a faint tint rather than a colour.
+	// a faint tint rather than a color.
 	Track color.RGBA
 	// Radius defaults to half the height — a bar with square ends reads as a
 	// container rather than as a level.
@@ -214,7 +214,7 @@ func (b Bar) Image() *image.RGBA {
 			c := b.Track
 			if x < filled {
 				// The ramp is sampled across the WHOLE bar, not across the
-				// filled part, so the colour at a given level does not change
+				// filled part, so the color at a given level does not change
 				// as the level moves. A gradient that slides is a gradient
 				// that reads as motion nobody asked for.
 				c = b.Ramp.At(float64(x) / float64(b.W-1))

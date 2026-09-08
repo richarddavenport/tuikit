@@ -173,7 +173,7 @@ func TestNilDrawIsDeclined(t *testing.T) {
 	}
 }
 
-// TestDrawReturningNil: a rasteriser that gives up must not produce an empty
+// TestDrawReturningNil: a rasterizer that gives up must not produce an empty
 // escape sequence that still moves the cursor.
 func TestDrawReturningNil(t *testing.T) {
 	c := canvasWith(t, term.Kitty)

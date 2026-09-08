@@ -4,7 +4,7 @@
 //
 // A tool resolves tuikit through `replace github.com/richarddavenport/tuikit
 // => ../tuikit`, so there is no version, no tag and no module cache — a pull in
-// tuikit changes the tool's behaviour with no upgrade event to hang release
+// tuikit changes the tool's behavior with no upgrade event to hang release
 // notes on. Something else has to be the marker.
 //
 // `design/decisions.md` already is one. It is numbered, append-only, and every

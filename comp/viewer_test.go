@@ -56,9 +56,9 @@ func TestTheZeroViewerIsUsable(t *testing.T) {
 	}
 }
 
-// The reason this is not a List. A list paints the cursor row in one colour on
+// The reason this is not a List. A list paints the cursor row in one color on
 // purpose; a document must not, because the line under the cursor is the line
-// being read and its syntax colours are the content.
+// being read and its syntax colors are the content.
 func TestTheCursorLineKeepsItsSpans(t *testing.T) {
 	keyword := lipgloss.NewStyle().Foreground(lipgloss.Color("5"))
 	cursor := lipgloss.NewStyle().Background(lipgloss.Color("8"))

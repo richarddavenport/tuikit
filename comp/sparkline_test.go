@@ -88,7 +88,7 @@ func TestMaxFixesTheScale(t *testing.T) {
 	auto1 := spark(4, 1, Sparkline{}, []float64{1, 2, 3, 4})
 	auto2 := spark(4, 1, Sparkline{}, []float64{50, 100, 150, 200})
 	if auto1 != auto2 {
-		t.Error("auto-scale did not make proportional series identical, which is its whole behaviour")
+		t.Error("auto-scale did not make proportional series identical, which is its whole behavior")
 	}
 }
 

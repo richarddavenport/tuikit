@@ -52,9 +52,9 @@ type Waiting struct {
 
 const waitingAfter = 2 * time.Second
 
-// Draw centres the wait in r.
+// Draw centers the wait in r.
 //
-// Centred because the region is otherwise empty: a message in the top-left of
+// Centered because the region is otherwise empty: a message in the top-left of
 // a large blank pane reads as content that failed to fill it, and the same
 // words in the middle read as a placeholder. Nothing is drawn if there is no
 // room, which is an ordinary state for a pane squeezed by a narrow terminal.
@@ -70,13 +70,13 @@ func (w Waiting) Draw(c *Canvas, r Rect, at time.Time, id ID) {
 	}
 	y := r.Y + r.H/2
 	if w.Detail != "" && r.H > 1 {
-		y-- // keep the pair centred, not the first line
+		y-- // keep the pair centered, not the first line
 	}
-	c.Text(centre(r, line), y, Truncate(line, r.W), w.Style, id)
+	c.Text(center(r, line), y, Truncate(line, r.W), w.Style, id)
 
 	if w.Detail != "" && y+1 <= r.Bottom() {
 		detail := Truncate(w.Detail, r.W)
-		c.Text(centre(r, detail), y+1, detail, w.DetailStyle, id)
+		c.Text(center(r, detail), y+1, detail, w.DetailStyle, id)
 	}
 }
 
@@ -99,7 +99,7 @@ func (w Waiting) elapsed(at time.Time) string {
 	return fmt.Sprintf("%dm %02ds", int(d.Minutes()), int(d.Seconds())%60)
 }
 
-// centre is the x a string starts at to sit in the middle of r.
-func centre(r Rect, s string) int {
+// center is the x a string starts at to sit in the middle of r.
+func center(r Rect, s string) int {
 	return r.X + max(0, (r.W-Width(s))/2)
 }

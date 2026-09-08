@@ -61,7 +61,7 @@ func (m *Model) sparklineEntry(s *styles) Entry {
 		Summary: "A number over time. The newest sample is always the last column, " +
 			"so the bar under your cursor does not move when one arrives.",
 		From: "k9s wrote internal/tchart; bottom vendored 55 kB of ratatui's own Chart " +
-			"rather than use it, and the specialisation it forked for is this one",
+			"rather than use it, and the specialization it forked for is this one",
 		Roles:  []string{"Accent", "Success", "Pending", "Muted"},
 		Glyphs: []string{"▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"},
 		States: []State{

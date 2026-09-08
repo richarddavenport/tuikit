@@ -9,7 +9,7 @@ import (
 
 // states is every distinct thing <<.Name>> can be showing.
 //
-// ONE list, walked by the goldens, the narrow-terminal run, the colour check
+// ONE list, walked by the goldens, the narrow-terminal run, the color check
 // and the capture. A screen added without a frame is a screen added without any
 // of them, which is the only arrangement in which they cannot drift apart.
 func states() []struct {
@@ -69,15 +69,15 @@ func TestFramesAtEightyColumns(t *testing.T) {
 	}
 }
 
-// Colour must not change the shape.
+// Color must not change the shape.
 //
-// Goldens are captured uncoloured, so a width bug in a styled string is
+// Goldens are captured uncolored, so a width bug in a styled string is
 // invisible to every one of them — which is how democtl's tab strip shipped
 // counting runes instead of columns.
-func TestColourDoesNotChangeTheShape(t *testing.T) {
+func TestColorDoesNotChangeTheShape(t *testing.T) {
 	for _, size := range []struct{ w, h int }{{132, 38}, {80, 24}} {
 		for _, st := range states() {
-			harness.ShapeSurvivesColour(t, st.name, func() string {
+			harness.ShapeSurvivesColor(t, st.name, func() string {
 				return view(sized(st.build(), size.w, size.h))
 			})
 		}

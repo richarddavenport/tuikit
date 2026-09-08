@@ -58,7 +58,7 @@ const (
 	confirmMargin = 8
 )
 
-// Draw centres the box on the canvas and returns the rect it took.
+// Draw centers the box on the canvas and returns the rect it took.
 //
 // Drawn last is on top. There is no compositing step, no re-measuring of the
 // lines beneath and nothing to get wrong — the bug that once wiped 8 of 18

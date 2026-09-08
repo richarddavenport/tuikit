@@ -53,7 +53,7 @@ func TestNeitherPaneCanBeDraggedToNothing(t *testing.T) {
 	}
 }
 
-// A minimum wider than half the space cannot be honoured on both sides. The
+// A minimum wider than half the space cannot be honored on both sides. The
 // first pane gets what is left rather than the second going negative.
 func TestAMinimumTooBigForTheSpaceDoesNotGoNegative(t *testing.T) {
 	s := &Split{Name: splitName, Min: 40}

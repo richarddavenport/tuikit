@@ -16,7 +16,7 @@ import (
 //
 // The chevrons. The deploy tool wraps the WHOLE strip in ‹ ›; democtl wraps
 // the ACTIVE TAB. democtl's is the accident: the active tab is already styled,
-// so the chevrons around it repeat what the colour says, and repeat it in the
+// so the chevrons around it repeat what the color says, and repeat it in the
 // one place a reader is already looking. The deploy tool's say something no
 // styling can — that the strip CYCLES, and that ‹ and › are the keys — which
 // is a fact about the keymap rather than about the state. Its comment says so

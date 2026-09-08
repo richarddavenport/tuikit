@@ -33,7 +33,7 @@ func TestSixelShape(t *testing.T) {
 	}
 	// Red is 5,0,0 in the 6-cube → index 180, and 255 is 100%.
 	if !strings.Contains(out, "#180;2;100;0;0") {
-		t.Errorf("red was not defined as a colour register:\n%q", out)
+		t.Errorf("red was not defined as a color register:\n%q", out)
 	}
 	// 12 rows is exactly two bands of six, so there is one band separator and
 	// it is not trailing.
@@ -54,9 +54,9 @@ func TestSixelRunLength(t *testing.T) {
 	}
 }
 
-// TestSixelSkipsColoursNotInABand. Emitting every register for every band is
-// correct and enormous; on a two-colour panel it doubles the payload.
-func TestSixelSkipsColoursNotInABand(t *testing.T) {
+// TestSixelSkipsColorsNotInABand. Emitting every register for every band is
+// correct and enormous; on a two-color panel it doubles the payload.
+func TestSixelSkipsColorsNotInABand(t *testing.T) {
 	img := fill(6, 12, color.RGBA{255, 0, 0, 255})
 	for y := 6; y < 12; y++ { // the second band only
 		for x := 0; x < 6; x++ {
@@ -66,14 +66,14 @@ func TestSixelSkipsColoursNotInABand(t *testing.T) {
 	out := term.EncodeSixel(img)
 	first := strings.Index(out, "#")
 	if first < 0 {
-		t.Fatal("no colour registers in the output")
+		t.Fatal("no color registers in the output")
 	}
 	bands := strings.Split(out[first:], "-")
 	if len(bands) != 2 {
 		t.Fatalf("want 2 bands, got %d", len(bands))
 	}
 	if strings.Contains(bands[1], "$") {
-		t.Error("the second band emitted a colour that is not in it")
+		t.Error("the second band emitted a color that is not in it")
 	}
 }
 

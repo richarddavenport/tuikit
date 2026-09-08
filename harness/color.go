@@ -5,7 +5,7 @@ import (
 	"github.com/muesli/termenv"
 )
 
-// ShapeSurvivesColour asserts that turning colour on does not change what a
+// ShapeSurvivesColor asserts that turning color on does not change what a
 // frame says.
 //
 // This exists because the goldens cannot see a whole class of bug. They run
@@ -19,17 +19,17 @@ import (
 // cut mid-escape at 80 columns, eating the sequence that turned bold off. The
 // golden showed `‹ Config ›  Events` and looked perfect.
 //
-// Colour is decoration. If it changes the SHAPE, something measured bytes that
+// Color is decoration. If it changes the SHAPE, something measured bytes that
 // it should have measured in columns, and this says so.
 //
 // render must build and draw the frame from scratch each time it is called:
-// lipgloss resolves colour at Render, so the same model is drawn twice, once
+// lipgloss resolves color at Render, so the same model is drawn twice, once
 // under each profile.
-func ShapeSurvivesColour(t T, name string, render func() string) {
+func ShapeSurvivesColor(t T, name string, render func() string) {
 	t.Helper()
 
 	// The profile is process-wide, so it is put back. A helper that leaves
-	// colour switched on hands the next test in the package a frame full of
+	// color switched on hands the next test in the package a frame full of
 	// escape sequences, and the failure lands nowhere near the cause.
 	profile, dark := lipgloss.ColorProfile(), lipgloss.HasDarkBackground()
 	defer func() {
@@ -42,9 +42,9 @@ func ShapeSurvivesColour(t T, name string, render func() string) {
 
 	lipgloss.SetColorProfile(termenv.TrueColor)
 	lipgloss.SetHasDarkBackground(true)
-	coloured := Strip(render())
+	colored := Strip(render())
 
-	if plain != coloured {
-		t.Errorf("%s says something different once colour is on:\n%s", name, diff(plain, coloured))
+	if plain != colored {
+		t.Errorf("%s says something different once color is on:\n%s", name, diff(plain, colored))
 	}
 }

@@ -1,11 +1,11 @@
 # `theme` — the vocabulary
 
-Nine colour roles, a closed glyph set, and the box characters. Small on purpose:
+Nine color roles, a closed glyph set, and the box characters. Small on purpose:
 this is the list `guard` holds a tool to.
 
 ## Palette
 
-`theme.Palette` carries roles, not colours — nine of them: `Accent`, `Muted`,
+`theme.Palette` carries roles, not colors — nine of them: `Accent`, `Muted`,
 `Border`, `Success`, `Pending`, `Danger`, `Stderr`, `SelectionFG`,
 `SelectionBG`. `theme.Default` is the shipped one, and a tool overrides the
 fields it wants rather than building a palette from scratch, because the point
@@ -16,7 +16,7 @@ nine do not cover. It is named and declared, so `guard.Tokens` still sees it.
 
 A tool styles with `p.Danger`, never with `lipgloss.Color("#ff5555")` — and
 `guard.Tokens` fails the build on the literal. The reason is not tidiness: ANSI
-0–15 are the **reader's** colours, set in their terminal, and a hex literal
+0–15 are the **reader's** colors, set in their terminal, and a hex literal
 overrides a choice they made deliberately.
 
 `Hex(c)` and `Value(c)` render a role for a design-system page.

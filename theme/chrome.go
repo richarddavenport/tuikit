@@ -2,7 +2,7 @@ package theme
 
 // Chrome is the third closed vocabulary: what an interface DRAWS WITH.
 //
-// Palette says which colours a tool may use and GlyphSet which characters it
+// Palette says which colors a tool may use and GlyphSet which characters it
 // may print. Neither says what a box looks like — so every component picked
 // its own, and sixteen characters ended up as literals inside comp where no
 // guard could see them. A tool narrowing its glyph set for a font without

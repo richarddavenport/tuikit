@@ -6,7 +6,7 @@
 // documentation and catching overflow are all downstream of that, and treating
 // any of them as the point produces a harness nobody runs.
 //
-// It generalises a working prototype — the database tool's
+// It generalizes a working prototype — the database tool's
 // screenshot_probe_test.go, whose seventeen frames found three bugs that
 // forty-odd assertions had not. Two of the three were something drawn wider
 // than its container, which no assertion checking content rather than shape
@@ -122,9 +122,9 @@ func Enabled(env string) string { return os.Getenv(env) }
 
 // Capture starts a session writing into dir.
 //
-// It forces lipgloss's colour profile, which is the trick that makes any of
-// this work: a test has no TTY, so lipgloss strips every colour and you
-// capture a grey rectangle. This does not contradict the palette being ANSI
+// It forces lipgloss's color profile, which is the trick that makes any of
+// this work: a test has no TTY, so lipgloss strips every color and you
+// capture a gray rectangle. This does not contradict the palette being ANSI
 // 256 — the values stay 256 indices; forcing the profile only stops them being
 // discarded on a pipe.
 func Capture(t T, dir string, opts ...Option) *Session {

@@ -4,7 +4,7 @@ tuikit gallery  every component, running                                        
 │ Components                    │ │ List                                                                                           │
 │ List                          │ │ A scrollable, selectable list, flat or grouped. The viewport and the selection are separate.   │
 │ Pane                          │ │ ‹ focused · unfocused · empty · overflowing · scrolled away · grouped · grouped, collapsed · no│
-│ Tabs                          │ │ the default: a selected row is one colour whatever its spans say, so ● ○ ✗ all read the same … │
+│ Tabs                          │ │ the default: a selected row is one color whatever its spans say, so ● ○ ✗ all read the same o… │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ ●  local                                                                                       │
 │ StepList                      │ │ ○  staging                                                                                     │

@@ -7,7 +7,7 @@ import "github.com/charmbracelet/lipgloss"
 // # Where this came from
 //
 // The deploy tool's logspane.go, 681 lines, is the only real one of the four —
-// and the only place FOLLOW is modelled. Its comment describes the behaviour
+// and the only place FOLLOW is modeled. Its comment describes the behavior
 // worth keeping: following pins to the tail; scrolling up detaches; scrolling
 // back to the bottom re-attaches. "The less/lazydocker feel."
 //

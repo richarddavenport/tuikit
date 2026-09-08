@@ -35,13 +35,13 @@ type T interface {
 	Fatalf(format string, args ...any)
 }
 
-// Tokens reports a colour that did not come from the palette, and a role in
+// Tokens reports a color that did not come from the palette, and a role in
 // the palette that nothing draws with.
 //
 // The first was broken in six places in the deploy tool before it was a rule:
 // the panel border was built from raw numbers twice, and the log pane kept its
 // own pair. Nobody decided that; it happened one file at a time. A raw index
-// also says what a colour IS instead of what it is FOR, which is how one value
+// also says what a color IS instead of what it is FOR, which is how one value
 // came to mean both "title" and "focused border" without anyone choosing that
 // they should move together.
 //
@@ -63,7 +63,7 @@ func Tokens(t T, dir string, p theme.Palette, except ...Exemption) {
 				used[filepath.Base(f.name)]++
 				return true
 			}
-			t.Errorf("%s:%d builds a colour from a literal — "+
+			t.Errorf("%s:%d builds a color from a literal — "+
 				"name the ROLE in your palette and use that instead",
 				f.name, f.fset.Position(call.Pos()).Line)
 			return true
@@ -147,7 +147,7 @@ type source struct {
 }
 
 // sources reads the package's own files. Test files are excluded: a test may
-// legitimately name a colour it is checking for, or print a glyph in a failure
+// legitimately name a color it is checking for, or print a glyph in a failure
 // message, and neither reaches a terminal.
 //
 // Parsed, not matched. A regex over the source cannot tell a string literal
@@ -214,18 +214,18 @@ func unique(in []string) []string {
 // # When the guard is wrong
 //
 // lazygit's `presentation/icons/file_icons.go` is 794 lines holding 743 hex
-// colour literals. They are file-type BRAND colours — the Go gopher's blue,
+// color literals. They are file-type BRAND colors — the Go gopher's blue,
 // the Rust orange — and the whole point of them is that they are the same
-// everywhere. Decision 28 puts colour on ANSI 0-15 so the reader's theme wins,
+// everywhere. Decision 28 puts color on ANSI 0-15 so the reader's theme wins,
 // and that reasoning does not reach a brand mark.
 //
 // Before this there were three options and all were bad: drop the guard and
-// lose it everywhere, move the colours somewhere unscanned, or give up the
+// lose it everywhere, move the colors somewhere unscanned, or give up the
 // icons.
 //
 // # Why a reason is required
 //
-// Because the value of the guard is that a colour outside the palette is a
+// Because the value of the guard is that a color outside the palette is a
 // DECISION, and an exemption that records nothing has thrown that away — it is
 // a suppression flag wearing a better name. This is the same bargain
 // [theme.GlyphSet.With] strikes for characters, and for the same reason.
@@ -284,7 +284,7 @@ func checkExemptions(t T, except []Exemption, sources []source, used map[string]
 				"delete the exemption, or the next file to take that name is unguarded",
 				e.File, e.Reason)
 		case used[e.File] == 0:
-			t.Errorf("guard: %s is exempted (%q) but builds no colours from literals — "+
+			t.Errorf("guard: %s is exempted (%q) but builds no colors from literals — "+
 				"delete the exemption rather than leaving a hole nobody is using",
 				e.File, e.Reason)
 		}

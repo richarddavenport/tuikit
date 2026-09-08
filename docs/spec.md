@@ -46,7 +46,7 @@ three answers that disagree in small ways with no way to tell which is current.
 `Describe` is generated from the same declarations the CLI runs and the TUI
 draws, so it cannot be stale without them being stale too. It carries the
 palette and glyph set as well, because an agent adding a screen needs to know
-which colour roles and characters exist *before* it writes anything, and those
+which color roles and characters exist *before* it writes anything, and those
 are exactly what a guard will fail it for afterwards.
 
 ## Exit codes, and why cobra is not here

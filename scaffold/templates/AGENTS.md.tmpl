@@ -36,7 +36,7 @@ config is engine work and the engine imports no tuikit. It is yours — change i
 ## Looking at the screens
 
 You cannot see a terminal, but you can read one. Every screen has a golden in
-`internal/tui/testdata` — a captured frame with the colour stripped — so
+`internal/tui/testdata` — a captured frame with the color stripped — so
 "what does this look like at 80 columns" is a file, not a question for a human.
 
 ```sh
@@ -52,7 +52,7 @@ not have to be told it exists.
 The goldens are rendered from `fixture()` in `internal/tui/fixture_test.go`,
 not from a live backend. To see a state that does not exist yet, add it to
 `states()` in `capture_test.go` and rerun with `-update-goldens`; the list is
-walked by the goldens, the 80-column run, the colour check and the capture, so
+walked by the goldens, the 80-column run, the color check and the capture, so
 one entry gets you all four.
 
 ## Before you say you are done
@@ -67,8 +67,8 @@ the point of having them.
 
 ## Rules that will fail your change if you break them
 
-- A colour must come from `Palette`, named by the ROLE it plays. A raw
-  `lipgloss.Color("205")` fails, because it says what a colour IS instead of
+- A color must come from `Palette`, named by the ROLE it plays. A raw
+  `lipgloss.Color("205")` fails, because it says what a color IS instead of
   what it is FOR.
 - A non-ASCII character must be in `Glyphs`. Add it deliberately, with the
   reason, or use ASCII.
@@ -79,7 +79,7 @@ the point of having them.
 ## Keeping up with tuikit
 
 tuikit is resolved through `replace => ../tuikit`, so it has no version: a pull
-there changes <<.Name>>'s behaviour with nothing to bump and nothing to read.
+there changes <<.Name>>'s behavior with nothing to bump and nothing to read.
 Two commands close that gap, and **both are worth running before you build any
 interface**.
 

@@ -151,7 +151,7 @@ func TestEveryEntryShowsMoreThanTheHappyPath(t *testing.T) {
 			t.Errorf("%s does not say what it is for or where it came from", e.Name)
 		}
 		if len(e.Roles) == 0 {
-			t.Errorf("%s names no colour roles — a tool cannot tell whether its palette can supply it", e.Name)
+			t.Errorf("%s names no color roles — a tool cannot tell whether its palette can supply it", e.Name)
 		}
 	}
 }
@@ -218,11 +218,11 @@ func TestGalleryAtEightyColumns(t *testing.T) {
 	})
 }
 
-// Colour must not change the shape — the check democtl's tab strip failed.
-func TestColourDoesNotChangeTheShape(t *testing.T) {
+// Color must not change the shape — the check democtl's tab strip failed.
+func TestColorDoesNotChangeTheShape(t *testing.T) {
 	for _, size := range []struct{ w, h int }{{132, 38}, {80, 24}} {
 		states(t, size.w, size.h, func(name string, m *Model) {
-			harness.ShapeSurvivesColour(t, name, func() string {
+			harness.ShapeSurvivesColor(t, name, func() string {
 				fresh := New(theme.Default)
 				fresh.index = m.index
 				fresh.state = m.state
@@ -253,7 +253,7 @@ func TestCaptureFrames(t *testing.T) {
 // The canvas guarantees nothing lands outside the CANVAS — Set clips, so a
 // coordinate past the edge is one that does not exist. It guarantees nothing
 // about a component staying inside the RECT it was handed, and a component that
-// overruns paints over its neighbour rather than failing: the frame is still
+// overruns paints over its neighbor rather than failing: the frame is still
 // well-formed, the goldens still pass, and the pane beside it is simply wrong.
 //
 // This is issue 6's guard.Width, and it lives here rather than in `guard`

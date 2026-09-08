@@ -56,7 +56,7 @@ func TestAResetEndsTheRun(t *testing.T) {
 }
 
 // Style carries across a newline, the way a terminal does it. A parser that
-// reset per line would colour one line of three.
+// reset per line would color one line of three.
 func TestStyleCarriesAcrossLines(t *testing.T) {
 	lines := ANSILines("\x1b[34mone\ntwo\nthree\x1b[0m")
 	if len(lines) != 3 {
@@ -64,7 +64,7 @@ func TestStyleCarriesAcrossLines(t *testing.T) {
 	}
 	for i, line := range lines {
 		if len(line) == 0 || line[0].Style == nil {
-			t.Errorf("line %d lost the colour: %#v", i, line)
+			t.Errorf("line %d lost the color: %#v", i, line)
 		}
 	}
 }
@@ -108,13 +108,13 @@ func TestNonSGRSequencesAreSkippedNotPrinted(t *testing.T) {
 	}
 }
 
-// 256-colour and truecolor survive, because a subprocess's output is data and
+// 256-color and truecolor survive, because a subprocess's output is data and
 // dropping the distinction loses what the program was drawing.
-func TestExtendedColoursSurvive(t *testing.T) {
+func TestExtendedColorsSurvive(t *testing.T) {
 	if got := ANSI("\x1b[38;5;208mamber\x1b[0m"); got[0].Style == nil {
-		t.Error("256-colour was dropped")
+		t.Error("256-color was dropped")
 	} else if fg := got[0].Style.GetForeground(); fg != lipgloss.Color("208") {
-		t.Errorf("256-colour became %v, want 208", fg)
+		t.Errorf("256-color became %v, want 208", fg)
 	}
 	if got := ANSI("\x1b[38;2;255;128;0mamber\x1b[0m"); got[0].Style == nil {
 		t.Error("truecolor was dropped")
@@ -123,17 +123,17 @@ func TestExtendedColoursSurvive(t *testing.T) {
 	}
 }
 
-// Neighbouring cells with one style come out as one segment, so a line of one
-// colour is not eighty of them.
-func TestARunOfOneColourIsOneSegment(t *testing.T) {
+// Neighboring cells with one style come out as one segment, so a line of one
+// color is not eighty of them.
+func TestARunOfOneColorIsOneSegment(t *testing.T) {
 	if got := ANSI("\x1b[31mabcdefghij\x1b[0m"); len(got) != 1 {
 		t.Errorf("a ten-character run became %d segments", len(got))
 	}
 }
 
-// Bold and colour compose, and 22 turns bold off without losing the colour.
+// Bold and color compose, and 22 turns bold off without losing the color.
 func TestAttributesCompose(t *testing.T) {
-	got := ANSI("\x1b[1;31mboth\x1b[22mjust colour")
+	got := ANSI("\x1b[1;31mboth\x1b[22mjust color")
 	if len(got) != 2 {
 		t.Fatalf("got %d segments, want 2", len(got))
 	}
@@ -141,10 +141,10 @@ func TestAttributesCompose(t *testing.T) {
 		t.Error("bold was lost")
 	}
 	if got[1].Style == nil || got[1].Style.GetBold() {
-		t.Error("22 should end bold and keep the colour")
+		t.Error("22 should end bold and keep the color")
 	}
 	if fg := got[1].Style.GetForeground(); fg != lipgloss.ANSIColor(1) {
-		t.Errorf("the colour did not survive 22: %v", fg)
+		t.Errorf("the color did not survive 22: %v", fg)
 	}
 }
 

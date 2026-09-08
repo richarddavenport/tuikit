@@ -76,17 +76,17 @@ func (t Table) Rows(w int, rows [][]string) []string {
 // Spans lays out STYLED cells, keeping each cell's own style.
 //
 // The same layout as [Table.Rows] and the same widths; what changes is that a
-// cell arrives as a [Segment] and leaves as one, so a column whose colour
+// cell arrives as a [Segment] and leaves as one, so a column whose color
 // carries meaning still has it.
 //
-// Rows returns joined strings, which is right when a whole line is one colour
+// Rows returns joined strings, which is right when a whole line is one color
 // — and it silently deletes information when it is not. The database tool
 // ported a manifest onto Table and had to make three columns plain: a rule's
 // data mode was amber for "none" and "filtered", a carried count was amber
 // when a table came across filtered rather than whole, and an unknown size was
 // a muted dash. All three became words with a comment explaining the loss
 // (issue 51). Words are a reasonable fallback and they are not the same thing:
-// colour is read without being looked at, which is the entire job of a status
+// color is read without being looked at, which is the entire job of a status
 // column.
 //
 // Padding is emitted as an unstyled segment rather than folded into the cell,

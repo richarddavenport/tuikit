@@ -156,7 +156,7 @@ func TestNothingIsWiderThanTheTerminal(t *testing.T) {
 }
 
 // A screen without a View case renders as an empty terminal, and nothing on
-// screen says a case is missing. The default branch complains in colour; this
+// screen says a case is missing. The default branch complains in color; this
 // checks no real screen reaches it.
 func TestEveryScreenHasAViewCase(t *testing.T) {
 	// The enumeration comes from the source rather than from a range written

@@ -14,11 +14,11 @@ import (
 // passes. Run `go test ./... -update-goldens` when a layout change is intended.
 var update = flag.Bool("update-goldens", false, "rewrite golden frames instead of comparing")
 
-// Golden compares a frame against testdata/<name>.golden, colour stripped.
+// Golden compares a frame against testdata/<name>.golden, color stripped.
 //
 // Stripped because a golden holds the SHAPE. A diff in a pull request wants to
 // show that a box moved, and one full of escape sequences shows nothing a
-// reader can act on. The .ansi files from a capture keep the colour.
+// reader can act on. The .ansi files from a capture keep the color.
 //
 // This is what turns "did I break the layout" into an ordinary test failure.
 // Across the four tools this framework came from there are 23,000 lines of

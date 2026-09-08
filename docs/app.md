@@ -48,7 +48,7 @@ app.Keys{Capture: modal, Screen: screen, Global: quit}.Route(msg)
 Whatever is **capturing** gets the key first, then the screen, then the globals.
 A global handled before a modal is a modal you cannot type into — press `q` in a
 filter box and the program exits. A capture takes the key whether or not it does
-anything with it: an unrecognised key inside a filter box is a character, not a
+anything with it: an unrecognized key inside a filter box is a character, not a
 chance for the screen underneath to act.
 
 The order is not something you write. It is the shape of the struct, and a nil
@@ -91,7 +91,7 @@ position readable by an agent, printable in a manifest, and reachable by a
 capture script. `comp.Breadcrumb` draws it.
 
 It is **not a router**. A screen is a value the tool already has, so parameters
-are typed and free and there is nothing to serialise.
+are typed and free and there is nothing to serialize.
 
 ## Async
 
@@ -112,7 +112,7 @@ returning whether it was consumed. The caret-aware version backs `comp.Input`.
 
 ## What it cannot do
 
-- **No router.** No path patterns, no nested outlets, no history serialisation.
+- **No router.** No path patterns, no nested outlets, no history serialization.
 - **No focus manager.** Nothing holds which of several panes on one screen is
   focused; `Focused` is a field you set on `List`, `Pane` and `Tabs`. Open issue,
   four tools deep.

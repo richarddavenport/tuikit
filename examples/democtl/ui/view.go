@@ -180,7 +180,7 @@ func (m *Model) field(c *comp.Canvas, inner comp.Rect, y int, name, value string
 //
 // The chevrons now wrap the strip rather than the current tab, which is
 // the deploy tool's arrangement and the better one: the current tab is already
-// coloured, so chevrons around it repeat what the colour says, while chevrons
+// colored, so chevrons around it repeat what the color says, while chevrons
 // around the strip say that ‹ and › cycle it — which nothing else on screen
 // does.
 func (m *Model) tabStrip(c *comp.Canvas, r comp.Rect) {
@@ -400,7 +400,7 @@ func (m *Model) bands() []comp.Rect {
 func (m *Model) body() comp.Rect { return m.bands()[2] }
 
 // stateStyle is a pointer into the model's styles rather than a copy, so every
-// row in a state shares one address and serialising groups them into a single
+// row in a state shares one address and serializing groups them into a single
 // run instead of one escape sequence per row.
 func (m *Model) stateStyle(s fleet.State) *lipgloss.Style {
 	switch s {

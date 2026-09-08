@@ -8,12 +8,12 @@ import (
 	"time"
 )
 
-// DefaultBackground is assumed when the terminal will not say: a dark grey
+// DefaultBackground is assumed when the terminal will not say: a dark gray
 // rather than pure black, because most dark themes are, and a shadow baked
 // against the wrong black shows up as a lighter rectangle.
 var DefaultBackground = color.RGBA{R: 0x1a, G: 0x1a, B: 0x1a, A: 0xff}
 
-// Background is the terminal's background colour, as RGB.
+// Background is the terminal's background color, as RGB.
 //
 // Only Sixel needs it, and it needs it badly. Sixel has no alpha channel, so a
 // soft edge or a rounded corner has to be composited against the background
@@ -22,7 +22,7 @@ var DefaultBackground = color.RGBA{R: 0x1a, G: 0x1a, B: 0x1a, A: 0xff}
 //
 // This is also the one piece of theme information tuikit reads back. Decision
 // 28 put the palette on ANSI 0–15 so the reader's terminal theme wins; a Sixel
-// picture cannot honour that theme without knowing what it actually is.
+// picture cannot honor that theme without knowing what it actually is.
 func Background() color.RGBA {
 	f, err := os.OpenFile("/dev/tty", os.O_RDWR, 0)
 	if err != nil {
@@ -63,10 +63,10 @@ func ParseBackground(reply string) color.RGBA {
 	return DefaultBackground
 }
 
-// ParseRGB reads an X11 rgb: colour out of a reply, and says whether it found
+// ParseRGB reads an X11 rgb: color out of a reply, and says whether it found
 // one.
 //
-// The bool is not decoration. ParseBackground has to answer with SOME colour,
+// The bool is not decoration. ParseBackground has to answer with SOME color,
 // so it substitutes a default on failure — and a caller that needs to tell
 // "the terminal said #1a1a1a" from "the terminal said nothing" cannot, because
 // those are the same value. That is precisely the collision decision 28 found
@@ -78,7 +78,7 @@ func ParseRGB(reply string) (color.RGBA, bool) {
 		return color.RGBA{}, false
 	}
 	body := reply[i+len("rgb:"):]
-	// The reply is terminated by BEL or ST; either ends the colour.
+	// The reply is terminated by BEL or ST; either ends the color.
 	for _, end := range []string{"\x07", "\x1b\\", "\x1b"} {
 		if j := strings.Index(body, end); j >= 0 {
 			body = body[:j]
@@ -95,7 +95,7 @@ func ParseRGB(reply string) (color.RGBA, bool) {
 			return color.RGBA{}, false
 		}
 		// Rounded, not truncated. A terminal may answer 5f00 or 5f5f for the
-		// same colour — both are 0x5f as a fraction of their own maximum — and
+		// same color — both are 0x5f as a fraction of their own maximum — and
 		// truncation turns the first into 94 while the second stays 95. One
 		// off is invisible in a gradient and very visible in a test.
 		full := uint64(1)<<(4*len(p)) - 1

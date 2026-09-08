@@ -64,7 +64,7 @@ func TestWithoutMinLeftOnlyACollisionDropsTheRightSide(t *testing.T) {
 }
 
 func TestEachEndCanBeSeveralStyles(t *testing.T) {
-	forceColour()
+	forceColor()
 	accent := lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 	muted := lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
 

@@ -79,7 +79,7 @@ survives the layout changing.
 | `Strip(frame)` | the text with every escape sequence removed |
 | `Lines(frame)` | those, split |
 | `Width(frame)` | the widest line, in columns |
-| `Rows(frame) [][]Span` | text **and** style, per run — for asserting a colour |
+| `Rows(frame) [][]Span` | text **and** style, per run — for asserting a color |
 | `HTML(frame)`, `FrameCSS` | the frame as a page |
 
 ## Goldens
@@ -88,12 +88,12 @@ survives the layout changing.
 harness.Golden(t, "testdata", "dashboard", frame)
 ```
 
-Colour-stripped, so a palette change does not rewrite every fixture and a
-diff shows what moved rather than what was recoloured. `-update-goldens`
+Color-stripped, so a palette change does not rewrite every fixture and a
+diff shows what moved rather than what was recolored. `-update-goldens`
 rewrites them.
 
-`ShapeSurvivesColour(t, name, render)` is the other half: it asserts the frame
-still reads with colour removed — that no distinction is carried by hue alone.
+`ShapeSurvivesColor(t, name, render)` is the other half: it asserts the frame
+still reads with color removed — that no distinction is carried by hue alone.
 
 `Hints(t, build, hints...)` presses every advertised key against a fresh model
 and fails on one that does nothing. Together with `guard.Keys` — which checks a
@@ -125,7 +125,7 @@ things therefore go untested here:
 
 - **Font and glyph rendering.** A CJK name is two columns because
   `ansi.StringWidth` says so. Whether the reader's font draws it that way is
-  somebody else's problem, and `harness.ShapeSurvivesColour` is the nearest
+  somebody else's problem, and `harness.ShapeSurvivesColor` is the nearest
   thing to a hedge.
 - **Graphics protocol support.** A Sixel or kitty image is bytes inside the
   frame. Whether a given terminal renders it, ignores it, or prints rubbish is

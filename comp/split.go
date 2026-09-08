@@ -77,7 +77,7 @@ func (s *Split) at(total, gap int) int {
 		}
 		at = total * num / den
 	}
-	// A minimum wider than half the space cannot be honoured on both sides, so
+	// A minimum wider than half the space cannot be honored on both sides, so
 	// the first pane gets what is left rather than the second going negative.
 	room := max(0, total-gap)
 	return clamp(at, min(s.Min, room), max(0, room-s.Min))

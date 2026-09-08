@@ -24,9 +24,9 @@ const kittyChunk = 4096
 //     real text: selectable, in the reader's font, and redrawn by the ordinary
 //     frame without the image being touched.
 //   - C=1 leaves the cursor alone, so placing a picture does not disturb the
-//     serialisation happening around it.
+//     serialization happening around it.
 //
-// The payload is zlib-compressed (o=z) because a panel is mostly flat colour
+// The payload is zlib-compressed (o=z) because a panel is mostly flat color
 // and RGBA is four bytes a pixel; on a slow link that ratio is the difference
 // between a redraw and a stutter.
 //

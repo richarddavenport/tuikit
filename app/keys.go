@@ -38,7 +38,7 @@ type Keys struct {
 // whichever took it.
 func (k Keys) Route(msg tea.KeyMsg) tea.Cmd {
 	// A capture takes the key whether or not it does anything with it. That is
-	// the point: an unrecognised key inside a filter box is a character, not a
+	// the point: an unrecognized key inside a filter box is a character, not a
 	// chance for the screen underneath to act on it.
 	if k.Capture != nil {
 		cmd, _ := k.Capture(msg)

@@ -18,7 +18,7 @@ func TestHexFollowsTheAnsiPalette(t *testing.T) {
 		{"15", "#ffffff"},  //
 		{"16", "#000000"},  // the cube's first corner
 		{"231", "#ffffff"}, // and its last
-		{"232", "#080808"}, // the grey ramp's ends
+		{"232", "#080808"}, // the gray ramp's ends
 		{"255", "#eeeeee"}, //
 		{"7", "#e5e5e5"},   // xterm's gray90, not VGA's silver
 		{"8", "#7f7f7f"},   // and its gray50
@@ -73,11 +73,11 @@ func TestHexPassesThroughAHexValue(t *testing.T) {
 	}
 }
 
-// An adaptive colour answers with its dark value, because everything that
+// An adaptive color answers with its dark value, because everything that
 // renders a palette outside a terminal draws on a dark ground — that is what
-// the frame was captured for, and recolouring it would report a tool that does
+// the frame was captured for, and recoloring it would report a tool that does
 // not exist.
-func TestAnAdaptiveColourAnswersDark(t *testing.T) {
+func TestAnAdaptiveColorAnswersDark(t *testing.T) {
 	c := lipgloss.AdaptiveColor{Light: "#1f2328", Dark: "#e6edf3"}
 	if got := Hex(c); got != "#e6edf3" {
 		t.Errorf("Hex(adaptive) = %s, want the dark value", got)
@@ -103,13 +103,13 @@ func TestValueIsWhatWasWritten(t *testing.T) {
 }
 
 // Every role must convert, or the design system draws a black square where a
-// colour should be.
-func TestEveryRoleHasAColour(t *testing.T) {
+// color should be.
+func TestEveryRoleHasAColor(t *testing.T) {
 	for _, r := range Default.Roles() {
 		// Empty, not "#000000": index 0 is a real role now, so a sentinel that
 		// collides with a real answer would pass over a broken one.
 		if hex := Hex(r.Color); hex == "" {
-			t.Errorf("%s (%s) has no colour", r.Name, r.Color)
+			t.Errorf("%s (%s) has no color", r.Name, r.Color)
 		}
 		if r.Why == "" {
 			t.Errorf("%s has no reason for existing — that is what makes it a role", r.Name)

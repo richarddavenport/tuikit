@@ -47,9 +47,9 @@ type Meter struct {
 
 	// Pixels asks for a smooth bar where the terminal can draw one.
 	//
-	// A bool rather than a colour, deliberately. The gradient comes from the
+	// A bool rather than a color, deliberately. The gradient comes from the
 	// canvas, which read it from the terminal's own palette — so a component
-	// says WHETHER it wants a picture and never WHAT COLOUR, which is the same
+	// says WHETHER it wants a picture and never WHAT COLOR, which is the same
 	// arrangement the nine roles give the characters. A component that could
 	// pass its own gradient is a component that can escape the theme.
 	Pixels bool
@@ -92,7 +92,7 @@ func (m Meter) Draw(c *Canvas, r Rect, id ID) int {
 	}
 
 	// Offered after the characters are already down. The canvas declines on a
-	// terminal that cannot draw it, and the rasteriser is never even called.
+	// terminal that cannot draw it, and the rasterizer is never even called.
 	if m.Pixels {
 		ramp := c.Ramp()
 		value := clamp01(m.Value)
@@ -104,8 +104,8 @@ func (m Meter) Draw(c *Canvas, r Rect, id ID) int {
 }
 
 // trackTint is the unfilled remainder: the ramp's own start, mostly
-// transparent. Derived rather than configured, because a track colour that
-// does not belong to the ramp is a tenth colour role nobody named.
+// transparent. Derived rather than configured, because a track color that
+// does not belong to the ramp is a tenth color role nobody named.
 func trackTint(r paint.Ramp) color.RGBA {
 	c := r.From
 	c.A = 60

@@ -24,11 +24,11 @@ import (
 var Epoch = time.Date(2026, 8, 31, 9, 14, 3, 0, time.UTC)
 
 // State is what a service is doing. The four are chosen to exercise the
-// palette: each maps to a colour role, and together they cover every one a
+// palette: each maps to a color role, and together they cover every one a
 // status can take.
 type State int
 
-// The four states, each mapping to a colour role, together covering every one
+// The four states, each mapping to a color role, together covering every one
 // a status line can take.
 const (
 	Running State = iota

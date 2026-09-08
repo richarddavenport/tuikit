@@ -76,7 +76,7 @@ Of the top 80 TUI repos, excluding the libraries themselves:
 **The first correction to the earlier doc: a cell buffer is not distinctive.**
 It is the majority position in the field and has been since termbox. Bubble
 Tea's `View() string` is the *outlier*, and the previous survey mistook the
-outlier's neighbourhood for the world.
+outlier's neighborhood for the world.
 
 ## The finding that survives
 
@@ -87,13 +87,13 @@ runs once and throws the mapping away; the click handler runs the layout a
 second time, by hand, and the two are kept in agreement by the author's
 attention. It is the same defect in five codebases.
 
-**cursive** — `Button` centres its label in `draw`:
+**cursive** — `Button` centers its label in `draw`:
 
 ```rust
 let offset = HAlign::Center.get_offset(self.label.width(), printer.size.x);
 ```
 
-and centres it again, separately, in `on_event`:
+and centers it again, separately, in `on_event`:
 
 ```rust
 let self_offset = HAlign::Center.get_offset(width, self.last_size.x);
@@ -240,10 +240,10 @@ Against 903 repos rather than five:
    `guard.Engine`, `guard.Reachable`. Nothing in 903 repos has a glyph
    allow-list or a reachability check. tview has no tests at all; ratatui has
    `clippy.toml` and `typos.toml`, which police the source, not the frame.
-4. **Semantic colour roles.** Weaker than claimed. cursive's `PaletteStyle` (13
+4. **Semantic color roles.** Weaker than claimed. cursive's `PaletteStyle` (13
    named roles, themable) and tview's `Theme` (11) are real palettes. Ours is
    distinguished by being *load-bearing* — `guard.Tokens` fails a build that
-   writes a raw colour — not by existing.
+   writes a raw color — not by existing.
 5. **Extracted from four production tools.** Every framework here is a framework
    first. lazygit and dive are the opposite — applications that never extracted.
    Nobody is standing where we are.

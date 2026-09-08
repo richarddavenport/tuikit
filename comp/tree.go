@@ -140,7 +140,7 @@ func (t *Tree) Toggle(key string) {
 //
 // The marker is the TOOL's, not this type's: ▸ and ▾ are one choice, + and -
 // are another, and a file manager that wants neither should not have to accept
-// one. [Row.Lead] is where it goes, and [Row.LeadStyle] keeps its colour under
+// one. [Row.Lead] is where it goes, and [Row.LeadStyle] keeps its color under
 // the selection.
 func (t *Tree) IsCollapsed(key string) bool { return t.Collapsed[key] }
 

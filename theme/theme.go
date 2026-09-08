@@ -1,4 +1,4 @@
-// Package theme is what a tuikit interface is allowed to look like: the colour
+// Package theme is what a tuikit interface is allowed to look like: the color
 // roles it may use, and the characters it may print.
 //
 // It exists as its own package for two reasons, both learned in the deploy
@@ -17,11 +17,11 @@ package theme
 
 import "github.com/charmbracelet/lipgloss"
 
-// Palette is the closed set of colour roles an interface draws with.
+// Palette is the closed set of color roles an interface draws with.
 //
 // Naming is by ROLE, never by hue. "Accent" survives someone deciding the
 // interface should be blue; "pink" does not. A raw index also says what a
-// colour IS instead of what it is FOR, which is how one value came to mean
+// color IS instead of what it is FOR, which is how one value came to mean
 // both "title" and "focused border" without anyone choosing that they move
 // together.
 //
@@ -29,7 +29,7 @@ import "github.com/charmbracelet/lipgloss"
 // a Palette from scratch, because the point of the set being closed is that
 // nine decisions is the whole vocabulary.
 //
-// # Why the colours are an interface
+// # Why the colors are an interface
 //
 // A role holds a lipgloss.TerminalColor rather than a lipgloss.Color, so a
 // tool may supply an AdaptiveColor and have its interface read on a light
@@ -39,11 +39,11 @@ import "github.com/charmbracelet/lipgloss"
 // working in daylight.
 //
 // Depth and adaptation are different questions. Decision 13 chose ANSI 256
-// over truecolour because ssh decides the profile; that is about how many
-// colours there are. Which of them to use on a pale background is a separate
+// over truecolor because ssh decides the profile; that is about how many
+// colors there are. Which of them to use on a pale background is a separate
 // decision, and one a design system has no business taking for a tool.
 type Palette struct {
-	// Accent is the interface's own colour: titles, the selected row, the
+	// Accent is the interface's own color: titles, the selected row, the
 	// focused panel's border. It marks WHERE YOU ARE, which is why the same
 	// value carries all three.
 	Accent lipgloss.TerminalColor
@@ -59,14 +59,14 @@ type Palette struct {
 	// you", distinct from both the running value and an error.
 	Pending lipgloss.TerminalColor
 	// Danger is a refusal, an error, or a guarded environment. It is never
-	// decoration: something coloured Danger is something that stopped or will.
+	// decoration: something colored Danger is something that stopped or will.
 	Danger lipgloss.TerminalColor
 	// Stderr marks a log line from stderr. Distinct from Danger on purpose —
-	// most programs write ordinary progress to stderr, and colouring that as a
+	// most programs write ordinary progress to stderr, and coloring that as a
 	// failure would make every run look broken.
 	Stderr lipgloss.TerminalColor
 	// SelectionFG and SelectionBG are the one place the interface paints a
-	// background: the selected row of a table, where a foreground colour alone
+	// background: the selected row of a table, where a foreground color alone
 	// cannot be seen against the surrounding rows.
 	SelectionFG lipgloss.TerminalColor
 	SelectionBG lipgloss.TerminalColor
@@ -75,7 +75,7 @@ type Palette struct {
 	//
 	// It exists because the alternative is worse: a tool that needs a tenth
 	// meaning and cannot name it reaches for a literal instead, and the guard
-	// that keeps colours honest is the first casualty. Adding one should still
+	// that keeps colors honest is the first casualty. Adding one should still
 	// feel like a decision — if it is a shade of an existing role rather than a
 	// different meaning, it is not one.
 	Extra []Role
@@ -85,9 +85,9 @@ type Palette struct {
 // gets unless it says otherwise.
 //
 // Values are the FIRST SIXTEEN ANSI indices, and the sixteen are the whole
-// point: they are the only colours a terminal lets its user redefine.
+// point: they are the only colors a terminal lets its user redefine.
 //
-// Everything from 16 up is a fixed formula — a 6x6x6 cube and a grey ramp —
+// Everything from 16 up is a fixed formula — a 6x6x6 cube and a gray ramp —
 // identical in every terminal and untouched by every theme. A palette built
 // from those indices looks the same under gruvbox, tokyo-night and solarized,
 // which is another way of saying it ignores what the reader chose. This
@@ -96,7 +96,7 @@ type Palette struct {
 //
 // The sixteen are already semantic, which is what makes this a mapping rather
 // than a guess. Terminal themes agree that 0 is the background and 7 the
-// foreground; 8 is the dimmed grey comments are drawn in; 15 is the brightest
+// foreground; 8 is the dimmed gray comments are drawn in; 15 is the brightest
 // text. Omarchy's templates say so literally — `palette = 0={{ background }}`,
 // `palette = 8={{ muted }}` — and every other theme system does the same thing
 // under other names.
@@ -114,17 +114,17 @@ type Palette struct {
 //
 // # What this costs
 //
-// One grey. Muted and Border are the same index, where they used to be 241 and
+// One gray. Muted and Border are the same index, where they used to be 241 and
 // 240 — one step apart on the ramp and near-indistinguishable anyway.
 //
 // And the accent is the terminal's magenta rather than the theme's own accent
-// colour, because ANSI has no accent slot. A tool that wants the real one
+// color, because ANSI has no accent slot. A tool that wants the real one
 // reads it from wherever its desktop keeps it and overrides the role; that is
 // what Extra and a plain assignment are for.
 var Default = Palette{
 	Accent:      lipgloss.Color("13"), // bright magenta
-	Muted:       lipgloss.Color("8"),  // the dimmed grey — literally named muted
-	Border:      lipgloss.Color("8"),  // the same grey; see above
+	Muted:       lipgloss.Color("8"),  // the dimmed gray — literally named muted
+	Border:      lipgloss.Color("8"),  // the same gray; see above
 	Success:     lipgloss.Color("2"),  // green
 	Pending:     lipgloss.Color("3"),  // yellow
 	Danger:      lipgloss.Color("1"),  // red
@@ -145,7 +145,7 @@ type Role struct {
 // the order the tool declared them.
 //
 // The Why text describes the ROLE, not the hue, so it survives a tool
-// recolouring the palette — which is the whole reason roles are named.
+// recoloring the palette — which is the whole reason roles are named.
 func (p Palette) Roles() []Role {
 	return append([]Role{
 		{"Accent", p.Accent, "titles, the selected row, the focused panel's border — where you are"},

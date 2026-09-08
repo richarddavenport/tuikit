@@ -24,7 +24,7 @@ func TestRampEndsAndMiddle(t *testing.T) {
 	}
 }
 
-// TestRampClamps: a caller a pixel off the end should get the end colour, not
+// TestRampClamps: a caller a pixel off the end should get the end color, not
 // the opposite one.
 func TestRampClamps(t *testing.T) {
 	if got := ramp.At(-3); got != ramp.From {
@@ -56,7 +56,7 @@ func TestRoundedCornersAreTransparent(t *testing.T) {
 		t.Errorf("corner alpha = %d, want 0", a)
 	}
 	if a := img.RGBAAt(20, 10).A; a != 255 {
-		t.Errorf("centre alpha = %d, want 255", a)
+		t.Errorf("center alpha = %d, want 255", a)
 	}
 	// The arc is antialiased rather than stepped, so somewhere along it there
 	// is a partial pixel.
@@ -100,7 +100,7 @@ func TestBarsAreDrawn(t *testing.T) {
 }
 
 // TestDefaultBarsAreVisible. The first version defaulted to the ramp's own end
-// colour, which on a panel filled with that same ramp is very nearly the
+// color, which on a panel filled with that same ramp is very nearly the
 // background — bars that are technically drawn and cannot be seen.
 func TestDefaultBarsAreVisible(t *testing.T) {
 	plain := paint.Panel{W: 60, H: 30, Ramp: ramp}.Image()

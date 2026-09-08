@@ -101,7 +101,7 @@ is deliberately still open.
 `comp` cannot do something → a tool files an issue here. This is the other
 direction, and it needs its own mechanism because there is no upgrade event to
 attach one to: a tool resolves tuikit through `replace => ../tuikit`, so a pull
-here changes its behaviour with no version to bump and nothing to read.
+here changes its behavior with no version to bump and nothing to read.
 
 `design/decisions.md` is the marker. It is numbered and append-only, and a tool
 records the number it has reconciled with:

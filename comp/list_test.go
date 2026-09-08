@@ -12,9 +12,9 @@ import (
 	"github.com/richarddavenport/tuikit/theme"
 )
 
-// uncoloured strips SGR sequences. Local rather than harness.Strip, because
+// uncolored strips SGR sequences. Local rather than harness.Strip, because
 // harness imports comp and a test cannot import it back.
-var uncoloured = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+var uncolored = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
 const services Name = "services"
 
@@ -214,7 +214,7 @@ func TestAListInNoRoomDrawsNothing(t *testing.T) {
 }
 
 func TestTheCursorRowIsStyledByFocus(t *testing.T) {
-	forceColour()
+	forceColor()
 	selected := lipgloss.NewStyle().Background(lipgloss.Color("57"))
 	unfocused := lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
@@ -318,11 +318,11 @@ func TestTheWheelStillDoesNotSnapBackAfterAResizeRule(t *testing.T) {
 	}
 }
 
-// A row can be more than one colour: a name with a dim count after it, a
+// A row can be more than one color: a name with a dim count after it, a
 // timestamp then a message. democtl and the cloud tool both had to draw their
 // own lists for want of this.
 func TestARowCanBeSeveralStyles(t *testing.T) {
-	forceColour()
+	forceColor()
 	dim := lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
 	accent := lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
@@ -335,7 +335,7 @@ func TestARowCanBeSeveralStyles(t *testing.T) {
 
 	got := c.String()
 	if !strings.Contains(got, "38;5;205") || !strings.Contains(got, "38;5;241") {
-		t.Errorf("the spans did not keep their own colours: %q", got)
+		t.Errorf("the spans did not keep their own colors: %q", got)
 	}
 	if !strings.Contains(harnessStrip(got), "rg-forge 5") {
 		t.Errorf("got %q", got)
@@ -343,10 +343,10 @@ func TestARowCanBeSeveralStyles(t *testing.T) {
 }
 
 // The selection paints over them. The cursor is the reader's own mark, and a
-// row that kept its colours under it would be hard to find in exactly the list
+// row that kept its colors under it would be hard to find in exactly the list
 // where finding it matters.
-func TestTheSelectedRowIsOneColourWhateverItsSpansSay(t *testing.T) {
-	forceColour()
+func TestTheSelectedRowIsOneColorWhateverItsSpansSay(t *testing.T) {
+	forceColor()
 	dim := lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
 	selected := lipgloss.NewStyle().Background(lipgloss.Color("57"))
 
@@ -359,7 +359,7 @@ func TestTheSelectedRowIsOneColourWhateverItsSpansSay(t *testing.T) {
 
 	first := strings.Split(c.String(), "\n")[0]
 	if strings.Contains(first, "38;5;241") {
-		t.Errorf("the selected row kept a span's colour: %q", first)
+		t.Errorf("the selected row kept a span's color: %q", first)
 	}
 	if !strings.Contains(first, "48;5;57") {
 		t.Errorf("the selected row is not painted: %q", first)
@@ -381,7 +381,7 @@ func harnessStrip(s string) string {
 	return b.String()
 }
 
-// A list whose selection is a CHARACTER, not only a colour.
+// A list whose selection is a CHARACTER, not only a color.
 //
 // comp.Form has had a cursor marker since it was written and a List did not,
 // which the cloud tool's migration found the hard way: its resource rows are
@@ -405,7 +405,7 @@ func TestAListCanMarkItsCursor(t *testing.T) {
 	}
 }
 
-// A list without one is unchanged: most selections are a colour.
+// A list without one is unchanged: most selections are a color.
 func TestAListWithoutAMarkerDrawsNoIndent(t *testing.T) {
 	l := &List{Name: services}
 	c := draw(l, 24, 6, 3)
@@ -460,7 +460,7 @@ func TestTheIndentComesFromChrome(t *testing.T) {
 //
 // Which matters because such a list otherwise carried its selection entirely
 // in Selected's background — invisible in a pipe, in a golden, and to a reader
-// who cannot see colour.
+// who cannot see color.
 func TestAMarkAndALeadBothGetADrawn(t *testing.T) {
 	c := NewCanvas(30, 4)
 	l := &List{Name: services, Marker: "> ", Blank: "  "}
@@ -750,13 +750,13 @@ func TestAnUnmarkedListIsUnchanged(t *testing.T) {
 	}
 }
 
-// A glyph that IS the state keeps its colour on the selected row.
+// A glyph that IS the state keeps its color on the selected row.
 //
 // From issue 44, and from a person: "when highlighting I can't see the color
-// of the dot." A selected row is otherwise one colour whatever its spans say,
+// of the dot." A selected row is otherwise one color whatever its spans say,
 // which is right for a label and wrong for a status glyph — the one row a
 // reader is looking at became the one row whose status they could not read.
-func TestALeadKeepsItsColourWhenTheRowIsSelected(t *testing.T) {
+func TestALeadKeepsItsColorWhenTheRowIsSelected(t *testing.T) {
 	lipgloss.SetColorProfile(termenv.TrueColor)
 
 	green := lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
@@ -770,10 +770,10 @@ func TestALeadKeepsItsColourWhenTheRowIsSelected(t *testing.T) {
 
 	out := c.String()
 	if !strings.Contains(out, green.Render("●")) {
-		t.Errorf("the state glyph lost its colour under the selection:\n%q", out)
+		t.Errorf("the state glyph lost its color under the selection:\n%q", out)
 	}
 	// The label still takes the selection — this must not become "every row
-	// keeps its own colours", which is the change that makes a cursor hard to
+	// keeps its own colors", which is the change that makes a cursor hard to
 	// find in exactly the list where finding it matters.
 	if !strings.Contains(out, "local") {
 		t.Fatal("the label was not drawn")
@@ -818,7 +818,7 @@ func TestAStyledLeadDoesNotMoveTheText(t *testing.T) {
 	rows[0].LeadStyle = &green
 	(&List{Name: "a"}).Draw(styled, Rect{X: 0, Y: 0, W: 20, H: 4}, rows)
 
-	if uncoloured.ReplaceAllString(styled.String(), "") != uncoloured.ReplaceAllString(plain.String(), "") {
+	if uncolored.ReplaceAllString(styled.String(), "") != uncolored.ReplaceAllString(plain.String(), "") {
 		t.Errorf("styling a lead moved the row:\n%q\n%q", styled.String(), plain.String())
 	}
 }
@@ -1083,7 +1083,7 @@ func TestMovingWithoutExtendingDropsTheRange(t *testing.T) {
 
 // A row with its own lead still gets the cursor's marker. It used to get one
 // or the other, so a list with a status glyph had no cursor at all once the
-// colour was stripped.
+// color was stripped.
 func TestALeadDoesNotSwallowTheMarker(t *testing.T) {
 	c := NewCanvas(30, 4)
 	l := &List{Name: services, Marker: "> ", Blank: "  ", Focused: true, NoStatus: true}
@@ -1139,7 +1139,7 @@ func TestAStatusColumnSurvivesTheIndent(t *testing.T) {
 	}
 	c := NewCanvas(40, 4)
 	l.Draw(c, c.Bounds(), rows)
-	lines := strings.Split(uncoloured.ReplaceAllString(c.String(), ""), "\n")
+	lines := strings.Split(uncolored.ReplaceAllString(c.String(), ""), "\n")
 
 	// Every status letter in the same column, whatever the depth.
 	col := -1
@@ -1192,7 +1192,7 @@ func TestRowIndentReplacesTheDepthSpaces(t *testing.T) {
 	}
 	c := NewCanvas(40, 4)
 	l.Draw(c, c.Bounds(), rows)
-	frame := uncoloured.ReplaceAllString(c.String(), "")
+	frame := uncolored.ReplaceAllString(c.String(), "")
 
 	if !strings.Contains(frame, "├─b") {
 		t.Errorf("no branch before the middle child:\n%s", frame)
@@ -1272,7 +1272,7 @@ func TestADeletedKeyFallsBackToTheIndex(t *testing.T) {
 		t.Errorf("cursor at %d with %d rows", l.Cursor(), len(after))
 	}
 	if got := after[l.Cursor()].Key; got != "c" {
-		t.Errorf("cursor on %q after b was deleted, want c — its neighbour", got)
+		t.Errorf("cursor on %q after b was deleted, want c — its neighbor", got)
 	}
 }
 

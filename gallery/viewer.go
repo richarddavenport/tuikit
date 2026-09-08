@@ -28,8 +28,8 @@ func (m *Model) viewerEntry(s *styles) Entry {
 		{Text: " }"},
 	}
 
-	// One line, coloured in pieces, so the cursor can be shown sitting on it
-	// without eating the colours.
+	// One line, colored in pieces, so the cursor can be shown sitting on it
+	// without eating the colors.
 	code := []comp.Line{
 		{Spans: []comp.Segment{
 			{Text: "func ", Style: &s.title}, {Text: "under"},
@@ -74,7 +74,7 @@ func (m *Model) viewerEntry(s *styles) Entry {
 	return Entry{
 		Name: "Viewer",
 		Summary: "A document you scroll, look through, and act on ranges of. " +
-			"Opens at the top, does not follow, and keeps its colours under the cursor.",
+			"Opens at the top, does not follow, and keeps its colors under the cursor.",
 		From: "seven of the fourteen tools surveyed each built this and none could get it " +
 			"from their toolkit — lazygit, gitui, k9s, fx, termshark, dive, gh-dash",
 		Keys: []comp.Hint{
@@ -87,7 +87,7 @@ func (m *Model) viewerEntry(s *styles) Entry {
 		Roles:  []string{"SelectionBG", "Accent", "Muted"},
 		Glyphs: []string{},
 		States: []State{
-			{Name: "a diff", Note: "the cursor is a background and the line keeps its own colour — a List would repaint the whole row and lose it",
+			{Name: "a diff", Note: "the cursor is a background and the line keeps its own color — a List would repaint the whole row and lose it",
 				Draw: view(func(v *comp.Viewer) { v.Goto(5) }, diff, true)},
 			{Name: "a range", Note: "shift-arrow, for staging a hunk or copying a span; ordered, so the caller never asks which way it was dragged",
 				Draw: view(func(v *comp.Viewer) { v.Goto(2); v.Extend(2) }, diff, true)},

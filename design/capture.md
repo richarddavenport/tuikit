@@ -48,7 +48,7 @@ read to see what I just changed.
 
 A binary in the module that opens a real TUI of every component: pane, tabs,
 table, filtered list, log pane, step list, form, confirm, toast, spinner, key
-hint bar — each with its variants and states, its keybindings, and the colour
+hint bar — each with its variants and states, its keybindings, and the color
 roles and glyphs it draws with.
 
 Not a static component sheet. A sheet tells you what exists; a running gallery
@@ -65,22 +65,22 @@ and the demo tool are close relatives.
 **This is no longer speculative.** The database tool shipped a working
 prototype on 2026-08-31 — a 308-line capture test producing 17 frames, whose
 commit message is "Capture the UI's frames, and fix the three bugs that found".
-tuikit's `harness` is a generalisation of that, not an invention.
+tuikit's `harness` is a generalization of that, not an invention.
 
 Note what it is *not*: the deploy tool's own `capture.go` is **log**
 capture. Screen capture existed nowhere until the database tool.
 
 ### What the prototype established
 
-**Forcing the colour profile is the whole trick.** A test has no TTY, so lipgloss
-strips every colour and you capture a grey rectangle:
+**Forcing the color profile is the whole trick.** A test has no TTY, so lipgloss
+strips every color and you capture a gray rectangle:
 
 ```go
 lipgloss.SetColorProfile(termenv.TrueColor)
 lipgloss.SetHasDarkBackground(true)
 ```
 
-This does not conflict with "indices, not truecolour" — the theme's *values*
+This does not conflict with "indices, not truecolor" — the theme's *values*
 stay palette indices, which is what ships. Forcing the TrueColor *profile* only
 stops lipgloss from discarding them on a pipe.
 
@@ -112,7 +112,7 @@ ordinary `go test ./...` skips them:
 PGCTL_SCREENSHOT_DIR=/tmp/shots go test ./internal/tui/ -run CaptureScreens
 ```
 
-tuikit standardises this and also exposes it from the binary, so an agent needs
+tuikit standardizes this and also exposes it from the binary, so an agent needs
 no test invocation: `tool tui --snapshot out/ --script keys.txt`.
 
 ### What capture is actually for
@@ -136,21 +136,21 @@ compared against index 0 instead of the running maximum, so it picked vpic
 ### What tuikit adds on top
 
 - **`guard.Width`** — the invariant the database tool now tests by hand
-  (`lipgloss.Width(line) > m.width`) generalised: every screen and every modal,
+  (`lipgloss.Width(line) > m.width`) generalized: every screen and every modal,
   rendered at 80 / 100 / 132 columns, failing on any line wider than the
   terminal. Overflow is a whole *class* of bug and two of the three found were
   instances of it.
 - **ANSI → HTML, written once.** The prototype hit a real trap: an
   escape-stripping regex over `[A-Za-z]` eats the `m` that terminates every SGR
-  sequence, so it strips the colour it is meant to preserve. That belongs in a
+  sequence, so it strips the color it is meant to preserve. That belongs in a
   library with a test, not re-derived per repo.
-- **Text goldens.** The ANSI files are already diffable; stripped of colour they
+- **Text goldens.** The ANSI files are already diffable; stripped of color they
   are golden files, and `harness.Golden(t, ...)` makes a layout regression an
   ordinary test failure. 23k lines of tests across the four repos and not one
   asserts on a rendered frame.
 - **A frame log** — one entry per keystroke, so a whole flow is reviewable rather
   than a screen at a time.
-- **Labelled provenance.** Every frame declares whether it is live or composed.
+- **Labeled provenance.** Every frame declares whether it is live or composed.
 the database tool marked the snapshot-manifest and plan/run frames composed
 because no production snapshot exists on that machine. A page of frames that
 quietly mixes the two is a page that misreports the tool.
@@ -161,7 +161,7 @@ quietly mixes the two is a page that misreports the tool.
 right and that tuikit should encode rather than leave to judgement:
 
 1. **Frames keep a dark ground in both light and dark themes.** The ANSI was
-   captured for a dark terminal; recolouring it reports colours the tool does not
+   captured for a dark terminal; recoloring it reports colors the tool does not
    have.
 2. **System monospace stack, no webfont.** Box-drawing and braille glyphs must
    share one set of advance widths. A webfont plus a fallback for the glyphs it
@@ -186,7 +186,7 @@ rule that a frame no group named still appears. Two copies of that loop is how
 one format grows the bug the other fixed.
 
 **The images are SVG, and that is a decision rather than a default.** A PNG
-needs a rasteriser, which needs a typeface, which is the open question in
+needs a rasterizer, which needs a typeface, which is the open question in
 decision 30 — writing documentation is the wrong reason to answer it. SVG names
 the same system monospace stack the page does and lets the reader's machine
 draw, so it needs no typeface of its own, keeps the text greppable, and scales.
@@ -199,6 +199,6 @@ Two properties it has to hold that a naive SVG writer does not:
   `spacingAndGlyphs` would hit the width by distorting the glyphs, which bends
   the box-drawing characters instead of moving them.
 - **No `<style>` element.** An SVG referenced from Markdown is rendered through
-  a sanitiser, and a stripped stylesheet leaves a frame that is all one colour
+  a sanitiser, and a stripped stylesheet leaves a frame that is all one color
   with no error to explain it. Presentation attributes survive; a stylesheet is
   a bet.

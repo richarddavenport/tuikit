@@ -1,6 +1,6 @@
 // Package ui is democtl's interface.
 //
-// It is written the way a tuikit tool is written today: every colour comes from
+// It is written the way a tuikit tool is written today: every color comes from
 // a theme.Palette, every non-ASCII character from a theme.GlyphSet, and
 // guard_test.go holds both closed. There is no component library yet, so the
 // panes here are hand-drawn — and that is deliberate. tuikit's comp package will

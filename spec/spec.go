@@ -5,7 +5,7 @@
 // the regions it targets. None of the four can drift from the others, because
 // there is only one of them.
 //
-// That is the idea the whole framework is organised around. Four tools have
+// That is the idea the whole framework is organized around. Four tools have
 // four copies of the same command described four times — in a cobra tree, in a
 // keymap, in a footer string, and in a README — and the copies disagree. Not
 // dramatically: a flag renamed in one place, a key that does something

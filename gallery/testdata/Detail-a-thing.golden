@@ -3,7 +3,7 @@ tuikit gallery  every component, running                                        
 ┌───────────────────────────────┐ ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ Components                    │ │ Detail                                                                                         │
 │ List                          │ │ What a pane says about the one thing you have selected.                                        │
-│ Pane                          │ │ ‹ a thing · a value with its own colour · a secret · revealed · prose · no room ›              │
+│ Pane                          │ │ ‹ a thing · a value with its own color · a secret · revealed · prose · no room ›               │
 │ Tabs                          │ │ labels line up per BLOCK, so a long tag key does not drag the facts above it wide              │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ vm-forge-0                                                                                     │

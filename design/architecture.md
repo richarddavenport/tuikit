@@ -9,7 +9,7 @@ Four tools now share a shape: the deploy tool (65k lines), the database tool
 (11k), the disk tool (3.8k), the cloud tool (3.2k). Each has `cmd/` +
 `internal/engine` + `internal/tui` + `internal/cli`, bubbletea and lipgloss, a
 `design/` directory, a Makefile with `## target:` self-help and ldflags version
-stamping. The cloud tool's own notes say it is "modelled on the deploy tool's
+stamping. The cloud tool's own notes say it is "modeled on the deploy tool's
 engine/tui/cli split"; the disk tool's say its project infrastructure was
 "ported from the deploy tool".
 
@@ -39,7 +39,7 @@ spec.Command{
 - **TUI** — a screen with the standard pane chrome, keymap, and async
   conventions already wired.
 - **Manifest** — `tool describe --json` emits every command, flag, screen, key
-  binding, colour role and glyph. An agent reads the tool's whole surface in one
+  binding, color role and glyph. An agent reads the tool's whole surface in one
   call instead of grepping for it.
 
 The third surface is the point. It is what "agents understand it out of the
@@ -50,11 +50,11 @@ gate" actually means in practice.
 Lifted wholesale from the deploy tool's `internal/tui/theme`, which already
 solved this and wrote down why:
 
-- **Nine colour roles** — `Accent`, `Muted`, `Border`, `Danger`, `Pending`,
+- **Nine color roles** — `Accent`, `Muted`, `Border`, `Danger`, `Pending`,
   `Success`, `Stderr`, `SelectionBG`, `SelectionFG`. The terminal's own sixteen
   ANSI indices — the only ones a theme can redefine (decision 28) — not
-  truecolour hex, "because that is what a terminal understands and what every
-  terminal has agreed on; a truecolour hex would look right on this machine and
+  truecolor hex, "because that is what a terminal understands and what every
+  terminal has agreed on; a truecolor hex would look right on this machine and
   wrong over ssh from another." Named by role, never by hue.
 - **A glyph allow-list** — every non-ASCII character the interface may print,
   each with a note on why it is safe.
@@ -121,7 +121,7 @@ All mechanism. Nothing here decides when it runs.
 | `app` | The bubbletea shell: screen router, focus model, the async conventions as *types* rather than prose — generation counters, single-flight polling, bounded poll failure, the `capturesKeys()` mode split. |
 | `spec` | Command declarations → CLI + TUI screen + manifest. stdlib `flag`, no cobra. |
 | `guard` | `Tokens`, `Glyphs`, and a `Screens` check that every screen constant has a `View()` case. |
-| `harness` | Headless drive, deterministic frames, golden tests, ANSI capture, ANSI→HTML. Generalised from the database tool's capture test. |
+| `harness` | Headless drive, deterministic frames, golden tests, ANSI capture, ANSI→HTML. Generalized from the database tool's capture test. |
 | `docgen` | Manifest → mkdocs-material site, and a capture directory → a frames page. Docs cannot drift from the code. |
 | `cmd/tuikit` | `new` (scaffold), `watch` (recapture on save, serve, reload), `gallery` (the running component browser). |
 | `safety` | `secret: true` scrubbing; the `assert` primitive that runs under `--dry-run`; protected-environment refusal. Both learned the hard way in the cloud tool. |

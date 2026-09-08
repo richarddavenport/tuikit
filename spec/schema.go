@@ -42,7 +42,7 @@ type Property struct {
 // SchemaOf builds the schema for a command.
 //
 // Arguments and flags share one property map, because a caller that is not a
-// shell has no positional/named distinction to honour — it has a bag of named
+// shell has no positional/named distinction to honor — it has a bag of named
 // values. Required covers the arguments a command cannot run without; a flag
 // is never required, which is what makes it a flag.
 //
@@ -73,7 +73,7 @@ func SchemaOf(cmd Command) Schema {
 	}
 
 	// Sorted, because a schema that reorders itself between runs is one nobody
-	// can diff — and an agent's cache key is usually the serialised schema.
+	// can diff — and an agent's cache key is usually the serialized schema.
 	sort.Strings(s.Required)
 	return s
 }

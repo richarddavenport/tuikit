@@ -96,7 +96,7 @@ func underPrefix(path, prefix string) bool {
 // because it was checking the renderer against a world invented three hundred
 // lines away in the same file.
 //
-// Four bugs shipped past 72 goldens, a colour check and a narrow-terminal run.
+// Four bugs shipped past 72 goldens, a color check and a narrow-terminal run.
 // Three of them for this reason.
 //
 // The compounding part is the worst of it: a hand-made fixture makes a wrong

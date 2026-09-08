@@ -21,7 +21,7 @@ import (
 // are properties of terminal frames rather than editorial choices:
 //
 //   - The frames keep a DARK ground in both light and dark themes. The ANSI was
-//     captured for a dark terminal; recolouring it reports colours the tool does
+//     captured for a dark terminal; recoloring it reports colors the tool does
 //     not have.
 //   - The system monospace stack, with no webfont. Box-drawing and braille must
 //     share one set of advance widths, and a webfont plus a fallback for the
@@ -91,7 +91,7 @@ func (f Frames) Page(dir string) (string, error) {
 	}
 	fmt.Fprintf(&b, "<p class=\"facts\">%d frames · %d&#215;%d</p>\n", len(manifest.Frames), manifest.Width, manifest.Height)
 
-	// The page cannot ask the reader's terminal what its sixteen colours are, so
+	// The page cannot ask the reader's terminal what its sixteen colors are, so
 	// it renders them as xterm's defaults — and until it said so, it was
 	// documenting a themeable tool in a palette nobody sees. A reviewer running
 	// Ghostty's Adventure theme said "mine is brown, not like the review", and
@@ -100,13 +100,13 @@ func (f Frames) Page(dir string) (string, error) {
 	// page like this one (issue 52).
 	//
 	// Said on the page rather than fixed, because there is nothing to fix: the
-	// colours are the reader's and a static page has no way to know them. What
+	// colors are the reader's and a static page has no way to know them. What
 	// was broken was the page's silence about it.
-	b.WriteString("<p class=\"caveat\">The sixteen ANSI colours are drawn as " +
+	b.WriteString("<p class=\"caveat\">The sixteen ANSI colors are drawn as " +
 		"<strong>xterm's defaults</strong>, because a page cannot ask your terminal what " +
-		"yours are. This tool takes its colours from the terminal (decision 28), so the " +
+		"yours are. This tool takes its colors from the terminal (decision 28), so the " +
 		"shapes here are exact and the hues are not yours. Review layout in this page and " +
-		"colour in your own terminal.</p>\n</header>\n")
+		"color in your own terminal.</p>\n</header>\n")
 
 	for _, sec := range f.sections(manifest, byName) {
 		if err := writeGroup(&b, dir, sec.Title, sec.Lede, sec.Notes, byName); err != nil {

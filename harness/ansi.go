@@ -32,7 +32,7 @@ func Width(frame string) int {
 
 // Strip removes every escape sequence, leaving what a reader sees.
 //
-// This is what a golden holds. Colour is captured for looking at; a diff in a
+// This is what a golden holds. Color is captured for looking at; a diff in a
 // pull request wants the shape, and a golden full of escape sequences is a
 // golden nobody reads.
 //
@@ -40,7 +40,7 @@ func Width(frame string) int {
 // a test rather than a regex at each call site: an escape sequence is
 // terminated by a letter, and the SGR terminator is `m`. A stripper that ends a
 // sequence at any of [A-Za-z] therefore eats the `m` and leaves `[0;38;5;205`
-// behind — stripping exactly the colour it was meant to preserve, and leaving
+// behind — stripping exactly the color it was meant to preserve, and leaving
 // the digits on screen.
 func Strip(frame string) string {
 	var b strings.Builder
@@ -73,13 +73,13 @@ func Strip(frame string) string {
 	return b.String()
 }
 
-// HTML renders a frame as a self-contained block, colour intact.
+// HTML renders a frame as a self-contained block, color intact.
 //
 // Three rules the prototype settled, encoded here rather than left to whoever
 // publishes the page:
 //
 //   - The frame keeps a dark ground in both light and dark themes. The ANSI was
-//     captured for a dark terminal; recolouring it reports colours the tool does
+//     captured for a dark terminal; recoloring it reports colors the tool does
 //     not have.
 //   - The system monospace stack, with no webfont. Box-drawing and braille must
 //     share one set of advance widths, and a webfont plus a fallback for the
@@ -111,7 +111,7 @@ func HTML(frame string) string {
 //
 // Exported because a frame is written once and read by more than one renderer —
 // HTML for a page, SVG for a document that needs an image. Both need the same
-// answer to "what colour is this character", and two parsers would eventually
+// answer to "what color is this character", and two parsers would eventually
 // disagree about a frame neither of them drew.
 type Style struct {
 	FG, BG string
@@ -134,7 +134,7 @@ type Span struct {
 // is threaded through the lines rather than reset at each one, because it
 // carries in a terminal: a background left switched on at the end of a row
 // paints the start of the next. What does NOT carry is the run itself — a run
-// never straddles a newline, since a colour left open across one paints the
+// never straddles a newline, since a color left open across one paints the
 // page's margin rather than the frame's.
 //
 // Cursor movement and every other non-SGR sequence is dropped: a static frame
@@ -225,7 +225,7 @@ func (s Style) css() string {
 // apply folds one SGR sequence into the state.
 //
 // Only what a terminal interface emits is handled: reset, bold, the default
-// colours, and both extended colour forms. Anything else is ignored rather than
+// colors, and both extended color forms. Anything else is ignored rather than
 // guessed at.
 func (s sgr) apply(params string) sgr {
 	if params == "" {
@@ -272,12 +272,12 @@ func (s sgr) apply(params string) sgr {
 }
 
 // extended reads the tail of a 38 or 48 sequence: `5;N` for a palette index,
-// `2;R;G;B` for 24-bit. It returns the colour and how many fields it consumed.
+// `2;R;G;B` for 24-bit. It returns the color and how many fields it consumed.
 //
 // The 24-bit form is why this is a parser rather than a lookup. Reading the
 // fields of `38;2;255;95;175` one at a time and asking what each MEANS finds
-// 95 in the range of the bright-colour codes, and renders a hand-picked pink as
-// bright magenta — a plausible wrong colour, which nobody questions.
+// 95 in the range of the bright-color codes, and renders a hand-picked pink as
+// bright magenta — a plausible wrong color, which nobody questions.
 func extended(rest []string) (string, int) {
 	if len(rest) == 0 {
 		return "", 0

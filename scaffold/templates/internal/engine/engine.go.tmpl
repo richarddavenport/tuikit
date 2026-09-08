@@ -1,6 +1,6 @@
 // Package engine is <<.Name>>'s domain, and it has NO TERMINAL CONCEPTS AT ALL.
 //
-// No colour, no width, no keys, no framework, no tuikit import. In practice an
+// No color, no width, no keys, no framework, no tuikit import. In practice an
 // engine imports the standard library plus its own backend's SDK. The UI never
 // calls the backend directly; the CLI is a peer of the TUI over the same
 // engine.
@@ -18,7 +18,7 @@ import (
 )
 
 // State is what a thing is doing. Four, chosen to exercise the palette: each
-// maps to a colour role, and together they cover every one a status can take.
+// maps to a color role, and together they cover every one a status can take.
 type State int
 
 // The four states.

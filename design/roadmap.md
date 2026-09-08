@@ -17,7 +17,7 @@ vacuously.
    the harness can use it as a fixture. First real consumer of the guards. Its
    own frames found two bugs before the harness that will automate looking at
    them exists.
-3. **`harness`** ([#3](https://github.com/richarddavenport/tuikit/issues/3)) — generalise the database tool's `screenshot_probe_test.go`: fixture and
+3. **`harness`** ([#3](https://github.com/richarddavenport/tuikit/issues/3)) — generalize the database tool's `screenshot_probe_test.go`: fixture and
    live modes, ANSI capture, ANSI→HTML, `guard.Width`, goldens. Prove it against
    democtl, then against the deploy tool's existing screens.
 4. **`comp.Canvas`** ([#5](https://github.com/richarddavenport/tuikit/issues/5), needs [#4](https://github.com/richarddavenport/tuikit/issues/4) wide runes) — the cell-grid substrate, settled by the prototype on
@@ -26,7 +26,7 @@ vacuously.
    string cannot be clicked. See [mouse.md](mouse.md).
 5. **`tuikit watch`** ([#7](https://github.com/richarddavenport/tuikit/issues/7)) — the inner loop. Cheap once `harness` and `docgen` exist,
    and it is what makes everything after this pleasant to build.
-6. **`comp` + `app`** ([#8](https://github.com/richarddavenport/tuikit/issues/8), [#9](https://github.com/richarddavenport/tuikit/issues/9), gallery [#10](https://github.com/richarddavenport/tuikit/issues/10)) — extract components, generalising only where two of the
+6. **`comp` + `app`** ([#8](https://github.com/richarddavenport/tuikit/issues/8), [#9](https://github.com/richarddavenport/tuikit/issues/9), gallery [#10](https://github.com/richarddavenport/tuikit/issues/10)) — extract components, generalizing only where two of the
    four already differ meaningfully. **`tuikit gallery`** grows alongside: a
    component that is not in the gallery is not finished.
 7. **`spec`** ([#11](https://github.com/richarddavenport/tuikit/issues/11)) — declarations, CLI generation, manifest, completions.

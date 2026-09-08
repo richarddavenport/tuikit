@@ -66,15 +66,15 @@ Twenty-four. Run `tuikit gallery` to use every one in every state it has, or
 | --- | --- |
 | `List` | a cursor and rows. Viewport and selection are separate, so scrolling away does not move the cursor |
 | `LogPane` | tails a stream. Following is a place, not a mode: scroll up to detach, scroll back to re-attach |
-| `Viewer` | a document. Opens at the **top**, scrolls sideways, and puts the cursor style *under* the line's spans so a diff keeps its syntax colours |
+| `Viewer` | a document. Opens at the **top**, scrolls sideways, and puts the cursor style *under* the line's spans so a diff keeps its syntax colors |
 
 `List` can do:
 
 - **grouped rows.** `Row.Skip` marks a heading the cursor passes over.
 - **a lead glyph that survives the selection.** `Row.LeadStyle` keeps a status
-  colour readable on the row you are pointing at.
+  color readable on the row you are pointing at.
 - **a right-aligned tail.** `Row.Right`.
-- **rows in more than one colour.** `Row.Spans`.
+- **rows in more than one color.** `Row.Spans`.
 - **a range selection.** `Extend`, `Range`, `ClearRange`.
 - **rows produced on demand.** `DrawFunc` asks only for what is visible, so a
   million rows cost a frame the size of the pane.

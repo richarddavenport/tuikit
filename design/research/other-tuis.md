@@ -17,7 +17,7 @@ across fourteen GitHub queries, with the substrate read from each top repo's
 **Unverified** — every other language. Written from memory, with no pull behind
 it and deliberately no numbers. **Do not cite a figure from this section**;
 check it first. That is not caution for its own sake — issue 52 was somebody
-reading a colour off tuikit's own generated page and repeating it as fact, and
+reading a color off tuikit's own generated page and repeating it as fact, and
 an unverified list is the same trap with a longer fuse.
 
 Dates are when a row was last checked, not when the project last moved.

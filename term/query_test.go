@@ -34,18 +34,18 @@ func TestParseRGB(t *testing.T) {
 }
 
 // TestParseRGBSaysWhenItFound_Nothing is the distinction ParseBackground alone
-// cannot make: a terminal that answered with the default colour and a terminal
+// cannot make: a terminal that answered with the default color and a terminal
 // that did not answer are the same value.
 func TestParseRGBSaysWhenItFoundNothing(t *testing.T) {
 	for _, bad := range []string{"", "\x1b[?62;4c", "rgb:", "rgb:zz/00/00", "rgb:00/00", "rgb:12345/0/0"} {
 		if _, ok := term.ParseRGB(bad); ok {
-			t.Errorf("ParseRGB(%q) claimed to find a colour", bad)
+			t.Errorf("ParseRGB(%q) claimed to find a color", bad)
 		}
 	}
 	// And the default IS a legitimate answer, distinguishable from silence.
 	reply := "\x1b]11;rgb:1a1a/1a1a/1a1a\x1b\\"
 	if c, ok := term.ParseRGB(reply); !ok || c != term.DefaultBackground {
-		t.Errorf("a terminal answering exactly the default was not recognised: %v %v", c, ok)
+		t.Errorf("a terminal answering exactly the default was not recognized: %v %v", c, ok)
 	}
 }
 
@@ -67,7 +67,7 @@ func TestParseColors(t *testing.T) {
 
 	got := term.ParseColors(reply)
 	if len(got) != 2 {
-		t.Fatalf("got %d colours, want 2: %v", len(got), got)
+		t.Fatalf("got %d colors, want 2: %v", len(got), got)
 	}
 	if want := (color.RGBA{95, 0, 255, 255}); got[5] != want {
 		t.Errorf("index 5 = %v, want %v", got[5], want)

@@ -27,8 +27,8 @@ func TestTheSVGIsWellFormedXML(t *testing.T) {
 	}
 }
 
-// The colour has to survive, or the image reports a tool that draws in grey.
-func TestTheSVGCarriesTheColourThrough(t *testing.T) {
+// The color has to survive, or the image reports a tool that draws in gray.
+func TestTheSVGCarriesTheColorThrough(t *testing.T) {
 	out := SVG(frame(t))
 
 	pink := hexOf(lipgloss.Color("205"))
@@ -67,7 +67,7 @@ func TestEverySpanStatesItsWidth(t *testing.T) {
 }
 
 // No stylesheet. An SVG in a Markdown document is rendered by a sanitiser, and
-// a stripped <style> block leaves a frame that is all one colour with nothing
+// a stripped <style> block leaves a frame that is all one color with nothing
 // to say why.
 func TestTheSVGCarriesNoStylesheet(t *testing.T) {
 	if out := SVG(frame(t)); strings.Contains(out, "<style") {

@@ -10,7 +10,7 @@ import (
 	"github.com/richarddavenport/tuikit/theme"
 )
 
-func forceColour() {
+func forceColor() {
 	lipgloss.SetColorProfile(termenv.TrueColor)
 	lipgloss.SetHasDarkBackground(true)
 }
@@ -27,7 +27,7 @@ const (
 func TestABlankCanvasIsBlankLines(t *testing.T) {
 	c := NewCanvas(10, 3)
 	if got := c.String(); got != "\n\n" {
-		t.Errorf("a blank canvas serialised to %q", got)
+		t.Errorf("a blank canvas serialized to %q", got)
 	}
 }
 
@@ -38,7 +38,7 @@ func TestARowDrawnToTheEdgeIsTheDeclaredWidth(t *testing.T) {
 	c.Fill(c.Bounds(), "─", nil, Region(pane))
 
 	if got := Width(c.String()); got != 10 {
-		t.Errorf("a filled 10-column row serialised to %d columns: %q", got, c.String())
+		t.Errorf("a filled 10-column row serialized to %d columns: %q", got, c.String())
 	}
 }
 
@@ -46,7 +46,7 @@ func TestARowDrawnToTheEdgeIsTheDeclaredWidth(t *testing.T) {
 // to its edge, which is how a selected row gets a background all the way
 // across. Trimming those would end the highlight at the last letter.
 func TestAStyledBlankIsNotTrailingWhitespace(t *testing.T) {
-	forceColour()
+	forceColor()
 	selected := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("229")).
 		Background(lipgloss.Color("57"))
@@ -123,10 +123,10 @@ func TestOwnerAtIsTheSameOnBothHalvesOfAWideRune(t *testing.T) {
 	}
 }
 
-// Serialising emits the lead once and skips its continuation. Emitting a space
+// Serializing emits the lead once and skips its continuation. Emitting a space
 // there would push everything after it a column right — the exact class of bug
 // the canvas exists to make impossible.
-func TestAFrameOfWideRunesSerialisesToItsDeclaredWidth(t *testing.T) {
+func TestAFrameOfWideRunesSerializesToItsDeclaredWidth(t *testing.T) {
 	for _, tc := range []struct{ name, text string }{
 		{"CJK", "世界世界"},
 		{"an emoji", "ok 👍 done"},
@@ -137,19 +137,19 @@ func TestAFrameOfWideRunesSerialisesToItsDeclaredWidth(t *testing.T) {
 			c := NewCanvas(20, 1)
 			drawn := c.Text(0, 0, tc.text, nil, Region(pane))
 
-			// The row must serialise to exactly the columns it claimed. A
+			// The row must serialize to exactly the columns it claimed. A
 			// continuation emitted as a space rather than skipped makes this
 			// one too wide per wide cluster, which is how everything after it
 			// ends up a column right of where it belongs.
 			if got := Width(c.String()); got != drawn {
-				t.Errorf("drew %d columns but serialised %d: %q", drawn, got, c.String())
+				t.Errorf("drew %d columns but serialized %d: %q", drawn, got, c.String())
 			}
 		})
 	}
 }
 
 // Overwriting half of a wide cluster has to take both cells. A leftover
-// continuation is an orphan — it serialises as nothing, so the row silently
+// continuation is an orphan — it serializes as nothing, so the row silently
 // loses a column.
 func TestOverwritingHalfOfAWideRuneClearsBoth(t *testing.T) {
 	for _, tc := range []struct {
@@ -165,7 +165,7 @@ func TestOverwritingHalfOfAWideRuneClearsBoth(t *testing.T) {
 			c.Set(tc.x, 0, "x", nil, Region(pane))
 
 			// Both cells go, so there is no continuation left with nothing to
-			// continue — an orphan serialises as nothing and the row silently
+			// continue — an orphan serializes as nothing and the row silently
 			// loses a column.
 			if got, want := c.String(), "x"; tc.x == 0 && got != want {
 				t.Errorf("got %q, want %q", got, want)
@@ -250,26 +250,26 @@ func TestIDNamesWhatACaptureScriptWrites(t *testing.T) {
 	}
 }
 
-// --- serialising --------------------------------------------------------
+// --- serializing --------------------------------------------------------
 
 // Runs sharing a style are one escape sequence, not one per character. A frame
 // is captured and diffed; one sequence per cell makes both unreadable.
-func TestRunsSharingAStyleAreGroupedOnSerialising(t *testing.T) {
-	forceColour()
+func TestRunsSharingAStyleAreGroupedOnSerializing(t *testing.T) {
+	forceColor()
 	accent := lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 
 	c := NewCanvas(11, 1)
 	c.Text(0, 0, "api_gateway", &accent, Region(row).At(0))
 
 	if got := strings.Count(c.String(), "\x1b[38;5;205m"); got != 1 {
-		t.Errorf("eleven characters produced %d colour sequences:\n%q", got, c.String())
+		t.Errorf("eleven characters produced %d color sequences:\n%q", got, c.String())
 	}
 }
 
 // Style identity is by pointer, so two components holding the same style share
 // a run and two holding their own do not.
 func TestAStyleChangeBreaksTheRun(t *testing.T) {
-	forceColour()
+	forceColor()
 	accent := lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 	muted := lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
 
@@ -369,7 +369,7 @@ func TestParseIDRejectsWhatItCannotName(t *testing.T) {
 //
 // The canvas already makes drawing off the terminal impossible. This is the
 // other half, and the half design/roadmap.md left open: a component that moved
-// but kept drawing at its old width scribbles over its neighbour, and the frame
+// but kept drawing at its old width scribbles over its neighbor, and the frame
 // is still exactly the right number of columns so nothing notices.
 func TestClipStopsAComponentLeavingItsRect(t *testing.T) {
 	c := NewCanvas(20, 3)

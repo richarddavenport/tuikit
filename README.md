@@ -24,7 +24,7 @@ democtl                                                           estate: prod
 j/k move · enter open · d deploy · / filter · q quit
 ```
 
-That is one `Draw` function. Every box, every glyph, every colour role in it is
+That is one `Draw` function. Every box, every glyph, every color role in it is
 a component you did not write.
 
 ```go
@@ -59,7 +59,7 @@ is no tree, so there is nothing to keep in step with the drawing.
 ## It is themed by whatever themed your terminal
 
 No config file. No loader. Nothing to ask the user for. A tuikit interface sends
-the first sixteen ANSI colour **indices** — the only colours a terminal lets its
+the first sixteen ANSI color **indices** — the only colors a terminal lets its
 user redefine — so the tool your reader opens is already in their palette, on
 the first frame. Nine roles, named by role and never by hue: `Accent` survives
 someone deciding the interface should be blue.
@@ -108,7 +108,7 @@ acts on, and — via `spec.SchemaOf` — a JSON Schema for tool-calling APIs.
 and rows. `LogPane` tails a stream and re-attaches when you scroll back to the
 bottom. `Viewer` is a document: it opens at the top, scrolls sideways, and puts
 the cursor style *underneath* the line's own spans — so the line you are reading
-in a diff keeps its syntax colours. Seven of the nine tools in the rebuild
+in a diff keeps its syntax colors. Seven of the nine tools in the rebuild
 studies had written that last one themselves.
 
 **Clicks that resolve to identity, not coordinates.** `comp.Canvas` is a grid
@@ -124,7 +124,7 @@ independent dividers is a composition rather than a component.
 **Guards that fail the build.** Each of these is a test failure rather than a
 review comment:
 
-- a colour outside the palette
+- a color outside the palette
 - a character outside the glyph set
 - chrome the glyph set cannot print
 - an engine that imported a terminal library
@@ -135,10 +135,10 @@ review comment:
 **Screens you can look at without a terminal.** `harness` renders any screen to
 a file. `tuikit frames` turns a captured run into an HTML page or into Markdown
 with an SVG per frame, for a README or a pull request. Goldens are
-colour-stripped, so a layout change is an ordinary test failure.
+color-stripped, so a layout change is an ordinary test failure.
 
-**Themed by the reader's terminal.** The nine colour roles resolve to ANSI
-indices 0–15 — the only colours a terminal lets its user redefine — so a tuikit
+**Themed by the reader's terminal.** The nine color roles resolve to ANSI
+indices 0–15 — the only colors a terminal lets its user redefine — so a tuikit
 tool looks like the rest of that person's terminal rather than like tuikit.
 
 **Pixels where the terminal has them.** On kitty-protocol or Sixel terminals,
@@ -210,7 +210,7 @@ do. [`docs/`](docs/) is the index.
 | [`comp`](docs/comp.md) | the cell canvas and the components |
 | [`app`](docs/app.md) | the shell: key routing, mouse, screen stack, async generations |
 | [`spec`](docs/spec.md) | one command declaration, and the surfaces it produces |
-| [`theme`](docs/theme.md) | nine colour roles, a closed glyph set, the box characters |
+| [`theme`](docs/theme.md) | nine color roles, a closed glyph set, the box characters |
 | [`guard`](docs/guard.md) | the tests that hold all of the above closed |
 | [`harness`](docs/harness.md) | drive a model, capture frames, compare goldens |
 | [`term`](docs/term.md) | what this terminal can do — graphics, cell size, palette |
@@ -227,7 +227,7 @@ tuikit gallery [-list]     every component, running — or as text
 tuikit pixels              what this terminal can draw
 tuikit frames <dir> [-md]  a captured run as a page, or as Markdown + SVG
 tuikit watch <dir>         recapture on save, rebuild, reload
-tuikit designsystem        the colours and glyphs as HTML
+tuikit designsystem        the colors and glyphs as HTML
 tuikit news                what changed since a tool last looked
 ```
 
@@ -250,6 +250,6 @@ behind it, including the things that were refused. `design/architecture.md` is
 how the packages fit together. `AGENTS.md` is what an agent working in a tuikit
 tool needs to know.
 
-## Licence
+## License
 
 MIT. See [LICENSE](LICENSE).

@@ -148,10 +148,10 @@ func TestTheFrameRulesAreInTheGeneratedCSS(t *testing.T) {
 	}
 }
 
-// The classic unreadable-artifact bug: a colour whose only definition sits
+// The classic unreadable-artifact bug: a color whose only definition sits
 // inside a media query never applies when the viewer's theme is unset, which is
 // the default.
-func TestEveryColourIsDefinedOnBareRoot(t *testing.T) {
+func TestEveryColorIsDefinedOnBareRoot(t *testing.T) {
 	page, err := Frames{}.Page(capture(t))
 	if err != nil {
 		t.Fatal(err)
@@ -201,13 +201,13 @@ func between(t *testing.T, s, open, close string) string {
 	return rest[:j]
 }
 
-// The page says its colours are not the reader's.
+// The page says its colors are not the reader's.
 //
 // Issue 52: it renders the sixteen as xterm's defaults, which is the only
 // answer a static page can give — and until it said so, it documented a
 // themeable tool in a palette nobody sees. A reviewer read "accent is bright
 // magenta" off a page like this; their own index 13 was dark mustard.
-func TestThePageSaysItsColoursAreNotYours(t *testing.T) {
+func TestThePageSaysItsColorsAreNotYours(t *testing.T) {
 	page, err := Frames{Title: "mytool"}.Page(capture(t))
 	if err != nil {
 		t.Fatal(err)
@@ -215,7 +215,7 @@ func TestThePageSaysItsColoursAreNotYours(t *testing.T) {
 
 	for _, want := range []string{"xterm", "terminal"} {
 		if !strings.Contains(page, want) {
-			t.Errorf("the page does not mention %q, so a reader reviewing colour is reviewing a tool nobody sees", want)
+			t.Errorf("the page does not mention %q, so a reader reviewing color is reviewing a tool nobody sees", want)
 		}
 	}
 	if !strings.Contains(page, "caveat") {

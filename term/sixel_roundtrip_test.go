@@ -16,7 +16,7 @@ import (
 // could show it is on someone's desk. So the test decodes the bytes back to
 // pixels and compares them to what went in, which catches the failures that
 // actually happen: a band written in the wrong order, run-length counts off by
-// one, colour registers scaled as bytes instead of percentages.
+// one, color registers scaled as bytes instead of percentages.
 func decodeSixel(t *testing.T, s string) *image.RGBA {
 	t.Helper()
 	body, ok := strings.CutPrefix(s, "\x1bP")
@@ -73,7 +73,7 @@ func decodeSixel(t *testing.T, s string) *image.RGBA {
 			x = 0
 			body = body[j:]
 
-		case '$': // carriage return: same band, next colour
+		case '$': // carriage return: same band, next color
 			x = 0
 			body = body[1:]
 
@@ -119,7 +119,7 @@ func pct8(v int) uint8 { return uint8(v * 255 / 100) }
 
 // TestSixelRoundTrip encodes an image, decodes it back, and compares.
 //
-// Colours are compared after quantising to the 6-cube, because that is the
+// Colors are compared after quantizing to the 6-cube, because that is the
 // documented lossy step — anything else being different is a bug.
 func TestSixelRoundTrip(t *testing.T) {
 	const w, h = 37, 19 // deliberately not multiples of 6
@@ -154,7 +154,7 @@ func TestSixelRoundTrip(t *testing.T) {
 	}
 }
 
-// snap is the encoder's documented quantisation: the 6×6×6 cube.
+// snap is the encoder's documented quantization: the 6×6×6 cube.
 func snap(c color.RGBA) color.RGBA {
 	q := func(v uint8) uint8 { return uint8(int(v) * 5 / 255 * 255 / 5) }
 	return color.RGBA{q(c.R), q(c.G), q(c.B), 255}

@@ -11,25 +11,25 @@ import (
 //
 // # Why this is in comp and not in harness
 //
-// Every operator tool shells out to something, and what comes back has colour
+// Every operator tool shells out to something, and what comes back has color
 // in it. gcpeasy shows `gcloud`, `kubectl` and a Rails console in a pane, and
 // wrote its own SGR parser to do it (issue 63). Without this a tool either
-// strips the colour — losing information the other program went to the trouble
+// strips the color — losing information the other program went to the trouble
 // of sending — or writes the parser again.
 //
 // [harness.Strip] parses the same sequences and is the wrong side of the fence:
 // it reads back a frame tuikit itself wrote, where the styles came from
 // [theme.Palette] in the first place. This is the open world.
 //
-// # Why the colours are passed through
+// # Why the colors are passed through
 //
-// Decision 28 puts a tool's own colour on ANSI 0-15 so the reader's theme wins.
+// Decision 28 puts a tool's own color on ANSI 0-15 so the reader's theme wins.
 // That rule is about DESIGN, and a subprocess's output is not the tool's design
 // — it is data, the same way the words are. A tool does not rewrite `kubectl`'s
-// nouns and should not rewrite its colours.
+// nouns and should not rewrite its colors.
 //
 // So 0-15 become [lipgloss.ANSIColor], which the reader's terminal theme still
-// renders. 256-colour and truecolor are passed through as they arrived, because
+// renders. 256-color and truecolor are passed through as they arrived, because
 // dropping them would lose the distinction the program was drawing.
 //
 // # What it does not do
@@ -132,8 +132,8 @@ func ansiLine(s string, style *lipgloss.Style) ([]Segment, *lipgloss.Style) {
 	return runTogether(cells), style
 }
 
-// runTogether merges neighbouring cells that share a style, so a line of one
-// colour is one segment rather than eighty.
+// runTogether merges neighboring cells that share a style, so a line of one
+// color is one segment rather than eighty.
 func runTogether(cells []cell) []Segment {
 	var out []Segment
 	for _, c := range cells {
@@ -189,7 +189,7 @@ func params(s string) []int {
 //
 // Returns nil for a full reset rather than an empty style, so an unstyled run
 // compares equal to the zero value and runTogether merges it with its
-// neighbours.
+// neighbors.
 func apply(style *lipgloss.Style, ps []int) *lipgloss.Style {
 	cur := lipgloss.NewStyle()
 	if style != nil {
@@ -255,7 +255,7 @@ func apply(style *lipgloss.Style, ps []int) *lipgloss.Style {
 	return &cur
 }
 
-// extended reads a 5;n (256-colour) or 2;r;g;b (truecolor) argument and returns
+// extended reads a 5;n (256-color) or 2;r;g;b (truecolor) argument and returns
 // how many parameters it consumed.
 func extended(ps []int) (lipgloss.TerminalColor, int) {
 	if len(ps) < 2 {

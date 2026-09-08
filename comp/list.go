@@ -65,7 +65,7 @@ type List struct {
 	StatusWidth int
 
 	// Marker is drawn against the cursor row and Blank against the rest, for a
-	// list whose selection is a CHARACTER rather than only a colour. They
+	// list whose selection is a CHARACTER rather than only a color. They
 	// should be the same width, or the rows jump as you move.
 	//
 	// comp.Form has had these since it was written and a List did not, which the
@@ -137,7 +137,7 @@ func (l *List) Offset() int { return l.offset }
 
 // Row is one line of a list.
 //
-// Text and Style are the common case: a whole row in one colour. Spans is for
+// Text and Style are the common case: a whole row in one color. Spans is for
 // a row that is more than one — a name with a dim count after it, a timestamp
 // then a message — and wins when it is set.
 //
@@ -185,7 +185,7 @@ type Row struct {
 	//
 	// Empty, and the cursor is an index, which is correct and free for a list
 	// whose rows never move. Opt-in for that reason: a tool that would have to
-	// invent a key per row per frame to get behaviour it already had should
+	// invent a key per row per frame to get behavior it already had should
 	// not have to.
 	//
 	// Everything else in comp is keyed by identity — owner IDs, [Marks],
@@ -194,8 +194,8 @@ type Row struct {
 	// five years apart (issue 80).
 	//
 	// When the key is gone from the list, the cursor stays at its index and is
-	// clamped, which is the old behaviour and the only sane fallback: the row
-	// a reader was on has been deleted, and its neighbour is the best guess.
+	// clamped, which is the old behavior and the only sane fallback: the row
+	// a reader was on has been deleted, and its neighbor is the best guess.
 	Key string
 
 	// Status is a fixed column between the cursor marker and the indent.
@@ -213,7 +213,7 @@ type Row struct {
 	// (issue 66).
 	Status string
 
-	// StatusStyle colours Status and keeps that colour under the selection,
+	// StatusStyle colors Status and keeps that color under the selection,
 	// the same way LeadStyle does and for the same reason.
 	StatusStyle *lipgloss.Style
 
@@ -251,13 +251,13 @@ type Row struct {
 	// neither is readable.
 	Right []Segment
 
-	// LeadStyle draws Lead in the row's own colour, and keeps it there when the
+	// LeadStyle draws Lead in the row's own color, and keeps it there when the
 	// row is selected.
 	//
 	// Nil means the lead takes whatever the rest of the row takes, which is
 	// what every list did before this existed.
 	//
-	// It is here because a selected row is otherwise one colour whatever its
+	// It is here because a selected row is otherwise one color whatever its
 	// spans say, and that is right for a LABEL and wrong for a glyph that IS the
 	// state. The database tool's connection list marks reachability with ● ○ ✗ in
 	// the first column; on the cursor row all three came out bold black on white,
@@ -265,13 +265,13 @@ type Row struct {
 	// could not read. A person using it said so.
 	//
 	// It is also an accessibility rule and not only a legibility one. A black ●
-	// on light grey does not read as "green ● that is highlighted", it reads as a
+	// on light gray does not read as "green ● that is highlighted", it reads as a
 	// DIFFERENT state — off, disabled. The database tool was saved by using
-	// distinct shapes as well as colours; a tool encoding state in colour alone
+	// distinct shapes as well as colors; a tool encoding state in color alone
 	// would have lost it outright, and nothing in the API would have said so.
 	//
 	// Only the lead, deliberately. Letting every styled span survive selection
-	// is more elegant and makes the cursor's prominence depend on how colourful
+	// is more elegant and makes the cursor's prominence depend on how colorful
 	// a row happens to be — the selection would be strong on a plain list and
 	// nearly invisible on a busy one, which is the opposite of what it is for.
 	LeadStyle *lipgloss.Style
@@ -364,11 +364,11 @@ func (l *List) DrawFunc(c *Canvas, r Rect, n int, row func(i int) Row) {
 		// the glyph.
 		l.fill(c, Rect{X: body.X, Y: y, W: body.W, H: 1}, style, id)
 
-		// A selected row is one colour whatever its spans say. The selection is
+		// A selected row is one color whatever its spans say. The selection is
 		// the reader's own mark on the list, and a row that kept its own
-		// colours under it would make the cursor hard to find in exactly the
+		// colors under it would make the cursor hard to find in exactly the
 		// list where finding it matters.
-		// The lead keeps its own colour through the selection when it has one,
+		// The lead keeps its own color through the selection when it has one,
 		// because it is the row's state and not the row's label.
 		leadStyle := style
 		if this.LeadStyle != nil {
@@ -521,7 +521,7 @@ func (l *List) Move(by int) { l.pending += by; l.reveal = true; l.ClearRange() }
 // Immediate, unlike Move: a caller that just clicked row 3 means row 3, and
 // asks about it in the same breath. If that row turns out to be one the cursor
 // may not hold, the draw moves off it — a click on a heading does nothing
-// rather than selecting its neighbour, because a cursor that lands somewhere
+// rather than selecting its neighbor, because a cursor that lands somewhere
 // you did not click is worse than a click that is ignored.
 //
 // Selecting the row the cursor is ALREADY on keeps a pending Move, because it
@@ -668,7 +668,7 @@ func (l *List) locate(n int, row func(int) Row) int {
 		}
 	}
 	// Gone. Stay at the index and let the clamp above stand — the row the
-	// reader was on has been removed, and its neighbour is the nearest thing
+	// reader was on has been removed, and its neighbor is the nearest thing
 	// to what they were looking at.
 	return at
 }
@@ -705,8 +705,8 @@ func (l *List) nearest(n int, row func(int) Row, i int) (int, bool) {
 // is wrong in the ordinary case rather than an edge one, because a status
 // glyph in the lead column is exactly what Row.LeadStyle exists for. Such a
 // list had its selection carried entirely by Selected's background, so it
-// vanished in a pipe, in a golden, and for a reader who cannot see the colour
-// — and harness.ShapeSurvivesColour could not catch it, because the shape was
+// vanished in a pipe, in a golden, and for a reader who cannot see the color
+// — and harness.ShapeSurvivesColor could not catch it, because the shape was
 // fine and the information was what went missing.
 //
 // Found by building a tool rather than by reading one: three lists in gcpeasy
@@ -718,7 +718,7 @@ func (l *List) nearest(n int, row func(int) Row, i int) (int, bool) {
 // drawLead paints the marker, the status column, the indent and the row's own
 // prefix, and returns the columns they took.
 //
-// Four pieces rather than one string, because Status carries its own colour.
+// Four pieces rather than one string, because Status carries its own color.
 // Concatenating them would mean a git status letter and a fold marker sharing
 // one style, which is the thing LeadStyle exists to prevent one level up.
 func (l *List) drawLead(c *Canvas, x, y int, row Row, i int, leadStyle *lipgloss.Style, id ID) int {
@@ -787,7 +787,7 @@ func (l *List) mark(i int) string {
 	return strings.Repeat(" ", Width(l.Marker))
 }
 
-// spansText is a row's words without its colours, for when the selection
+// spansText is a row's words without its colors, for when the selection
 // paints over them.
 func spansText(spans []Segment) string {
 	var b strings.Builder

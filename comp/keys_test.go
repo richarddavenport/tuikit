@@ -77,7 +77,7 @@ func TestKeysSaysWhenItRanOutOfRoom(t *testing.T) {
 	}
 }
 
-// As an overlay it is a centred box, so "what was I looking at" is still
+// As an overlay it is a centered box, so "what was I looking at" is still
 // answerable.
 func TestKeysAsAnOverlayIsABox(t *testing.T) {
 	c := NewCanvas(60, 20)

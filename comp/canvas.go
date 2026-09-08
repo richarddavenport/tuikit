@@ -125,7 +125,7 @@ func (id ID) String() string {
 // thing a reader sees, and a grid that splits it draws two halves of nothing.
 //
 // An empty Text marks the CONTINUATION of a wide cluster in the cell to its
-// left. It is not a space, and serialising skips it — emitting a space there
+// left. It is not a space, and serializing skips it — emitting a space there
 // would push everything after it one column right, which is exactly the class
 // of bug the canvas exists to make impossible.
 type Cell struct {
@@ -225,14 +225,14 @@ func (c *Canvas) at(x, y int) *Cell {
 // Center is r's middle, w by h, clipped to r.
 //
 // A rect is not a layout, and this is not one either — it is the arithmetic
-// every overlay does, written once. [Confirm] centred itself privately and
+// every overlay does, written once. [Confirm] centered itself privately and
 // [Menu] positions itself privately, so a tool building its own overlay on a
 // [List] wrote it again (issue 53). Three copies of `(r.W-w)/2` is two too
 // many, and the one that is wrong is wrong by one column in a way nobody sees
 // until they look at two overlays side by side.
 //
 // The POSITION is clamped and the size is not. A box larger than what it is
-// centred in starts at the edge and is cut by the canvas, which is a box you
+// centered in starts at the edge and is cut by the canvas, which is a box you
 // can read the left of rather than one drawn off the screen — and it is what
 // [Confirm] has always done, deliberately: a modal has a minimum width it
 // keeps even on a terminal too narrow for it, because a question squeezed to
@@ -272,7 +272,7 @@ func (c *Canvas) Set(x, y int, cluster string, s *lipgloss.Style, owner ID) int 
 
 	// Whatever is being overwritten may be half of a wide cluster. Both of its
 	// cells have to go, or the leftover half is an orphan: a continuation with
-	// nothing to continue, which serialises as a missing column.
+	// nothing to continue, which serializes as a missing column.
 	c.clear(x, y)
 	c.clear(x+w-1, y)
 
@@ -372,7 +372,7 @@ func (c *Canvas) OwnerAt(x, y int) ID {
 }
 
 // CellAt reads one cell, for a test or a guard that wants to know what is
-// drawn where without serialising the frame first.
+// drawn where without serializing the frame first.
 func (c *Canvas) CellAt(x, y int) (Cell, bool) {
 	if cell := c.at(x, y); cell != nil {
 		return *cell, true
@@ -402,7 +402,7 @@ func (c *Canvas) Region(id ID) (Rect, bool) {
 	return Rect{minX, minY, maxX - minX + 1, maxY - minY + 1}, true
 }
 
-// String serialises the grid, grouping runs that share a style so the output
+// String serializes the grid, grouping runs that share a style so the output
 // is not one escape sequence per character.
 //
 // Styles are compared by POINTER. A tool holds its styles in a struct and

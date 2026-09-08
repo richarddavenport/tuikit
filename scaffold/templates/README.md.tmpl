@@ -21,7 +21,7 @@ Three packages, and the split between them is the point.
 
 | | |
 |---|---|
-| `internal/engine` | The domain. **No terminal concepts at all** — no colour, no width, no keys, no framework. A test holds that closed. |
+| `internal/engine` | The domain. **No terminal concepts at all** — no color, no width, no keys, no framework. A test holds that closed. |
 | `internal/tui` | The interface. Draws cells into a canvas, so the frame is its own map and a click can ask what it landed on. |
 | `internal/cli` | The command tree, declared once. The CLI, the screens, `describe --json` and the context menus all read the same declaration. |
 
@@ -49,9 +49,9 @@ go test ./internal/tui -update-goldens
 ## What the tests hold closed
 
 - **The screens.** A golden per state, at 132 columns and again at 80, plus a
-  check that colour does not change the shape — goldens are captured uncoloured,
+  check that color does not change the shape — goldens are captured uncolored,
   so a width bug in a styled string is invisible to all of them.
-- **The vocabulary.** A colour that did not come from the palette, or a
+- **The vocabulary.** A color that did not come from the palette, or a
   character the glyph set does not cover, fails. The palette is the terminal's
   own sixteen ANSI indices, so <<.Name>> follows your terminal's theme. A font without a glyph draws a
   replacement box, which reads as a bug rather than as decoration.

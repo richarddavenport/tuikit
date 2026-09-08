@@ -25,10 +25,10 @@ import "github.com/charmbracelet/lipgloss"
 // sample is always in the last column; a series shorter than the pane leaves
 // the LEFT blank, and one longer drops its oldest.
 //
-// A general chart centres its data or stretches it to fit, and both are wrong
+// A general chart centers its data or stretches it to fit, and both are wrong
 // here: the bar under your cursor moves when a sample arrives, and two
 // sparklines of different lengths stop being comparable. That is what bottom's
-// vendored copy specialises for and it is the whole reason this type exists
+// vendored copy specializes for and it is the whole reason this type exists
 // rather than a `Chart`.
 //
 // # What it is not

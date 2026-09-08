@@ -15,7 +15,7 @@ package spec
 // bar for adding a fifth is that a reader would be SURPRISED to find it
 // meaning something else — not that it would be tidy.
 //
-// # What is reserved is the meaning, not the behaviour
+// # What is reserved is the meaning, not the behavior
 //
 // A tool may put a question in front of `q` (decision 39 — the cloud tool asks
 // before abandoning a half-run playbook, the database tool cancels

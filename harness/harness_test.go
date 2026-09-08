@@ -22,12 +22,12 @@ import (
 //
 // An escape sequence ends at a final byte in 0x40-0x7E, and the SGR terminator
 // is `m`. A stripper that ends a sequence at any of [A-Za-z] therefore eats the
-// `m` and leaves the parameters behind — stripping exactly the colour it was
+// `m` and leaves the parameters behind — stripping exactly the color it was
 // meant to preserve, and printing the digits.
 func TestStripDoesNotEatTheSGRTerminator(t *testing.T) {
-	coloured := "\x1b[38;5;205mapi_gateway\x1b[0m  3/3"
+	colored := "\x1b[38;5;205mapi_gateway\x1b[0m  3/3"
 
-	got := Strip(coloured)
+	got := Strip(colored)
 	if got != "api_gateway  3/3" {
 		t.Errorf("Strip = %q", got)
 	}
@@ -65,8 +65,8 @@ func TestStripPreservesWidth(t *testing.T) {
 	}
 }
 
-func TestHTMLCarriesTheColourThrough(t *testing.T) {
-	forceColour()
+func TestHTMLCarriesTheColorThrough(t *testing.T) {
+	forceColor()
 	frame := lipgloss.NewStyle().Foreground(lipgloss.Color("205")).Render("selected")
 
 	got := HTML(frame)
@@ -81,8 +81,8 @@ func TestHTMLCarriesTheColourThrough(t *testing.T) {
 	}
 }
 
-// A colour left switched on across a newline paints the page's background,
-// which is how a frame ends up with a coloured margin down the side.
+// A color left switched on across a newline paints the page's background,
+// which is how a frame ends up with a colored margin down the side.
 func TestHTMLClosesSpansAtEveryLine(t *testing.T) {
 	frame := "\x1b[38;5;205mone\ntwo\nthree"
 
@@ -230,20 +230,20 @@ func TestGoldenComparesShapeAndReportsTheLine(t *testing.T) {
 	}
 }
 
-// A golden holds the shape, so colour is not a difference.
-func TestGoldenIgnoresColour(t *testing.T) {
-	forceColour()
+// A golden holds the shape, so color is not a difference.
+func TestGoldenIgnoresColor(t *testing.T) {
+	forceColor()
 	dir := t.TempDir()
 	if err := os.WriteFile(filepath.Join(dir, "frame.golden"), []byte("selected"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
-	coloured := lipgloss.NewStyle().Foreground(lipgloss.Color("205")).Render("selected")
+	colored := lipgloss.NewStyle().Foreground(lipgloss.Color("205")).Render("selected")
 	rec := &recorder{}
-	Golden(rec, dir, "frame", coloured)
+	Golden(rec, dir, "frame", colored)
 
 	if len(rec.msgs) != 0 {
-		t.Errorf("colour was reported as a difference: %v", rec.msgs)
+		t.Errorf("color was reported as a difference: %v", rec.msgs)
 	}
 }
 
@@ -260,7 +260,7 @@ func TestAMissingGoldenSaysHowToWriteIt(t *testing.T) {
 
 // --- helpers ------------------------------------------------------------
 
-func forceColour() {
+func forceColor() {
 	lipgloss.SetColorProfile(termenv.TrueColor)
 	lipgloss.SetHasDarkBackground(true)
 }
@@ -277,18 +277,18 @@ func (r *recorder) Fatalf(format string, args ...any) {
 }
 
 // A terminal accumulates SGR state, so bold set by one sequence survives a
-// later one that only names a colour. Treating each sequence as a complete
+// later one that only names a color. Treating each sequence as a complete
 // style renders the second run pink with the bold silently gone — which is a
 // real frame democtl draws, not a synthetic case.
 func TestHTMLAccumulatesStyleTheWayATerminalDoes(t *testing.T) {
-	forceColour()
+	forceColor()
 	got := HTML("\x1b[1m\x1b[38;5;205mbold pink\x1b[0m")
 
 	// The text must sit inside ONE span carrying both. Asserting that the page
 	// merely contains each property somewhere passes against the bug, which
-	// emits a bold span and then a separate colour span with the bold gone.
+	// emits a bold span and then a separate color span with the bold gone.
 	if want := `<span style="color:#ff5faf;font-weight:600">bold pink`; !strings.Contains(got, want) {
-		t.Errorf("the bold and the colour are not on one span:\n%s", got)
+		t.Errorf("the bold and the color are not on one span:\n%s", got)
 	}
 }
 
@@ -296,7 +296,7 @@ func TestHTMLAccumulatesStyleTheWayATerminalDoes(t *testing.T) {
 // continue on the page. The span still closes at the newline — it is reopened
 // on the next line rather than left hanging.
 func TestHTMLCarriesStyleAcrossALineBreak(t *testing.T) {
-	forceColour()
+	forceColor()
 	got := HTML("\x1b[48;5;57mrow one\nrow two\x1b[0m")
 
 	lines := strings.Split(got, "\n")
@@ -311,16 +311,16 @@ func TestHTMLCarriesStyleAcrossALineBreak(t *testing.T) {
 	}
 }
 
-// 24-bit colour is not something theme produces — the palette is nine 256
+// 24-bit color is not something theme produces — the palette is nine 256
 // indices — but it is what lipgloss emits the moment a tool author writes a hex
 // value, and reading its channels one at a time as separate SGR codes finds 95
-// in the bright-colour range and renders a hand-picked pink as bright magenta.
-func TestHTMLDoesNotMistakeAColourChannelForACode(t *testing.T) {
-	forceColour()
+// in the bright-color range and renders a hand-picked pink as bright magenta.
+func TestHTMLDoesNotMistakeAColorChannelForACode(t *testing.T) {
+	forceColor()
 	got := HTML(lipgloss.NewStyle().Foreground(lipgloss.Color("#ff5faf")).Render("hand-picked"))
 
 	if !strings.Contains(got, "#ff5faf") {
-		t.Errorf("a 24-bit colour did not survive:\n%s", got)
+		t.Errorf("a 24-bit color did not survive:\n%s", got)
 	}
 	if strings.Contains(got, "#ff00ff") {
 		t.Errorf("the blue channel was read as SGR 95, bright magenta:\n%s", got)
@@ -330,7 +330,7 @@ func TestHTMLDoesNotMistakeAColourChannelForACode(t *testing.T) {
 // A background must not survive a reset, or every frame after the first styled
 // run is painted.
 func TestHTMLResetClearsEverything(t *testing.T) {
-	forceColour()
+	forceColor()
 	got := HTML("\x1b[1;48;5;57mrow\x1b[0mplain")
 
 	if strings.Contains(got, ">plain") && strings.Contains(got, `<span style="background:#5f00ff;font-weight:600">plain`) {

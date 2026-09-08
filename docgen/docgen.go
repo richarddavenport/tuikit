@@ -2,10 +2,10 @@
 // somewhere that is not a terminal.
 //
 // The problem it solves: a design tool draws pixels, and a TUI draws a
-// CHARACTER GRID — one monospace cell per column, 256 ANSI colours, box-drawing
+// CHARACTER GRID — one monospace cell per column, 256 ANSI colors, box-drawing
 // characters, and a closed set of glyphs. A mockup made without those
 // constraints is a picture of a tool that cannot be built. So the bundle is a
-// faithful grid: every colour comes from the tool's palette, every glyph comes
+// faithful grid: every color comes from the tool's palette, every glyph comes
 // from the same allow-list guard.Glyphs enforces, and nothing is positioned in
 // pixels.
 //
@@ -32,7 +32,7 @@ type Page struct {
 
 // DesignSystem renders a tool's vocabulary.
 //
-// Only the foundations are here so far — the colours, the glyphs, and the grid
+// Only the foundations are here so far — the colors, the glyphs, and the grid
 // they sit on. Component and screen cards arrive with the components; a card
 // depicting a component that does not exist would be the drift this package
 // exists to prevent.
@@ -80,7 +80,7 @@ func (d DesignSystem) renderer() renderer {
 	}
 	// Checked on one field rather than against a zero Palette: Palette holds a
 	// slice, so it is not comparable, and a tool that set only Extra still has
-	// no colours.
+	// no colors.
 	if r.pal.Accent == nil {
 		r.pal = theme.Default
 	}

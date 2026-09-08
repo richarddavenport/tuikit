@@ -51,7 +51,7 @@ func TestMatchIsCaseInsensitive(t *testing.T) {
 		t.Error("upper-case query did not match lower-case text")
 	}
 	// ...but an exact-case match scores higher, so `Env` prefers the one that
-	// is actually capitalised.
+	// is actually capitalized.
 	exact, _ := fuzzy.Match("Env", "Environment")
 	loose, _ := fuzzy.Match("Env", "environment")
 	if exact.Score <= loose.Score {

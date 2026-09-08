@@ -89,7 +89,7 @@ func (t Tool) Env() string {
 	return strings.ToUpper(strings.ReplaceAll(t.Name, "-", "_"))
 }
 
-// Title is the tool's name for prose: capitalised, since a sentence starts
+// Title is the tool's name for prose: capitalized, since a sentence starts
 // with one and a binary name does not.
 func (t Tool) Title() string {
 	if t.Name == "" {
@@ -163,7 +163,7 @@ func (t Tool) valid() error {
 			continue
 		}
 		// The name is a binary, a directory, a package path and a Go
-		// identifier's neighbour. Rejecting the rest here beats a compile error
+		// identifier's neighbor. Rejecting the rest here beats a compile error
 		// in generated code somebody did not write.
 		return fmt.Errorf("%q: a tool's name is lower-case letters, digits and dashes", t.Name)
 	}

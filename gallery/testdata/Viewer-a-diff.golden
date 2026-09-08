@@ -4,7 +4,7 @@ tuikit gallery  every component, running                                        
 │ Components                    │ │ Viewer                                                                                         │
 │ List                          │ │ A document you scroll, look through, and act on ranges of. Opens at the top, does not follow,… │
 │ Pane                          │ │ ‹ a diff · a range · syntax under the cursor · wider than the pane · scrolled sideways · no cur│
-│ Tabs                          │ │ the cursor is a background and the line keeps its own colour — a List would repaint the whole… │
+│ Tabs                          │ │ the cursor is a background and the line keeps its own color — a List would repaint the whole … │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ 1 @@ -12,7 +12,9 @@ func (l *List) Extend(by int) {                                            │
 │ StepList                      │ │ 2  func (l *List) Extend(by int) {                                                             │

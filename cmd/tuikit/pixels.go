@@ -329,7 +329,7 @@ func escape(s string) string {
 }
 
 // barStyles is the two styles the bar needs, from the default palette — which
-// is ANSI 0-15, so they are your terminal's own colours too.
+// is ANSI 0-15, so they are your terminal's own colors too.
 func barStyles() [2]lipgloss.Style {
 	return [2]lipgloss.Style{
 		lipgloss.NewStyle().Foreground(theme.Default.Accent),

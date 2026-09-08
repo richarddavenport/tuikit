@@ -6,7 +6,7 @@ tuikit gallery [-list]     every component, running — or as text
 tuikit pixels              what this terminal can draw
 tuikit frames <dir> [-md]  a captured run as a page, or as Markdown + SVG
 tuikit watch <dir>         recapture on save, rebuild, reload
-tuikit designsystem        the colours and glyphs as HTML
+tuikit designsystem        the colors and glyphs as HTML
 tuikit news                what changed since a tool last looked
 ```
 
