@@ -12,6 +12,7 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"sort"
@@ -104,6 +105,18 @@ func browse(c spec.Call) int {
 	script, err := harness.ScriptFile(c.Flag("script"))
 	if err != nil {
 		fail(c, err)
+		return spec.Fail
+	}
+
+	// A capture never runs a tea.Cmd — that is what makes it deterministic, and
+	// it means a model that loads its data in Init captures an empty screen
+	// with nothing to say it did (tuikit issue 65). Load synchronously here
+	// instead, then ask whether anything is still pending.
+	//
+	// Delete this check when the model has no Init work left; keep it while it
+	// does, because the failure it catches is silent and the frames look fine.
+	if why, ok := harness.LoadsBeforeCapture(m); !ok {
+		fail(c, errors.New(why))
 		return spec.Fail
 	}
 	// Wrapped in a runner because the model has no View: the runner owns the

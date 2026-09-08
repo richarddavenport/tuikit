@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 // Snapshot drives a model through a script and writes the frames — from the
@@ -118,4 +120,48 @@ func (c *collector) Errorf(format string, args ...any) {
 func (c *collector) Fatalf(format string, args ...any) {
 	c.Errorf(format, args...)
 	panic(stop{})
+}
+
+// LoadsBeforeCapture reports whether a model is ready to be captured, and says
+// what is wrong when it is not.
+//
+// # The silent failure this exists to break
+//
+// [Press] and [Snapshot] discard the [tea.Cmd] an Update returns. That is
+// deliberate and it is what makes a capture deterministic: nothing asynchronous
+// resolves, so the same script always produces the same frame.
+//
+// The consequence is that **a model which loads its data in Init captures an
+// empty screen**. Init is never called, the command it would have returned
+// never runs, and the frames say "nothing yet". Nothing errors. The tests pass,
+// because they call the model's own Load directly. It took a real tool a while
+// to find (issue 65).
+//
+// So: hand the model here before capturing it. A model whose Init returns a
+// command has work it expects someone else to do, and under a harness nobody
+// will.
+//
+// # What to do about a true answer
+//
+// Load synchronously first, then capture:
+//
+//	if snap, err := load(); err == nil {
+//		m.Load(snap)
+//	}
+//
+// Not "run the command" — putting real asynchrony into a capture would cost the
+// determinism the discarding buys, which is the whole point of it.
+//
+// A model with no Init method, or one returning nil, is ready and this says so.
+func LoadsBeforeCapture(m any) (why string, ok bool) {
+	init, has := m.(interface{ Init() tea.Cmd })
+	if !has {
+		return "", true
+	}
+	if init.Init() == nil {
+		return "", true
+	}
+	return "this model's Init returns a command, and a capture never runs one — " +
+		"the frames will show the screen before the data arrived. " +
+		"Load synchronously before capturing.", false
 }

@@ -181,3 +181,30 @@ func read(t *testing.T, dir, name string) string {
 	}
 	return Strip(string(body))
 }
+
+// Issue 65: the silent failure is that a model loading in Init captures an
+// empty screen, and nothing says so.
+func TestLoadsBeforeCaptureNamesThePendingInit(t *testing.T) {
+	if why, ok := LoadsBeforeCapture(&loadsInInit{}); ok {
+		t.Error("a model whose Init returns a command was called ready")
+	} else if !strings.Contains(why, "Init") {
+		t.Errorf("the reason does not mention Init: %q", why)
+	}
+}
+
+// A model with nothing pending is ready, and so is one with no Init at all —
+// the check must not force every tool to grow a method.
+func TestLoadsBeforeCaptureAcceptsAReadyModel(t *testing.T) {
+	if _, ok := LoadsBeforeCapture(&snapModel{}); !ok {
+		t.Error("a model whose Init returns nil was called not ready")
+	}
+	if _, ok := LoadsBeforeCapture(struct{}{}); !ok {
+		t.Error("a model with no Init at all was called not ready")
+	}
+}
+
+type loadsInInit struct{ snapModel }
+
+func (*loadsInInit) Init() tea.Cmd {
+	return func() tea.Msg { return nil }
+}
