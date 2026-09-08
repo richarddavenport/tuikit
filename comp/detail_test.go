@@ -52,8 +52,9 @@ func TestItReportsTheRowAfterTheLastEvenWhenItRanOut(t *testing.T) {
 }
 
 // A block's labels line up with each other and not with the rest of the pane.
-// democtl padded to ten and azctl to sixteen, both arbitrary, and azctl's
-// overflowed: a longer label pushed its value out of line with every other row.
+// democtl padded to ten and the cloud tool to sixteen, both arbitrary, and the
+// cloud tool's overflowed: a longer label pushed its value out of line with
+// every other row.
 func TestLabelsLineUpPerBlock(t *testing.T) {
 	lines := drawDetail(Detail{Blocks: []Block{
 		{Facts: []Fact{{Label: "id", Value: "one"}, {Label: "at", Value: "two"}}},
@@ -94,8 +95,8 @@ func TestAFactCanColourItsValueAlone(t *testing.T) {
 	}
 }
 
-// Blocks read as blocks, but a pane that opens with an empty line looks like it
-// failed to draw.
+// Blocks read as blocks, but a pane that opens with an empty line looks like
+// it failed to draw.
 func TestThereIsNoBlankRowBeforeTheFirstThing(t *testing.T) {
 	lines := drawDetail(Detail{Blocks: []Block{
 		{Facts: []Fact{{Label: "group", Value: "rg-forge"}}},
@@ -129,10 +130,10 @@ func TestProseWrapsAndAFactTruncates(t *testing.T) {
 	}
 }
 
-// A heading indents what is under it, by Chrome.Indent — the same rule a nested
-// list row follows, so a pane and a tree agree about what nesting looks like.
-// Without it the rows under "tags" are level with the heading and read as three
-// more facts about the thing rather than as the tags.
+// A heading indents what is under it, by Chrome.Indent — the same rule a
+// nested list row follows, so a pane and a tree agree about what nesting looks
+// like. Without it the rows under "tags" are level with the heading and read
+// as three more facts about the thing rather than as the tags.
 func TestAnIndentedBlockUsesChromesIndent(t *testing.T) {
 	lines := drawDetail(Detail{Blocks: []Block{
 		{Heading: "tags", Facts: []Fact{{Label: "env", Value: "prod"}}},

@@ -64,9 +64,10 @@ func TestTheCursorPullsTheViewportWhenFocused(t *testing.T) {
 	}
 }
 
-// swarmctl follows the cursor only when the pane is focused and pgctl always
-// does. swarmctl is right: an unfocused pane whose viewport jumps because its
-// cursor is elsewhere moves while you are reading it.
+// the deploy tool follows the cursor only when the pane is focused and the
+// database tool always does. The deploy tool is right: an unfocused pane whose
+// viewport jumps because its cursor is elsewhere moves while you are reading
+// it.
 func TestAnUnfocusedListDoesNotChaseItsCursor(t *testing.T) {
 	l := &List{Name: services, Focused: false}
 	l.Select(15)
@@ -108,7 +109,8 @@ func TestAListThatFitsDoesNotScroll(t *testing.T) {
 }
 
 // The count is drawn ALWAYS. On a tall terminal where everything fits, a wheel
-// that correctly does nothing is otherwise indistinguishable from a broken one.
+// that correctly does nothing is otherwise indistinguishable from a broken
+// one.
 func TestTheCountIsDrawnEvenWhenNothingIsHidden(t *testing.T) {
 	l := &List{Name: services}
 	got := draw(l, 20, 10, 3).String()
@@ -152,8 +154,8 @@ func TestASelectionScrolledOutOfViewSaysWhichWay(t *testing.T) {
 }
 
 // The owner carries the index in the LIST. They differ the moment the viewport
-// moves, and an ID meaning "row 3 of the screen" then acts on whatever scrolled
-// into row 3.
+// moves, and an ID meaning "row 3 of the screen" then acts on whatever
+// scrolled into row 3.
 func TestRowsAreOwnedByTheirIndexNotTheirRow(t *testing.T) {
 	l := &List{Name: services}
 	// Drawn once so the list knows what a frame can show, then scrolled and
@@ -174,7 +176,8 @@ func TestRowsAreOwnedByTheirIndexNotTheirRow(t *testing.T) {
 	}
 }
 
-// An empty list is an ordinary state, and its row is clickable across the pane.
+// An empty list is an ordinary state, and its row is clickable across the
+// pane.
 func TestAnEmptyListSaysSo(t *testing.T) {
 	l := &List{Name: services, Empty: "  nothing matches"}
 	c := NewCanvas(30, 6)
@@ -258,7 +261,8 @@ func TestTheOffsetClampsAgainWhenThePaneGrows(t *testing.T) {
 }
 
 // The count moves as you scroll. A number that says how MUCH is shown is the
-// same wherever you are in the list, so it answers nothing about where that is.
+// same wherever you are in the list, so it answers nothing about where that
+// is.
 func TestTheCountMovesWithTheViewport(t *testing.T) {
 	l := &List{Name: services}
 	before := draw(l, 20, 6, 20).String()
@@ -277,8 +281,8 @@ func TestTheCountMovesWithTheViewport(t *testing.T) {
 // A resize is not a wheel. The reveal flag keeps the wheel from snapping back
 // to the cursor, but when the PANE changes size the view moved underneath the
 // reader rather than because they asked — and a cursor left off screen means
-// whatever is drawn beside the list describes something invisible, and the next
-// key acts on it.
+// whatever is drawn beside the list describes something invisible, and the
+// next key acts on it.
 func TestAResizeBringsTheCursorBack(t *testing.T) {
 	l := &List{Name: services, Focused: true}
 	draw(l, 20, 32, 39) // thirty body rows
@@ -315,8 +319,8 @@ func TestTheWheelStillDoesNotSnapBackAfterAResizeRule(t *testing.T) {
 }
 
 // A row can be more than one colour: a name with a dim count after it, a
-// timestamp then a message. democtl and azctl both had to draw their own lists
-// for want of this.
+// timestamp then a message. democtl and the cloud tool both had to draw their
+// own lists for want of this.
 func TestARowCanBeSeveralStyles(t *testing.T) {
 	forceColour()
 	dim := lipgloss.NewStyle().Foreground(lipgloss.Color("241"))
@@ -380,9 +384,9 @@ func harnessStrip(s string) string {
 // A list whose selection is a CHARACTER, not only a colour.
 //
 // comp.Form has had a cursor marker since it was written and a List did not,
-// which azctl's migration found the hard way: its resource rows are marked with
-// › and the port silently dropped them. Two components with a cursor should
-// agree about how a cursor is shown.
+// which the cloud tool's migration found the hard way: its resource rows are
+// marked with › and the port silently dropped them. Two components with a
+// cursor should agree about how a cursor is shown.
 func TestAListCanMarkItsCursor(t *testing.T) {
 	l := &List{Name: services, Marker: "› ", Blank: "  ", Focused: true}
 	l.Move(1)
@@ -430,8 +434,8 @@ func TestDepthIndentsARow(t *testing.T) {
 	}
 }
 
-// The indent is Chrome's, so a tool that wants a tighter tree changes it in one
-// place rather than reindenting every row it builds.
+// The indent is Chrome's, so a tool that wants a tighter tree changes it in
+// one place rather than reindenting every row it builds.
 func TestTheIndentComesFromChrome(t *testing.T) {
 	ch := theme.DefaultChrome
 	ch.Indent = 4
@@ -445,18 +449,18 @@ func TestTheIndentComesFromChrome(t *testing.T) {
 	}
 }
 
-// A row carrying its own state glyph gets the cursor's mark AS WELL, in its own
-// column to the left of the indent.
+// A row carrying its own state glyph gets the cursor's mark AS WELL, in its
+// own column to the left of the indent.
 //
-// This used to be one or the other, on the grounds that two glyphs fighting for
-// one column is how a tree's headers end up out of line with its children. That
-// worry is real and it is answered by giving the marker a column of its own
-// rather than by dropping it: the header's text and the child's still line up,
-// and the cursor is now visible on a list whose rows have leads.
+// This used to be one or the other, on the grounds that two glyphs fighting
+// for one column is how a tree's headers end up out of line with its children.
+// That worry is real and it is answered by giving the marker a column of its
+// own rather than by dropping it: the header's text and the child's still line
+// up, and the cursor is now visible on a list whose rows have leads.
 //
-// Which matters because such a list otherwise carried its selection entirely in
-// Selected's background — invisible in a pipe, in a golden, and to a reader who
-// cannot see colour.
+// Which matters because such a list otherwise carried its selection entirely
+// in Selected's background — invisible in a pipe, in a golden, and to a reader
+// who cannot see colour.
 func TestAMarkAndALeadBothGetADrawn(t *testing.T) {
 	c := NewCanvas(30, 4)
 	l := &List{Name: services, Marker: "> ", Blank: "  "}
@@ -748,8 +752,8 @@ func TestAnUnmarkedListIsUnchanged(t *testing.T) {
 
 // A glyph that IS the state keeps its colour on the selected row.
 //
-// From issue 44, and from a person: "when highlighting I can't see the color of
-// the dot." A selected row is otherwise one colour whatever its spans say,
+// From issue 44, and from a person: "when highlighting I can't see the color
+// of the dot." A selected row is otherwise one colour whatever its spans say,
 // which is right for a label and wrong for a status glyph — the one row a
 // reader is looking at became the one row whose status they could not read.
 func TestALeadKeepsItsColourWhenTheRowIsSelected(t *testing.T) {
@@ -819,9 +823,9 @@ func TestAStyledLeadDoesNotMoveTheText(t *testing.T) {
 	}
 }
 
-// NoStatus gives the row back. From issue 46: pgctl stacks five lists in one
-// column, and five status rows are a quarter of an 80x24 body spent on counters
-// that read 3/3 beside panel titles already saying (3).
+// NoStatus gives the row back. From issue 46: the database tool stacks five
+// lists in one column, and five status rows are a quarter of an 80x24 body
+// spent on counters that read 3/3 beside panel titles already saying (3).
 func TestNoStatusGivesTheRowBackToTheRows(t *testing.T) {
 	const h = 5
 
@@ -869,9 +873,10 @@ func TestOverheadSaysWhatTheListSpendsOnItself(t *testing.T) {
 // Clamping the cursor to where it already is must not eat a pending move.
 //
 // Issue 45: every one of these tools arrived at "clamp every cursor whenever
-// the data changes" independently, from when a cursor was a plain int. With the
-// deferred Move that clamp reads as Select(Cursor()), which zeroed the move the
-// arrow key had just recorded. The key did nothing and nothing errored.
+// the data changes" independently, from when a cursor was a plain int. With
+// the deferred Move that clamp reads as Select(Cursor()), which zeroed the
+// move the arrow key had just recorded. The key did nothing and nothing
+// errored.
 func TestClampingToWhereTheCursorAlreadyIsKeepsAPendingMove(t *testing.T) {
 	l := &List{Name: "a", Focused: true}
 	c := NewCanvas(20, 6)
@@ -928,7 +933,7 @@ func clampTo(i, hi int) int {
 }
 
 // A row can pin content to its right edge, which is what Bar has always done
-// and what three call sites in boardctl were doing by hand (issue 53).
+// and what three call sites in the board were doing by hand (issue 53).
 func TestARowCanPinContentToItsRightEdge(t *testing.T) {
 	l := &List{Name: "lanes"}
 	c := NewCanvas(30, 3)
@@ -979,8 +984,9 @@ func TestTheRightEdgeAccountsForTheLead(t *testing.T) {
 	}
 }
 
-// Dropped rather than overlapped when there is no room, because a count written
-// over the end of a name is two pieces of information and neither is readable.
+// Dropped rather than overlapped when there is no room, because a count
+// written over the end of a name is two pieces of information and neither is
+// readable.
 func TestTheRightEdgeIsDroppedWhenThereIsNoRoom(t *testing.T) {
 	l := &List{Name: "lanes"}
 	c := NewCanvas(4, 2)
@@ -1054,8 +1060,8 @@ func TestARangeCanBeDraggedBackThroughItsAnchor(t *testing.T) {
 	}
 }
 
-// An ordinary arrow key drops the selection. A range that survived one would be
-// a range a reader cannot get rid of.
+// An ordinary arrow key drops the selection. A range that survived one would
+// be a range a reader cannot get rid of.
 func TestMovingWithoutExtendingDropsTheRange(t *testing.T) {
 	l := &List{Name: "a", Focused: true}
 	c := NewCanvas(20, 8)
@@ -1075,9 +1081,9 @@ func TestMovingWithoutExtendingDropsTheRange(t *testing.T) {
 	}
 }
 
-// A row with its own lead still gets the cursor's marker. It used to get one or
-// the other, so a list with a status glyph had no cursor at all once the colour
-// was stripped.
+// A row with its own lead still gets the cursor's marker. It used to get one
+// or the other, so a list with a status glyph had no cursor at all once the
+// colour was stripped.
 func TestALeadDoesNotSwallowTheMarker(t *testing.T) {
 	c := NewCanvas(30, 4)
 	l := &List{Name: services, Marker: "> ", Blank: "  ", Focused: true, NoStatus: true}
@@ -1121,9 +1127,9 @@ func columnOf(t *testing.T, line, want string) int {
 
 // Issue 66: a status column and a tree indent at the same time.
 //
-// lazygit's file rows lead with git status letters, which have to form a column
-// down the screen. dive's layer tree indents. Before this, one Lead field had
-// to serve both, and Depth pushed the status letters out of line.
+// lazygit's file rows lead with git status letters, which have to form a
+// column down the screen. dive's layer tree indents. Before this, one Lead
+// field had to serve both, and Depth pushed the status letters out of line.
 func TestAStatusColumnSurvivesTheIndent(t *testing.T) {
 	l := &List{Name: "files", StatusWidth: 2, NoStatus: true}
 	rows := []Row{

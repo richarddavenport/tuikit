@@ -1,26 +1,27 @@
 // Package app is the shell a tuikit tool runs inside: key routing, mouse
 // dispatch, a screen router, and the async conventions as TYPES.
 //
-// The argument for types over prose is in this repo's own history. Every one of
-// these conventions was written down in a design doc and then re-implemented,
-// slightly differently, in each of four tools — and democtl, which documents
-// capturesKeys as the central convention, still needed a reviewer to notice
-// where it applied. A convention you can forget to apply is not a convention. A
-// type you have to construct is.
+// The argument for types over prose is in this repo's own history. Every one
+// of these conventions was written down in a design doc and then
+// re-implemented, slightly differently, in each of four tools — and democtl,
+// which documents capturesKeys as the central convention, still needed a
+// reviewer to notice where it applied. A convention you can forget to apply is
+// not a convention. A type you have to construct is.
 package app
 
 // Gen invalidates results from work that has been abandoned.
 //
 // # Where this came from
 //
-// swarmctl's sessGen — "a tick scheduled by a closed session must not drive the
-// replacement session (quick reconnects would otherwise multiply refresh
-// chains)" — and democtl's gen, for a step finishing after you pressed Esc.
+// The deploy tool's sessGen — "a tick scheduled by a closed session must not
+// drive the replacement session (quick reconnects would otherwise multiply
+// refresh chains)" — and democtl's gen, for a step finishing after you pressed
+// Esc.
 //
 // The failure it prevents is nasty precisely because it looks like nothing: an
-// abandoned run's result arrives and draws into its successor, so the step list
-// shows a step that belongs to a different run. Nothing errors. The screen is
-// simply wrong, in a way that is almost impossible to reproduce.
+// abandoned run's result arrives and draws into its successor, so the step
+// list shows a step that belongs to a different run. Nothing errors. The
+// screen is simply wrong, in a way that is almost impossible to reproduce.
 type Gen struct{ n int }
 
 // Next abandons everything in flight and returns the new generation, which is
@@ -38,9 +39,9 @@ func (g *Gen) Stale(gen int) bool { return gen != g.n }
 //
 // # Where this came from
 //
-// swarmctl's refreshing flag — "a slow fetch (>refreshEvery, e.g. over a laggy
-// ssh link) must not stack concurrent Docker API calls" — and its repairing
-// flag, so "a second failure reports instead of looping".
+// The deploy tool's refreshing flag — "a slow fetch (>refreshEvery, e.g. over
+// a laggy ssh link) must not stack concurrent Docker API calls" — and its
+// repairing flag, so "a second failure reports instead of looping".
 //
 // Both halves matter and both are easy to leave out. Without single-flight, a
 // link slower than the poll interval accumulates calls until something falls
@@ -49,7 +50,7 @@ func (g *Gen) Stale(gen int) bool { return gen != g.n }
 // that the machine is warm.
 type Poll struct {
 	// Limit is the consecutive failures tolerated before it stops. Zero takes
-	// swarmctl's five, which is long enough to ride out a blip and short
+	// the deploy tool's five, which is long enough to ride out a blip and short
 	// enough that nobody is left polling into the void.
 	Limit int
 

@@ -58,9 +58,9 @@ func TestAnEmptyFieldShowsItsPlaceholder(t *testing.T) {
 	}
 }
 
-// The marker comes from the caller. pgctl uses ▸, which is not in tuikit's
-// default glyph set, so a component hard-coding it would smuggle a character
-// past guard.Glyphs and draw a replacement box on a font without it.
+// The marker comes from the caller. The database tool uses ▸, which is not in
+// tuikit's default glyph set, so a component hard-coding it would smuggle a
+// character past guard.Glyphs and draw a replacement box on a font without it.
 func TestTheMarkerComesFromTheCaller(t *testing.T) {
 	f := sample()
 	f.Focused, f.Cursor = true, 1
@@ -80,7 +80,7 @@ func TestTheMarkerComesFromTheCaller(t *testing.T) {
 	}
 }
 
-// swarmctl requires a destructive action to be confirmed by typing the
+// the deploy tool requires a destructive action to be confirmed by typing the
 // subject's name. The difference between a keystroke and a decision.
 func TestAPhraseHasToMatchBeforeTheFormIsComplete(t *testing.T) {
 	f := Form{Fields: []Field{{Label: "type the name", Must: "api_gateway"}}}
@@ -118,8 +118,8 @@ func TestAHalfTypedPhraseIsMarkedNotRejected(t *testing.T) {
 	}
 }
 
-// A disabled field still shows its value: a choice you cannot change is one you
-// may still need to read.
+// A disabled field still shows its value: a choice you cannot change is one
+// you may still need to read.
 func TestADisabledFieldStillShowsItsValue(t *testing.T) {
 	f := Form{Fields: []Field{{Label: "target", Kind: FieldText, Text: "production", Disabled: true}}}
 	c := NewCanvas(40, 2)

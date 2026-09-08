@@ -17,7 +17,8 @@ var tabNames = []string{"Overview", "Config", "Events"}
 // Everything below draws CELLS into a canvas rather than returning strings to
 // be joined. That is what makes a click land somewhere: every cell records who
 // drew it, so the frame is its own map. It also deletes a category of bug —
-// there is no way to draw past the edge, because the coordinate does not exist.
+// there is no way to draw past the edge, because the coordinate does not
+// exist.
 //
 // The canvas is one row shorter than the terminal, which is where the old
 // bodyHeight arithmetic already put it: two rows of header, the body, one of
@@ -62,11 +63,11 @@ func (m *Model) header(c *comp.Canvas) {
 
 // footer names the keys that act on WHAT IS FOCUSED, right now.
 //
-// swarmctl learned the rule the expensive way and wrote it down: its footer
-// used to list every action on every panel, which grew a letter per feature and
-// read as a menu of things mostly not applicable. And while something is
-// capturing keys, the keys it is not taking do not belong here — listing them
-// is a lie.
+// The deploy tool learned the rule the expensive way and wrote it down: its
+// footer used to list every action on every panel, which grew a letter per
+// feature and read as a menu of things mostly not applicable. And while
+// something is capturing keys, the keys it is not taking do not belong here —
+// listing them is a lie.
 func (m *Model) footer(c *comp.Canvas) {
 	var hints []comp.Hint
 	switch {
@@ -178,7 +179,7 @@ func (m *Model) field(c *comp.Canvas, inner comp.Rect, y int, name, value string
 // tabStrip draws the tabs.
 //
 // The chevrons now wrap the strip rather than the current tab, which is
-// swarmctl's arrangement and the better one: the current tab is already
+// the deploy tool's arrangement and the better one: the current tab is already
 // coloured, so chevrons around it repeat what the colour says, while chevrons
 // around the strip say that ‹ and › cycle it — which nothing else on screen
 // does.
@@ -296,8 +297,8 @@ func (m *Model) run(c *comp.Canvas, r comp.Rect) {
 }
 
 // stepStates maps democtl's step states onto the component's. A table rather
-// than matching integers, so renumbering either side is a compile error instead
-// of a silently wrong badge.
+// than matching integers, so renumbering either side is a compile error
+// instead of a silently wrong badge.
 var stepStates = map[stepState]comp.StepState{
 	stepWaiting: comp.StepWaiting,
 	stepRunning: comp.StepRunning,
@@ -330,9 +331,9 @@ func (m *Model) modal(c *comp.Canvas) {
 // drawMenu is comp.Menu, styled.
 //
 // What used to be here was forty lines with three real rules buried in it: a
-// keyboard-opened menu anchors to where its region is IN THIS FRAME, the box is
-// nudged back on screen rather than clipped, and the key sits beside the action
-// because it is the same list. All three are the component's now.
+// keyboard-opened menu anchors to where its region is IN THIS FRAME, the box
+// is nudged back on screen rather than clipped, and the key sits beside the
+// action because it is the same list. All three are the component's now.
 func (m *Model) drawMenu(c *comp.Canvas) {
 	menu := comp.Menu{
 		Name: regMenu, Item: regMenuItem,
@@ -370,8 +371,8 @@ func (m *Model) box(c *comp.Canvas, r comp.Rect, title string, focused bool, id 
 
 // paneWidth is where the divider currently sits, for a test that drags it.
 //
-// Read off the last frame, because the gap between panes is the canvas's chrome
-// and asking a different canvas could give a different answer.
+// Read off the last frame, because the gap between panes is the canvas's
+// chrome and asking a different canvas could give a different answer.
 func (m *Model) paneWidth() int {
 	if m.canvas == nil {
 		return 0
@@ -383,9 +384,9 @@ func (m *Model) paneWidth() int {
 // bands is democtl's window: a title, a rule, the body, and the key hints.
 //
 // One declaration rather than a rect and a height computed separately and kept
-// in step by whoever remembers. Adding a row used to mean changing a literal in
-// body() and a different literal in bodyHeight(), with nothing relating them
-// and no test that could catch getting it wrong.
+// in step by whoever remembers. Adding a row used to mean changing a literal
+// in body() and a different literal in bodyHeight(), with nothing relating
+// them and no test that could catch getting it wrong.
 func (m *Model) bands() []comp.Rect {
 	return comp.Layout{Constraints: []comp.Constraint{
 		comp.Length(1),      // the title bar

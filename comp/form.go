@@ -10,29 +10,31 @@ import (
 //
 // # Where this came from
 //
-// pgctl's viewForm (actionview.go) and swarmctl's applyedits.go. Both render
-// EVERY FIELD AT ONCE, and pgctl says why: "so the operator can see what they
-// have chosen rather than remembering it". A wizard that asks one question per
-// screen is asking someone to hold the answers in their head while deciding
-// whether to go ahead, which is exactly when they should be able to look.
+// The database tool's viewForm and the deploy tool's applyedits.go. Both
+// render EVERY FIELD AT ONCE, and the database tool says why: "so the operator
+// can see what they have chosen rather than remembering it". A wizard that
+// asks one question per screen is asking someone to hold the answers in their
+// head while deciding whether to go ahead, which is exactly when they should
+// be able to look.
 //
 // # The phrase
 //
-// swarmctl requires destructive actions to be confirmed by TYPING the subject's
-// name — env/service where the environment is guarded (action.go confirmPhrase,
-// confirmed). This is where it lives, because it is a text field with one extra
-// rule: the value has to match. comp.Confirm's doc comment sends you here.
+// The deploy tool requires destructive actions to be confirmed by TYPING the
+// subject's name — env/service where the environment is guarded (action.go
+// confirmPhrase, confirmed). This is where it lives, because it is a text
+// field with one extra rule: the value has to match. comp.Confirm's doc
+// comment sends you here.
 //
-// It is not a nag. It is the difference between a keystroke and a decision, and
-// it belongs on the removal of a thing whose name you should be able to type if
-// you are sure you mean that one.
+// It is not a nag. It is the difference between a keystroke and a decision,
+// and it belongs on the removal of a thing whose name you should be able to
+// type if you are sure you mean that one.
 //
 // # The marker
 //
-// The glyph on the focused row comes from the caller, like a StepList's badges.
-// pgctl uses ▸, which is not in tuikit's default glyph set — so a component
-// that hard-coded it would smuggle a character past guard.Glyphs and produce a
-// replacement box on a font without it.
+// The glyph on the focused row comes from the caller, like a StepList's
+// badges. The database tool uses ▸, which is not in tuikit's default glyph set
+// — so a component that hard-coded it would smuggle a character past
+// guard.Glyphs and produce a replacement box on a font without it.
 type Form struct {
 	Fields []Field
 	// Cursor is the field being edited.
@@ -65,7 +67,8 @@ type Form struct {
 // FieldKind is what sort of answer a field takes.
 type FieldKind int
 
-// The kinds, from pgctl's form: free text, one of a list, and a flag.
+// The kinds, from the database tool's form: free text, one of a list, and a
+// flag.
 const (
 	FieldText FieldKind = iota
 	FieldChoice
@@ -90,8 +93,8 @@ type Field struct {
 	// On is a FieldToggle.
 	On bool
 
-	// Must is a phrase Text has to match before the form is Complete —
-	// swarmctl's type-the-name-to-confirm. Empty means no such requirement.
+	// Must is a phrase Text has to match before the form is Complete — the deploy
+	// tool's type-the-name-to-confirm. Empty means no such requirement.
 	Must string
 
 	// Disabled greys a field out. It still shows its value: a choice you

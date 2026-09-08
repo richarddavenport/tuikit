@@ -1,5 +1,5 @@
-// Package comp is tuikit's component substrate: a grid of cells that components
-// draw into, instead of strings they return.
+// Package comp is tuikit's component substrate: a grid of cells that
+// components draw into, instead of strings they return.
 //
 // A component that returns a string cannot be clicked. Hit-testing needs
 // geometry, and `lipgloss.JoinHorizontal` throws it away — by the time View()
@@ -13,7 +13,7 @@
 //
 //   - Overflow stops being a class of bug. Set clips to the canvas, so drawing
 //     past the edge is not an error to catch — it is a coordinate that does not
-//     exist. Two of the three bugs pgctl's first capture found, and both of
+//     exist. Two of the three bugs the database tool's first capture found, and both of
 //     democtl's, were something drawn wider than its container.
 //   - The trim-versus-clip problem stops existing. Style lives on the cell, so
 //     the canvas never parses ANSI and there is no escape sequence to miscount.
@@ -43,8 +43,8 @@ func (r Rect) Contains(x, y int) bool {
 	return x >= r.X && x < r.X+r.W && y >= r.Y && y < r.Y+r.H
 }
 
-// Inset shrinks a rect by n on every side: the inside-the-border case, which is
-// most of what a component wants.
+// Inset shrinks a rect by n on every side: the inside-the-border case, which
+// is most of what a component wants.
 func (r Rect) Inset(n int) Rect {
 	return Rect{r.X + n, r.Y + n, max(0, r.W-2*n), max(0, r.H-2*n)}
 }
@@ -53,17 +53,17 @@ func (r Rect) Inset(n int) Rect {
 //
 // [Inset] takes a column off every edge, which turns a one-row band into no
 // band at all — so a tool that wanted a title indented inside a full-width row
-// had to write the arithmetic itself. azctl did, twice, with a comment
-// explaining why Inset would not do. Two lines of coordinate arithmetic in a
-// tool that is otherwise entirely free of it is exactly the kind of thing that
-// belongs here instead.
+// had to write the arithmetic itself. The cloud tool did, twice, with a
+// comment explaining why Inset would not do. Two lines of coordinate
+// arithmetic in a tool that is otherwise entirely free of it is exactly the
+// kind of thing that belongs here instead.
 func (r Rect) Narrow(n int) Rect {
 	return Rect{r.X + n, r.Y, max(0, r.W-2*n), r.H}
 }
 
-// Empty reports whether the rect has no cells. Worth asking before drawing into
-// it: a pane squeezed to nothing by a narrow terminal is a normal state, not a
-// failure.
+// Empty reports whether the rect has no cells. Worth asking before drawing
+// into it: a pane squeezed to nothing by a narrow terminal is a normal state,
+// not a failure.
 func (r Rect) Empty() bool { return r.W <= 0 || r.H <= 0 }
 
 // Right is the last column inside the rect.
@@ -75,21 +75,23 @@ func (r Rect) Bottom() int { return r.Y + r.H - 1 }
 // Name is a region's name, declared once by the tool as a constant.
 //
 // A named type rather than a string so that the set of regions a tool has is
-// something you can read in one place, and so a capture script or a right-click
-// menu cannot quietly invent one. Canvas.Region answers whether a name was
-// actually drawn, which is the other half of that guarantee.
+// something you can read in one place, and so a capture script or a
+// right-click menu cannot quietly invent one. Canvas.Region answers whether a
+// name was actually drawn, which is the other half of that guarantee.
 type Name string
 
-// NoIndex marks an ID that names a region as a whole rather than one item in it.
+// NoIndex marks an ID that names a region as a whole rather than one item in
+// it.
 const NoIndex = -1
 
 // ID is the identity of whatever drew a cell.
 //
 // An IDENTITY, never a screen position. The index is the item's absolute index
 // in its collection, not the row it happens to occupy — "the ID is where it is
-// on screen" works perfectly until something scrolls, and then it does not fail
-// visibly, it performs the WRONG ACTION on the item that moved into that row.
-// This is the first place the canvas design could have gone quietly wrong.
+// on screen" works perfectly until something scrolls, and then it does not
+// fail visibly, it performs the WRONG ACTION on the item that moved into that
+// row. This is the first place the canvas design could have gone quietly
+// wrong.
 type ID struct {
 	Name  Name
 	Index int
@@ -199,8 +201,8 @@ func (c *Canvas) WithChrome(ch theme.Chrome) *Canvas {
 //
 // A view rather than a copy: the cells are shared, so a component draws into
 // the real frame and simply cannot reach past its own box. Coordinates stay
-// absolute, so a component's rect arithmetic is unchanged and nothing has to be
-// translated back for a hit test.
+// absolute, so a component's rect arithmetic is unchanged and nothing has to
+// be translated back for a hit test.
 func (c *Canvas) Clip(r Rect) *Canvas {
 	view := *c
 	view.clip = intersect(c.clip, r)
@@ -232,9 +234,9 @@ func (c *Canvas) at(x, y int) *Cell {
 // The POSITION is clamped and the size is not. A box larger than what it is
 // centred in starts at the edge and is cut by the canvas, which is a box you
 // can read the left of rather than one drawn off the screen — and it is what
-// [Confirm] has always done, deliberately: a modal has a minimum width it keeps
-// even on a terminal too narrow for it, because a question squeezed to twenty
-// columns is a question nobody can read either.
+// [Confirm] has always done, deliberately: a modal has a minimum width it
+// keeps even on a terminal too narrow for it, because a question squeezed to
+// twenty columns is a question nobody can read either.
 //
 // So a caller that needs the result to fit inside r must say so itself. Doing
 // it here would have silently changed Confirm's floor into a ceiling, which a
@@ -259,9 +261,9 @@ func Width(s string) int { return ansi.StringWidth(s) }
 //
 // Out of bounds is a no-op rather than a panic: clipping is what every caller
 // wants, and doing it here means no component needs a bounds check. A wide
-// cluster that would hang off the right edge draws nothing at all — there is no
-// half of a glyph to draw, and leaving the row a column short would be worse
-// than leaving it blank.
+// cluster that would hang off the right edge draws nothing at all — there is
+// no half of a glyph to draw, and leaving the row a column short would be
+// worse than leaving it blank.
 func (c *Canvas) Set(x, y int, cluster string, s *lipgloss.Style, owner ID) int {
 	w := Width(cluster)
 	if w <= 0 || !c.in(x, y) || x+w > c.w {
@@ -369,8 +371,8 @@ func (c *Canvas) OwnerAt(x, y int) ID {
 	return ID{}
 }
 
-// CellAt reads one cell, for a test or a guard that wants to know what is drawn
-// where without serialising the frame first.
+// CellAt reads one cell, for a test or a guard that wants to know what is
+// drawn where without serialising the frame first.
 func (c *Canvas) CellAt(x, y int) (Cell, bool) {
 	if cell := c.at(x, y); cell != nil {
 		return *cell, true
@@ -400,12 +402,13 @@ func (c *Canvas) Region(id ID) (Rect, bool) {
 	return Rect{minX, minY, maxX - minX + 1, maxY - minY + 1}, true
 }
 
-// String serialises the grid, grouping runs that share a style so the output is
-// not one escape sequence per character.
+// String serialises the grid, grouping runs that share a style so the output
+// is not one escape sequence per character.
 //
-// Styles are compared by POINTER. A tool holds its styles in a struct and hands
-// out the same address every time, so identity is both cheaper and more honest
-// than equality: two styles that happen to look alike are still two decisions.
+// Styles are compared by POINTER. A tool holds its styles in a struct and
+// hands out the same address every time, so identity is both cheaper and more
+// honest than equality: two styles that happen to look alike are still two
+// decisions.
 func (c *Canvas) String() string {
 	var b strings.Builder
 	for y := 0; y < c.h; y++ {

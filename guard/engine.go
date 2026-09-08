@@ -46,10 +46,10 @@ var TerminalPackages = []Denied{
 // it is mechanically checkable, so it is checked.
 //
 // The bar is higher than "no Bubble Tea imports". Measured on the tools that
-// exist when this was written: democtl's fleet imports fmt, math/rand and time,
-// and swarmctl's internal/engine imports nothing from charmbracelet across some
-// forty files. What an engine imports is stdlib plus its own domain SDK — pgx,
-// the Azure SDK, the Docker SDK.
+// exist when this was written: democtl's fleet imports fmt, math/rand and
+// time, and the deploy tool's internal/engine imports nothing from
+// charmbracelet across some forty files. What an engine imports is stdlib plus
+// its own domain SDK — pgx, the Azure SDK, the Docker SDK.
 //
 // Pass denied to hold a package to a different list; the default is
 // TerminalPackages.
@@ -89,12 +89,12 @@ func underPrefix(path, prefix string) bool {
 // # The failure it catches
 //
 // Decision 1 says the fixture the screens are rendered from is a value the
-// engine returns. Nothing enforced it, and in docket it quietly stopped being
-// one: `fixture()` set a field by hand while the engine composed the same field
-// as a sentence, and the renderer composed it again. The golden showed the row
-// disagreeing with itself on every run and looked right, because it was
-// checking the renderer against a world invented three hundred lines away in
-// the same file.
+// engine returns. Nothing enforced it, and in the board it quietly stopped
+// being one: `fixture()` set a field by hand while the engine composed the
+// same field as a sentence, and the renderer composed it again. The golden
+// showed the row disagreeing with itself on every run and looked right,
+// because it was checking the renderer against a world invented three hundred
+// lines away in the same file.
 //
 // Four bugs shipped past 72 goldens, a colour check and a narrow-terminal run.
 // Three of them for this reason.
@@ -106,8 +106,8 @@ func underPrefix(path, prefix string) bool {
 // # What to pass
 //
 // The types that are the engine's ANSWERS rather than its inputs — what a
-// gather-and-reconcile produced, not the arguments it was called with. In
-// docket those are `Truth` and `Live`: neither is ever written by a person, so
+// gather-and-reconcile produced, not the arguments it was called with. In the
+// board those are `Truth` and `Live`: neither is ever written by a person, so
 // neither should ever be typed by one in a test.
 //
 //	guard.Derived(t, ".", "engine", "Truth", "Live")

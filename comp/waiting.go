@@ -10,14 +10,14 @@ import (
 // Waiting is a region whose contents have not arrived yet.
 //
 // [Spinner] is the inline case — one turning glyph beside a row that is doing
-// something. This is the other one: a pane, or a whole screen, that has nothing
-// to show because it is still reading.
+// something. This is the other one: a pane, or a whole screen, that has
+// nothing to show because it is still reading.
 //
 // # Draw it INSIDE the interface, not instead of it
 //
-// The mistake this exists to stop is replacing the frame with the message.
-// azctl's first estate read drew "reading the estate…" and nothing else — no
-// header, no panes, no key hints — so the interface did not look busy, it
+// The mistake this exists to stop is replacing the frame with the message. The
+// cloud tool's first estate read drew "reading the estate…" and nothing else —
+// no header, no panes, no key hints — so the interface did not look busy, it
 // looked absent, and a slow subscription looked like a crash.
 //
 // A pane that is empty and framed says "the thing you asked for is coming".
@@ -54,10 +54,10 @@ const waitingAfter = 2 * time.Second
 
 // Draw centres the wait in r.
 //
-// Centred because the region is otherwise empty: a message in the top-left of a
-// large blank pane reads as content that failed to fill it, and the same words
-// in the middle read as a placeholder. Nothing is drawn if there is no room,
-// which is an ordinary state for a pane squeezed by a narrow terminal.
+// Centred because the region is otherwise empty: a message in the top-left of
+// a large blank pane reads as content that failed to fill it, and the same
+// words in the middle read as a placeholder. Nothing is drawn if there is no
+// room, which is an ordinary state for a pane squeezed by a narrow terminal.
 func (w Waiting) Draw(c *Canvas, r Rect, at time.Time, id ID) {
 	if r.Empty() {
 		return

@@ -4,9 +4,9 @@ package app
 //
 // # Two tools, two purposes
 //
-// azctl keeps `expanded map[string]bool` for which buckets in its tree are
-// open. swarmctl keeps this, under another name, for which secrets are
-// unmasked:
+// The cloud tool keeps `expanded map[string]bool` for which buckets in its
+// tree are open. The deploy tool keeps this, under another name, for which
+// secrets are unmasked:
 //
 //	// revealState tracks which rows are unmasked. Keyed by a stable row id so
 //	// the state survives re-renders and cursor movement.
@@ -70,9 +70,9 @@ func (t *Toggles) SetAll(on bool) { t.all, t.keys = on, map[string]bool{} }
 // ToggleAll flips the global override.
 //
 // Turning it off also clears the per-key set, so pressing the key twice is a
-// reliable way back to nothing on. swarmctl's note on why: without the clear,
-// "hide everything" leaves whatever was individually revealed still showing,
-// and the reader has no way to tell how many that is.
+// reliable way back to nothing on. The deploy tool's note on why: without the
+// clear, "hide everything" leaves whatever was individually revealed still
+// showing, and the reader has no way to tell how many that is.
 func (t *Toggles) ToggleAll() { t.SetAll(!t.all) }
 
 // All reports that the global override is on. For a footer that has to say

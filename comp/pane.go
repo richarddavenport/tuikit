@@ -6,19 +6,19 @@ import "github.com/charmbracelet/lipgloss"
 //
 // # Where this came from
 //
-// swarmctl has TWO of these — drawBox (dashboard.go:1013) and drawBoxRaw
-// (pane.go:454) — and they disagree with each other. One truncates a title too
-// long for its frame and styles it; the other drops the title entirely and
-// takes it pre-styled. Neither is wrong; they were written months apart for the
-// same job. A tool duplicating a function inside itself is the clearest
-// argument for extraction there is, because there is no second tool's
-// requirements to blame it on.
+// The deploy tool has TWO of these — drawBox and drawBoxRaw — and they
+// disagree with each other. One truncates a title too long for its frame and
+// styles it; the other drops the title entirely and takes it pre-styled.
+// Neither is wrong; they were written months apart for the same job. A tool
+// duplicating a function inside itself is the clearest argument for extraction
+// there is, because there is no second tool's requirements to blame it on.
 //
-// democtl draws its own, and puts the title on a ROW INSIDE the box where
-// swarmctl puts it in the top edge. That difference is real rather than
-// accidental: swarmctl's panes are small and numerous, so a row costs it
-// something, while democtl's title row carries the focus highlight across the
-// full width of the pane. So it is a field rather than a decision taken here.
+// democtl draws its own, and puts the title on a ROW INSIDE the box where the
+// deploy tool puts it in the top edge. That difference is real rather than
+// accidental: the deploy tool's panes are small and numerous, so a row costs
+// it something, while democtl's title row carries the focus highlight across
+// the full width of the pane. So it is a field rather than a decision taken
+// here.
 //
 // A title too long to fit is truncated with an ellipsis, following drawBox.
 // drawBoxRaw's answer — drop the title — loses the name of the pane you are
@@ -55,13 +55,13 @@ const (
 //
 // The returned rect is ALREADY inside the border. For padding within it use
 // [Rect.Narrow], which takes columns off the sides; [Rect.Inset] also takes a
-// row off the top and the bottom, and it is the obvious-looking one. pgctl
-// called Inset(1) here, sized a box for ten rows of content, was handed eight,
-// and drew its help row on top of its last field — a silent failure, reported
-// as a trap rather than a gap (issue 49).
+// row off the top and the bottom, and it is the obvious-looking one. The
+// database tool called Inset(1) here, sized a box for ten rows of content, was
+// handed eight, and drew its help row on top of its last field — a silent
+// failure, reported as a trap rather than a gap (issue 49).
 //
-// The inside is blanked, so a pane drawn over something else covers it. That is
-// what makes a modal or a menu a draw rather than a composite.
+// The inside is blanked, so a pane drawn over something else covers it. That
+// is what makes a modal or a menu a draw rather than a composite.
 //
 // The blank cells are owned by the PANE, not by nobody. A pane whose empty
 // space belongs to no one answers "what is the pointer over" with nothing, so

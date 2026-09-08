@@ -6,7 +6,8 @@ import (
 )
 
 // A clean engine is stdlib plus its own domain SDK. That is not an ideal — it
-// is what democtl's fleet and swarmctl's internal/engine actually import.
+// is what democtl's fleet and the deploy tool's internal/engine actually
+// import.
 func TestEngineAcceptsStdlibAndADomainSDK(t *testing.T) {
 	dir := pkg(t, `package fleet
 
@@ -26,8 +27,8 @@ var _ pgx.Tx
 	silent(t, run(t, func(rec T) { Engine(rec, dir) }))
 }
 
-// The bar is "no terminal concepts", not "no Bubble Tea": every one of these is
-// a way of learning about columns or escape sequences.
+// The bar is "no terminal concepts", not "no Bubble Tea": every one of these
+// is a way of learning about columns or escape sequences.
 func TestEngineRejectsEveryWayOfLearningAboutTerminals(t *testing.T) {
 	for _, tc := range []struct {
 		path string
@@ -52,9 +53,9 @@ func TestEngineRejectsEveryWayOfLearningAboutTerminals(t *testing.T) {
 	}
 }
 
-// The reason is reported, not just the fact. A guard that says "forbidden" tells
-// you what happened; one that says why tells you whether the rule is wrong,
-// which is occasionally the right conclusion.
+// The reason is reported, not just the fact. A guard that says "forbidden"
+// tells you what happened; one that says why tells you whether the rule is
+// wrong, which is occasionally the right conclusion.
 func TestEngineSaysWhyRatherThanJustNo(t *testing.T) {
 	dir := pkg(t, "package engine\n\nimport _ \"github.com/charmbracelet/lipgloss\"\n")
 	msgs := run(t, func(rec T) { Engine(rec, dir) })
@@ -107,7 +108,7 @@ func TestEveryDeniedPrefixSaysWhy(t *testing.T) {
 }
 
 // Issue 62: decision 1 says the fixture is a value the engine returns, and
-// nothing enforced it, so in docket it quietly stopped being one.
+// nothing enforced it, so in the board it quietly stopped being one.
 func TestDerivedRejectsAHandBuiltAnswer(t *testing.T) {
 	dir := t.TempDir()
 	write(t, dir, "board_test.go", `package tui
@@ -137,8 +138,8 @@ func fixture() engine.Truth {
 	silent(t, run(t, func(rec T) { Derived(rec, dir, "engine", "Truth", "Live") }))
 }
 
-// A type the test SHOULD construct is not listed and must not fire. This is not
-// "tests may not build structs".
+// A type the test SHOULD construct is not listed and must not fire. This is
+// not "tests may not build structs".
 func TestDerivedIgnoresTypesItWasNotGiven(t *testing.T) {
 	dir := t.TempDir()
 	write(t, dir, "board_test.go", `package tui

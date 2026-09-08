@@ -15,8 +15,8 @@ const maskWidth = 8
 // It takes no argument, which is deliberate: a function given the secret is a
 // function that could return some of it, and every "just the last four" is a
 // decision about a particular kind of secret that a framework has no business
-// making. A tool that wants `ghp_…a1b2` builds that string itself and passes it
-// as an ordinary value — then it is visibly the tool's choice.
+// making. A tool that wants `ghp_…a1b2` builds that string itself and passes
+// it as an ordinary value — then it is visibly the tool's choice.
 //
 // # Where the rest of this lives
 //
@@ -24,10 +24,10 @@ const maskWidth = 8
 //
 //   - WHICH secrets are revealed is [app.Toggles], keyed by a stable id so the
 //     state survives a filter, a re-sort or a refresh. That already exists,
-//     and swarmctl's revealState is what it was lifted from.
+//     and the deploy tool's revealState is what it was lifted from.
 //   - SCRUBBING a secret out of text that flows past — a command line, a log
 //     line — belongs to the tool's engine, because only the tool knows what
-//     its secrets are and where they go. azctl's runner does it, and it is
+//     its secrets are and where they go. The cloud tool's runner does it, and it is
 //     what caught a swarm join token printing to stdout.
 //   - What a hidden value LOOKS like is this.
 func Mask() string { return strings.Repeat("•", maskWidth) }

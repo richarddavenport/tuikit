@@ -6,30 +6,33 @@ import "github.com/charmbracelet/lipgloss"
 //
 // # Where this came from
 //
-// swarmctl's action.go (777 lines) and pgctl's actionview.go (278) both have
-// one, and democtl's overlay is a third. What they share is the shape — a
-// title, an explanation, and the keys — and a hard-won rule about width.
+// The deploy tool's action.go (777 lines) and the database tool's
+// actionview.go (278) both have one, and democtl's overlay is a third. What
+// they share is the shape — a title, an explanation, and the keys — and a
+// hard-won rule about width.
 //
-// The rule is pgctl's, and its comment records why: "the plan's description
-// contains lines as long as a list of every table a widened selection adds, and
-// an unbounded box drew itself off the side of the screen — which the
-// screenshots caught before anyone else did." So a modal is BOUNDED TO ITS
-// CONTAINER by construction. There is no way to ask for one that is too wide.
+// The rule is the database tool's, and its comment records why: "the plan's
+// description contains lines as long as a list of every table a widened
+// selection adds, and an unbounded box drew itself off the side of the screen
+// — which the screenshots caught before anyone else did." So a modal is
+// BOUNDED TO ITS CONTAINER by construction. There is no way to ask for one
+// that is too wide.
 //
-// The meaningful difference is the floor. pgctl clamps between 32 and 104
-// columns; democtl only caps at 64 and has no minimum, so on a narrow terminal
-// its modal shrinks until the question no longer reads. pgctl is right, and a
-// floor costs nothing: a box wider than the terminal is clipped by the canvas
-// anyway, which is a better failure than a box too narrow to read.
+// The meaningful difference is the floor. The database tool clamps between 32
+// and 104 columns; democtl only caps at 64 and has no minimum, so on a narrow
+// terminal its modal shrinks until the question no longer reads. The database
+// tool is right, and a floor costs nothing: a box wider than the terminal is
+// clipped by the canvas anyway, which is a better failure than a box too
+// narrow to read.
 //
 // # Typing the name
 //
-// swarmctl requires DESTRUCTIVE actions to be confirmed by typing the subject's
-// name — the service, or env/service when the environment is guarded (action.go
-// confirmPhrase, confirmed). That lives in comp.Form, as a Field with a Must:
-// it is a text field with one extra rule, and putting it here would have been a
-// second implementation of typed input. A confirm that needs it draws a Form in
-// its body and asks Form.Complete before acting.
+// The deploy tool requires DESTRUCTIVE actions to be confirmed by typing the
+// subject's name — the service, or env/service when the environment is guarded
+// (action.go confirmPhrase, confirmed). That lives in comp.Form, as a Field
+// with a Must: it is a text field with one extra rule, and putting it here
+// would have been a second implementation of typed input. A confirm that needs
+// it draws a Form in its body and asks Form.Complete before acting.
 type Confirm struct {
 	Title, Body string
 
@@ -40,14 +43,15 @@ type Confirm struct {
 	Hints []Hint
 
 	// Max, Min and Margin bound the box. Zero takes the defaults, which are
-	// pgctl's numbers with democtl's margin.
+	// the database tool's numbers with democtl's margin.
 	Max, Min, Margin int
 
 	// Styles.
 	Border, TitleStyle, DangerStyle, BodyStyle, HintStyle *lipgloss.Style
 }
 
-// Default bounds, from pgctl, whose modal met the longest content of the four.
+// Default bounds, from the database tool, whose modal met the longest content
+// of the four.
 const (
 	confirmMax    = 64
 	confirmMin    = 32

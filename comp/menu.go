@@ -7,8 +7,8 @@ import "github.com/charmbracelet/lipgloss"
 // # Where this came from
 //
 // democtl's context menu, which was forty lines of drawing with three real
-// rules buried in it — and azctl needs the same menu, which is the second
-// consumer that makes this an extraction rather than a guess.
+// rules buried in it — and the cloud tool needs the same menu, which is the
+// second consumer that makes this an extraction rather than a guess.
 //
 // The rules, all of them learned rather than designed:
 //
@@ -43,8 +43,8 @@ type Menu struct {
 	Border, Style, Selected *lipgloss.Style
 }
 
-// DrawAt places the menu with its top-left corner at x, y — where a right-click
-// landed.
+// DrawAt places the menu with its top-left corner at x, y — where a
+// right-click landed.
 func (m Menu) DrawAt(c *Canvas, x, y int) Rect {
 	if len(m.Items) == 0 {
 		return Rect{}
@@ -81,8 +81,8 @@ func (m Menu) DrawAt(c *Canvas, x, y int) Rect {
 // The keyboard path. "At the cursor" means at the thing the cursor is on, and
 // the only place that is knowable is the frame being drawn — the row may have
 // scrolled since the key was pressed. Falls back to the top-left when the
-// region was not drawn at all, which is a menu somewhere odd rather than a menu
-// that vanished.
+// region was not drawn at all, which is a menu somewhere odd rather than a
+// menu that vanished.
 func (m Menu) DrawOn(c *Canvas, on ID) Rect {
 	x, y := 0, 0
 	if at, ok := c.Region(on); ok {

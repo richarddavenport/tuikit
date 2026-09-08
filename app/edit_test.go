@@ -15,7 +15,7 @@ func TestEdit(t *testing.T) {
 		took  bool
 	}{
 		{"a letter", "fo", tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("r")}, "for", true},
-		// Bubble Tea sets Runes for KeySpace as well as the type. azctl
+		// Bubble Tea sets Runes for KeySpace as well as the type. The cloud tool
 		// appended both and put two spaces in for every one pressed.
 		{"a space goes in once", "rg", tea.KeyMsg{Type: tea.KeySpace, Runes: []rune{' '}}, "rg ", true},
 		{"backspace", "rg-", tea.KeyMsg{Type: tea.KeyBackspace}, "rg", true},
@@ -33,8 +33,8 @@ func TestEdit(t *testing.T) {
 }
 
 // Backspace removes a CHARACTER, not a byte. Cutting a multi-byte rune in half
-// leaves a string that is no longer valid UTF-8, and the frame it is drawn into
-// shows a replacement mark for something the reader typed correctly.
+// leaves a string that is no longer valid UTF-8, and the frame it is drawn
+// into shows a replacement mark for something the reader typed correctly.
 func TestBackspaceRemovesARune(t *testing.T) {
 	got, _ := Edit("café", tea.KeyMsg{Type: tea.KeyBackspace})
 	if got != "caf" {

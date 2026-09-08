@@ -2,20 +2,21 @@ package comp
 
 import "github.com/charmbracelet/lipgloss"
 
-// Rule is a horizontal line across a band — the thing under a header, and above
-// a footer.
+// Rule is a horizontal line across a band — the thing under a header, and
+// above a footer.
 //
 // It exists because four codebases drew it by hand and disagreed about what it
-// was made of. azctl drew it twice, swarmctl once, and tuikit's own gallery,
-// democtl and [Palette] between them three more times; five of those seven
-// wrote the literal "─" and two asked the chrome. A tool on [theme.ASCIIBox] —
-// which exists so an interface can be drawn in a font that has nothing — got
-// "-" from its palette and "─" from its header in the same frame.
+// was made of. The cloud tool drew it twice, the deploy tool once, and
+// tuikit's own gallery, democtl and [Palette] between them three more times;
+// five of those seven wrote the literal "─" and two asked the chrome. A tool
+// on [theme.ASCIIBox] — which exists so an interface can be drawn in a font
+// that has nothing — got "-" from its palette and "─" from its header in the
+// same frame.
 //
-// So the character comes from Chrome and not from the caller. That is the whole
-// point: [guard.Glyphs] cannot catch a hardcoded "─", because "─" is a legal
-// glyph. It was the wrong SOURCE, not an illegal character, and the only fix
-// for a wrong source is to have one source.
+// So the character comes from Chrome and not from the caller. That is the
+// whole point: [guard.Glyphs] cannot catch a hardcoded "─", because "─" is a
+// legal glyph. It was the wrong SOURCE, not an illegal character, and the only
+// fix for a wrong source is to have one source.
 //
 // Not a field on [Bar]. Bar means "one line with content at each end", and a
 // Bar with no content that fills its own width is a second meaning wearing the

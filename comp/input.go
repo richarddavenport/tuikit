@@ -7,9 +7,9 @@ import (
 // Input is one line being typed into.
 //
 // From three places that each drew their own. democtl's filter is a pane title
-// with an underscore stuck on the end; azctl's is the same trick; and the
-// swarmctl palette needs a real one — a caret you can move, text that scrolls
-// when it outgrows the box, and a cursor you can see.
+// with an underscore stuck on the end; the cloud tool's is the same trick; and
+// the the deploy tool palette needs a real one — a caret you can move, text
+// that scrolls when it outgrows the box, and a cursor you can see.
 //
 // The underscore version is worth naming, because it is what everyone writes
 // first and it is wrong in a specific way: it cannot show WHERE you are. Every
@@ -120,8 +120,8 @@ func (in Input) Draw(c *Canvas, r Rect, id ID) int {
 // scroll is the first rune to draw, chosen so the caret is always on screen.
 //
 // The window follows the caret rather than the text: a field scrolled to the
-// end and then arrowed back to the start has to come with you, or the thing you
-// are editing is somewhere you cannot see.
+// end and then arrowed back to the start has to come with you, or the thing
+// you are editing is somewhere you cannot see.
 func (in Input) scroll(runes []rune, cursor, width int) int {
 	if width <= 0 {
 		return 0

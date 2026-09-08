@@ -17,14 +17,14 @@ import (
 // nothing can tell the difference. The goldens will happily record whatever
 // comes out.
 //
-// azctl was got to the point where `grep -c 'c.Text(|c.Fill(|c.Set('
+// The cloud tool was got to the point where `grep -c 'c.Text(|c.Fill(|c.Set('
 // internal/tui/*.go` is zero — the tool computes no coordinates at all. Nothing
 // enforced that. It was a habit, and habits are not properties.
 //
-// Draw makes it one. A model is handed a canvas and a rect and has nowhere else
-// to put anything: there is no return value to smuggle a string through. The
-// runner owns the canvas, its size, its chrome, and its pixel layer, so those
-// stop being four things every tool sets up the same way and gets subtly
+// Draw makes it one. A model is handed a canvas and a rect and has nowhere
+// else to put anything: there is no return value to smuggle a string through.
+// The runner owns the canvas, its size, its chrome, and its pixel layer, so
+// those stop being four things every tool sets up the same way and gets subtly
 // different.
 //
 // Update returns a Model rather than a tea.Model for the same reason. A
@@ -59,20 +59,20 @@ type Option func(*Runner)
 //
 // The default keeps one row back. Nobody had written down why (issue 37), and
 // the answer turned out to be that nobody decided it: democtl inherited the
-// arithmetic from swarmctl and it was then promoted to a rule on the grounds
-// that two tools did it "independently".
+// arithmetic from the deploy tool and it was then promoted to a rule on the
+// grounds that two tools did it "independently".
 //
 // Measured since, in tmux 3.5a at 24x10 under tea.WithAltScreen: a frame of
-// exactly the terminal height, with a bordered pane so the bottom-right cell is
-// genuinely written, renders with its top line intact and does not scroll. The
-// pending-wrap hazard is real in general and does not fire here, because
-// nothing is written after the last cell. azctl also ran full height for months
-// before it migrated, with no report of a lost line.
+// exactly the terminal height, with a bordered pane so the bottom-right cell
+// is genuinely written, renders with its top line intact and does not scroll.
+// The pending-wrap hazard is real in general and does not fire here, because
+// nothing is written after the last cell. The cloud tool also ran full height
+// for months before it migrated, with no report of a lost line.
 //
 // So this is safe as far as anyone has looked, and the default still keeps the
 // row: one emulator family has been measured, the failure mode is a top line
-// eaten on some OTHER terminal, and that is a bad trade against one row. Turn it
-// on for a tool where the row matters and say which terminals you checked.
+// eaten on some OTHER terminal, and that is a bad trade against one row. Turn
+// it on for a tool where the row matters and say which terminals you checked.
 func WithFullHeight() Option { return func(r *Runner) { r.fullHeight = true } }
 
 // WithChrome sets the characters components draw with.
@@ -121,10 +121,10 @@ func (r *Runner) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // View builds the frame.
 //
 // The canvas is one row shorter than the terminal unless [WithFullHeight] says
-// otherwise. Decision 38 has the measurement and the argument; the short version
-// is that the reserved row is a hedge, not a requirement, and it is kept by
-// default because the cost of being wrong is a lost top line and the cost of
-// being right is one row.
+// otherwise. Decision 38 has the measurement and the argument; the short
+// version is that the reserved row is a hedge, not a requirement, and it is
+// kept by default because the cost of being wrong is a lost top line and the
+// cost of being right is one row.
 func (r *Runner) View() string {
 	h := r.h - 1
 	if r.fullHeight {

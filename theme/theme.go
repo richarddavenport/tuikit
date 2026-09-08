@@ -1,18 +1,18 @@
 // Package theme is what a tuikit interface is allowed to look like: the colour
 // roles it may use, and the characters it may print.
 //
-// It exists as its own package for two reasons, both learned in swarmctl before
-// this was a library. The first is that these were not written down anywhere —
-// nine raw ANSI numbers in one file plus six more hardcoded across three others,
-// with the SAME number meaning "focused border" in one place and "title" in
-// another purely by coincidence. A role with a name can be changed once; a
-// number cannot be changed at all.
+// It exists as its own package for two reasons, both learned in the deploy
+// tool before this was a library. The first is that these were not written
+// down anywhere — nine raw ANSI numbers in one file plus six more hardcoded
+// across three others, with the SAME number meaning "focused border" in one
+// place and "title" in another purely by coincidence. A role with a name can
+// be changed once; a number cannot be changed at all.
 //
-// The second is that a design system has to be able to read them. Anything that
-// draws the interface somewhere other than a terminal — a mockup, a palette, a
-// component sheet, a captured frame turned into HTML — has to start from the
-// same table the terminal starts from, or it is drawing a tool that does not
-// exist.
+// The second is that a design system has to be able to read them. Anything
+// that draws the interface somewhere other than a terminal — a mockup, a
+// palette, a component sheet, a captured frame turned into HTML — has to start
+// from the same table the terminal starts from, or it is drawing a tool that
+// does not exist.
 package theme
 
 import "github.com/charmbracelet/lipgloss"
@@ -21,25 +21,27 @@ import "github.com/charmbracelet/lipgloss"
 //
 // Naming is by ROLE, never by hue. "Accent" survives someone deciding the
 // interface should be blue; "pink" does not. A raw index also says what a
-// colour IS instead of what it is FOR, which is how one value came to mean both
-// "title" and "focused border" without anyone choosing that they move together.
+// colour IS instead of what it is FOR, which is how one value came to mean
+// both "title" and "focused border" without anyone choosing that they move
+// together.
 //
-// A tool takes [Default] and overrides the fields it wants. It does not build a
-// Palette from scratch, because the point of the set being closed is that
+// A tool takes [Default] and overrides the fields it wants. It does not build
+// a Palette from scratch, because the point of the set being closed is that
 // nine decisions is the whole vocabulary.
 //
 // # Why the colours are an interface
 //
-// A role holds a lipgloss.TerminalColor rather than a lipgloss.Color, so a tool
-// may supply an AdaptiveColor and have its interface read on a light terminal
-// as well as a dark one. That is azctl's requirement, found by migrating it:
-// its palette is light/dark pairs, and a Palette that could not hold them would
-// have forced it to choose between tuikit's vocabulary and working in daylight.
+// A role holds a lipgloss.TerminalColor rather than a lipgloss.Color, so a
+// tool may supply an AdaptiveColor and have its interface read on a light
+// terminal as well as a dark one. That is the cloud tool's requirement, found
+// by migrating it: its palette is light/dark pairs, and a Palette that could
+// not hold them would have forced it to choose between tuikit's vocabulary and
+// working in daylight.
 //
-// Depth and adaptation are different questions. Decision 13 chose ANSI 256 over
-// truecolour because ssh decides the profile; that is about how many colours
-// there are. Which of them to use on a pale background is a separate decision,
-// and one a design system has no business taking for a tool.
+// Depth and adaptation are different questions. Decision 13 chose ANSI 256
+// over truecolour because ssh decides the profile; that is about how many
+// colours there are. Which of them to use on a pale background is a separate
+// decision, and one a design system has no business taking for a tool.
 type Palette struct {
 	// Accent is the interface's own colour: titles, the selected row, the
 	// focused panel's border. It marks WHERE YOU ARE, which is why the same
@@ -79,8 +81,8 @@ type Palette struct {
 	Extra []Role
 }
 
-// Default is the palette swarmctl arrived at, and the one a tuikit tool gets
-// unless it says otherwise.
+// Default is the palette the deploy tool arrived at, and the one a tuikit tool
+// gets unless it says otherwise.
 //
 // Values are the FIRST SIXTEEN ANSI indices, and the sixteen are the whole
 // point: they are the only colours a terminal lets its user redefine.
@@ -88,9 +90,9 @@ type Palette struct {
 // Everything from 16 up is a fixed formula — a 6x6x6 cube and a grey ramp —
 // identical in every terminal and untouched by every theme. A palette built
 // from those indices looks the same under gruvbox, tokyo-night and solarized,
-// which is another way of saying it ignores what the reader chose. This palette
-// used to be 205/241/240; it was themeable in the sense that a Go programmer
-// could edit it.
+// which is another way of saying it ignores what the reader chose. This
+// palette used to be 205/241/240; it was themeable in the sense that a Go
+// programmer could edit it.
 //
 // The sixteen are already semantic, which is what makes this a mapping rather
 // than a guess. Terminal themes agree that 0 is the background and 7 the
@@ -106,9 +108,9 @@ type Palette struct {
 // # The selection is reverse video, deliberately
 //
 // SelectionFG is the background and SelectionBG the foreground, which inverts
-// correctly on a light theme BY CONSTRUCTION rather than by detecting one.
-// swarmctl's design notes reached the same place independently: it is "the one
-// treatment that reads identically in both profiles".
+// correctly on a light theme BY CONSTRUCTION rather than by detecting one. The
+// deploy tool's design notes reached the same place independently: it is "the
+// one treatment that reads identically in both profiles".
 //
 // # What this costs
 //
@@ -116,9 +118,9 @@ type Palette struct {
 // 240 — one step apart on the ramp and near-indistinguishable anyway.
 //
 // And the accent is the terminal's magenta rather than the theme's own accent
-// colour, because ANSI has no accent slot. A tool that wants the real one reads
-// it from wherever its desktop keeps it and overrides the role; that is what
-// Extra and a plain assignment are for.
+// colour, because ANSI has no accent slot. A tool that wants the real one
+// reads it from wherever its desktop keeps it and overrides the role; that is
+// what Extra and a plain assignment are for.
 var Default = Palette{
 	Accent:      lipgloss.Color("13"), // bright magenta
 	Muted:       lipgloss.Color("8"),  // the dimmed grey — literally named muted
@@ -138,9 +140,9 @@ type Role struct {
 	Why   string
 }
 
-// Roles is the palette in the order it is worth reading: what the interface is,
-// then what it says, then what it warns about. Extra roles come last, in the
-// order the tool declared them.
+// Roles is the palette in the order it is worth reading: what the interface
+// is, then what it says, then what it warns about. Extra roles come last, in
+// the order the tool declared them.
 //
 // The Why text describes the ROLE, not the hue, so it survives a tool
 // recolouring the palette — which is the whole reason roles are named.
@@ -164,15 +166,16 @@ func (p Palette) Roles() []Role {
 // The set is CLOSED, and guard.Glyphs holds it closed. A terminal font without
 // a glyph draws a replacement box, which reads as a bug rather than as
 // decoration — that is exactly what happened to a block-character edit cursor.
-// Adding one means adding it here and deciding, deliberately, that it is common
-// enough.
+// Adding one means adding it here and deciding, deliberately, that it is
+// common enough.
 //
 // Box-drawing, arrows, bullets and typographic punctuation are in every font
 // shipped with a terminal. Block elements (U+2580–U+259F), geometric shapes
 // beyond the plain bullet, emoji and Nerd Font private-use icons are not.
 type GlyphSet map[rune]string
 
-// DefaultGlyphs is swarmctl's allow-list, and the one a tuikit tool starts from.
+// DefaultGlyphs is the deploy tool's allow-list, and the one a tuikit tool
+// starts from.
 var DefaultGlyphs = GlyphSet{
 	'·': "middle dot — key separator in footers",
 	'—': "em dash — clause separator in messages",
@@ -213,9 +216,9 @@ var DefaultGlyphs = GlyphSet{
 //
 // A copy, because a GlyphSet is a map and a map is a reference: a tool that
 // added a glyph to DefaultGlyphs in place would be adding it to every other
-// tool in the process, and to the guard that is supposed to catch it. Pairs are
-// rune, reason, rune, reason; an odd count or a non-rune key panics, because
-// both are typos rather than conditions to handle.
+// tool in the process, and to the guard that is supposed to catch it. Pairs
+// are rune, reason, rune, reason; an odd count or a non-rune key panics,
+// because both are typos rather than conditions to handle.
 func (g GlyphSet) With(pairs ...any) GlyphSet {
 	if len(pairs)%2 != 0 {
 		panic("theme: GlyphSet.With wants rune, reason pairs")
@@ -242,8 +245,8 @@ func (g GlyphSet) With(pairs ...any) GlyphSet {
 //
 // The spinner is drawn by bubbles, not by the tool, so its characters never
 // appear in a string literal and the guard never sees them. Writing that down
-// rather than leaving it as a hole: Braille patterns are in every terminal font
-// — which is exactly why a spinner reaches for them instead of the block
+// rather than leaving it as a hole: Braille patterns are in every terminal
+// font — which is exactly why a spinner reaches for them instead of the block
 // elements that would be a box on someone's terminal — so the dependency
 // happens to be making the same decision this list makes.
 //

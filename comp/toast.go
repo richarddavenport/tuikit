@@ -6,16 +6,16 @@ import "github.com/charmbracelet/lipgloss"
 //
 // # Where this came from
 //
-// swarmctl's errorView (errorview.go). Its shape is what failed, against which
+// The deploy tool's errorView. Its shape is what failed, against which
 // target, the cleaned root cause wrapped to the terminal — and, in its own
 // words, "a hint for the failures we know how to fix".
 //
 // That last part is the component. An error that names what went wrong and
 // stops is a dead end: the reader is told they have a problem and left to
 // guess. A Hint is the difference between "connection refused" and "connection
-// refused — is the tunnel up? try `pgctl connect`", and it is the field most
-// likely to be left empty, so it is a field rather than something you are
-// expected to append to Body.
+// refused — is the tunnel up? try `the database tool connect`", and it is the
+// field most likely to be left empty, so it is a field rather than something
+// you are expected to append to Body.
 //
 // Bounded the way a modal is, and for the same reason: the root cause of a
 // failure is arbitrary text from somewhere else, and an unbounded box drew

@@ -3,13 +3,14 @@
 //
 // The where is the part that is easy to leave out and hard to add later. A
 // matcher that answers yes or no can filter a list; only one that returns
-// positions can underline the letters you typed, and without that a ranked list
-// is a list whose order you have to take on trust. The swarmctl palette design
-// asks for the matched substring to be underlined, and it is right to: it is
-// the difference between "these five things matched" and "here is why".
+// positions can underline the letters you typed, and without that a ranked
+// list is a list whose order you have to take on trust. The the deploy tool
+// palette design asks for the matched substring to be underlined, and it is
+// right to: it is the difference between "these five things matched" and "here
+// is why".
 //
-// It is a package rather than part of comp because it draws nothing. comp holds
-// components; this is the arithmetic underneath one.
+// It is a package rather than part of comp because it draws nothing. comp
+// holds components; this is the arithmetic underneath one.
 package fuzzy
 
 import (
@@ -44,8 +45,8 @@ const (
 // Match scores query against text, case-insensitively.
 //
 // An empty query matches everything with no highlights, which is what makes an
-// unfiltered list and a filtered one the same code path — the palette shows all
-// 41 commands before you type anything, and that is not a special case.
+// unfiltered list and a filtered one the same code path — the palette shows
+// all 41 commands before you type anything, and that is not a special case.
 func Match(query, text string) (Result, bool) {
 	if query == "" {
 		return Result{}, true

@@ -38,12 +38,12 @@ func TestHexFollowsTheAnsiPalette(t *testing.T) {
 	}
 }
 
-// Anything that is neither a palette index nor a hex value is EMPTY rather than
-// a panic: this runs in a generator, and a bad value should be visible as a
-// missing swatch, not a crashed build.
+// Anything that is neither a palette index nor a hex value is EMPTY rather
+// than a panic: this runs in a generator, and a bad value should be visible as
+// a missing swatch, not a crashed build.
 //
-// Empty rather than black, because index 0 is a real role now — a sentinel that
-// collides with a legitimate answer is a check that has stopped checking.
+// Empty rather than black, because index 0 is a real role now — a sentinel
+// that collides with a legitimate answer is a check that has stopped checking.
 func TestHexIsTotal(t *testing.T) {
 	for _, in := range []string{"", "nope", "-1", "256"} {
 		if got := Hex(lipglossColor(in)); got != "" {
@@ -57,9 +57,9 @@ func TestHexIsTotal(t *testing.T) {
 }
 
 // A tool that named its roles in hex has already answered the question, so Hex
-// hands it back rather than pretending not to understand. azctl's palette is
-// hex pairs, and a design system that drew nine black squares for it would be
-// describing a tool that does not exist.
+// hands it back rather than pretending not to understand. The cloud tool's
+// palette is hex pairs, and a design system that drew nine black squares for
+// it would be describing a tool that does not exist.
 func TestHexPassesThroughAHexValue(t *testing.T) {
 	for in, want := range map[string]string{
 		"#ff00ff": "#ff00ff",

@@ -10,17 +10,18 @@ import (
 //
 // # Where this came from
 //
-// pgctl's `window` (view.go:232), swarmctl's pane scrolling (pane.go:409) and
-// azctl's cursor/top pair (dashboard.go) are the same function written three
-// times. All three keep the offset in a separate field from the cursor, and all
-// three pull the offset along to keep the cursor in view.
+// The database tool's `window`, the deploy tool's pane scrolling and the cloud
+// tool's cursor/top pair are the same function written three times. All three
+// keep the offset in a separate field from the cursor, and all three pull the
+// offset along to keep the cursor in view.
 //
 // The one place two of them differ meaningfully is worth a parameter rather
-// than a choice: swarmctl follows the cursor ONLY WHEN THE PANE IS FOCUSED, and
-// pgctl always does. swarmctl is right. An unfocused pane whose viewport jumps
-// because its cursor is somewhere else is a pane that moves while you are
-// reading it, and the cursor there is a memory of where you were rather than a
-// thing you are pointing at. So Focused decides it.
+// than a choice: the deploy tool follows the cursor ONLY WHEN THE PANE IS
+// FOCUSED, and the database tool always does. The deploy tool is right. An
+// unfocused pane whose viewport jumps because its cursor is somewhere else is
+// a pane that moves while you are reading it, and the cursor there is a memory
+// of where you were rather than a thing you are pointing at. So Focused
+// decides it.
 //
 // What none of the three had, and the canvas-mouse prototype found by being
 // used:
@@ -67,9 +68,9 @@ type List struct {
 	// list whose selection is a CHARACTER rather than only a colour. They
 	// should be the same width, or the rows jump as you move.
 	//
-	// comp.Form has had these since it was written and a List did not, which
-	// azctl's migration found the hard way: its resource rows are marked with
-	// › and the port silently dropped them. Two components with a cursor
+	// comp.Form has had these since it was written and a List did not, which the
+	// cloud tool's migration found the hard way: its resource rows are marked
+	// with › and the port silently dropped them. Two components with a cursor
 	// should agree about how a cursor is shown.
 	Marker, Blank string
 
@@ -86,10 +87,10 @@ type List struct {
 	// The default reserves it whether or not the list overflows, because a
 	// viewport that only looks like one when it is scrolling is a viewport you
 	// cannot tell from a short list. That reasoning holds for one big list and
-	// stops holding for several small ones: pgctl stacks FIVE lists in a
-	// column, and at 80x24 their status rows are five of about twenty-one body
-	// rows — a quarter of the column spent on counters reading 3/3, 3/3, 1/1,
-	// 1/1 and blank, next to panel titles that already say the same number.
+	// stops holding for several small ones: the database tool stacks FIVE lists
+	// in a column, and at 80x24 their status rows are five of about twenty-one
+	// body rows — a quarter of the column spent on counters reading 3/3, 3/3,
+	// 1/1, 1/1 and blank, next to panel titles that already say the same number.
 	//
 	// Off by default, so a list that has never heard of this keeps the row and
 	// the guarantee that comes with it. Turn it off only where something else
@@ -136,15 +137,15 @@ func (l *List) Offset() int { return l.offset }
 
 // Row is one line of a list.
 //
-// Text and Style are the common case: a whole row in one colour. Spans is for a
-// row that is more than one — a name with a dim count after it, a timestamp
+// Text and Style are the common case: a whole row in one colour. Spans is for
+// a row that is more than one — a name with a dim count after it, a timestamp
 // then a message — and wins when it is set.
 //
 // Spans arrived late, from two tools independently. democtl's log lines are a
-// muted timestamp then plain text, and azctl's tree rows are a label then a
-// dim count; both had to fall back to drawing themselves rather than using a
-// List. Two of four needing it is the line at which it stops being a special
-// case.
+// muted timestamp then plain text, and the cloud tool's tree rows are a label
+// then a dim count; both had to fall back to drawing themselves rather than
+// using a List. Two of four needing it is the line at which it stops being a
+// special case.
 type Row struct {
 	Text  string
 	Style *lipgloss.Style
@@ -158,7 +159,7 @@ type Row struct {
 	//
 	// Without it, a list containing a heading breaks three ways at once: ↑↓
 	// appears to do nothing, whatever sits beside the list has nothing to show,
-	// and enter acts on a row that is not a thing. swarmctl hit this and
+	// and enter acts on a row that is not a thing. The deploy tool hit this and
 	// hand-rolled `navigable()`; the command palette needs the same for its
 	// tier headers.
 	Skip bool
@@ -167,12 +168,12 @@ type Row struct {
 	// two of the four tools already have in five separate places, every one of
 	// them writing `"  " + line` by hand.
 	//
-	// A NUMBER, not a node. The flattening stays the tool's: azctl's
-	// row{bucket, res} and swarmctl's diffRow{service, action, change} look
-	// alike and are not, because each carries a domain payload, and a shared
-	// []Node would make both of them box their data or keep it twice. What
-	// they have in common is that a child sits two columns right of its
-	// header, and that is this field.
+	// A NUMBER, not a node. The flattening stays the tool's: the cloud tool's
+	// row{bucket, res} and the deploy tool's diffRow{service, action, change}
+	// look alike and are not, because each carries a domain payload, and a shared
+	// []Node would make both of them box their data or keep it twice. What they
+	// have in common is that a child sits two columns right of its header, and
+	// that is this field.
 	Depth int
 
 	// Key is this row's identity, for a list whose rows come and go.
@@ -235,7 +236,7 @@ type Row struct {
 	// Right is drawn hard against the row's right-hand edge, after Spans.
 	//
 	// [Bar] has done this since it was written and was not reachable from
-	// inside a list, so three call sites in boardctl did the arithmetic by hand
+	// inside a list, so three call sites in the board did the arithmetic by hand
 	// — and it produced two bugs that a golden caught and a reader would not
 	// have: len(s) where Width(s) was meant, on a string holding a `,` and
 	// forgetting that Lead comes out of the same width, which pushed every lane
@@ -257,17 +258,17 @@ type Row struct {
 	// what every list did before this existed.
 	//
 	// It is here because a selected row is otherwise one colour whatever its
-	// spans say, and that is right for a LABEL and wrong for a glyph that IS
-	// the state. pgctl's connection list marks reachability with ● ○ ✗ in the
-	// first column; on the cursor row all three came out bold black on white,
+	// spans say, and that is right for a LABEL and wrong for a glyph that IS the
+	// state. The database tool's connection list marks reachability with ● ○ ✗ in
+	// the first column; on the cursor row all three came out bold black on white,
 	// so the one row a reader is looking at was the one row whose status they
 	// could not read. A person using it said so.
 	//
 	// It is also an accessibility rule and not only a legibility one. A black ●
-	// on light grey does not read as "green ● that is highlighted", it reads as
-	// a DIFFERENT state — off, disabled. pgctl was saved by using distinct
-	// shapes as well as colours; a tool encoding state in colour alone would
-	// have lost it outright, and nothing in the API would have said so.
+	// on light grey does not read as "green ● that is highlighted", it reads as a
+	// DIFFERENT state — off, disabled. The database tool was saved by using
+	// distinct shapes as well as colours; a tool encoding state in colour alone
+	// would have lost it outright, and nothing in the API would have said so.
 	//
 	// Only the lead, deliberately. Letting every styled span survive selection
 	// is more elegant and makes the cursor's prominence depend on how colourful
@@ -289,10 +290,10 @@ func (l *List) Draw(c *Canvas, r Rect, rows []Row) {
 // DrawFunc is Draw for a list whose rows are made on demand.
 //
 // From the file managers and log viewers this library keeps being compared to,
-// where a directory of 200,000 entries or a log of a million lines is ordinary.
-// Draw already only PAINTS what fits — the expensive part was never the
-// drawing, it was building a []Row for everything so that twenty of them could
-// be shown.
+// where a directory of 200,000 entries or a log of a million lines is
+// ordinary. Draw already only PAINTS what fits — the expensive part was never
+// the drawing, it was building a []Row for everything so that twenty of them
+// could be shown.
 //
 // row is called only for the rows actually on screen, so the cost of a frame
 // is the size of the pane rather than the size of the data. It is called with
@@ -437,10 +438,10 @@ func (l *List) right(c *Canvas, body Rect, y int, row Row, style *lipgloss.Style
 // header (issue 76).
 //
 // It exists so a tool laying out several lists does not encode this
-// component's internals as a constant. pgctl had `const chrome = 3` (two
-// borders and "the row comp.List keeps for its position counter"), which is a
-// number that goes silently wrong the moment the answer changes — the class
-// decision 32 is about.
+// component's internals as a constant. The database tool had `const chrome =
+// 3` (two borders and "the row comp.List keeps for its position counter"),
+// which is a number that goes silently wrong the moment the answer changes —
+// the class decision 32 is about.
 func (l *List) StatusRows() int {
 	if l.NoStatus {
 		return 0
@@ -495,7 +496,8 @@ func (l *List) Count() int { return l.count }
 // Shown is how many rows the last frame had room for.
 func (l *List) Shown() int { return l.shown }
 
-// Max is the furthest the list can be scrolled, given what the last frame drew.
+// Max is the furthest the list can be scrolled, given what the last frame
+// drew.
 func (l *List) Max() int { return max(0, l.count-l.shown) }
 
 // Scroll moves the viewport. It never moves the cursor, and it never asks for
@@ -506,12 +508,12 @@ func (l *List) Scroll(by int) { l.offset = clamp(l.offset+by, 0, l.Max()) }
 //
 // The move is RECORDED and resolved at draw time, because the list does not
 // hold its rows — they arrive at Draw — so nothing here can know which of them
-// the cursor is allowed to land on. That is the same arrangement Select and the
-// viewport already use: "clamped at draw time rather than here".
+// the cursor is allowed to land on. That is the same arrangement Select and
+// the viewport already use: "clamped at draw time rather than here".
 //
-// It means Cursor() between a Move and a Draw is the old value. Every caller in
-// this repo and in the tools moves in Update and reads in Draw, which is the
-// order a Bubble Tea program runs in anyway.
+// It means Cursor() between a Move and a Draw is the old value. Every caller
+// in this repo and in the tools moves in Update and reads in Draw, which is
+// the order a Bubble Tea program runs in anyway.
 func (l *List) Move(by int) { l.pending += by; l.reveal = true; l.ClearRange() }
 
 // Select puts the cursor on a row by its index in the LIST.
@@ -534,8 +536,8 @@ func (l *List) Move(by int) { l.pending += by; l.reveal = true; l.ClearRange() }
 // With the cursor in range that clamp is `Select(Cursor())`, and it used to
 // zero the pending move recorded by the arrow key in the same Update. The move
 // was applied and immediately discarded, so the key did nothing and nothing
-// errored (issue 45). Out of range it still selects for real, which is the case
-// the clamp was written for.
+// errored (issue 45). Out of range it still selects for real, which is the
+// case the clamp was written for.
 //
 // Not the wider fix of applying pending on top of any Select: a click means
 // that row, and a queued arrow key landing on top of a click would be worse
@@ -551,7 +553,8 @@ func (l *List) Select(i int) {
 	l.ClearRange()
 }
 
-// Extend moves the cursor and keeps the other end of the selection where it is.
+// Extend moves the cursor and keeps the other end of the selection where it
+// is.
 //
 // The shift-arrow half of a range. The first Extend from no selection anchors
 // at the cursor, so a reader who presses shift-down once has selected two rows
@@ -650,10 +653,10 @@ func (l *List) resolve(n int, row func(int) Row) {
 // keeps the cursor in range and the key keeps it on the same thing, and a list
 // needs both because a row can be filtered out entirely.
 //
-// A linear scan, once per frame, over rows already being asked for. A map would
-// cost a build of every key per frame to save a walk of the same length, and
-// DrawFunc exists so that a list of two hundred thousand is not walked at all —
-// so this stays O(n) and the tools that care about that do not set Key.
+// A linear scan, once per frame, over rows already being asked for. A map
+// would cost a build of every key per frame to save a walk of the same length,
+// and DrawFunc exists so that a list of two hundred thousand is not walked at
+// all — so this stays O(n) and the tools that care about that do not set Key.
 func (l *List) locate(n int, row func(int) Row) int {
 	at := clamp(l.cursor, 0, n-1)
 	if l.key == "" {
@@ -699,12 +702,12 @@ func (l *List) nearest(n int, row func(int) Row, i int) (int, bool) {
 // # The marker comes first, and outside the indent
 //
 // It used to be one or the other: a row with a Lead got no marker at all. That
-// is wrong in the ordinary case rather than an edge one, because a status glyph
-// in the lead column is exactly what Row.LeadStyle exists for. Such a list had
-// its selection carried entirely by Selected's background, so it vanished in a
-// pipe, in a golden, and for a reader who cannot see the colour — and
-// harness.ShapeSurvivesColour could not catch it, because the shape was fine
-// and the information was what went missing.
+// is wrong in the ordinary case rather than an edge one, because a status
+// glyph in the lead column is exactly what Row.LeadStyle exists for. Such a
+// list had its selection carried entirely by Selected's background, so it
+// vanished in a pipe, in a golden, and for a reader who cannot see the colour
+// — and harness.ShapeSurvivesColour could not catch it, because the shape was
+// fine and the information was what went missing.
 //
 // Found by building a tool rather than by reading one: three lists in gcpeasy
 // each re-implemented this badly, and lazygit's file rows need it too.
@@ -731,8 +734,8 @@ func (l *List) drawLead(c *Canvas, x, y int, row Row, i int, leadStyle *lipgloss
 	return w + c.Text(x+w, y, row.Lead, leadStyle, id)
 }
 
-// statusOf pads Status to StatusWidth, so the column is the same width on every
-// row including the rows with nothing to put in it.
+// statusOf pads Status to StatusWidth, so the column is the same width on
+// every row including the rows with nothing to put in it.
 func (l *List) statusOf(row Row) string {
 	if l.StatusWidth <= 0 {
 		return ""
@@ -748,8 +751,8 @@ func (l *List) indentOf(c *Canvas, row Row) string {
 	return strings.Repeat(" ", max(0, row.Depth)*c.Chrome().Indent)
 }
 
-// LeadWidth is the columns drawn before a row's own text, for a header that has
-// to start in the same place.
+// LeadWidth is the columns drawn before a row's own text, for a header that
+// has to start in the same place.
 //
 // The FIXED part only: the cursor marker and the status column. An indent
 // varies per row by definition, so a caller aligning a table header wants this
@@ -784,8 +787,8 @@ func (l *List) mark(i int) string {
 	return strings.Repeat(" ", Width(l.Marker))
 }
 
-// spansText is a row's words without its colours, for when the selection paints
-// over them.
+// spansText is a row's words without its colours, for when the selection
+// paints over them.
 func spansText(spans []Segment) string {
 	var b strings.Builder
 	for _, s := range spans {

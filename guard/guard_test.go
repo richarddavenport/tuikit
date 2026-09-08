@@ -74,8 +74,8 @@ func TestAGlyphInACommentIsNotAGlyphOnScreen(t *testing.T) {
 	silent(t, run(t, func(rec T) { Glyphs(rec, dir, theme.DefaultGlyphs) }))
 }
 
-// A tool that adds a glyph deliberately is the supported path; the guard has to
-// follow the set it was given rather than the default.
+// A tool that adds a glyph deliberately is the supported path; the guard has
+// to follow the set it was given rather than the default.
 func TestGlyphsFollowsAnExtendedSet(t *testing.T) {
 	dir := pkg(t, "package ui\n\nvar n = \"×3\"\n")
 
@@ -108,8 +108,8 @@ func TestAGuardWithNothingToScanFailsRatherThanPasses(t *testing.T) {
 
 // --- fixtures and the recorder ------------------------------------------
 
-// allRoleUses is a line drawing with every role, so a fixture testing one guard
-// does not trip the other's "role never used" arm.
+// allRoleUses is a line drawing with every role, so a fixture testing one
+// guard does not trip the other's "role never used" arm.
 func allRoleUses() string {
 	var b strings.Builder
 	b.WriteString("var _ = []any{\n")
@@ -189,10 +189,11 @@ func silent(t *testing.T, msgs []string) {
 // all of them.
 //
 // A tool that never paints a selection background cannot "drop" SelectionBG —
-// it is a field on a struct it inherited. This check came from swarmctl, where
-// the palette was the tool's own and an unused role really was dead; azctl's
-// migration is where that stopped being true, and it failed on four roles at
-// once for the crime of being a browser rather than a table.
+// it is a field on a struct it inherited. This check came from the deploy
+// tool, where the palette was the tool's own and an unused role really was
+// dead; the cloud tool's migration is where that stopped being true, and it
+// failed on four roles at once for the crime of being a browser rather than a
+// table.
 func TestTokensDoesNotDemandAToolUseEveryInheritedRole(t *testing.T) {
 	dir := t.TempDir()
 	write(t, dir, "ui.go", `package ui
@@ -207,9 +208,9 @@ var _ = p.Accent
 	}
 }
 
-// The spinner range is the documented escape hatch, and the guard has to honour
-// the same answer GlyphSet.Printable gives. Two functions answering "may this
-// be printed" differently is worse than either answer.
+// The spinner range is the documented escape hatch, and the guard has to
+// honour the same answer GlyphSet.Printable gives. Two functions answering
+// "may this be printed" differently is worse than either answer.
 func TestGlyphsHonoursTheSpinnerRange(t *testing.T) {
 	dir := t.TempDir()
 	write(t, dir, "ui.go", "package ui\n\nvar frame = \"⠿\"\n")

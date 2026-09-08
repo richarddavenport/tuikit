@@ -10,11 +10,12 @@ import (
 //
 // # Where this came from
 //
-// pgctl's rows.go (192 lines) and swarmctl's pane and detail tables. Both build
-// a row as a status marker, a name, and then whatever else fits — and pgctl's
-// comment says why that order: "the marker answers 'can I reach it' before the
-// name answers 'which is it', because an unreachable environment changes what
-// every panel below is showing."
+// The database tool's rows.go (192 lines) and the deploy tool's pane and
+// detail tables. Both build a row as a status marker, a name, and then
+// whatever else fits — and the database tool's comment says why that order:
+// "the marker answers 'can I reach it' before the name answers 'which is it',
+// because an unreachable environment changes what every panel below is
+// showing."
 //
 // So a Table is columns with an ALIGNMENT and a WIDTH RULE, and the leading
 // narrow column is the ordinary case rather than a special one.
@@ -22,10 +23,10 @@ import (
 // # What a Table is not
 //
 // It is not a List with columns. A List owns a selection and a viewport; a
-// Table owns alignment. Rows that both scroll and align are a List whose rows a
-// Table laid out, which is two components composed rather than one component
-// with more fields — and it is how democtl's service list already works, having
-// formatted its rows before handing them over.
+// Table owns alignment. Rows that both scroll and align are a List whose rows
+// a Table laid out, which is two components composed rather than one component
+// with more fields — and it is how democtl's service list already works,
+// having formatted its rows before handing them over.
 type Table struct {
 	Columns []Column
 	// Gap is the columns between one column and the next.
@@ -78,14 +79,15 @@ func (t Table) Rows(w int, rows [][]string) []string {
 // cell arrives as a [Segment] and leaves as one, so a column whose colour
 // carries meaning still has it.
 //
-// Rows returns joined strings, which is right when a whole line is one colour —
-// and it silently deletes information when it is not. pgctl ported a manifest
-// onto Table and had to make three columns plain: a rule's data mode was amber
-// for "none" and "filtered", a carried count was amber when a table came across
-// filtered rather than whole, and an unknown size was a muted dash. All three
-// became words with a comment explaining the loss (issue 51). Words are a
-// reasonable fallback and they are not the same thing: colour is read without
-// being looked at, which is the entire job of a status column.
+// Rows returns joined strings, which is right when a whole line is one colour
+// — and it silently deletes information when it is not. The database tool
+// ported a manifest onto Table and had to make three columns plain: a rule's
+// data mode was amber for "none" and "filtered", a carried count was amber
+// when a table came across filtered rather than whole, and an unknown size was
+// a muted dash. All three became words with a comment explaining the loss
+// (issue 51). Words are a reasonable fallback and they are not the same thing:
+// colour is read without being looked at, which is the entire job of a status
+// column.
 //
 // Padding is emitted as an unstyled segment rather than folded into the cell,
 // so a cell with a background does not paint the gap after it.
@@ -194,8 +196,8 @@ func fit(s string, w int, right bool) string {
 	return s + strings.Repeat(" ", pad)
 }
 
-// Draw writes the rows into r, one per line. The common case is handing them to
-// a List instead.
+// Draw writes the rows into r, one per line. The common case is handing them
+// to a List instead.
 func (t Table) Draw(c *Canvas, r Rect, rows [][]string, style *lipgloss.Style, id ID) {
 	c = c.Clip(r)
 	for i, line := range t.Rows(r.W, rows) {

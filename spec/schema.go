@@ -6,19 +6,19 @@ import "sort"
 //
 // # Why this is here and an MCP server is not
 //
-// docket needed to be usable by an agent that cannot run a shell — a hosted
+// The board needed to be usable by an agent that cannot run a shell — a hosted
 // runtime, an Agents SDK app — and wrote an MCP server for it. About two
-// hundred lines, and by its author's own account "not one of them is about
-// docket": every tool it offers is generated from the [Command] tree and every
+// hundred lines, and by its author's own account "not one of them is about the
+// board": every tool it offers is generated from the [Command] tree and every
 // call goes back through Run (issue 54).
 //
 // That is a true observation about the tree, and it is also an argument for a
 // smaller thing than an MCP server. The part that is tuikit's business is the
-// TRANSFORMATION — a command already declares its name, its help, its arguments
-// and their kinds, and turning that into a parameter schema is a fact about
-// [Command] rather than about any protocol. The JSON-RPC plumbing, the tool
-// naming, the allow-list of what to expose, the transport: all of that is the
-// server's, and it differs per host.
+// TRANSFORMATION — a command already declares its name, its help, its
+// arguments and their kinds, and turning that into a parameter schema is a
+// fact about [Command] rather than about any protocol. The JSON-RPC plumbing,
+// the tool naming, the allow-list of what to expose, the transport: all of
+// that is the server's, and it differs per host.
 //
 // So this is the half that would otherwise be written once per transport.
 // An MCP server built on it is small; so is a function-calling adapter, or
@@ -43,12 +43,13 @@ type Property struct {
 //
 // Arguments and flags share one property map, because a caller that is not a
 // shell has no positional/named distinction to honour — it has a bag of named
-// values. Required covers the arguments a command cannot run without; a flag is
-// never required, which is what makes it a flag.
+// values. Required covers the arguments a command cannot run without; a flag
+// is never required, which is what makes it a flag.
 //
 // A variadic argument becomes an array. Everything else follows [Kind], and an
-// unknown kind is a string rather than an error: a schema that refuses to build
-// leaves an agent with no description at all, which is worse than a loose one.
+// unknown kind is a string rather than an error: a schema that refuses to
+// build leaves an agent with no description at all, which is worse than a
+// loose one.
 func SchemaOf(cmd Command) Schema {
 	s := Schema{Type: "object", Properties: map[string]Property{}}
 
@@ -79,9 +80,9 @@ func SchemaOf(cmd Command) Schema {
 
 // jsonType maps a flag's kind onto JSON Schema's.
 //
-// Duration is a string rather than a number: it is declared as "30s" and parsed
-// as one, and a schema saying "integer" would invite an agent to send 30 and
-// mean half a minute.
+// Duration is a string rather than a number: it is declared as "30s" and
+// parsed as one, and a schema saying "integer" would invite an agent to send
+// 30 and mean half a minute.
 func jsonType(k Kind) string {
 	switch k {
 	case Bool:

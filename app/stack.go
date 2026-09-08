@@ -14,10 +14,10 @@ package app
 //
 // Back as a hardcoded constant, correct only because every screen happened to
 // be reached from the dashboard. Open the logs from a run and it goes to the
-// wrong place, silently — the same failure shape as an owner ID that means "row
-// 3 of the screen" rather than "row 3 of the list". And azctl did not even have
-// that: its runner was a second tea.NewProgram, so a playbook run lost the
-// browser entirely.
+// wrong place, silently — the same failure shape as an owner ID that means
+// "row 3 of the screen" rather than "row 3 of the list". And the cloud tool
+// did not even have that: its runner was a second tea.NewProgram, so a
+// playbook run lost the browser entirely.
 //
 // # What this is not
 //

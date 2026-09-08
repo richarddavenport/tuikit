@@ -1,12 +1,13 @@
 // Package guard holds the interface closed.
 //
 // A tuikit tool's UI package calls these from a test. They are the mechanism —
-// they know about Go source and terminal vocabulary, and nothing about what the
-// tool does. Deciding to run them is the tool's business; the scaffolder writes
-// the test that does, so a tool has them from its first commit.
+// they know about Go source and terminal vocabulary, and nothing about what
+// the tool does. Deciding to run them is the tool's business; the scaffolder
+// writes the test that does, so a tool has them from its first commit.
 //
-// All three enforce rules that are obvious, that everyone agrees with, and that
-// got broken anyway — one file at a time, by people who each had a reason.
+// All three enforce rules that are obvious, that everyone agrees with, and
+// that got broken anyway — one file at a time, by people who each had a
+// reason.
 package guard
 
 import (
@@ -34,15 +35,15 @@ type T interface {
 	Fatalf(format string, args ...any)
 }
 
-// Tokens reports a colour that did not come from the palette, and a role in the
-// palette that nothing draws with.
+// Tokens reports a colour that did not come from the palette, and a role in
+// the palette that nothing draws with.
 //
-// The first was broken in six places in swarmctl before it was a rule: the
-// panel border was built from raw numbers twice, and the log pane kept its own
-// pair. Nobody decided that; it happened one file at a time. A raw index also
-// says what a colour IS instead of what it is FOR, which is how one value came
-// to mean both "title" and "focused border" without anyone choosing that they
-// should move together.
+// The first was broken in six places in the deploy tool before it was a rule:
+// the panel border was built from raw numbers twice, and the log pane kept its
+// own pair. Nobody decided that; it happened one file at a time. A raw index
+// also says what a colour IS instead of what it is FOR, which is how one value
+// came to mean both "title" and "focused border" without anyone choosing that
+// they should move together.
 //
 // The second is the other direction. A role nothing draws with is a decision
 // nobody made.
@@ -81,9 +82,9 @@ func Tokens(t T, dir string, p theme.Palette, except ...Exemption) {
 	// The nine are the framework's vocabulary, not the tool's promise to draw
 	// with all of them: a tool that never paints a selection background cannot
 	// "drop" SelectionBG, because it is a field on a struct it inherited. This
-	// check came from swarmctl, where the palette was the tool's own and an
-	// unused role really was dead — azctl's migration is where that stopped
-	// being true.
+	// check came from the deploy tool, where the palette was the tool's own and
+	// an unused role really was dead — the cloud tool's migration is where that
+	// stopped being true.
 	//
 	// An unused Extra is still dead, and still worth failing on. A tool that
 	// invented a tenth meaning and then did not use it has left a name for the
@@ -101,8 +102,8 @@ func Tokens(t T, dir string, p theme.Palette, except ...Exemption) {
 // Glyphs reports a character printed by the package that the allow-list does
 // not cover.
 //
-// A terminal font without a glyph draws a replacement box, which reads as a bug
-// rather than as decoration.
+// A terminal font without a glyph draws a replacement box, which reads as a
+// bug rather than as decoration.
 func Glyphs(t T, dir string, g theme.GlyphSet) {
 	t.Helper()
 
@@ -213,8 +214,8 @@ func unique(in []string) []string {
 // # When the guard is wrong
 //
 // lazygit's `presentation/icons/file_icons.go` is 794 lines holding 743 hex
-// colour literals. They are file-type BRAND colours — the Go gopher's blue, the
-// Rust orange — and the whole point of them is that they are the same
+// colour literals. They are file-type BRAND colours — the Go gopher's blue,
+// the Rust orange — and the whole point of them is that they are the same
 // everywhere. Decision 28 puts colour on ANSI 0-15 so the reader's theme wins,
 // and that reasoning does not reach a brand mark.
 //

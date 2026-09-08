@@ -10,10 +10,10 @@ import (
 //
 // # Where this came from
 //
-// pgctl's spinner (rows.go:183) and azctl's ⠿. The rule worth keeping is
-// pgctl's, and its comment states it: the frame comes from THE CLOCK rather
-// than from a counter, "so every spinner on screen turns together and at a
-// steady rate however often the view is rendered".
+// The database tool's spinner and the cloud tool's ⠿. The rule worth keeping
+// is the database tool's, and its comment states it: the frame comes from THE
+// CLOCK rather than from a counter, "so every spinner on screen turns together
+// and at a steady rate however often the view is rendered".
 //
 // That is not a nicety. A counter advanced in View turns faster when more is
 // happening, which is exactly backwards, and two spinners on one screen drift
@@ -22,8 +22,8 @@ import (
 // counter would make every golden depend on how many times View had been
 // called.
 //
-// azctl's single ⠿ is a spinner that has stopped, which reads as hung rather
-// than as working. Not carried.
+// The cloud tool's single ⠿ is a spinner that has stopped, which reads as hung
+// rather than as working. Not carried.
 type Spinner struct {
 	// Frames turn in one direction at one dot per frame, so a dropped frame
 	// slows it rather than reversing it. Empty takes the braille set.
@@ -34,8 +34,8 @@ type Spinner struct {
 	Style *lipgloss.Style
 }
 
-// The default frames, from pgctl. Braille, so the dot travels round a ring
-// rather than flickering between unrelated shapes.
+// The default frames, from the database tool. Braille, so the dot travels
+// round a ring rather than flickering between unrelated shapes.
 var spinnerFrames = []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 
 const spinnerEvery = 100 * time.Millisecond

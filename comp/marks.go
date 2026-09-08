@@ -8,15 +8,16 @@ import "sort"
 //
 // Three tools, and they disagree about the shape in a way worth knowing.
 //
-// yazi splits it in two: `tab/visual.rs` is a live anchored range you drag, and
-// `tab/selected.rs` is an IndexMap keyed by URL that the range commits into.
-// The range is primary.
+// yazi splits it in two: `tab/visual.rs` is a live anchored range you drag,
+// and `tab/selected.rs` is an IndexMap keyed by URL that the range commits
+// into. The range is primary.
 //
 // k9s does not have an anchor at all. `SelectTable.SpanMark` scans backwards
-// from the cursor for the nearest existing mark, forwards if it finds none, and
-// fills between. The set is primary and the range is derived from it.
+// from the cursor for the nearest existing mark, forwards if it finds none,
+// and fills between. The set is primary and the range is derived from it.
 //
-// pgctl asked for the same thing from a third direction (issue 49).
+// The database tool asked for the same thing from a third direction (issue
+// 49).
 //
 // # Why it is not a field on List
 //
@@ -31,8 +32,8 @@ import "sort"
 //
 // Indices move. A filter that removes one row above a marked one would
 // otherwise mark a different row, and it would not error while doing it — the
-// same failure shape [Tree] keys around. yazi keys by URL and k9s by row ID for
-// exactly this reason.
+// same failure shape [Tree] keys around. yazi keys by URL and k9s by row ID
+// for exactly this reason.
 type Marks struct {
 	keys map[string]bool
 }
@@ -109,9 +110,9 @@ func (m *Marks) Keys() []string {
 //		return s.marks.UnsortedList()
 //	}
 //
-// Neither yazi's version nor pgctl's request made this visible. A component
-// that handed back the set and left every call site to write that `if` would
-// have done the easy half.
+// Neither yazi's version nor the database tool's request made this visible. A
+// component that handed back the set and left every call site to write that
+// `if` would have done the easy half.
 //
 // Returns nil when nothing is marked and there is no cursor, which is an
 // ordinary state — an empty list — rather than an error.

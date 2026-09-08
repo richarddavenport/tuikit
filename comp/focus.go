@@ -6,13 +6,14 @@ package comp
 //
 // Five tools in the rebuild survey wrote this, and every one of them is a
 // multi-pane screen: lazygit's `pkg/gui/context/`, termshark's five widgets
-// (framefocus, trackfocus, renderfocused, keepselected, enableselected), dive's
-// `ui/v1/app/controller.go`, gcpeasy's `focus tuiPanel`, and swarmctl's
-// `focus int`.
+// (framefocus, trackfocus, renderfocused, keepselected, enableselected),
+// dive's `ui/v1/app/controller.go`, gcpeasy's `focus tuiPanel`, and the deploy
+// tool's `focus int`.
 //
-// It was refused once on a count of one, because only swarmctl of the four
-// private tools had it. That was the wrong pool to count in: three of those four
-// have a single list per screen, which is the shape that does not need this.
+// It was refused once on a count of one, because only the deploy tool of the
+// four private tools had it. That was the wrong pool to count in: three of
+// those four have a single list per screen, which is the shape that does not
+// need this.
 //
 // # What was already here, and what was not
 //
@@ -24,15 +25,15 @@ package comp
 // A ring of indices breaks the moment a pane is added, removed or hidden — the
 // focus silently moves to a different pane, which is the same failure shape as
 // an owner ID that means "row 3 of the screen". A [Name] survives the ring
-// changing under it, and it is the name the region is already drawn under, so a
-// click resolves against the same value.
+// changing under it, and it is the name the region is already drawn under, so
+// a click resolves against the same value.
 //
 // # What it does not do
 //
-// It does not own the components and it does not draw. termshark's version is a
-// wrapper widget that frames whatever has focus; in immediate mode that would
-// be a field, not a wrapper, and Pane.Focused already is one. The state is the
-// part worth extracting.
+// It does not own the components and it does not draw. termshark's version is
+// a wrapper widget that frames whatever has focus; in immediate mode that
+// would be a field, not a wrapper, and Pane.Focused already is one. The state
+// is the part worth extracting.
 type Focus struct {
 	// Ring is the order [Focus.Next] moves through. Usually declared once
 	// beside the region names.
@@ -59,9 +60,9 @@ func (f *Focus) Is(n Name) bool { return n != "" && f.resolve() == n }
 
 // resolve is the current name, falling back to the head of the ring.
 //
-// Falling back rather than staying empty, so a tool that never called Set still
-// has somewhere for the first key press to go — and so a focused pane that has
-// left the ring does not leave the keyboard pointing at nothing.
+// Falling back rather than staying empty, so a tool that never called Set
+// still has somewhere for the first key press to go — and so a focused pane
+// that has left the ring does not leave the keyboard pointing at nothing.
 func (f *Focus) resolve() Name {
 	if f.at != "" && f.inRing(f.at) {
 		return f.at

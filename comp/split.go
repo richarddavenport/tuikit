@@ -20,8 +20,8 @@ import "github.com/charmbracelet/lipgloss"
 // that never drags renders exactly as it did before.
 //
 // Its width and its character come from the canvas's chrome, so a tool that
-// wants two columns between panes, or a visible seam rather than a gap, changes
-// them in one place for every split it has.
+// wants two columns between panes, or a visible seam rather than a gap,
+// changes them in one place for every split it has.
 type Split struct {
 	// Name is the divider's region, and what a drag names.
 	Name Name
@@ -46,10 +46,11 @@ type Split struct {
 
 // Layout divides r without drawing, for a tool that needs the rects first.
 //
-// It takes the CANVAS rather than a gap, so it cannot be handed a different one
-// from the one Draw will use. That asymmetry was the actual bug: two ways of
-// getting the same rects that could disagree, and both democtl and azctl were
-// building a throwaway 0x0 canvas to read the gap back out of the chrome.
+// It takes the CANVAS rather than a gap, so it cannot be handed a different
+// one from the one Draw will use. That asymmetry was the actual bug: two ways
+// of getting the same rects that could disagree, and both democtl and the
+// cloud tool were building a throwaway 0x0 canvas to read the gap back out of
+// the chrome.
 func (s *Split) Layout(c *Canvas, r Rect) (first, second Rect) {
 	gap := c.Chrome().Gap
 	total, at := r.W, s.at(r.W, gap)
@@ -133,9 +134,9 @@ func (s *Split) Move(c *Canvas, n int, r Rect) {
 
 // MoveTo puts the divider under a pointer, for a drag.
 //
-// The position is absolute — the column or row the pointer is on — because that
-// is what a mouse event carries, and converting it here means no tool does the
-// arithmetic twice.
+// The position is absolute — the column or row the pointer is on — because
+// that is what a mouse event carries, and converting it here means no tool
+// does the arithmetic twice.
 func (s *Split) MoveTo(pos int, r Rect) {
 	if s.Vertical {
 		s.At = max(1, pos-r.Y)

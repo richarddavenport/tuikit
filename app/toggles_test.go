@@ -27,8 +27,8 @@ func TestAKeyIsRememberedAcrossARebuild(t *testing.T) {
 	}
 }
 
-// swarmctl's rule, and its reason: without the clear, "hide everything" leaves
-// whatever was individually revealed still showing.
+// the deploy tool's rule, and its reason: without the clear, "hide everything"
+// leaves whatever was individually revealed still showing.
 func TestToggleAllTwiceIsAReliableWayBackToNothing(t *testing.T) {
 	var tg Toggles
 	tg.Toggle("one")

@@ -8,17 +8,18 @@ import (
 
 // Palette is one key to everything a tool can do right now.
 //
-// From swarmctl's navigation design. It replaces having to remember twenty
-// single-key bindings while still teaching them, because every row shows its
-// key — a directory of the keyboard rather than a replacement for it.
+// From the deploy tool's navigation design. It replaces having to remember
+// twenty single-key bindings while still teaching them, because every row
+// shows its key — a directory of the keyboard rather than a replacement for
+// it.
 //
 // # What it knows and does not know
 //
-// It takes GROUPS of items and knows nothing about what a group is. swarmctl's
-// are scope tiers — service, node, environment, global — and that word does not
-// appear here, because "what scopes exist" is a fact about swarmctl and not
-// about palettes. A tool with two groups called "commands" and "go to" gets the
-// same component.
+// It takes GROUPS of items and knows nothing about what a group is. The deploy
+// tool's are scope tiers — service, node, environment, global — and that word
+// does not appear here, because "what scopes exist" is a fact about the deploy
+// tool and not about palettes. A tool with two groups called "commands" and
+// "go to" gets the same component.
 //
 // It does the ranking itself, with [fuzzy], because a palette whose caller
 // ranked its own items is a palette that could disagree with the letters it
@@ -139,8 +140,8 @@ func (p *Palette) Total() int {
 // items is the query applied: everything when nothing is typed, ranked matches
 // otherwise.
 //
-// Ranked, never filtered BY GROUP: the groups are an order of preference, not a
-// filter, and a reader who typed the name of a global command should find it
+// Ranked, never filtered BY GROUP: the groups are an order of preference, not
+// a filter, and a reader who typed the name of a global command should find it
 // whatever they had selected.
 func (p *Palette) items() []PaletteItem {
 	var all []PaletteItem

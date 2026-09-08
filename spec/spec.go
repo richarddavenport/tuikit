@@ -8,16 +8,16 @@
 // That is the idea the whole framework is organised around. Four tools have
 // four copies of the same command described four times — in a cobra tree, in a
 // keymap, in a footer string, and in a README — and the copies disagree. Not
-// dramatically: a flag renamed in one place, a key that does something slightly
-// different, a README a version behind. Enough that an agent reading any one of
-// them is reading a lie.
+// dramatically: a flag renamed in one place, a key that does something
+// slightly different, a README a version behind. Enough that an agent reading
+// any one of them is reading a lie.
 //
 // # No cobra
 //
 // Decision 12. Once spec is the source of truth, cobra is a second description
-// of the same tree — and adapting into it costs the exit-code contract, because
-// cobra wants to own os.Exit. Nothing here does: Run returns a code and main
-// decides. The CLI is built on stdlib flag.
+// of the same tree — and adapting into it costs the exit-code contract,
+// because cobra wants to own os.Exit. Nothing here does: Run returns a code
+// and main decides. The CLI is built on stdlib flag.
 package spec
 
 import "github.com/richarddavenport/tuikit/comp"
@@ -25,8 +25,8 @@ import "github.com/richarddavenport/tuikit/comp"
 // Kind is what a flag holds.
 type Kind int
 
-// The kinds. Bool is the zero value because most flags are switches, and a flag
-// declared without a kind should be the harmless one.
+// The kinds. Bool is the zero value because most flags are switches, and a
+// flag declared without a kind should be the harmless one.
 const (
 	Bool Kind = iota
 	String
@@ -137,11 +137,11 @@ type Command struct {
 	// PassThrough collects flags this command did not declare, instead of
 	// rejecting them.
 	//
-	// From azctl, whose `play` takes `--<param> <value>` for any parameter the
-	// PLAYBOOK declares — a set the command cannot know, because it is in a
-	// YAML file chosen at runtime. Without this the choice is between rejecting
-	// a valid invocation and declaring nothing, and a command that declares
-	// nothing has no help, no completions and no manifest entry.
+	// From the cloud tool, whose `play` takes `--<param> <value>` for any
+	// parameter the PLAYBOOK declares — a set the command cannot know, because it
+	// is in a YAML file chosen at runtime. Without this the choice is between
+	// rejecting a valid invocation and declaring nothing, and a command that
+	// declares nothing has no help, no completions and no manifest entry.
 	//
 	// Off by default, and it should stay off for almost everything: a command
 	// that quietly accepts --wach instead of --watch is a command that does

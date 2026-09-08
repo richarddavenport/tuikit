@@ -1,12 +1,13 @@
 // Package fleet is democtl's engine: a small fictional service fleet, and the
 // operations you can run against it.
 //
-// It has no UI imports, which is the split every tuikit tool keeps. It also has
-// no backend — everything here is generated from a seed, deterministically, and
-// that is the point rather than a shortcut. tuikit's capture harness renders
-// democtl's screens as its own test fixture, and a fixture that changes between
-// runs is not one. Given the same seed this package returns the same fleet, the
-// same log lines and the same step timings, forever.
+// It has no UI imports, which is the split every tuikit tool keeps. It also
+// has no backend — everything here is generated from a seed,
+// deterministically, and that is the point rather than a shortcut. tuikit's
+// capture harness renders democtl's screens as its own test fixture, and a
+// fixture that changes between runs is not one. Given the same seed this
+// package returns the same fleet, the same log lines and the same step
+// timings, forever.
 package fleet
 
 import (
@@ -22,13 +23,13 @@ import (
 // golden fails the day after it is written.
 var Epoch = time.Date(2026, 8, 31, 9, 14, 3, 0, time.UTC)
 
-// State is what a service is doing. The four are chosen to exercise the palette:
-// each maps to a colour role, and together they cover every one a status can
-// take.
+// State is what a service is doing. The four are chosen to exercise the
+// palette: each maps to a colour role, and together they cover every one a
+// status can take.
 type State int
 
-// The four states, each mapping to a colour role, together covering every one a
-// status line can take.
+// The four states, each mapping to a colour role, together covering every one
+// a status line can take.
 const (
 	Running State = iota
 	Pending
@@ -101,9 +102,9 @@ func New(seed int64) Fleet {
 	return Fleet{Services: out}
 }
 
-// Stacks returns the stack names in the order they should be read, which is the
-// order they were declared rather than alphabetical — a fleet has a shape, and
-// sorting it hides that.
+// Stacks returns the stack names in the order they should be read, which is
+// the order they were declared rather than alphabetical — a fleet has a shape,
+// and sorting it hides that.
 func (f Fleet) Stacks() []string {
 	seen := map[string]bool{}
 	var out []string
@@ -152,8 +153,8 @@ func (f Fleet) Logs(service string, n int) []LogLine {
 	return out
 }
 
-// Step is one unit of a Plan: the shape azctl's playbooks and pgctl's applies
-// both have, reduced to what a step list has to draw.
+// Step is one unit of a Plan: the shape the cloud tool's playbooks and the
+// database tool's applies both have, reduced to what a step list has to draw.
 type Step struct {
 	Name string
 	// Took is how long it takes when it runs. Fixed per step so a captured run

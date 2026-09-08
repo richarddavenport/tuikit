@@ -6,10 +6,11 @@
 // documentation and catching overflow are all downstream of that, and treating
 // any of them as the point produces a harness nobody runs.
 //
-// It generalises a working prototype — pgctl's screenshot_probe_test.go, whose
-// seventeen frames found three bugs that forty-odd assertions had not. Two of
-// the three were something drawn wider than its container, which no assertion
-// checking content rather than shape can see.
+// It generalises a working prototype — the database tool's
+// screenshot_probe_test.go, whose seventeen frames found three bugs that
+// forty-odd assertions had not. Two of the three were something drawn wider
+// than its container, which no assertion checking content rather than shape
+// can see.
 //
 // # Two modes, and both are needed
 //
@@ -17,10 +18,11 @@
 // goldens are made of. Live mode fills it from a real backend: documentation,
 // and the thing that finds what a fixture hides.
 //
-// The second is not a luxury. pgctl's header-overflow bug was masked in its
-// first capture because the fixture shortened a config path to "pgctl.yaml";
-// only a real temp-dir path was long enough to overflow. A fixture encodes the
-// author's assumptions, which is exactly what a capture is meant to catch.
+// The second is not a luxury. The database tool's header-overflow bug was
+// masked in its first capture because the fixture shortened a config path to
+// "the database tool.yaml"; only a real temp-dir path was long enough to
+// overflow. A fixture encodes the author's assumptions, which is exactly what
+// a capture is meant to catch.
 package harness
 
 import (
@@ -63,7 +65,8 @@ type Clock interface{ Now(time.Time) }
 // Mode records where a frame's data came from.
 //
 // A page of frames that quietly mixes the two misreports the tool, so the
-// distinction is carried through to the manifest rather than left to a caption.
+// distinction is carried through to the manifest rather than left to a
+// caption.
 type Mode string
 
 const (
@@ -71,9 +74,9 @@ const (
 	Fixture Mode = "fixture"
 	// Live is a model filled from a real backend moments before capture.
 	Live Mode = "live"
-	// Composed is a frame whose data could not be obtained and was staged —
-	// pgctl marked its snapshot-manifest frames this way, because no production
-	// snapshot existed on that machine to photograph.
+	// Composed is a frame whose data could not be obtained and was staged — the
+	// database tool marked its snapshot-manifest frames this way, because no
+	// production snapshot existed on that machine to photograph.
 	Composed Mode = "composed"
 )
 
@@ -120,10 +123,10 @@ func Enabled(env string) string { return os.Getenv(env) }
 // Capture starts a session writing into dir.
 //
 // It forces lipgloss's colour profile, which is the trick that makes any of
-// this work: a test has no TTY, so lipgloss strips every colour and you capture
-// a grey rectangle. This does not contradict the palette being ANSI 256 — the
-// values stay 256 indices; forcing the profile only stops them being discarded
-// on a pipe.
+// this work: a test has no TTY, so lipgloss strips every colour and you
+// capture a grey rectangle. This does not contradict the palette being ANSI
+// 256 — the values stay 256 indices; forcing the profile only stops them being
+// discarded on a pipe.
 func Capture(t T, dir string, opts ...Option) *Session {
 	t.Helper()
 
@@ -147,8 +150,8 @@ func Capture(t T, dir string, opts ...Option) *Session {
 // Shot renders the model and writes it as <name>.ansi.
 func (s *Session) Shot(name string, m Model) { s.t.Helper(); s.shot(name, m, s.mode) }
 
-// ShotAs renders one frame with a mode of its own — for a screen that had to be
-// staged in an otherwise live run.
+// ShotAs renders one frame with a mode of its own — for a screen that had to
+// be staged in an otherwise live run.
 func (s *Session) ShotAs(name string, m Model, mode Mode) { s.t.Helper(); s.shot(name, m, mode) }
 
 func (s *Session) shot(name string, m Model, mode Mode) {

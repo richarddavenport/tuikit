@@ -8,9 +8,9 @@ import (
 
 // Hints fails when a frame advertises a key that does nothing.
 //
-// A footer is a promise. `q abort` is read by someone deciding whether to press
-// it, and a footer naming a key nothing handles is a lie the reader has no way
-// to check — the interface still renders perfectly, so no golden and no
+// A footer is a promise. `q abort` is read by someone deciding whether to
+// press it, and a footer naming a key nothing handles is a lie the reader has
+// no way to check — the interface still renders perfectly, so no golden and no
 // assertion notices.
 //
 // It presses each advertised key against a copy of the state the caller has
@@ -19,11 +19,11 @@ import (
 // # What this does NOT catch
 //
 // A key that does something OTHER than what its label says. That was the bug
-// which prompted this (azctl's runner promised `q abort (the running step
-// finishes)` while `q` cancelled the run and quit the program): `q` did plenty,
-// it just did not do what the footer said. No mechanical check reaches that,
-// because it is a claim about English. Decision 32 is the discipline that
-// covers it — a comment or a label describing behaviour is an untested
+// which prompted this (the cloud tool's runner promised `q abort (the running
+// step finishes)` while `q` cancelled the run and quit the program): `q` did
+// plenty, it just did not do what the footer said. No mechanical check reaches
+// that, because it is a claim about English. Decision 32 is the discipline
+// that covers it — a comment or a label describing behaviour is an untested
 // assertion, and the answer is a test named after the sentence.
 //
 // So this catches the lesser sibling: the DEAD advertised key. Worth having,

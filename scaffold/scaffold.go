@@ -4,13 +4,13 @@
 // library, policy goes in the scaffolder. Anything that must work for every
 // tool is a function you call; anything that is merely a good default is
 // generated code the tool OWNS and can edit on day one. Repo infrastructure —
-// a Makefile, a CI workflow, a linter config — cannot be a dependency, which is
-// the whole reason this exists.
+// a Makefile, a CI workflow, a linter config — cannot be a dependency, which
+// is the whole reason this exists.
 //
-// Seeded from what azctl's migration actually needed rather than from a guess,
-// which is why it came after that migration. The order of what it writes is
-// the order of how much trouble each thing saves, and that order is in
-// azctl/design/migrating-to-tuikit.md.
+// Seeded from what the cloud tool's migration actually needed rather than from
+// a guess, which is why it came after that migration. The order of what it
+// writes is the order of how much trouble each thing saves, and that order is
+// in the cloud tool/design/migrating-to-tuikit.md.
 package scaffold
 
 import (
@@ -54,7 +54,7 @@ type Tool struct {
 	// tuikit is private and unpublished, so a generated tool needs one to
 	// build. A relative path by default, so a checkout beside tuikit works on
 	// any machine rather than only the one it was written on — which is the
-	// mistake azctl's go.mod made first.
+	// mistake the cloud tool's go.mod made first.
 	Tuikit string
 	// GoVersion is the go directive and the version CI installs.
 	GoVersion string
@@ -83,13 +83,14 @@ func (t Tool) Defaults() Tool {
 	return t
 }
 
-// Env is the tool's name as an environment variable prefix: DEMOCTL, AZCTL.
+// Env is the tool's name as an environment variable prefix: DEMOCTL, the cloud
+// tool.
 func (t Tool) Env() string {
 	return strings.ToUpper(strings.ReplaceAll(t.Name, "-", "_"))
 }
 
-// Title is the tool's name for prose: capitalised, since a sentence starts with
-// one and a binary name does not.
+// Title is the tool's name for prose: capitalised, since a sentence starts
+// with one and a binary name does not.
 func (t Tool) Title() string {
 	if t.Name == "" {
 		return ""
@@ -100,8 +101,8 @@ func (t Tool) Title() string {
 // Write generates the tool into dir/<name> and returns what it wrote.
 //
 // It refuses to write into a directory that already has anything in it. A
-// scaffolder that overwrites is a scaffolder nobody runs twice, and "it emptied
-// my repo" is not a thing to find out by doing it.
+// scaffolder that overwrites is a scaffolder nobody runs twice, and "it
+// emptied my repo" is not a thing to find out by doing it.
 func (t Tool) Write(dir string) ([]string, error) {
 	t = t.Defaults()
 	if err := t.valid(); err != nil {
@@ -196,9 +197,9 @@ func (t Tool) reachable(root string) error {
 }
 
 // relativeTuikit rewrites the replace path to be relative to the generated
-// tool, which is what go.mod.tmpl's own comment already promises: "Relative, so
-// it works on any machine with both repos side by side rather than only on the
-// one it was generated on."
+// tool, which is what go.mod.tmpl's own comment already promises: "Relative,
+// so it works on any machine with both repos side by side rather than only on
+// the one it was generated on."
 //
 // It did not. `-tuikit /Users/someone/Developer/tuikit` was written verbatim,
 // under that comment, and the generated repository then built on exactly one
@@ -228,8 +229,8 @@ func (t Tool) relativeTuikit(root string) string {
 // about a framework it has no history with.
 //
 // Zero on any failure, which renders as "decision 0" — a marker that reports
-// everything. A generated tool being told too much is a bad morning; being told
-// nothing is a tool that never learns tuikit moved.
+// everything. A generated tool being told too much is a bad morning; being
+// told nothing is a tool that never learns tuikit moved.
 func (t Tool) latestDecision(root string) int {
 	path := t.Tuikit
 	if !filepath.IsAbs(path) {

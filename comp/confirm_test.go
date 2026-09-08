@@ -33,10 +33,10 @@ func TestAModalIsBoundedToItsContainer(t *testing.T) {
 	}
 }
 
-// pgctl floors the width at 32 and democtl does not, so democtl's modal shrinks
-// on a narrow terminal until the question no longer reads. A box wider than the
-// terminal is clipped by the canvas, which is a better failure than one too
-// narrow to read.
+// the database tool floors the width at 32 and democtl does not, so democtl's
+// modal shrinks on a narrow terminal until the question no longer reads. A box
+// wider than the terminal is clipped by the canvas, which is a better failure
+// than one too narrow to read.
 func TestAModalHasAFloorAsWellAsACap(t *testing.T) {
 	_, narrow := confirmOn(30, 20, Confirm{Title: "Remove?", Body: "gone for good"})
 	if narrow.W < confirmMin {

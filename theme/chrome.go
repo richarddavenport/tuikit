@@ -3,15 +3,15 @@ package theme
 // Chrome is the third closed vocabulary: what an interface DRAWS WITH.
 //
 // Palette says which colours a tool may use and GlyphSet which characters it
-// may print. Neither says what a box looks like — so every component picked its
-// own, and sixteen characters ended up as literals inside comp where no guard
-// could see them. A tool narrowing its glyph set for a font without chevrons
-// would still have had them printed on its behalf.
+// may print. Neither says what a box looks like — so every component picked
+// its own, and sixteen characters ended up as literals inside comp where no
+// guard could see them. A tool narrowing its glyph set for a font without
+// chevrons would still have had them printed on its behalf.
 //
 // Kept as a closed set for the same reason the other two are. This is not a
-// configuration bag: it is the small number of decisions that make an interface
-// look like itself, and a tool takes [DefaultChrome] and overrides what it
-// wants.
+// configuration bag: it is the small number of decisions that make an
+// interface look like itself, and a tool takes [DefaultChrome] and overrides
+// what it wants.
 //
 // # The rule that keeps it from separating
 //
@@ -80,10 +80,10 @@ type Chrome struct {
 
 // BoxSet is the six characters a frame is drawn with.
 //
-// Six, not eleven: there are no tee or cross pieces, so a title sits inside the
-// top edge rather than breaking it. That is a constraint the default glyph set
-// imposes and the components were designed around — a set with tees would need
-// components that know what to do with them.
+// Six, not eleven: there are no tee or cross pieces, so a title sits inside
+// the top edge rather than breaking it. That is a constraint the default glyph
+// set imposes and the components were designed around — a set with tees would
+// need components that know what to do with them.
 type BoxSet struct {
 	TopLeft, Top, TopRight          string
 	Left, Right                     string
@@ -94,7 +94,7 @@ type BoxSet struct {
 // others need their characters added deliberately, which is the decision worth
 // making rather than a preference worth defaulting.
 var (
-	// LightBox is the single-line frame swarmctl and democtl draw.
+	// LightBox is the single-line frame the deploy tool and democtl draw.
 	LightBox = BoxSet{"┌", "─", "┐", "│", "│", "└", "─", "┘"}
 	// RoundedBox is softer and needs ╭╮╰╯ in the glyph set.
 	RoundedBox = BoxSet{"╭", "─", "╮", "│", "│", "╰", "─", "╯"}
@@ -107,8 +107,8 @@ var (
 	ASCIIBox = BoxSet{"+", "-", "+", "|", "|", "+", "-", "+"}
 )
 
-// DefaultChrome is what a tuikit tool starts from, and every character in it is
-// in [DefaultGlyphs].
+// DefaultChrome is what a tuikit tool starts from, and every character in it
+// is in [DefaultGlyphs].
 var DefaultChrome = Chrome{
 	Box: LightBox,
 	// A blank divider, so the gap between two panes reads as space rather than
@@ -184,10 +184,10 @@ func (c Chrome) With(box BoxSet) Chrome { c.Box = box; return c }
 // # Why this is themeable rather than fixed
 //
 // htop carries two of these — `CRT_treeStrUtf8` and `CRT_treeStrAscii` — and
-// picks between them from the locale, because a terminal running under `LANG=C`
-// draws box-drawing characters as replacement boxes and a tree becomes a column
-// of them. That is the same failure the whole GlyphSet exists to prevent, found
-// in a tool that has been shipping since 2004.
+// picks between them from the locale, because a terminal running under
+// `LANG=C` draws box-drawing characters as replacement boxes and a tree
+// becomes a column of them. That is the same failure the whole GlyphSet exists
+// to prevent, found in a tool that has been shipping since 2004.
 //
 // So [ASCIITree] is here beside the default, and a tool that has to run on
 // somebody else's server can choose it.
@@ -207,7 +207,8 @@ type TreeSet struct {
 // UnicodeTree is the default: box-drawing connectors, two columns each.
 var UnicodeTree = TreeSet{Vertical: "│ ", Branch: "├─", Last: "└─", Gap: "  "}
 
-// ASCIITree is htop's fallback set, for a terminal that cannot draw the others.
+// ASCIITree is htop's fallback set, for a terminal that cannot draw the
+// others.
 var ASCIITree = TreeSet{Vertical: "| ", Branch: "|-", Last: "`-", Gap: "  "}
 
 // WithTree returns a copy drawing its tree with the given connectors.

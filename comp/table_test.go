@@ -44,7 +44,8 @@ func TestANaturalColumnFitsItsWidestCell(t *testing.T) {
 	}
 }
 
-// The filler takes what is left, so the table is exactly as wide as it was told.
+// The filler takes what is left, so the table is exactly as wide as it was
+// told.
 func TestTheFillerTakesWhatIsLeft(t *testing.T) {
 	tbl := Table{Gap: 1, Columns: []Column{{Width: 3}, {Fill: true}, {Width: 4}}}
 	rows := tbl.Rows(40, [][]string{{"abc", "middle", "tail"}})
@@ -75,8 +76,8 @@ func TestALongCellIsTruncatedRatherThanPushing(t *testing.T) {
 	}
 }
 
-// Wide runes count as two columns, or a CJK name silently knocks a table out of
-// alignment for every row below it.
+// Wide runes count as two columns, or a CJK name silently knocks a table out
+// of alignment for every row below it.
 func TestColumnsAreMeasuredInColumns(t *testing.T) {
 	tbl := Table{Gap: 1, Columns: []Column{{Width: 8}, {Fill: true}}}
 	got := tbl.Rows(20, [][]string{{"世界", "after"}, {"ab", "after"}})
@@ -130,8 +131,9 @@ func at(line, cell string) int {
 	return Width(line[:i])
 }
 
-// A cell keeps its own style. Issue 51: Rows joins to strings, so pgctl had to
-// make three columns plain and write a comment explaining the loss.
+// A cell keeps its own style. Issue 51: Rows joins to strings, so the database
+// tool had to make three columns plain and write a comment explaining the
+// loss.
 func TestSpansKeepEachCellsStyle(t *testing.T) {
 	amber := lipgloss.NewStyle().Foreground(lipgloss.Color("214"))
 	muted := lipgloss.NewStyle().Foreground(lipgloss.Color("241"))

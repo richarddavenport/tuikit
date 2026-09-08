@@ -9,7 +9,8 @@ import (
 //
 // # Why this is not four lines in each tool
 //
-// It was four lines in each tool, and one of them was wrong. azctl's filter had:
+// It was four lines in each tool, and one of them was wrong. The cloud tool's
+// filter had:
 //
 //	case tea.KeyRunes, tea.KeySpace:
 //		m.filter += string(msg.Runes)
@@ -21,8 +22,8 @@ import (
 // type, so a space went in twice. Nobody noticed, because no captured frame
 // types a space and nobody filters an Azure estate by a phrase.
 //
-// That is the whole argument for this being a function: it is small enough that
-// everyone writes it, and just fiddly enough that somebody gets it wrong.
+// That is the whole argument for this being a function: it is small enough
+// that everyone writes it, and just fiddly enough that somebody gets it wrong.
 //
 // What it does NOT handle is enter and escape, which mean different things in
 // different tools — keep, accept, cancel, clear the value, close the prompt.

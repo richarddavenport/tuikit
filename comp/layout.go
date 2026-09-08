@@ -12,9 +12,9 @@ package comp
 //	func (m *Model) body() Rect     { return Rect{X: 0, Y: 2, W: m.width, H: m.listHeight() + 2} }
 //	func (m *Model) listHeight() int { return max(3, m.height-5) }
 //
-// azctl got that wrong this week: adding one row for a pivot strip means
-// changing a literal in one function and a different literal in another, and
-// nothing relates them. There is no test that can catch it, because both
+// the cloud tool got that wrong this week: adding one row for a pivot strip
+// means changing a literal in one function and a different literal in another,
+// and nothing relates them. There is no test that can catch it, because both
 // numbers are equally plausible.
 //
 // # Why not ratatui's solver
@@ -23,12 +23,12 @@ package comp
 // constants — and it is the right answer for a general-purpose library that
 // must lay out anything. Measured against what four tools actually lay out,
 // which is a column of bands and a pane split in two, a single linear pass is
-// enough. Fill, Min and Max cover every case in swarmctl, pgctl, azctl and
-// democtl.
+// enough. Fill, Min and Max cover every case in the deploy tool, the database
+// tool, the cloud tool and democtl.
 //
 // Generalise past that when two of the four need it, which is the rule every
-// component here was extracted under. Flex alignment and negative spacing exist
-// in ratatui because ratatui is a general library; we are not one.
+// component here was extracted under. Flex alignment and negative spacing
+// exist in ratatui because ratatui is a general library; we are not one.
 type Layout struct {
 	// Constraints are the bands, in order.
 	Constraints []Constraint
@@ -62,8 +62,8 @@ func Length(n int) Constraint { return Constraint{kind: kindLength, value: n} }
 func Percent(n int) Constraint { return Constraint{kind: kindPercent, value: n} }
 
 // Fill takes what is left, split between the fills by weight. Weight zero is
-// treated as one, so Fill(0) is an ordinary equal share rather than a band that
-// silently disappears.
+// treated as one, so Fill(0) is an ordinary equal share rather than a band
+// that silently disappears.
 func Fill(weight int) Constraint { return Constraint{kind: kindFill, value: max(1, weight)} }
 
 // Min floors a constraint. A body clamped to three rows still shows something
@@ -105,9 +105,9 @@ func (l Layout) Cols(r Rect) []Rect {
 // its share, and the space it gave up or took has to come from somewhere. Each
 // pass pins at least one band, so it terminates in at most one round per fill.
 //
-// That re-solve is the whole reason ratatui reaches for a constraint solver. At
-// this scale — a handful of bands on one axis — pinning and repeating gets the
-// same answer, and a reader can follow it.
+// That re-solve is the whole reason ratatui reaches for a constraint solver.
+// At this scale — a handful of bands on one axis — pinning and repeating gets
+// the same answer, and a reader can follow it.
 func (l Layout) solve(total int) []int {
 	n := len(l.Constraints)
 	sizes := make([]int, n)
@@ -190,8 +190,8 @@ func (l Layout) solve(total int) []int {
 	return sizes
 }
 
-// hungriest is the fill band furthest below what its weight asked for, and that
-// its Max still allows to grow.
+// hungriest is the fill band furthest below what its weight asked for, and
+// that its Max still allows to grow.
 func (l Layout) hungriest(sizes []int, pinned []bool) int {
 	best, bestWeight := -1, 0
 	for i, c := range l.Constraints {

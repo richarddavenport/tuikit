@@ -11,9 +11,10 @@ import (
 
 // Meter is how far along something is.
 //
-// From swarmctl's run dialog and its activity strip, which both wanted the same
-// bar and had neither — the dialog showed five rows all reading "measuring…",
-// which says a thing is happening and nothing about how much of it is left.
+// From the deploy tool's run dialog and its activity strip, which both wanted
+// the same bar and had neither — the dialog showed five rows all reading
+// "measuring…", which says a thing is happening and nothing about how much of
+// it is left.
 //
 // The characters are `[`, `─` for the filled part and `·` for the rest. Block
 // elements (U+2580–U+259F) are deliberately not used: they are the obvious
@@ -103,8 +104,8 @@ func (m Meter) Draw(c *Canvas, r Rect, id ID) int {
 }
 
 // trackTint is the unfilled remainder: the ramp's own start, mostly
-// transparent. Derived rather than configured, because a track colour that does
-// not belong to the ramp is a tenth colour role nobody named.
+// transparent. Derived rather than configured, because a track colour that
+// does not belong to the ramp is a tenth colour role nobody named.
 func trackTint(r paint.Ramp) color.RGBA {
 	c := r.From
 	c.A = 60

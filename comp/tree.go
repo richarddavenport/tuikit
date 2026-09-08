@@ -11,14 +11,15 @@ import (
 // # What it is not
 //
 // It is not a node type, and it does not draw. Both of those were the reason a
-// tree was refused the first time: azctl's rows carried a bucket and a resource,
-// swarmctl's carried a service and an action and a change, and a shared node
-// type would have made both of them box their data or keep it twice.
+// tree was refused the first time: the cloud tool's rows carried a bucket and
+// a resource, the deploy tool's carried a service and an action and a change,
+// and a shared node type would have made both of them box their data or keep
+// it twice.
 //
-// That refusal was right about the payload and wrong about the conclusion. What
-// those tools have in common is not a node — it is the ANSWER TO ONE QUESTION:
-// given a flat list of things with depths, and a set of collapsed ones, which
-// are visible? That question has no payload in it.
+// That refusal was right about the payload and wrong about the conclusion.
+// What those tools have in common is not a node — it is the ANSWER TO ONE
+// QUESTION: given a flat list of things with depths, and a set of collapsed
+// ones, which are visible? That question has no payload in it.
 //
 // So the tool keeps its own rows, [List] still draws them, [Row.Depth] still
 // indents them, and this decides which ones exist this frame.
@@ -28,15 +29,16 @@ import (
 // A flattened hierarchy is what every one of these tools already has, because
 // it is what a list can draw. Depth is derivable from a parent pointer and not
 // the other way round, and asking for parents would mean a tool that has
-// depths — which is all of them — building a graph to hand over and throwing it
-// away again.
+// depths — which is all of them — building a graph to hand over and throwing
+// it away again.
 //
 // # What actually needs one
 //
 // Four tools in the survey have a tree, checked in their source on 2026-09-04
-// rather than assumed: lazygit (`pkg/gui/filetree`, eleven files, plus a second
-// one for commit files), dive (`dive/filetree/`), termshark (`pkg/pdmltree`
-// and `widgets/copymodetree`) and fx (collapse state over a JSON document).
+// rather than assumed: lazygit (`pkg/gui/filetree`, eleven files, plus a
+// second one for commit files), dive (`dive/filetree/`), termshark
+// (`pkg/pdmltree` and `widgets/copymodetree`) and fx (collapse state over a
+// JSON document).
 //
 // Three that were first claimed to have one do not. yazi and superfile contain
 // no match for "tree" or "collapse" anywhere in their sources, and ranger's
@@ -92,9 +94,10 @@ type Node struct {
 // without a separate pass.
 //
 // Returning indices is what buys [List] a draw with no copying, and the linked
-// design gives that up. So this is right for hierarchies of thousands and would
-// need rethinking at millions — the map lookup on Key, once per node per frame,
-// is where it would show first. No tool in the survey has a million-node tree.
+// design gives that up. So this is right for hierarchies of thousands and
+// would need rethinking at millions — the map lookup on Key, once per node per
+// frame, is where it would show first. No tool in the survey has a
+// million-node tree.
 func (t *Tree) Visible(nodes []Node) []int {
 	out := make([]int, 0, len(nodes))
 
@@ -153,7 +156,8 @@ func HasChildren(nodes []Node, i int) bool {
 //
 // The pair a tool binds to a key for "open all"/"close all", written here
 // because doing it correctly means knowing that a leaf must not be collapsed —
-// shutting one hides nothing and leaves a marker beside a row with no children.
+// shutting one hides nothing and leaves a marker beside a row with no
+// children.
 func (t *Tree) Expand() { t.Collapsed = nil }
 
 // Collapse shuts every node that has children.
@@ -171,8 +175,8 @@ func (t *Tree) Collapse(nodes []Node) {
 //
 // # Why a function and not [Row.Depth]
 //
-// Depth cannot answer it. Which connector a row gets depends on facts about the
-// rows BETWEEN it and its parent:
+// Depth cannot answer it. Which connector a row gets depends on facts about
+// the rows BETWEEN it and its parent:
 //
 //	init
 //	├─ systemd-journald
@@ -190,13 +194,13 @@ func (t *Tree) Collapse(nodes []Node) {
 //
 // # Where the result goes
 //
-// [Row.Indent], for a list. Or anywhere: htop draws its tree INSIDE the command
-// column, because a prefix in front of the PID makes every numeric column
-// ragged, and a plain string can go there. Returning strings rather than
-// drawing is what makes both possible.
+// [Row.Indent], for a list. Or anywhere: htop draws its tree INSIDE the
+// command column, because a prefix in front of the PID makes every numeric
+// column ragged, and a plain string can go there. Returning strings rather
+// than drawing is what makes both possible.
 //
-// Takes the same []Node as [Tree.Visible] and returns one prefix per node, so a
-// caller that filtered with Visible indexes this with the same indices.
+// Takes the same []Node as [Tree.Visible] and returns one prefix per node, so
+// a caller that filtered with Visible indexes this with the same indices.
 func Branches(nodes []Node, ch theme.Chrome) []string {
 	out := make([]string, len(nodes))
 	// open[d] is whether the ancestor at depth d still has siblings below, and
@@ -242,8 +246,8 @@ func Branches(nodes []Node, ch theme.Chrome) []string {
 //
 // Read off the depths rather than stored, the same way [HasChildren] is: a
 // stored flag can disagree with the shape it describes, and a derived one
-// cannot. The scan stops at the first node shallower than i, which is where the
-// parent's run of children ends.
+// cannot. The scan stops at the first node shallower than i, which is where
+// the parent's run of children ends.
 func lastChild(nodes []Node, i, depth int) bool {
 	for j := i + 1; j < len(nodes); j++ {
 		switch d := max(0, nodes[j].Depth); {

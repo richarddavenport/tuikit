@@ -7,17 +7,17 @@ import "github.com/charmbracelet/lipgloss"
 // # Where this came from
 //
 // The last hand-drawn thing in two tools. Both had a helper that placed one
-// label and one value and returned the next row, and both made the caller carry
-// `y` from call to call:
+// label and one value and returned the next row, and both made the caller
+// carry `y` from call to call:
 //
 //	y = m.field(c, inner, y, "state", svc.State.String(), style)   // democtl
-//	y := m.fields(c, Rect{X: r.X, Y: r.Y + 3, ...}, fields)        // azctl
+//	y := m.fields(c, Rect{X: r.X, Y: r.Y + 3, ...}, fields)        // the cloud tool
 //
 // That is the shape of the bug they both guarded against and neither tested:
 // `if y > inner.Y+inner.H-1 { return y + 1 }`, written once, in one of the two
 // helpers, and not in the loops beside it. A detail pane one row too tall
-// writes over the border it sits in, and every one of those `y + 1`s is a place
-// to get that wrong.
+// writes over the border it sits in, and every one of those `y + 1`s is a
+// place to get that wrong.
 //
 // So the arithmetic is here. A caller says what the facts ARE; where they land
 // is not a decision anybody was making on purpose.
@@ -25,10 +25,11 @@ import "github.com/charmbracelet/lipgloss"
 // # Labels line up per block, not per pane
 //
 // A block's label column takes what its widest label needs. democtl padded to
-// ten and azctl to sixteen, both arbitrary, and azctl's overflowed: a label
-// longer than the pad pushed its value out of line with every other row. A
-// natural width cannot do that, and it keeps a block of two-word labels from
-// being dragged wide by a heading somewhere else in the pane.
+// ten and the cloud tool to sixteen, both arbitrary, and the cloud tool's
+// overflowed: a label longer than the pad pushed its value out of line with
+// every other row. A natural width cannot do that, and it keeps a block of
+// two-word labels from being dragged wide by a heading somewhere else in the
+// pane.
 type Detail struct {
 	// Title and Subtitle name the thing. Both optional; a Detail that is all
 	// blocks is a perfectly ordinary one.

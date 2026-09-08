@@ -6,26 +6,26 @@ import "github.com/charmbracelet/lipgloss"
 //
 // # Where this came from
 //
-// swarmctl's logspane.go, 681 lines, is the only real one of the four — and
-// the only place FOLLOW is modelled. Its comment describes the behaviour worth
-// keeping: following pins to the tail; scrolling up detaches; scrolling back to
-// the bottom re-attaches. "The less/lazydocker feel."
+// The deploy tool's logspane.go, 681 lines, is the only real one of the four —
+// and the only place FOLLOW is modelled. Its comment describes the behaviour
+// worth keeping: following pins to the tail; scrolling up detaches; scrolling
+// back to the bottom re-attaches. "The less/lazydocker feel."
 //
 // democtl has a log view with an offset and no follow at all, so it opens on
 // the OLDEST lines in the buffer — which for a log is the wrong end. That is
 // not a difference between two tools worth a parameter, it is the thing
-// swarmctl already learned.
+// the deploy tool already learned.
 //
 // A log pane is a viewport WITHOUT a selection, which is why it is not a List:
-// there is no cursor, so there is nothing for the cursor rules to be about. The
-// count means something different too — not where the selection is, but how far
-// from the tail you have scrolled.
+// there is no cursor, so there is nothing for the cursor rules to be about.
+// The count means something different too — not where the selection is, but
+// how far from the tail you have scrolled.
 //
-// Not carried over: swarmctl's line-insertion anchoring, which keeps the view
-// still when a line arrives above the viewport, and its 5000-line buffer cap.
-// Both matter for a live stream and neither has anything to exercise it here —
-// democtl's log lines are a fixture and arrive all at once. logspane.go:265 is
-// where the anchoring lives when a tool needs it.
+// Not carried over: the deploy tool's line-insertion anchoring, which keeps
+// the view still when a line arrives above the viewport, and its 5000-line
+// buffer cap. Both matter for a live stream and neither has anything to
+// exercise it here — democtl's log lines are a fixture and arrive all at once.
+// logspane.go:265 is where the anchoring lives when a tool needs it.
 type LogPane struct {
 	// Follow pins the view to the newest line. It starts true, because a log
 	// you have just opened is one you want the end of.

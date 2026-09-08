@@ -16,10 +16,10 @@ import "github.com/charmbracelet/lipgloss"
 //
 // # Where the sections should come from
 //
-// Ideally from [spec.Command], which already carries a Key — "the keyboard path
-// to this command inside the TUI". A help screen built from the spec cannot
-// drift from what the keys actually do. One written out by hand drifts the
-// first time somebody adds a binding and forgets, and nothing catches it,
+// Ideally from [spec.Command], which already carries a Key — "the keyboard
+// path to this command inside the TUI". A help screen built from the spec
+// cannot drift from what the keys actually do. One written out by hand drifts
+// the first time somebody adds a binding and forgets, and nothing catches it,
 // because a help screen that is slightly wrong still renders perfectly.
 //
 // This component does not read the spec itself, because a tool's screen-level
@@ -39,11 +39,11 @@ type Keys struct {
 
 	// Offset is the first line shown, for a list taller than its space.
 	//
-	// Without it this said "… more" and offered no way to see the rest, which
-	// is the least helpful state a help screen has: it tells a reader there is
-	// something they cannot reach. pgctl declined to adopt the component for
-	// exactly this — 35 lines across four sections, on a 24-row terminal, which
-	// is an ordinary terminal rather than a hard case (issue 50).
+	// Without it this said "… more" and offered no way to see the rest, which is
+	// the least helpful state a help screen has: it tells a reader there is
+	// something they cannot reach. The database tool declined to adopt the
+	// component for exactly this — 35 lines across four sections, on a 24-row
+	// terminal, which is an ordinary terminal rather than a hard case (issue 50).
 	//
 	// [Keys.Rows] is the total, so a caller can clamp this and decide whether
 	// to offer scrolling at all.

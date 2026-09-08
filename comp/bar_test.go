@@ -35,7 +35,7 @@ func TestTheRightSideGoesWhenTheyWouldCollide(t *testing.T) {
 	}
 }
 
-// swarmctl drops the version unless the hints still get room, because a
+// the deploy tool drops the version unless the hints still get room, because a
 // version squeezing the keys you can press is decoration winning over content.
 func TestMinLeftProtectsTheLeftSideFromDecoration(t *testing.T) {
 	c := NewCanvas(30, 1)
