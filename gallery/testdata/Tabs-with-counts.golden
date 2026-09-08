@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │ mouse    click each tab is its own region                                                      │
 │                               │ │ roles    Accent · Muted                                                                        │
 │                               │ │ glyphs   ‹ › ·                                                                                 │
-│                               │ │ from     swarmctl tabStrip, pgctl tab bar, democtl                                             │
+│                               │ │ from     a deploy tool's tab strip, a database tool's tab bar, democtl                         │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

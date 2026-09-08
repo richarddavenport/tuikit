@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │ roles    Accent · Border · Muted                                                               │
 │                               │ │ glyphs   ─ ·                                                                                   │
-│                               │ │ from     swarmctl's run dialog and activity strip, which both wanted it and had neither        │
+│                               │ │ from     a deploy tool's run dialog and activity strip, which both wanted it and had neither   │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

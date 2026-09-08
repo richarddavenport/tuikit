@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │ keys     r run again · esc back                                                                │
 │                               │ │ roles    Success · Danger · Pending · Muted                                                    │
 │                               │ │ glyphs   ✓ ✗ ● • →                                                                             │
-│                               │ │ from     swarmctl renderdeploy.go, pgctl actionrun.go, azctl runner.go                         │
+│                               │ │ from     three tools' run views: a deploy render, an action run and a runner                   │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

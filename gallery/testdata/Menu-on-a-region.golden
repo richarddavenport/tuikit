@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │ keys     ↑↓ choose · enter do it · esc close                                                   │
 │                               │ │ mouse    rclick open it on what is under the pointer · click choose — and a click on the bord… │
 │                               │ │ roles    Accent · Muted · SelectionFG · SelectionBG                                            │
-│                               │ │ from     democtl's context menu; azctl needs the same one                                      │
+│                               │ │ from     democtl's context menu; a cloud tool needs the same one                               │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

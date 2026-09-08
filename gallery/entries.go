@@ -162,7 +162,7 @@ func (m *Model) formEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Form",
 		Summary: "Every field at once, so you can see what you have chosen rather than remember it.",
-		From:    "pgctl viewForm, swarmctl applyedits.go and confirmPhrase",
+		From:    "a database tool's form, a deploy tool's edit-apply and its confirm phrase",
 		Keys:    []comp.Hint{{Key: "↑↓", Label: "field"}, {Key: "‹›", Label: "choice"}, {Key: "space", Label: "toggle"}},
 		Roles:   []string{"Accent", "Muted", "Danger"},
 		States: []State{
@@ -170,7 +170,7 @@ func (m *Model) formEntry(s *styles) Entry {
 				Draw: draw(comp.Form{Fields: fields, Cursor: 1, Focused: true})},
 			{Name: "unfocused", Note: "still shows every value — seeing what you chose is the point",
 				Draw: draw(comp.Form{Fields: fields, Cursor: 1})},
-			{Name: "type the name", Note: "swarmctl's rule: the difference between a keystroke and a decision",
+			{Name: "type the name", Note: "the deploy tool's rule: the difference between a keystroke and a decision",
 				Draw: draw(comp.Form{Focused: true, Fields: []comp.Field{
 					{Label: "service", Kind: comp.FieldText, Text: "api_gateway", Disabled: true},
 					{Label: "type the name", Kind: comp.FieldText, Must: "api_gateway", Text: "api_gate"},
@@ -214,7 +214,7 @@ func (m *Model) toastEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Toast",
 		Summary: "Something the interface has to say — and, where we know it, what to do about it.",
-		From:    "swarmctl errorView",
+		From:    "a deploy tool's error view",
 		Roles:   []string{"Danger", "Success", "Border", "Muted"},
 		Glyphs:  []string{"┌", "─", "┐", "│", "└", "┘"},
 		States: []State{
@@ -222,7 +222,7 @@ func (m *Model) toastEntry(s *styles) Entry {
 				Draw: draw(comp.Toast{
 					Title: "cannot reach staging",
 					Body:  "dial tcp 10.0.0.4:5432: connection refused",
-					Hint:  "is the tunnel up? try `pgctl connect staging`",
+					Hint:  "is the tunnel up? try `db connect staging`",
 				})},
 			{Name: "a failure without one", Note: "allowed, and usually means nobody has worked out the answer yet",
 				Draw: draw(comp.Toast{
@@ -267,7 +267,7 @@ func (m *Model) menuEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Menu",
 		Summary: "A short list of actions, at a point or on the thing they act on.",
-		From:    "democtl's context menu; azctl needs the same one",
+		From:    "democtl's context menu; a cloud tool needs the same one",
 		Keys: []comp.Hint{
 			{Key: "↑↓", Label: "choose"}, {Key: "enter", Label: "do it"}, {Key: "esc", Label: "close"},
 		},
@@ -328,7 +328,7 @@ func (m *Model) detailEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Detail",
 		Summary: "What a pane says about the one thing you have selected.",
-		From:    "democtl field(), azctl fields() — both carried y from call to call",
+		From:    "democtl and a cloud tool each drew fields — both carried y from call to call",
 		Roles:   []string{"Accent", "Muted", "Danger"},
 		States: []State{
 			{Name: "a thing", Note: "labels line up per BLOCK, so a long tag key does not drag the facts above it wide",
@@ -389,7 +389,7 @@ func (m *Model) tableEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Table",
 		Summary: "Rows of aligned columns. It lays out; a List selects and scrolls.",
-		From:    "pgctl rows.go, swarmctl pane and detail tables",
+		From:    "a database tool's rows, a deploy tool's pane and detail tables",
 		Roles:   []string{"Muted"},
 		Glyphs:  []string{"✓", "✗", "●", "…"},
 		States: []State{
@@ -423,7 +423,7 @@ func (m *Model) spinnerEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Spinner",
 		Summary: "Work in flight. Its frame comes from the clock, so every spinner turns together.",
-		From:    "pgctl spinner(), azctl's single ⠿",
+		From:    "a database tool's spinner, a cloud tool's single ⠿",
 		Roles:   []string{"Pending", "Muted"},
 		Glyphs:  []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"},
 		States: []State{
@@ -565,7 +565,7 @@ func (m *Model) listEntry(s *styles) Entry {
 	return Entry{
 		Name:    "List",
 		Summary: "A scrollable, selectable list, flat or grouped. The viewport and the selection are separate.",
-		From:    "pgctl window(), swarmctl pane scrolling, azctl cursor/top",
+		From:    "three tools' viewports: a window, pane scrolling, and a cursor/top pair",
 		Keys: []comp.Hint{
 			{Key: "↑↓", Label: "move the selection"},
 			{Key: "j/k", Label: "the same"},
@@ -656,12 +656,12 @@ func (m *Model) paneEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Pane",
 		Summary: "A bordered box with a title, and the rect inside it.",
-		From:    "swarmctl drawBox and drawBoxRaw (which disagreed), democtl box",
+		From:    "a deploy tool's two box routines, which disagreed, and democtl's",
 		Mouse:   []comp.Hint{{Key: "click", Label: "the border belongs to the pane"}},
 		Roles:   []string{"Border", "Accent"},
 		Glyphs:  []string{"┌", "─", "┐", "│", "└", "┘"},
 		States: []State{
-			{Name: "title in the edge", Note: "swarmctl's arrangement; costs no row",
+			{Name: "title in the edge", Note: "a deploy tool's arrangement; costs no row",
 				Draw: draw(comp.Pane{Title: "Services"}, "the room inside")},
 			{Name: "title on a row", Note: "democtl's; the focus highlight is the pane's",
 				Draw: draw(comp.Pane{Title: "Services", TitleAt: comp.TitleOnRow}, "the room inside")},
@@ -700,7 +700,7 @@ func (m *Model) tabsEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Tabs",
 		Summary: "A strip of names, one of them current. The chevrons say it cycles.",
-		From:    "swarmctl tabStrip, pgctl tab bar, democtl",
+		From:    "a deploy tool's tab strip, a database tool's tab bar, democtl",
 		Keys:    []comp.Hint{{Key: "‹›", Label: "cycle"}},
 		Mouse:   []comp.Hint{{Key: "click", Label: "each tab is its own region"}},
 		Roles:   []string{"Accent", "Muted"},
@@ -725,7 +725,7 @@ func (m *Model) barEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Bar",
 		Summary: "One line with content at each end. Its Hints are a key and what it does.",
-		From:    "swarmctl footerLine, azctl footer, democtl header and footer",
+		From:    "a deploy tool's footer line, a cloud tool's footer, democtl's header and footer",
 		Roles:   []string{"Accent", "Muted", "Success"},
 		Glyphs:  []string{"·"},
 		States: []State{
@@ -774,7 +774,7 @@ func (m *Model) confirmEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Confirm",
 		Summary: "A question in a box, bounded to its container by construction.",
-		From:    "swarmctl action.go, pgctl actionview.go, democtl overlay",
+		From:    "a deploy tool's actions, a database tool's action view, democtl's overlay",
 		Keys:    []comp.Hint{{Key: "y", Label: "confirm"}, {Key: "n", Label: "cancel"}},
 		Roles:   []string{"Accent", "Danger", "Muted"},
 		Glyphs:  []string{"┌", "─", "┐", "│", "└", "┘", "·"},
@@ -814,7 +814,7 @@ func (m *Model) stepListEntry(s *styles) Entry {
 	return Entry{
 		Name:    "StepList",
 		Summary: "A run in progress: what will happen, what has, and what it cost.",
-		From:    "swarmctl renderdeploy.go, pgctl actionrun.go, azctl runner.go",
+		From:    "three tools' run views: a deploy render, an action run and a runner",
 		Keys:    []comp.Hint{{Key: "r", Label: "run again"}, {Key: "esc", Label: "back"}},
 		Roles:   []string{"Success", "Danger", "Pending", "Muted"},
 		Glyphs:  []string{"✓", "✗", "●", "•", "→"},
@@ -876,7 +876,7 @@ func (m *Model) logPaneEntry(s *styles) Entry {
 	return Entry{
 		Name:    "LogPane",
 		Summary: "A stream of lines, tailing. Following is a place, not a mode.",
-		From:    "swarmctl logspane.go",
+		From:    "a deploy tool's log pane",
 		Keys:    []comp.Hint{{Key: "↑↓", Label: "scroll, detaching from the tail"}},
 		Mouse:   []comp.Hint{{Key: "wheel", Label: "the same"}},
 		Roles:   []string{"Muted", "Stderr"},
@@ -922,7 +922,7 @@ func (m *Model) meterEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Meter",
 		Summary: "How far along something is — characters everywhere, pixels where they exist.",
-		From:    "swarmctl's run dialog and activity strip, which both wanted it and had neither",
+		From:    "a deploy tool's run dialog and activity strip, which both wanted it and had neither",
 		Roles:   []string{"Accent", "Border", "Muted"},
 		Glyphs:  []string{"─", "·"},
 		States: []State{
@@ -963,7 +963,7 @@ func (m *Model) inputEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Input",
 		Summary: "One line being typed into, with a caret you can move.",
-		From:    "democtl and azctl both fake it with a trailing underscore; the swarmctl palette cannot",
+		From:    "democtl and a cloud tool both fake it with a trailing underscore; a deploy tool's palette cannot",
 		Keys: []comp.Hint{
 			{Key: "←→", Label: "move the caret"},
 			{Key: "^a ^e", Label: "start, end"},
@@ -1024,7 +1024,7 @@ func (m *Model) waitingEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Waiting",
 		Summary: "A region whose contents have not arrived. Draw it inside the interface, not instead of it.",
-		From:    "azctl's first estate read; swarmctl's connecting screen",
+		From:    "a cloud tool's first inventory read; a deploy tool's connecting screen",
 		Roles:   []string{"Muted", "Pending", "Border"},
 		Glyphs:  []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏", "…"},
 		States: []State{
@@ -1200,7 +1200,7 @@ func (m *Model) paletteEntry(s *styles) Entry {
 		}},
 		{Name: "global", Note: "works on any screen, connected or not", Items: []comp.PaletteItem{
 			{Label: "switch environment", Key: "E", Hint: "latest · qat · prd · local"},
-			{Label: "edit environments", Key: "e", Hint: "opens ~/.swarmctl/config.yaml"},
+			{Label: "edit environments", Key: "e", Hint: "opens ~/.config/<tool>/config.yaml"},
 			{Label: "keys", Key: "?", Hint: "every binding, by screen"},
 			{Label: "quit", Key: "q", Hint: "leaves running jobs alone"},
 		}},
@@ -1233,7 +1233,7 @@ func (m *Model) paletteEntry(s *styles) Entry {
 	return Entry{
 		Name:    "Palette",
 		Summary: "One key to everything the tool can do right now — a directory of the keyboard, not a replacement for it.",
-		From:    "swarmctl's navigation design, screens 2a and 2b",
+		From:    "a deploy tool's navigation design, screens 2a and 2b",
 		Keys: []comp.Hint{
 			{Key: "type", Label: "filter across every group, ranked"},
 			{Key: "↑↓", Label: "move — headings are passed over"},

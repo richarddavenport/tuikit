@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │ keys     type filter across every group, ranked · ↑↓ move — headings are passed over · enter … │
 │                               │ │ roles    Accent · Muted · Pending · Danger · SelectionFG · SelectionBG                         │
 │                               │ │ glyphs   ─ · … ↑ ↓                                                                             │
-│                               │ │ from     swarmctl's navigation design, screens 2a and 2b                                       │
+│                               │ │ from     a deploy tool's navigation design, screens 2a and 2b                                  │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

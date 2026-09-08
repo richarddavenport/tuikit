@@ -4,7 +4,7 @@ tuikit gallery  every component, running                                        
 │ Components                    │ │ Pane                                                                                           │
 │ List                          │ │ A bordered box with a title, and the rect inside it.                                           │
 │ Pane                          │ │ ‹ title in the edge · title on a row · focused · title too long · no room · rounded · ASCII ›  │
-│ Tabs                          │ │ swarmctl's arrangement; costs no row                                                           │
+│ Tabs                          │ │ a deploy tool's arrangement; costs no row                                                      │
 │ Bar                           │ │                                                                                                │
 │ Confirm                       │ │ ┌─ Services ─────────────────────────────────────────────────────────────────────────────────┐ │
 │ StepList                      │ │ │ the room inside                                                                            │ │
@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │ mouse    click the border belongs to the pane                                                  │
 │                               │ │ roles    Border · Accent                                                                       │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
-│                               │ │ from     swarmctl drawBox and drawBoxRaw (which disagreed), democtl box                        │
+│                               │ │ from     a deploy tool's two box routines, which disagreed, and democtl's                      │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

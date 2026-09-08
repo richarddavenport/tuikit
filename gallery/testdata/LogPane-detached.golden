@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │ keys     ↑↓ scroll, detaching from the tail                                                    │
 │                               │ │ mouse    wheel the same                                                                        │
 │                               │ │ roles    Muted · Stderr                                                                        │
-│                               │ │ from     swarmctl logspane.go                                                                  │
+│                               │ │ from     a deploy tool's log pane                                                              │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

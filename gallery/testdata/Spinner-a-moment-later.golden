@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │ roles    Pending · Muted                                                                       │
 │                               │ │ glyphs   ⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏                                                                   │
-│                               │ │ from     pgctl spinner(), azctl's single ⠿                                                     │
+│                               │ │ from     a database tool's spinner, a cloud tool's single ⠿                                    │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

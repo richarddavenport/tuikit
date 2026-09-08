@@ -260,14 +260,14 @@ func TestAValueFlagWithNoValueSaysSo(t *testing.T) {
 
 // A command whose flags are not knowable until it runs.
 //
-// azctl's `play` takes --<param> <value> for any parameter the PLAYBOOK
+// the cloud tool's `play` takes --<param> <value> for any parameter the PLAYBOOK
 // declares, and the playbook is a YAML file chosen at runtime. Without
 // pass-through the choice is between rejecting a valid invocation and declaring
 // nothing — and a command that declares nothing has no help, no completions and
 // no manifest entry.
 func TestAPassThroughCommandCollectsWhatItDidNotDeclare(t *testing.T) {
 	var got Call
-	root := Command{Name: "azctl", Commands: []Command{{
+	root := Command{Name: "the cloud tool", Commands: []Command{{
 		Name:        "play",
 		Args:        []Arg{{Name: "playbook", Required: true}},
 		Flags:       []Flag{{Name: "dry-run", Kind: Bool}, {Name: "provider", Kind: String, Default: "azure"}},

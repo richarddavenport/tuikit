@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │                                                                                                │
 │                               │ │ roles    Muted                                                                                 │
 │                               │ │ glyphs   ✓ ✗ ● …                                                                               │
-│                               │ │ from     pgctl rows.go, swarmctl pane and detail tables                                        │
+│                               │ │ from     a database tool's rows, a deploy tool's pane and detail tables                        │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

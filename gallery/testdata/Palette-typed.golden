@@ -11,7 +11,7 @@ tuikit gallery  every component, running                                        
 │ LogPane                       │ │ │service api_api ‹ node vm-qat-0 ‹ environment qat ‹ global                   tab pins a tier│ │
 │ Spinner                       │ │ │────────────────────────────────────────────────────────────────────────────────────────────│ │
 │ Table                         │ │ │  switch environment                E    global              latest · qat · prd · local     │ │
-│ Detail                        │ │ │  edit environments                 e    global              opens ~/.swarmctl/config.yaml  │ │
+│ Detail                        │ │ │  edit environments                 e    global              opens ~/.config/<tool>/config.y│ │
 │ Menu                          │ │ │                                                                                            │ │
 │ Toast                         │ │ │                                                                                            │ │
 │ Form                          │ │ │                                                                                            │ │
@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │ keys     type filter across every group, ranked · ↑↓ move — headings are passed over · enter … │
 │                               │ │ roles    Accent · Muted · Pending · Danger · SelectionFG · SelectionBG                         │
 │                               │ │ glyphs   ─ · … ↑ ↓                                                                             │
-│                               │ │ from     swarmctl's navigation design, screens 2a and 2b                                       │
+│                               │ │ from     a deploy tool's navigation design, screens 2a and 2b                                  │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

@@ -100,7 +100,7 @@ func TestTheMarkerIsReadOutOfProse(t *testing.T) {
 	for _, body := range []string{
 		"Reconciled with tuikit through decision 32.",
 		"reconciled with tuikit through decision 32",
-		"# azctl\n\nSome prose.\n\nReconciled with tuikit through decision 32. More prose.\n",
+		"# mytool\n\nSome prose.\n\nReconciled with tuikit through decision 32. More prose.\n",
 		"Reconciled  with   tuikit\nthrough decision 32.",
 	} {
 		got, ok := Marker(write(t, "AGENTS.md", body))
@@ -109,7 +109,7 @@ func TestTheMarkerIsReadOutOfProse(t *testing.T) {
 		}
 	}
 
-	if _, ok := Marker(write(t, "AGENTS.md", "# azctl\n\nNo marker here.\n")); ok {
+	if _, ok := Marker(write(t, "AGENTS.md", "# mytool\n\nNo marker here.\n")); ok {
 		t.Error("a file with no marker reported one")
 	}
 }
@@ -120,7 +120,7 @@ func TestTheMarkerIsReadOutOfProse(t *testing.T) {
 func TestTheCheckoutComesFromTheReplaceDirective(t *testing.T) {
 	dir := t.TempDir()
 	gomod := filepath.Join(dir, "go.mod")
-	body := "module example.com/azctl\n\ngo 1.25\n\nreplace github.com/richarddavenport/tuikit => ../tuikit\n"
+	body := "module example.com/mytool\n\ngo 1.25\n\nreplace github.com/richarddavenport/tuikit => ../tuikit\n"
 	if err := os.WriteFile(gomod, []byte(body), 0o600); err != nil {
 		t.Fatal(err)
 	}

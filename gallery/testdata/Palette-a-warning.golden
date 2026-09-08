@@ -22,7 +22,7 @@ tuikit gallery  every component, running                                        
 │ Waiting                       │ │ │  prune unused images              asks first · 8M reclaimable                              │ │
 │ Breadcrumb                    │ │ │ global                                               works on any screen, connected or not │ │
 │ Scrollbar                     │ │ │  switch environment          E    latest · qat · prd · local                               │ │
-│ Keys                          │ │ │  edit environments           e    opens ~/.swarmctl/config.yaml                            │ │
+│ Keys                          │ │ │  edit environments           e    opens ~/.config/<tool>/config.yaml                       │ │
 │ Palette                       │ │ │  keys                        ?    every binding, by screen                                 │ │
 │ Rule                          │ │ │                                                                                      14/15 │ │
 │ Viewer                        │ │ │────────────────────────────────────────────────────────────────────────────────────────────│ │
@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │ keys     type filter across every group, ranked · ↑↓ move — headings are passed over · enter … │
 │                               │ │ roles    Accent · Muted · Pending · Danger · SelectionFG · SelectionBG                         │
 │                               │ │ glyphs   ─ · … ↑ ↓                                                                             │
-│                               │ │ from     swarmctl's navigation design, screens 2a and 2b                                       │
+│                               │ │ from     a deploy tool's navigation design, screens 2a and 2b                                  │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit

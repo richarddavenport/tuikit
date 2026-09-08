@@ -208,7 +208,7 @@ func between(t *testing.T, s, open, close string) string {
 // themeable tool in a palette nobody sees. A reviewer read "accent is bright
 // magenta" off a page like this; their own index 13 was dark mustard.
 func TestThePageSaysItsColoursAreNotYours(t *testing.T) {
-	page, err := Frames{Title: "pgctl"}.Page(capture(t))
+	page, err := Frames{Title: "mytool"}.Page(capture(t))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -8,7 +8,7 @@ import (
 const toastName Name = "toast"
 
 // A hint is the difference between telling someone they have a problem and
-// telling them what to do about it. swarmctl's error view carries "a hint for
+// telling them what to do about it. a deploy tool's error view carries "a hint for
 // the failures we know how to fix", and it is the field most likely to be left
 // off — so it is a field rather than something you append to the body.
 func TestAToastCanSayWhatToDoAboutIt(t *testing.T) {
@@ -16,11 +16,11 @@ func TestAToastCanSayWhatToDoAboutIt(t *testing.T) {
 	Toast{
 		Title: "cannot reach staging",
 		Body:  "dial tcp 10.0.0.4:5432: connection refused",
-		Hint:  "is the tunnel up? try `pgctl connect staging`",
+		Hint:  "is the tunnel up? try `db connect staging`",
 	}.Draw(c, c.Bounds(), Region(toastName))
 
 	got := c.String()
-	for _, want := range []string{"cannot reach staging", "connection refused", "pgctl connect"} {
+	for _, want := range []string{"cannot reach staging", "connection refused", "db connect"} {
 		if !strings.Contains(got, want) {
 			t.Errorf("%q is missing:\n%s", want, got)
 		}

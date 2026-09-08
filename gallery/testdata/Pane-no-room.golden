@@ -31,7 +31,7 @@ tuikit gallery  every component, running                                        
 │                               │ │ mouse    click the border belongs to the pane                                                  │
 │                               │ │ roles    Border · Accent                                                                       │
 │                               │ │ glyphs   ┌ ─ ┐ │ └ ┘                                                                           │
-│                               │ │ from     swarmctl drawBox and drawBoxRaw (which disagreed), democtl box                        │
+│                               │ │ from     a deploy tool's two box routines, which disagreed, and democtl's                      │
 │                         25/25 │ │                                                                                                │
 └───────────────────────────────┘ └────────────────────────────────────────────────────────────────────────────────────────────────┘
   ↑↓ component · ‹› state · tab pane · q quit
