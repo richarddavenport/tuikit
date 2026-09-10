@@ -282,8 +282,8 @@ const tuikitModule = "github.com/richarddavenport/tuikit"
 // than against this working tree, since the two differ for every commit
 // between one tag and the next. Bump them in the release commit.
 const (
-	tuikitVersion  = "v0.1.1"
-	tuikitDecision = 54
+	tuikitVersion  = "v0.2.0"
+	tuikitDecision = 56
 )
 
 func (t Tool) render(name string) ([]byte, error) {
