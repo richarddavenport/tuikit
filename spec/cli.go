@@ -295,6 +295,32 @@ func Usage(cmd Command, path []string, w io.Writer) {
 		printf(w, "  %-24s  %s\n", name, help)
 	}
 	printf(w, "  %-24s  %s\n", "--json", "machine-readable output")
+
+	builtins(path, w)
+}
+
+// builtins prints the commands every tuikit tool answers, at the root only.
+//
+// They are printed rather than declared because they cannot be Commands: each
+// needs something Run has no way to hand it — the version the linker stamped,
+// the tool's own palette and glyph set, the process's exit — so each is
+// intercepted in main before the tree is walked. Printing them here is what
+// stops that being a thing a tool has to remember to document, in the same way
+// --json is printed rather than declared on every command.
+//
+// The first line is the one that matters. An agent meeting a tool it has never
+// seen runs --help, and if help does not name the manifest then the manifest
+// may as well not exist: it will parse this text instead, or read the source,
+// or guess. One line turns two commands into the whole surface.
+func builtins(path []string, w io.Writer) {
+	if len(path) != 1 {
+		return
+	}
+	printf(w, "\nbuilt in:\n")
+	printf(w, "  %-24s  %s\n", "describe --json", "the whole surface in one call — every command, flag,")
+	printf(w, "  %-24s  %s\n", "", "screen, region, color role, glyph and exit code")
+	printf(w, "  %-24s  %s\n", "version", "the version, on one line")
+	printf(w, "  %-24s  %s\n", "completion <shell>", "bash, zsh or fish")
 }
 
 // printf writes and drops the error.

@@ -27,6 +27,10 @@ type Manifest struct {
 	Regions  []RegionInfo  `json:"regions,omitempty"`
 	Roles    []RoleInfo    `json:"roles,omitempty"`
 	Glyphs   []GlyphInfo   `json:"glyphs,omitempty"`
+	// Codes is never omitted. A caller acting on what a command returns needs
+	// the contract before it runs anything, and the tool that leaves it out is
+	// the tool whose 2 gets read as failure.
+	Codes []CodeInfo `json:"codes"`
 }
 
 // CommandInfo is one command, flattened to the name you would type.
@@ -86,9 +90,21 @@ type GlyphInfo struct {
 	Why   string `json:"why"`
 }
 
+// CodeInfo is one exit code and what it means.
+//
+// In the manifest because the contract is richer than ok-or-not and nothing
+// else reports it: 2 is a finding rather than a failure, and a caller that
+// learns that by observing a run has learned it from one run. The values are
+// in codes.go, next to the constants, and [Codes] returns them.
+type CodeInfo struct {
+	Code    int    `json:"code"`
+	Name    string `json:"name"`
+	Meaning string `json:"meaning"`
+}
+
 // Describe builds the manifest.
 func Describe(root Command, version string, p theme.Palette, glyphs theme.GlyphSet) Manifest {
-	m := Manifest{Tool: root.Name, Version: version}
+	m := Manifest{Tool: root.Name, Version: version, Codes: Codes()}
 
 	screens := map[string]bool{}
 	regions := map[string][]string{}

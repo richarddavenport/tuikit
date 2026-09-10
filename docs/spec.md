@@ -47,7 +47,19 @@ three answers that disagree in small ways with no way to tell which is current.
 draws, so it cannot be stale without them being stale too. It carries the
 palette and glyph set as well, because an agent adding a screen needs to know
 which color roles and characters exist *before* it writes anything, and those
-are exactly what a guard will fail it for afterwards.
+are exactly what a guard will fail it for afterwards. It carries the exit codes
+too, because a caller acting on what a command returns needs the contract before
+it runs anything.
+
+**How anything finds it.** `Usage` prints a `built in:` block at the root, so
+`tool --help` names `describe --json`, `version` and `completion`. Those three
+are intercepted in `main` before the tree is walked — each needs the linker's
+version, the tool's palette or the process's exit — so they are not `Command`s
+and nothing would otherwise list them. Printing rather than declaring them is
+what stops a tool having to remember to document them, in the same way every
+command takes `--json` without declaring it. The first line is the one that
+earns the block: an agent meeting a tool it has never seen runs `--help`, and a
+manifest nothing points at is a manifest nobody calls.
 
 ## Exit codes, and why cobra is not here
 
@@ -59,6 +71,10 @@ are exactly what a guard will fail it for afterwards.
 
 `OK` · `Fail` · `Drift`. The two is the point: `the deploy tool diff && deploy`
 must not deploy when there is drift.
+
+`spec.Codes()` is the same three with their meanings, and it is what `Describe`
+puts in the manifest. A caller that has to learn the two by observing a run has
+learned it from one run.
 
 ## Argument and flag kinds
 

@@ -305,3 +305,29 @@ func TestWithoutPassThroughAnUnknownFlagIsStillRejected(t *testing.T) {
 		t.Errorf("exit %d, %q", code, errOut)
 	}
 }
+
+// The whole point of the built-in block: an agent that has never seen this
+// tool runs --help and learns that one more call gets it everything. If this
+// test fails, the manifest is still there and nothing can find it.
+func TestRootHelpNamesTheManifest(t *testing.T) {
+	for _, spelling := range [][]string{{"-h"}, {"--help"}, {"help"}} {
+		_, out, _ := run(spelling...)
+		if !strings.Contains(out, "describe --json") {
+			t.Errorf("`%s` does not name the manifest:\n%s", strings.Join(spelling, " "), out)
+		}
+		for _, want := range []string{"version", "completion <shell>"} {
+			if !strings.Contains(out, want) {
+				t.Errorf("%q is missing from the built-in block:\n%s", want, out)
+			}
+		}
+	}
+}
+
+// Only at the root. A subcommand's help is about that subcommand, and four
+// lines repeated under every one of them is four lines nobody reads.
+func TestASubcommandsHelpDoesNotRepeatTheBuiltIns(t *testing.T) {
+	_, out, _ := run("status", "-h")
+	if strings.Contains(out, "built in:") {
+		t.Errorf("the built-in block is repeated under a subcommand:\n%s", out)
+	}
+}

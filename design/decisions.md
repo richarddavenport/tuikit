@@ -2040,3 +2040,64 @@ diff:
 What this does not change: a tool still reconciles by decision number rather
 than by version. A bump from `v0.1.1` to `v0.2.0` is an event and not an
 explanation, and decision 0's reasoning survives the arrival of tags intact.
+
+## 56. `--help` names the manifest, and there is no `agents` subcommand
+
+Every generated tool has had `describe --json` since spec existed, and nothing
+pointed at it. `democtl help` listed four commands and stopped; `describe`,
+`version` and `completion` are intercepted in `main` before the tree is walked,
+so `Usage` had never seen them and could not list what it did not know about.
+The manifest was reachable only by someone who had already read a tuikit
+document saying it was there — which is everyone except the audience it was
+built for.
+
+The proposal that prompted this was a subcommand: `pgctl agents`, or `pgctl ai`,
+a door marked for the thing on the other side of it. Rejected for three reasons,
+and the third is the one that would have hurt later.
+
+An agent meeting an unfamiliar binary runs `--help`. It will not guess `ai`, so
+the subcommand gets found only if help mentions it, and a help that can mention
+a subcommand can carry the sentence instead. The door needs a sign either way,
+and once there is a sign the door is redundant.
+
+Naming it for agents splits an audience that is not split. The exit-code
+contract is the clearest case: a person writing `pgctl diff && pgctl deploy`
+needs to know that 2 is a finding exactly as much as an agent does. Put that
+behind a robots-only command and the human's door stays worse for no gain, on a
+distinction the tool cannot actually observe.
+
+And it would have been a fifth surface. The whole argument of `spec` is one
+declaration producing four — CLI, TUI, manifest, menu — none of them written by
+hand, none able to drift. A hand-written agent blurb is a fifth thing to keep in
+step, and the first one that can lie.
+
+So `Usage` grew a `built in:` block at the root, printed rather than declared,
+the same way every command takes `--json` without declaring it. Four lines, one
+place, and it reaches tools generated before it existed on their next bump.
+Nothing was added to a template, because a template only helps the tools that
+have not been written yet.
+
+Two smaller things came with it.
+
+- **The manifest carries the exit codes.** `spec.Codes()` reads the list beside
+  the constants in `codes.go`, and a test fails if the two disagree. A function
+  returning a copy rather than an exported slice, because an exported slice is
+  writable by anyone who can read it, and `theme.DefaultGlyphs` already has that
+  test for that reason. It is
+  the one part of the contract a caller must know before it runs anything, and
+  it was the one part nothing reported. Reading it by observing a run means
+  reading it from one run.
+- **`democtl` stopped calling `flag.Parse`.** `flag.CommandLine` owns `-h`, so
+  it answered `--help` itself, printed the stdlib's usage and exited, and
+  democtl's own help never ran. It also prints every flag any linked package
+  registered at init — `ui` imports `harness` for `--snapshot`, and `harness`
+  registers `-update-goldens`, so the example tool's `--help` advertised a
+  testing flag. The seed is now taken by hand, which is what it always needed:
+  the tree is built from it, so it cannot be a declared flag on the tree. The
+  scaffold template never had this bug. The example did, and the example is what
+  gets read.
+
+What this does not settle: `harness` still registers a flag at package init, and
+any tool importing it for `--snapshot` links that flag into its binary. It is
+invisible now because nothing calls `flag.Usage`, which makes it a latent bug
+rather than a fixed one.

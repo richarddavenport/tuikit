@@ -14,9 +14,10 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/richarddavenport/tuikit/examples/democtl/ui"
 	"github.com/richarddavenport/tuikit/spec"
@@ -34,15 +35,24 @@ var version = "dev"
 // else is a command. main is the only place that can decide which, because it
 // is the only place that knows a bare `democtl` means "show me".
 func main() {
-	seed := flag.Int64("seed", 1, "which fleet to generate; the same seed is the same fleet")
-	flag.Parse()
-
-	argv := flag.Args()
+	// -seed is taken by hand rather than with flag.Parse, and the reason is
+	// what a reader of this file is most likely to copy.
+	//
+	// flag.CommandLine owns -h and --help. A flag.Parse here answers them
+	// itself, prints the stdlib's usage and exits, so democtl's own help never
+	// runs and `democtl --help` says nothing about democtl. It also prints
+	// every flag any linked package registered at init: harness registers
+	// -update-goldens, ui imports harness for --snapshot, and a shipped tool's
+	// --help ends up advertising a testing flag.
+	//
+	// The seed has to be read before the tree exists, because the tree is built
+	// from it. That is the whole reason it is not a declared flag.
+	seed, argv := takeSeed(os.Args[1:])
 	if len(argv) == 0 {
 		argv = []string{"tui"}
 	}
 
-	root := ui.Commands(*seed)
+	root := ui.Commands(seed)
 	switch argv[0] {
 	case "describe":
 		// The whole surface in one call, so an agent never has to grep for it.
@@ -78,4 +88,29 @@ func main() {
 	// which is what gives it --snapshot and --script, in help and in the
 	// manifest, without democtl declaring either.
 	os.Exit(spec.Run(root, argv, os.Stdout, os.Stderr))
+}
+
+// takeSeed pulls -seed out of the arguments and returns the rest.
+//
+// Both spellings and both separators, because a reader who types --seed=7 has
+// not made a mistake worth an error message. A value that is not a number is
+// ignored rather than rejected: this is a fixture knob, and the run it would
+// abort is a run somebody wanted to look at.
+func takeSeed(argv []string) (int64, []string) {
+	seed := int64(1)
+	rest := make([]string, 0, len(argv))
+	for i := 0; i < len(argv); i++ {
+		name, value, split := strings.Cut(argv[i], "=")
+		if name != "-seed" && name != "--seed" {
+			rest = append(rest, argv[i])
+			continue
+		}
+		if !split && i+1 < len(argv) {
+			value, i = argv[i+1], i+1
+		}
+		if n, err := strconv.ParseInt(value, 10, 64); err == nil {
+			seed = n
+		}
+	}
+	return seed, rest
 }

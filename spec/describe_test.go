@@ -142,3 +142,61 @@ func TestTheManifestIsValidJSON(t *testing.T) {
 		t.Errorf("round trip lost the tool: %+v", back)
 	}
 }
+
+// The consts in codes.go and the list the manifest carries are one contract in
+// two places. A code added to one and not the other is a code a caller cannot
+// learn about, which is the failure this exists to make loud.
+func TestEveryExitCodeIsInTheManifest(t *testing.T) {
+	m := manifest(t)
+
+	for _, want := range []struct {
+		code int
+		name string
+	}{{OK, "ok"}, {Fail, "fail"}, {Drift, "drift"}} {
+		found := false
+		for _, got := range m.Codes {
+			if got.Code == want.code {
+				found = true
+				if got.Name != want.name {
+					t.Errorf("exit %d is called %q, want %q", want.code, got.Name, want.name)
+				}
+				if got.Meaning == "" {
+					t.Errorf("exit %d has no meaning", want.code)
+				}
+			}
+		}
+		if !found {
+			t.Errorf("exit %d is not in the manifest", want.code)
+		}
+	}
+	if len(m.Codes) != 3 {
+		t.Errorf("the manifest carries %d codes, and codes.go declares 3", len(m.Codes))
+	}
+}
+
+// Drift is the one that costs something to get wrong: a caller that reads it
+// as failure is wrong in a direction that looks like the tool working.
+func TestTheManifestSaysDriftIsNotAFailure(t *testing.T) {
+	m := manifest(t)
+
+	for _, c := range m.Codes {
+		if c.Code == Drift && !strings.Contains(c.Meaning, "not a failure") {
+			t.Errorf("exit 2 says %q, which does not say it is not a failure", c.Meaning)
+		}
+	}
+}
+
+// An exported slice is writable by anyone who can read it. theme.DefaultGlyphs
+// has the same test for the same reason: one caller rewriting a Meaning in
+// place would change what every other caller in the process is told.
+func TestCodesCannotBeMutatedThroughWhatItReturns(t *testing.T) {
+	got := Codes()
+	got[0].Meaning = "whatever this caller felt like"
+
+	if Codes()[0].Meaning == "whatever this caller felt like" {
+		t.Error("Codes returns the package's own slice — every caller now sees that")
+	}
+	if manifest(t).Codes[0].Meaning == "whatever this caller felt like" {
+		t.Error("the manifest carries the package's own slice")
+	}
+}
