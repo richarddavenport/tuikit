@@ -109,16 +109,15 @@ func TestABadNameIsRefused(t *testing.T) {
 }
 
 // generate writes a tool into a temporary directory and returns its root.
+//
+// Against THIS checkout, not against the released version the default would
+// pull: the acceptance test's whole job is to fail when a change here breaks
+// generated code, and a generated tool compiled against the last tag cannot
+// see the change being tested. That makes it the one caller that wants
+// -tuikit, and the reason the flag still exists.
 func generate(t *testing.T, tool Tool) string {
 	t.Helper()
-	// The generated go.mod must point at THIS checkout, not at wherever a
-	// sibling ../tuikit happens to be — otherwise the test compiles somebody
-	// else's copy of the framework.
-	here, err := filepath.Abs("..")
-	if err != nil {
-		t.Fatal(err)
-	}
-	tool.Tuikit = here
+	tool.Tuikit = tuikitRoot(t)
 
 	dir := t.TempDir()
 	if _, err := tool.Write(dir); err != nil {
@@ -134,20 +133,55 @@ func run(dir, name string, args ...string) (string, error) {
 	return string(out), err
 }
 
-// The `replace` is checked before anything is written, so a first run outside a
-// sibling checkout says which flag fixes it rather than failing four steps
-// later inside `go mod tidy`, against a module the reader did not write.
-func TestAToolIsNotWrittenIfTuikitCannotBeFound(t *testing.T) {
+// Somebody who has installed the command and has no checkout gets a tool. That
+// is the whole point of a public module, and for a while it was the one thing
+// the scaffolder could not do: the default `replace => ../tuikit` meant every
+// first run anywhere refused, naming a flag whose only valid argument was a
+// clone the person had not made.
+func TestAToolIsGeneratedWithNoCheckoutAnywhere(t *testing.T) {
 	dir := t.TempDir()
-	_, err := (Tool{Name: "widgetctl"}).Write(dir)
+	if _, err := (Tool{Name: "widgetctl"}).Write(dir); err != nil {
+		t.Fatalf("a plain run refused: %v", err)
+	}
+
+	gomod, err := os.ReadFile(filepath.Join(dir, "widgetctl", "go.mod"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(gomod), "replace") {
+		t.Errorf("a tool generated without -tuikit still has a replace:\n%s", gomod)
+	}
+	if want := "require " + tuikitModule + " " + tuikitVersion; !strings.Contains(string(gomod), want) {
+		t.Errorf("go.mod does not %q:\n%s", want, gomod)
+	}
+}
+
+// -tuikit is still checked before anything is written, so a wrong path says so
+// while it is still on screen rather than failing four steps later inside
+// `go mod tidy`, against a module the reader did not write.
+func TestABadTuikitPathIsRefusedBeforeWriting(t *testing.T) {
+	dir := t.TempDir()
+	_, err := (Tool{Name: "widgetctl", Tuikit: filepath.Join(dir, "nowhere")}).Write(dir)
 	if err == nil {
-		t.Fatal("wrote a tool whose replace cannot resolve")
+		t.Fatal("accepted a -tuikit that is not a checkout")
 	}
 	if !strings.Contains(err.Error(), "-tuikit") {
-		t.Errorf("the error does not name the flag that fixes it: %v", err)
+		t.Errorf("the error does not name the flag it is about: %v", err)
 	}
 	if entries, _ := os.ReadDir(filepath.Join(dir, "widgetctl")); len(entries) > 0 {
 		t.Errorf("%d files were written anyway", len(entries))
+	}
+}
+
+// A stale tuikitVersion generates tools pinned to a tuikit that is not the
+// current release.
+func TestTheCompiledInVersionIsTheNewestTag(t *testing.T) {
+	out, err := run(tuikitRoot(t), "git", "describe", "--tags", "--abbrev=0")
+	if err != nil {
+		t.Skipf("no git tag to check against: %v", err)
+	}
+	if want := strings.TrimSpace(out); tuikitVersion != want {
+		t.Errorf("tuikitVersion is %s but the newest tag is %s — bump it", tuikitVersion, want)
 	}
 }
 
@@ -155,6 +189,11 @@ func TestAToolIsNotWrittenIfTuikitCannotBeFound(t *testing.T) {
 // would, on its first `tuikit news`, be told about every decision tuikit has
 // ever taken — including the ones that produced the code it was just given.
 func TestAGeneratedToolRecordsTheCurrentDecision(t *testing.T) {
+	// Against a checkout, where "current" means this working tree and the
+	// marker is read from its decisions.md. The default path stamps the
+	// constant instead, and is checked against the decisions its required
+	// version ships — the two answers differ between tags, which is why they
+	// are two tests and not one.
 	dir := t.TempDir()
 	if _, err := (Tool{Name: "probectl", Tuikit: tuikitRoot(t)}).Write(dir); err != nil {
 		t.Fatal(err)
@@ -232,32 +271,81 @@ func TestTheReplacePathIsRelative(t *testing.T) {
 // Checkable without a runner, which is the point — the invariant is between two
 // generated files, not between a file and GitHub.
 func TestTheWorkflowChecksOutWhateverTheReplaceNeeds(t *testing.T) {
+	// Both shapes, because the invariant is not "two checkouts" — it is that
+	// the workflow matches the go.mod beside it. Only checking the -tuikit one
+	// would let the ordinary tool ship a workflow that clones a repository it
+	// has no reason to want and no token to reach.
+	for _, tool := range []Tool{
+		{Name: "probectl"},
+		{Name: "probectl", Tuikit: tuikitRoot(t)},
+	} {
+		dir := t.TempDir()
+		if _, err := tool.Write(dir); err != nil {
+			t.Fatal(err)
+		}
+
+		gomod, err := os.ReadFile(filepath.Join(dir, "probectl", "go.mod"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		ci, err := os.ReadFile(filepath.Join(dir, "probectl", ".github", "workflows", "ci.yml"))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		local := strings.Contains(string(gomod), "=> ..") || strings.Contains(string(gomod), "=> /")
+		checkouts := strings.Count(string(ci), "actions/checkout@")
+
+		switch {
+		case local && checkouts < 2:
+			t.Errorf("go.mod replaces tuikit with a local path but the workflow checks out %d repositories — "+
+				"CI cannot build, and `go build` fails before gofmt, vet or the tests run", checkouts)
+		case !local && checkouts > 1:
+			t.Errorf("the replace is gone but the workflow still checks out %d repositories", checkouts)
+		}
+
+		if local != strings.Contains(string(ci), "TUIKIT_TOKEN") {
+			t.Errorf("replace=%v but TUIKIT_TOKEN present=%v; the secret exists only to reach the second checkout",
+				local, !local)
+		}
+	}
+}
+
+// The acceptance test above compiles a tool built against this checkout, which
+// is the only way it can catch a change made here. Nothing in it exercises the
+// go.mod everyone else gets, so a require pointing at a version that does not
+// resolve would pass every check and fail on the first stranger.
+func TestAToolBuiltAgainstTheReleasedVersionResolves(t *testing.T) {
+	if testing.Short() {
+		t.Skip("fetches tuikit from the module proxy")
+	}
 	dir := t.TempDir()
-	if _, err := (Tool{Name: "probectl", Tuikit: tuikitRoot(t)}).Write(dir); err != nil {
+	if _, err := (Tool{Name: "widgetctl"}).Write(dir); err != nil {
 		t.Fatal(err)
 	}
+	root := filepath.Join(dir, "widgetctl")
+	if err := Bootstrap(root); err != nil {
+		t.Fatalf("bootstrap: %v", err)
+	}
+	if out, err := run(root, "go", "build", "./..."); err != nil {
+		t.Fatalf("a tool depending on tuikit %s does not build:\n%s", tuikitVersion, out)
+	}
 
-	gomod, err := os.ReadFile(filepath.Join(dir, "probectl", "go.mod"))
+	// And it is born reconciled with THAT tuikit, not with this working tree.
+	// The two differ for every commit between a tag and the next one, and a
+	// marker taken from the tree would name decisions the tool's dependency
+	// does not contain — a tool told it has read something that does not exist
+	// where it is looking.
+	dir, err := run(root, "go", "list", "-m", "-f", "{{.Dir}}", tuikitModule)
+	if err != nil {
+		t.Fatalf("locating the module: %v\n%s", err, dir)
+	}
+	ds, err := news.Read(filepath.Join(strings.TrimSpace(dir), "design", "decisions.md"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	ci, err := os.ReadFile(filepath.Join(dir, "probectl", ".github", "workflows", "ci.yml"))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	local := strings.Contains(string(gomod), "=> ..") || strings.Contains(string(gomod), "=> /")
-	checkouts := strings.Count(string(ci), "actions/checkout@")
-
-	switch {
-	case local && checkouts < 2:
-		t.Errorf("go.mod replaces tuikit with a local path but the workflow checks out %d repositories — "+
-			"CI cannot build, and `go build` fails before gofmt, vet or the tests run", checkouts)
-	case !local && checkouts > 1:
-		t.Errorf("the replace is gone but the workflow still checks out %d repositories", checkouts)
-	}
-
-	if local && !strings.Contains(string(ci), "TUIKIT_TOKEN") {
-		t.Error("the second checkout has no token; GITHUB_TOKEN cannot reach another repository")
+	if want := news.Latest(ds); tuikitDecision != want {
+		t.Errorf("tuikitDecision is %d but tuikit %s ships %d — bump it with the version",
+			tuikitDecision, tuikitVersion, want)
 	}
 }

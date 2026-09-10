@@ -2,10 +2,15 @@ module <<.Module>>
 
 go <<.GoVersion>>
 
-require github.com/richarddavenport/tuikit v0.0.0
-
-// tuikit is private and unpublished, so this resolves it from a sibling
-// checkout. Relative, so it works on any machine with both repos side by side
-// rather than only on the one it was generated on. It goes when tuikit is
-// tagged.
+require github.com/richarddavenport/tuikit <<.Version>>
+<<if .Tuikit>>
+// Building against a tuikit CHECKOUT rather than the released module, because
+// -tuikit was passed. That is the arrangement for working on tuikit and a tool
+// at the same time, and it is not the default: without the flag this go.mod is
+// an ordinary dependency on a tagged version and needs nothing beside it.
+//
+// Relative, so it works on any machine with both repos side by side rather
+// than only on the one it was generated on. Delete it and the require above
+// takes over.
 replace github.com/richarddavenport/tuikit => <<.Tuikit>>
+<<end>>

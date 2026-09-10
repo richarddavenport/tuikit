@@ -99,9 +99,10 @@ is deliberately still open.
 ## Telling the tools what changed
 
 `comp` cannot do something → a tool files an issue here. This is the other
-direction, and it needs its own mechanism because there is no upgrade event to
-attach one to: a tool resolves tuikit through `replace => ../tuikit`, so a pull
-here changes its behavior with no version to bump and nothing to read.
+direction, and it needs its own mechanism because a version bump is an event
+rather than an explanation: `v0.1.1` to `v0.2.0` says something moved and
+nothing about what. A tool built against a checkout with `-tuikit` has less
+than that, since a pull here changes its behavior with no bump at all.
 
 `design/decisions.md` is the marker. It is numbered and append-only, and a tool
 records the number it has reconciled with:

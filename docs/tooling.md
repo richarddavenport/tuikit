@@ -20,11 +20,32 @@ reading `comp`'s own source — adding a component without an entry fails a test
 `-list` prints the inventory as text, each entry with the tools it was extracted
 from.
 
+## `new` — scaffolding a tool
+
+```sh
+tuikit new widgetctl -module github.com/you/widgetctl -short "watches widgets"
+```
+
+Needs nothing but the command. The generated `go.mod` requires a tagged tuikit
+like any other dependency, so the tool builds on any machine that can reach a
+module proxy, and its CI checks out one repository.
+
+`-tuikit <path>` is the exception, for working on tuikit and a tool at the same
+time. It adds a `replace` to that checkout, and the generated CI grows a second
+checkout and a `TUIKIT_TOKEN` secret to match. Without it there is no replace.
+Decision 55 is why that is the default around this way.
+
 ## `news` — how a tool learns tuikit changed
 
 Backed by the `news` package. `design/decisions.md` is a numbered record; a
 generated tool records the number it was born reconciled with, and `tuikit news`
 prints the decisions since.
+
+Run from a tool's root with no arguments. `Checkout` finds the tuikit that tool
+builds against: a `replace` directive if it has one, otherwise the required
+version in the module cache — `design/decisions.md` ships inside the module,
+because a module zip carries the whole repository. In a fresh clone that has
+not downloaded anything yet, `go mod download` first.
 
 `Read(path)` · `Since(ds, n)` · `Latest(ds)` · `Marker(path)` ·
 `Checkout(gomod)`

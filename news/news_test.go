@@ -137,10 +137,57 @@ func TestTheCheckoutComesFromTheReplaceDirective(t *testing.T) {
 	}
 }
 
-func TestAGoModWithNoReplaceIsNotAToolWeCanHelp(t *testing.T) {
+func TestAGoModThatDoesNotDependOnTuikitIsNotAToolWeCanHelp(t *testing.T) {
 	gomod := write(t, "go.mod", "module example.com/thing\n\ngo 1.25\n")
 	if _, ok := Checkout(gomod); ok {
-		t.Error("a go.mod with no tuikit replace reported a checkout")
+		t.Error("a go.mod with no tuikit in it at all reported a checkout")
+	}
+}
+
+// A tool being worked on alongside tuikit has both: a require left over from
+// when it was generated, and a replace added since. Go builds the replace, so
+// news must report the replace — reading the module cache there would describe
+// a tuikit the tool is not running.
+func TestTheReplaceWinsOverTheRequire(t *testing.T) {
+	dir := t.TempDir()
+	gomod := filepath.Join(dir, "go.mod")
+	body := "module example.com/mytool\n\ngo 1.25\n\n" +
+		"require github.com/richarddavenport/tuikit v0.1.1\n\n" +
+		"replace github.com/richarddavenport/tuikit => ../tuikit\n"
+	if err := os.WriteFile(gomod, []byte(body), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	got, ok := Checkout(gomod)
+	if !ok {
+		t.Fatal("no checkout found")
+	}
+	want, _ := filepath.Abs(filepath.Join(dir, "..", "tuikit"))
+	if got != want {
+		t.Errorf("resolved to %s, want the replace at %s", got, want)
+	}
+}
+
+// The ordinary tool has only a require, and its tuikit is the module cache.
+// This asserts the require is RECOGNIZED — where it resolves to is the
+// toolchain's answer and needs a downloaded module, which the scaffolder's own
+// end-to-end test covers.
+func TestAVersionedRequireIsRecognized(t *testing.T) {
+	dir := t.TempDir()
+	gomod := filepath.Join(dir, "go.mod")
+	body := "module example.com/mytool\n\ngo 1.25\n\n" +
+		"require (\n\tgithub.com/charmbracelet/lipgloss v1.1.0\n" +
+		"\tgithub.com/richarddavenport/tuikit v0.1.1\n)\n"
+	if err := os.WriteFile(gomod, []byte(body), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if !requireLine.Match([]byte(body)) {
+		t.Error("a require inside a block was not recognized")
+	}
+	// No go.sum and nothing downloaded here, so this is allowed to miss — what
+	// it must not do is mistake the require for a replace and return a path.
+	if got, ok := Checkout(gomod); ok && got == "" {
+		t.Error("reported a checkout with no path")
 	}
 }
 

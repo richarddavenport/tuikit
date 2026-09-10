@@ -1986,3 +1986,57 @@ was right, and the shapes of the types where they differed.
 
 `democtl` keeps its name — it is this repository's own example and you can read
 it. So does `herdr`, which is somebody else's public project.
+
+## 55. A generated tool depends on a version, not on a directory
+
+`tuikit new` used to write `replace github.com/richarddavenport/tuikit =>
+../tuikit` into every tool it generated, and refuse to write anything at all
+unless that directory already held a checkout. The default was `../tuikit`,
+which is the arrangement on the machine the scaffolder was written on and on no
+other.
+
+**The consequence was that the documented install could not scaffold.** `go
+install github.com/richarddavenport/tuikit/cmd/tuikit@latest` puts a working
+binary on the PATH, and the first thing it did was refuse:
+
+```
+tuikit new: no tuikit checkout at ./tuikit
+Pass -tuikit <path> to say where yours is
+```
+
+There is no answer to that flag for somebody who has installed a command. The
+only valid argument is a clone they have not made, and the message did not say
+to make one. A scaffolder nobody outside this repository can run is a
+scaffolder with one user.
+
+**So the require is a version and the replace is gone.** tuikit is public and
+tagged; a generated `go.mod` says `require github.com/richarddavenport/tuikit
+v0.1.1` like any other dependency, and the tool builds anywhere Go can reach a
+proxy. `-tuikit` survives as what it should always have been: an opt-in for
+working on tuikit and a tool at the same time, inert unless passed.
+
+Four things followed, and they are the reason this is a decision and not a
+diff:
+
+- **CI drops to one checkout.** The second one, its paths, the
+  `working-directory`, and the `TUIKIT_TOKEN` secret existed only to put a
+  private sibling on the runner. A generated workflow now clones one repository
+  and fetches the rest. The invariant that CI must match the go.mod beside it
+  is tested in both shapes, not just the one this repository uses.
+- **`tuikit news` reads the module cache.** It found tuikit through the replace
+  directive, which most tools no longer have. It now falls back to `go list -m`
+  on the require — and that works because a module zip carries the whole
+  repository, so `design/decisions.md` ships inside the dependency. The command
+  needs the module downloaded and says so when it is not.
+- **The starting marker is a constant.** It was read from the checkout's
+  `decisions.md`, and there is no checkout to read. `scaffold.tuikitDecision`
+  is compiled in beside `tuikitVersion`, held to the decisions the *required
+  version* ships rather than to this working tree — those differ for every
+  commit between one tag and the next, and a tool marked ahead of its own
+  dependency has been told it read something it cannot find.
+- **Releasing now has two constants to bump.** Both are guarded by tests that
+  name themselves in the failure, which is the cheapest form this could take.
+
+What this does not change: a tool still reconciles by decision number rather
+than by version. A bump from `v0.1.1` to `v0.2.0` is an event and not an
+explanation, and decision 0's reasoning survives the arrival of tags intact.

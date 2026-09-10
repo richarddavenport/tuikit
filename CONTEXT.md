@@ -48,9 +48,15 @@ each with a reason. Closed, and a guard holds it closed: a font without a glyph
 draws a replacement box, which reads as a bug rather than as decoration.
 
 **Guard** — a test function that holds a rule closed against a package.
-`Tokens`, `Glyphs`, `Chrome`, `Engine`, `Reachable` and `Screens` exist;
-`Width` is still open (#6). A guard is mechanism: it knows Go source and terminal vocabulary, and
-nothing about what a tool does.
+`Tokens`, `Glyphs`, `Chrome`, `Engine`, `Reachable` and `Screens` exist. A guard
+is mechanism: it knows Go source and terminal vocabulary, and nothing about what
+a tool does.
+
+There is no `guard.Width`, and decision 37 explains why: the check that a
+component stays inside the rect it was given lives in the gallery, as
+`TestNoComponentDrawsOutsideItsRect`, because the gallery is already the
+complete list of components and already draws each one in every state it has. A
+guard would need a second list, and a second list drifts.
 
 **Mechanism / policy** — the line the library-versus-scaffolder split falls on.
 Mechanism is a library function that must work for every tool. Policy is a

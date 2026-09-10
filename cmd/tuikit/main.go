@@ -74,7 +74,7 @@ func newTool(args []string) {
 	module := fs.String("module", "", "the go.mod path; defaults to the tool's name")
 	short := fs.String("short", "", "one sentence saying what the tool does")
 	dir := fs.String("dir", ".", "where to create the tool's directory")
-	tuikitPath := fs.String("tuikit", "", "what the `replace` points at; defaults to ../tuikit")
+	tuikitPath := fs.String("tuikit", "", "build against a tuikit `checkout` instead of the released module")
 	skip := fs.Bool("no-bootstrap", false, "write the files and stop, without running go")
 
 	// The name is taken before parsing, so it may come first or last. stdlib
@@ -283,7 +283,9 @@ func newsCmd(args []string) {
 	if root == "" {
 		found, ok := news.Checkout("go.mod")
 		if !ok {
-			fmt.Fprintln(os.Stderr, "tuikit news: no tuikit replace directive in ./go.mod — run this from a tool, or pass -tuikit <path>")
+			fmt.Fprintln(os.Stderr, "tuikit news: cannot find the tuikit ./go.mod builds against.\n\n"+
+				"Run this from a tool's root. If its go.mod does require tuikit, the\n"+
+				"module is not in the cache yet — `go mod download` fills it.")
 			os.Exit(2)
 		}
 		root = found

@@ -2,10 +2,10 @@
 //
 // # Why decisions and not versions
 //
-// A tool resolves tuikit through `replace github.com/richarddavenport/tuikit
-// => ../tuikit`, so there is no version, no tag and no module cache — a pull in
-// tuikit changes the tool's behavior with no upgrade event to hang release
-// notes on. Something else has to be the marker.
+// A version bump is an event, but it is not an explanation: `v0.1.1` to
+// `v0.2.0` says something moved and nothing about what. A tool built against a
+// checkout has less than that — a pull in tuikit changes its behavior with no
+// upgrade event at all. Both shapes need a marker that is neither.
 //
 // `design/decisions.md` already is one. It is numbered, append-only, and every
 // entry was written to be read by whoever comes next; the record existed and
@@ -25,6 +25,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -139,34 +140,75 @@ func Marker(path string) (int, bool) {
 	return n, err == nil
 }
 
-// replaceLine matches the go.mod directive a tool uses to resolve tuikit.
-var replaceLine = regexp.MustCompile(`(?m)^\s*replace\s+github\.com/richarddavenport/tuikit\s+=>\s+(\S+)`)
+// tuikitModule is the module path a tool depends on.
+const tuikitModule = "github.com/richarddavenport/tuikit"
 
-// Checkout finds the tuikit source a tool is actually building against, by
-// reading the replace directive out of its go.mod.
+// replaceLine matches the go.mod directive a tool generated with -tuikit uses
+// to resolve tuikit, and requireLine the ordinary dependency every other tool
+// has. Checked in that order, because a replace wins over a require in Go and
+// has to win here too.
+var (
+	replaceLine = regexp.MustCompile(`(?m)^\s*replace\s+github\.com/richarddavenport/tuikit\s+=>\s+(\S+)`)
+	requireLine = regexp.MustCompile(`(?m)^\s*(require\s+)?github\.com/richarddavenport/tuikit\s+v\S+`)
+)
+
+// Checkout finds the tuikit source a tool is actually building against.
 //
 // Asking the go.mod rather than a flag or an environment variable, because the
-// answer already exists there and cannot be wrong: it is the path the compiler
-// used. A second way to say where tuikit is, is a second way to be told about a
-// tuikit the tool does not build against.
+// answer already exists there and cannot be wrong: it is the source the
+// compiler used. A second way to say where tuikit is, is a second way to be
+// told about a tuikit the tool does not build against.
 //
-// The path is resolved relative to the go.mod, since that is what Go does.
+// Two shapes answer to that, and the ordinary one is now the second. A tool
+// generated with -tuikit has a replace pointing at a directory, resolved
+// relative to the go.mod since that is what Go does. Every other tool has an
+// ordinary versioned require, and its tuikit is the module cache — which holds
+// design/decisions.md, because a module zip carries the whole repository and
+// not only its .go files.
 func Checkout(gomod string) (string, bool) {
 	body, err := os.ReadFile(gomod) //nolint:gosec // a path the caller chose
 	if err != nil {
 		return "", false
 	}
-	m := replaceLine.FindSubmatch(body)
-	if m == nil {
+	if m := replaceLine.FindSubmatch(body); m != nil {
+		path := string(m[1])
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(filepath.Dir(gomod), path)
+		}
+		abs, err := filepath.Abs(path)
+		if err != nil {
+			return "", false
+		}
+		return abs, true
+	}
+	if !requireLine.Match(body) {
 		return "", false
 	}
-	path := string(m[1])
-	if !filepath.IsAbs(path) {
-		path = filepath.Join(filepath.Dir(gomod), path)
-	}
-	abs, err := filepath.Abs(path)
+	return module(filepath.Dir(gomod))
+}
+
+// module asks the toolchain where the required tuikit unpacked to.
+//
+// `go list -m` rather than composing GOMODCACHE with the version by hand,
+// because the version in go.mod is not necessarily the one selected — a
+// transitive requirement or a toolchain upgrade can raise it, and reporting
+// news from a tuikit the tool does not build against is the one thing this
+// package exists not to do.
+//
+// It reads the cache and does not fill it, so an answer needs the module
+// already downloaded. That is true of any repository someone has built, and
+// false in a fresh clone until `go mod download` runs — an empty Dir, which is
+// a miss here and a message from the caller.
+func module(dir string) (string, bool) {
+	cmd := exec.Command("go", "list", "-m", "-f", "{{.Dir}}", tuikitModule)
+	cmd.Dir = dir
+	out, err := cmd.Output()
 	if err != nil {
 		return "", false
 	}
-	return abs, true
+	path := strings.TrimSpace(string(out))
+	if path == "" {
+		return "", false
+	}
+	return path, true
 }

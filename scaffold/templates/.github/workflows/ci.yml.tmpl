@@ -4,16 +4,17 @@ on:
     branches: [main, master]
   pull_request:
 
-# The two checkouts are the price of go.mod's `replace ... => ../tuikit`.
-# tuikit is private and untagged, so it cannot be fetched as a module; it has to
-# be a sibling directory on the runner, which means <<.Name>> cannot be checked
-# out at the workspace root. TUIKIT_TOKEN is a PAT with read access to
+<<if .Tuikit>># The two checkouts are the price of go.mod's `replace ... => ../tuikit`,
+# which this repository was generated with. tuikit has to be a sibling
+# directory on the runner, which means <<.Name>> cannot be checked out at the
+# workspace root. TUIKIT_TOKEN is a PAT with read access to
 # richarddavenport/tuikit — GITHUB_TOKEN is scoped to this repository and will
 # not reach another one. **Until that secret exists this workflow is red for
 # that reason and not for yours.**
 #
-# All of it goes when tuikit is tagged and the replace comes out: the second
-# checkout, the paths, the working-directory, and the secret.
+# All of it goes when the replace does: the second checkout, the paths, the
+# working-directory, and the secret. tuikit is a tagged public module, so
+# dropping the replace leaves an ordinary dependency CI can just fetch.
 defaults:
   run:
     working-directory: <<.Name>>
@@ -35,16 +36,26 @@ jobs:
           # The go directive, not a number repeated here: a version in two
           # places is a version that drifts.
           go-version-file: <<.Name>>/go.mod
-      - name: gofmt
+<<else>>jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          # The go directive, not a number repeated here: a version in two
+          # places is a version that drifts.
+          go-version-file: go.mod
+<<end>>      - name: gofmt
         run: gofmt -l . | tee /dev/stderr | (! read)
       - name: vet
         run: go vet ./...
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
-        with:
+        with:<<if .Tuikit>>
           # The action runs from the workspace root whatever `defaults` says,
           # so it needs telling separately.
-          working-directory: <<.Name>>
+          working-directory: <<.Name>><<end>>
           # Pinned to the v2 line explicitly. The action's "latest" resolves to
           # v1, which is built with an older Go than this module's directive and
           # refuses to run rather than degrading.

@@ -49,13 +49,22 @@ type Tool struct {
 	// against, because a tool generated today is by definition up to date and
 	// a tool born stale would report news it has no history with.
 	Decision int
-	// Tuikit is the path a `replace` points at.
+	// Tuikit is the path a `replace` points at, and empty in the ordinary
+	// case.
 	//
-	// tuikit is private and unpublished, so a generated tool needs one to
-	// build. A relative path by default, so a checkout beside tuikit works on
-	// any machine rather than only the one it was written on — which is the
-	// mistake the cloud tool's go.mod made first.
+	// tuikit is a tagged, public module, so a generated tool requires a
+	// version like any other dependency and needs nothing beside it. This is
+	// the escape hatch for the other arrangement: working on tuikit and a tool
+	// at the same time, where the tool must build against the checkout rather
+	// than the release. Set, it adds a `replace`; unset, there is none.
+	//
+	// It is never defaulted. A default of "../tuikit" is what made the
+	// scaffolder unusable for anyone without a checkout, and a flag that must
+	// be passed to be inert is a flag pointed the wrong way.
 	Tuikit string
+	// Version is the tuikit the generated go.mod requires. Defaults to the
+	// release this scaffolder was cut alongside.
+	Version string
 	// GoVersion is the go directive and the version CI installs.
 	GoVersion string
 	// Linter is the pinned golangci-lint, run through `go run` so it is the
@@ -71,8 +80,8 @@ func (t Tool) Defaults() Tool {
 	if t.Short == "" {
 		t.Short = "a tuikit tool"
 	}
-	if t.Tuikit == "" {
-		t.Tuikit = "../tuikit"
+	if t.Version == "" {
+		t.Version = tuikitVersion
 	}
 	if t.GoVersion == "" {
 		t.GoVersion = "1.25"
@@ -119,7 +128,9 @@ func (t Tool) Write(dir string) ([]string, error) {
 	if t.Decision == 0 {
 		t.Decision = t.latestDecision(root)
 	}
-	t.Tuikit = t.relativeTuikit(root)
+	if t.Tuikit != "" {
+		t.Tuikit = t.relativeTuikit(root)
+	}
 
 	names, err := files()
 	if err != nil {
@@ -172,14 +183,19 @@ func (t Tool) valid() error {
 
 // reachable checks that the `replace` will resolve, BEFORE writing anything.
 //
-// The default is a sibling checkout, which is right when you have one and
-// wrong the first time you run this anywhere else. Left to fail on its own it
-// fails four steps later, inside `go mod tidy`, as "replacement directory
-// ../tuikit does not exist" against a module the reader did not write and a
-// path they did not choose. Refusing here can say which flag fixes it.
+// Only when one was asked for. There is no replace by default, so the ordinary
+// run has nothing to reach and this returns immediately — which is the whole
+// point of the change: the check used to run against a path nobody had chosen,
+// and refused to scaffold anything for anyone without a checkout.
 //
-// It goes when tuikit is tagged, along with the replace itself.
+// When -tuikit IS passed and is wrong, left to fail on its own it fails four
+// steps later, inside `go mod tidy`, as "replacement directory does not exist"
+// against a module the reader did not write. Refusing here can say so while
+// the flag they just typed is still on screen.
 func (t Tool) reachable(root string) error {
+	if t.Tuikit == "" {
+		return nil
+	}
 	path := t.Tuikit
 	if !filepath.IsAbs(path) {
 		// Relative to the tool's own directory, because that is where go.mod
@@ -191,9 +207,9 @@ func (t Tool) reachable(root string) error {
 		return nil
 	}
 	abs, _ := filepath.Abs(path)
-	return fmt.Errorf("no tuikit checkout at %s\n\n"+
-		"tuikit is unpublished, so a generated tool resolves it from a directory\n"+
-		"on this machine. Pass -tuikit <path> to say where yours is", abs)
+	return fmt.Errorf("-tuikit %s is not a tuikit checkout\n\n"+
+		"That flag is only for building against a checkout instead of the\n"+
+		"released module. Drop it to depend on tuikit %s", abs, tuikitVersion)
 }
 
 // relativeTuikit rewrites the replace path to be relative to the generated
@@ -232,6 +248,12 @@ func (t Tool) relativeTuikit(root string) string {
 // everything. A generated tool being told too much is a bad morning; being
 // told nothing is a tool that never learns tuikit moved.
 func (t Tool) latestDecision(root string) int {
+	if t.Tuikit == "" {
+		// No checkout to read, because the ordinary tool depends on a
+		// released version rather than a directory. tuikitDecision is what
+		// that release ships, held to the real file by a test.
+		return tuikitDecision
+	}
 	path := t.Tuikit
 	if !filepath.IsAbs(path) {
 		path = filepath.Join(root, path)
@@ -245,6 +267,24 @@ func (t Tool) latestDecision(root string) int {
 
 // tuikitModule is what a checkout has to declare to be one.
 const tuikitModule = "github.com/richarddavenport/tuikit"
+
+// tuikitVersion is what a generated go.mod requires, and tuikitDecision is the
+// newest decision that version ships — the marker a generated tool is born
+// reconciled at.
+//
+// Both are constants rather than anything derived, because this binary is
+// installed with `go install ...@latest` and then run somewhere that has no
+// tuikit checkout and no git. There is nothing to read at that point but what
+// was compiled in.
+//
+// Both are held honest by tests: tuikitVersion against the newest tag, and
+// tuikitDecision against the decisions.md that version actually ships rather
+// than against this working tree, since the two differ for every commit
+// between one tag and the next. Bump them in the release commit.
+const (
+	tuikitVersion  = "v0.1.1"
+	tuikitDecision = 54
+)
 
 func (t Tool) render(name string) ([]byte, error) {
 	src, err := templates.ReadFile(name)
